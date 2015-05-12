@@ -224,7 +224,9 @@ $config['cache_path'] = '';
 | MUST set an encryption key.  See the user guide for info.
 |
 */
-$config['encryption_key'] = '';
+// NOTE: This key is not used in the application and does not need to be
+//       set to a random value.
+$config['encryption_key'] = '6308741971186634ayn7362447921874';
 
 /*
 |--------------------------------------------------------------------------
@@ -382,12 +384,8 @@ $config['rodsServerZone']      = 'tempZone';
 $config['rodsDefaultResource'] = 'demoResc1';
 $config['rodsAuthType']        = 'STANDARD'; // Either STANDARD or PAM.
 
-// This must be set to a 32-byte random value in config_local.php
-// By default, it isn't used anywhere and may be safely set to 32 zeroes.
-$config['encryption_key']      = '';
-
 if (file_exists(dirname(__FILE__) . '/config_local.php'))
-	include(dirname(__FILE__) . '/config_local.php');
+	include(    dirname(__FILE__) . '/config_local.php');
 
 // }}}
 
