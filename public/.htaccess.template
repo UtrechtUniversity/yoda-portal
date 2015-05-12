@@ -1,0 +1,20 @@
+RewriteEngine on
+
+# Rewrite everything to index.php except for robots.txt, /static and module-static directories.
+RewriteCond $1 !^(index\.php|robots\.txt|([^/]+/)?static/)
+RewriteRule ^(.*)$ index.php/$1 [L]
+
+## YODA_CODEIGNITER_ROOT: A relative path from the portal docroot to the codeigniter directory
+##                        (i.e. from /.../portal-repo/public/ to /.../codeigniter/).
+##                        No trailing slashes.
+SetEnvIf YODA_CODEIGNITER_ROOT ^$ YODA_CODEIGNITER_ROOT=../../CodeIgniter
+
+## YODA_IRODS_PHP_ROOT: A relative path from the application directory to the irods library
+##                      (i.e. from /.../portal-repo/ to /.../irods-php/).
+##                      No trailing slashes.
+SetEnvIf YODA_IRODS_PHP_ROOT ^$ YODA_IRODS_PHP_ROOT=../irods-php
+
+## CI_APPLICATION: A relative path from the codeigniter directory to the application directory
+##                 (i.e. from /.../codeigniter/ to /.../portal-repo/).
+##                 No trailing slashes.
+SetEnvIf CI_APPLICATION ^$ CI_APPLICATION=../yoda-portal
