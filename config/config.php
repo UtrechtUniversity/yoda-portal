@@ -14,6 +14,9 @@
 | path to your installation.
 |
 */
+//$config['base_url'] = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ? "https" : "http");
+//$config['base_url'] .= "://".$_SERVER['HTTP_HOST'];
+//$config['base_url'] .= str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT_NAME']);
 $config['base_url']	= '';
 
 /*
@@ -224,9 +227,9 @@ $config['cache_path'] = '';
 | MUST set an encryption key.  See the user guide for info.
 |
 */
-// NOTE: This key is not used in the application and does not need to be
-//       set to a random value.
-$config['encryption_key'] = '6308741971186634ayn7362447921874';
+// NOTE: This key must be set to a random string in your config_local.php file.
+//       Do NOT use the default value on a production server.
+//$config['encryption_key'] = '6308741971186634ayn7362447921874';
 
 /*
 |--------------------------------------------------------------------------
@@ -248,8 +251,8 @@ $config['encryption_key'] = '6308741971186634ayn7362447921874';
 */
 $config['sess_cookie_name']		= 'yoda_session';
 $config['sess_expiration']		= 7200;
-$config['sess_expire_on_close']	= FALSE;
-$config['sess_encrypt_cookie']	= FALSE;
+$config['sess_expire_on_close']	= TRUE;
+$config['sess_encrypt_cookie']	= TRUE;
 $config['sess_use_database']	= FALSE;
 $config['sess_table_name']		= 'ci_sessions';
 $config['sess_match_ip']		= FALSE;
@@ -270,7 +273,7 @@ $config['sess_time_to_update']	= 300;
 $config['cookie_prefix']	= "";
 $config['cookie_domain']	= "";
 $config['cookie_path']		= "/";
-$config['cookie_secure']	= FALSE;
+$config['cookie_secure']	= TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -295,9 +298,9 @@ $config['global_xss_filtering'] = FALSE;
 | 'csrf_cookie_name' = The cookie name
 | 'csrf_expire' = The number in seconds the token should expire.
 */
-$config['csrf_protection'] = FALSE;
-$config['csrf_token_name'] = 'csrf_test_name';
-$config['csrf_cookie_name'] = 'csrf_cookie_name';
+$config['csrf_protection'] = TRUE;
+$config['csrf_token_name'] = 'csrf_yoda';
+$config['csrf_cookie_name'] = 'csrf_yoda';
 $config['csrf_expire'] = 7200;
 
 /*
@@ -377,11 +380,15 @@ $config['modules_locations'] = array(APPPATH . 'modules/');
 // }}}
 // Yoda Portal configuration {{{
 
+// NOTE: The encryption key must be set to a random value in config_local.php,
+//       like this:
+//$config['encryption_key'] = '12345678901234567890123456789012';
+
 // These config lines may be overridden by setting them in a config_local.php file.
 $config['rodsServerAddress']   = 'localhost';
 $config['rodsServerPort']      = 1247;
 $config['rodsServerZone']      = 'tempZone';
-$config['rodsDefaultResource'] = 'demoResc1';
+$config['rodsDefaultResource'] = 'demoResc';
 $config['rodsAuthType']        = 'STANDARD'; // Either STANDARD or PAM.
 
 if (file_exists(dirname(__FILE__) . '/config_local.php'))

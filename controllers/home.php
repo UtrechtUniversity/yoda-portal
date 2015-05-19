@@ -1,6 +1,6 @@
 <?php
 
-class Home extends CI_Controller {
+class Home extends MY_Controller {
 
 	public function index() {
 		$this->load->view('common-start', array(
@@ -13,22 +13,5 @@ class Home extends CI_Controller {
 		));
 		$this->load->view('home_index');
 		$this->load->view('common-end');
-	}
-
-	public function __construct() {
-		parent::__construct();
-
-		$this->load->library('session');
-		$this->load->model('rodsuser');
-
-		if (
-			   $this->session->userdata('username') !== false
-			&& $this->session->userdata('password') !== false
-		) {
-			$this->rodsuser->getRodsAccount(
-				$this->session->userdata('username'),
-				$this->session->userdata('password')
-			);
-		}
 	}
 }

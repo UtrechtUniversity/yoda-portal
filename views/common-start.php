@@ -34,16 +34,20 @@
 ?>
 	<script>
 		$(function() {
-			YodaPortal.extend('baseUrl', '<?php echo base_url() ?>');
+			YodaPortal.extend('baseUrl', <?php echo json_encode(base_url()) ?>);
 <?php
 	if (isset($user) && isset($user['username'])) {
 ?>
 			YodaPortal.extend('user', {
-				username: '<?php echo $user['username']?>',
+				username: <?php echo json_encode($user['username']); ?>,
 			});
 <?php
 	}
 ?>
+			YodaPortal.extend('csrf', {
+				tokenName:  <?php echo json_encode($this->security->get_csrf_token_name()); ?>,
+				tokenValue: <?php echo json_encode($this->security->get_csrf_hash()); ?>
+			});
 		});
 	</script>
 <?php

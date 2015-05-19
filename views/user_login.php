@@ -5,7 +5,7 @@
 				<h3 class="panel-title">Login to Yoda</h3>
 			</div>
 			<div class="panel-body">
-				<form method="POST" class="form-horizontal" id="f-login">
+				<?php echo form_open('user/login', array('class' => 'form-horizontal')); ?>
 					<div class="form-group">
 						<label class="col-sm-3 control-label" for="f-login-username">Username</label>
 						<div class="col-sm-9">
@@ -23,7 +23,7 @@
 							<input id="f-login-submit" class="btn btn-primary" type="submit" value="Sign in" />
 						</div>
 					</div>
-				</form>
+				<?php echo form_close(); ?>
 <?php
 	if ($loginFailed) {
 ?>
