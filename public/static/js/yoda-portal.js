@@ -159,5 +159,16 @@ $(function(){
 		return str.replace(/\\/g, '\\\\').replace(/("|')/g, '\\$1');
 	});
 
+	/**
+	 * \brief Escape characters that may have a special meaning in HTML by converting them to HTML entities.
+	 *
+	 * \param str
+	 *
+	 * \return
+	 */
+	YodaPortal.extend('escapeEntities', function(str) {
+		return $('<div>').text(str).html();
+	});
+
 	YodaPortal.load();
 });
