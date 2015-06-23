@@ -2,10 +2,10 @@
 /config/config_local.php
 
 # Ignore any symlinks to module document roots.
-/public/
+/public/*
 !/public/.htaccess.template
 !/public/index.php
-!/public/static
+!/public/static/
 
 /modules/
 
