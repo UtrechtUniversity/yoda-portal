@@ -7,6 +7,10 @@
  * with HttpOnly enabled.
  */
 class MY_Session extends CI_Session {
+	function __construct($params = array()) {
+		parent::__construct($params);
+	}
+
 	/**
 	 * Write the session cookie
 	 *

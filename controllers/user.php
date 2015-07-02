@@ -1,6 +1,6 @@
 <?php
 
-class User extends CI_Controller {
+class User extends MY_Controller {
 
 	public function login() {
 		$this->session->unset_userdata('username');
