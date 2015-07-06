@@ -38,8 +38,10 @@ class MY_Controller extends CI_Controller {
 		}
 
 		// Require a valid login for all pages except Home and User/Login.
-		if (!in_array(uri_string(), array('user/login', '')) && !$this->rodsuser->isLoggedIn())
-			redirect('user/login');
+		if (!in_array(uri_string(), array('user/login', '')) && !$this->rodsuser->isLoggedIn()) {
+			$this->session->set_flashdata('redirect_after_login', uri_string());
+			redirect('user/login', 'refresh');
+		}
 
 		// Disable caching.
 		$this->output->set_header('Pragma: no-cache');
