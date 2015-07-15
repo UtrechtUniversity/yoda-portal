@@ -37,6 +37,18 @@ class MY_Controller extends CI_Controller {
 			);
 		}
 
+		# XXX: FIXME: TEMPORARY HACK.
+		# Reloading the config is apparently required for HMVC modules that have their own config directory.
+		# However, reloading the config in the main application causes some strange problems.
+		#
+		# 1) Find out if there's a better method for finding out whether the current controller is a module or a main controller.
+		# 2) Figure out why reloading the config is needed (is this an issue with the HMVC plugin or how we implement it?)
+		#
+		# Reload the config if the current controller resides in the modules directory.
+		$reflector = new ReflectionClass($this);
+		if (strstr($reflector->getFilename(), '/modules/') !== false)
+			$this->load->config('config');
+
 		// Require a valid login for all pages except Home and User/Login.
 		if (!in_array(uri_string(), array('user/login', '')) && !$this->rodsuser->isLoggedIn()) {
 			$this->session->set_flashdata('redirect_after_login', uri_string());
