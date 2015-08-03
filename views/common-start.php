@@ -65,7 +65,7 @@
 	</div>
 	<div class="auth-action pull-right">
 		<?php if (isset($user) && isset($user['username'])) { ?>
-		<a class="logout text-right" href="<?php echo base_url('user/logout')?>">Log out <?php echo $user['username']?></a>
+		<a class="logout text-right" href="<?php echo base_url('user/logout')?>">Log out <?php echo htmlentities($user['username']) ?></a>
 		<?php } else { ?>
 		<a class="btn btn-primary text-right " href="<?php echo base_url('user/login')?>">Sign in</a>
 		<?php } ?>
