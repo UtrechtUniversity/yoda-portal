@@ -33,7 +33,7 @@
 
 <div class="container-fluid portal-chooser">
 	<div class="row">
-		<div class="col-xs-12 col-md-2">
+		<div class="col-xs-12 col-md-0">
 		</div>
 <?php
 

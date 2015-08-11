@@ -1,6 +1,6 @@
 <?php
 
-class User extends CI_Controller {
+class User extends MY_Controller {
 
 	public function login() {
 		$this->session->unset_userdata('username');
@@ -21,11 +21,19 @@ class User extends CI_Controller {
 				$this->session->set_userdata('username', $username);
 				$this->session->set_userdata('password', $password);
 				// TODO: Set iRODS temporary password instead.
-				redirect('home');
+
+				$redirectTarget = $this->session->flashdata('redirect_after_login');
+				if ($redirectTarget === false)
+					redirect('home');
+				else
+					redirect($redirectTarget);
 			} else {
 				$loginFailed = true;
 			}
 		}
+
+		$this->session->keep_flashdata('redirect_after_login');
+
 		$this->load->view('common-start', array(
 			 'styleIncludes' => array(),
 			'scriptIncludes' => array('js/login.js'),

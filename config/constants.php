@@ -42,6 +42,10 @@ $YODA_MODULES = array(
 		'label'      => 'Intake Area',
 		'icon_class' => 'glyphicon glyphicon-saved',
 	),
+	'intake/reports' => array(
+		'label'      => 'Reports',
+		'icon_class' => 'glyphicon glyphicon-stats'
+	),
 	'group-manager' => array(
 		'label'      => 'Group Manager',
 		'icon_class' => 'glyphicon glyphicon-user'

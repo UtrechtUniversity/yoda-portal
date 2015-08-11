@@ -273,7 +273,8 @@ $config['sess_time_to_update']	= 300;
 $config['cookie_prefix']	= "";
 $config['cookie_domain']	= "";
 $config['cookie_path']		= "/";
-$config['cookie_secure']	= TRUE;
+// Enable HTTPS-only cookies in any environment other than development.
+$config['cookie_secure']	= ENVIRONMENT !== 'development';
 
 /*
 |--------------------------------------------------------------------------

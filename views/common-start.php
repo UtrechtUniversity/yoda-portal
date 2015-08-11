@@ -7,6 +7,7 @@
 	<link rel="stylesheet" href="<?php echo base_url('/static/lib/bootstrap/css/bootstrap.min.css')?>">
 	<link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2.css')?>">
 	<link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2-bootstrap.min.css')?>">
+	<link rel="stylesheet" href="<?php echo base_url('/static/css/yoda-portal.css')?>">
 <?php
 	$moduleBase = base_url($this->router->module);
 
@@ -56,7 +57,22 @@
 </head>
 <body>
 
-<nav class="navbar navbar-default navbar-static-top">
+<div class="brandbar container">
+	<div class="logo pull-left">
+		<a href="http://www.uu.nl">
+			<img src="<?php echo base_url('/static/img/logo-uu.svg')?>">
+		</a>
+	</div>
+	<div class="auth-action pull-right">
+		<?php if (isset($user) && isset($user['username'])) { ?>
+		<a class="logout text-right" href="<?php echo base_url('user/logout')?>">Log out <?php echo htmlentities($user['username']) ?></a>
+		<?php } else { ?>
+		<a class="btn btn-primary text-right " href="<?php echo base_url('user/login')?>">Sign in</a>
+		<?php } ?>
+	</div>
+</div>
+
+<nav class="navbar navbar-inverse navbar-static-top">
 	<div class="container">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -85,15 +101,6 @@
 	}
 ?>
 			</ul>
-			<?php if (isset($user) && isset($user['username'])) { ?>
-			<div class="navbar-form navbar-right">
-				<a class="logout" href="<?php echo base_url('user/logout')?>">Log out <?php echo $user['username']?></a>
-			</div>
-			<?php } else { ?>
-			<div class="navbar-form navbar-right">
-				<a class="btn btn-primary" href="<?php echo base_url('user/login')?>">Sign in</a>
-			</div>
-			<?php } ?>
 		</div>
 	</div>
 </nav>
