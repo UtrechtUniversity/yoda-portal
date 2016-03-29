@@ -1,4 +1,4 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * Reads modules from the modules directory.
@@ -56,9 +56,9 @@ class Menu {
 				$conf = $f . "/config/module.php";
 				if (is_file($conf))
 				{
-					array_push($menu_array, $this->get_conf_from_file($conf));
+					array_push($menu_array, $this->get_conf_from_file($conf, $module));
 				} else {
-					array_push($menu_array, $this->guess_conf_from_module($f));
+					array_push($menu_array, $this->guess_conf_from_module($module));
 				}
 			}
 		}
@@ -72,10 +72,22 @@ class Menu {
 	 * @param 	$file	Configuration file path
 	 * @return 			Module configuration array
 	 */
-	private function get_conf_from_file($file)
+	private function get_conf_from_file($file, $module_name)
 	{
 		$module = array();
+
+		// Read config file for module
 		require_once($file);
+		
+		if(!array_key_exists("name", $module))
+			$module["name"] = $module_name;
+		if(!array_key_exists("label", $module))
+			$module["label"] = $this->guess_label_from_module_name($module_name);
+		if(!array_key_exists("glyph", $module))
+			$module["glyph"] = $this->ci->config->item("default_glyphicon");
+		if(!array_key_exists("menu_order", $module))
+			$module["menu_order"] = $this->ci->config->item("default_menu_prevalence");
+		
 		return $module;
 	}
 
@@ -85,10 +97,34 @@ class Menu {
 	 * @param 	$module 	Module directory path
 	 * @return 				Module configuration array
 	 */
-	private function guess_conf_from_module($module)
+	private function guess_conf_from_module($module_name)
 	{
+		$module = array(
+				"name" => $module_name,
+				"label" => $this->guess_label_from_module_name($module_name),
+				"glyph" => $this->ci->config->item("default_glyphicon"),
+				"menu_order" => $this->ci->config->item("default_menu_prevalence"),
+				);
+		return $module;
+	}
 
-		return "";
+	/**
+	 * Guesses the label for a module from the module directory name,
+	 * by replacing all non-word and non-number characters with a
+	 * space and capitalizing each word
+	 * @param $module_name 		The modules directory name
+	 * @return 					Guessed label for module
+	 */
+	private function guess_label_from_module_name($module_name)
+	{
+		$words = preg_split("/(?=[A-Z\d])|[-_ ]/", $module_name);
+		$newWords = array();
+		foreach($words as $word)
+		{
+			array_push($newWords, ucfirst($word));
+		}
+
+		return join(' ', $newWords);
 	}
 
 	/**

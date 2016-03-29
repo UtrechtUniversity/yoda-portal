@@ -39,6 +39,19 @@ Include your routing in the modules routing.php file (located in **config/routes
 
 Menu items for your module will refer to the module name, so it is important to resolve this uri in your routing table.
 
+### Helping your user
+An example file of the config/module.php file is provided in this directory (with the same examples used as above, look for the **module.php** file). This file is especially
+useful because of its content description and user guide, so copy the file to your own module.
+
+Make sure to add the following line to your .gitignore:
+
+	/config/module_local.php
+
+This way, your settings can be overrided.
+
+Because your routes.php contains a reference to how you called this directory, you have to make sure the person who adds this module to the Yoda Portal
+knows to name the directory the same way. Therefor, provide an example call to add the module to the portal, which includes the git repositry and the intended name of the directory. Anybody should be able to just copy this line and have it work (see **adding the Module** for examples).
+
 Adding the Module
 -----------------
 To add the module, open the shell in the Yoda Portal root. Find the git URL of the module and run the **tools/add-module.sh** script, with the git url as the first argument, and the name defined in $module["name"] as the second:
