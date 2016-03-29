@@ -34,7 +34,6 @@
 <div class="container-fluid portal-chooser">
 	<?php foreach($modules as $mod):?>
 		<div class="row">
-			<div class="col-xs-12 col-md-0"></div>
 		<?php
 			$md_size = round(12 / sizeof($mod));
 			foreach ($mod as $moduleName => $module):

@@ -41,7 +41,5 @@
 $route['default_controller'] = "home";
 $route['404_override'] = '';
 
-$route['group-manager'] = "group-manager/group_manager";
-
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

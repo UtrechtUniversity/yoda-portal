@@ -3,10 +3,7 @@
 class Home extends MY_Controller {
 
 	public function index() {
-
-		// Todo: using 'global' is not very CodeIgniter-ish
-		global $YODA_MODULES;
-		$mods = $this->split_modules($YODA_MODULES);
+		$mods = $this->split_modules($this->menu->getModules());
 
 		$this->load->view(
 			'common-start', 
