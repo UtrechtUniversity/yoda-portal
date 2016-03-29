@@ -50,7 +50,45 @@ $YODA_MODULES = array(
 		'label'      => 'Group Manager',
 		'icon_class' => 'glyphicon glyphicon-user'
 	),
+	'group-manager2' => array(
+		'label'      => 'Group Manager',
+		'icon_class' => 'glyphicon glyphicon-user'
+	),
+	'group-manager3' => array(
+		'label'      => 'Group Manager',
+		'icon_class' => 'glyphicon glyphicon-user'
+	),
+	// 'group-manager4' => array(
+	// 	'label'      => 'Group Manager',
+	// 	'icon_class' => 'glyphicon glyphicon-user'
+	// ),
+	// 'group-manager5' => array(
+	// 	'label'      => 'Group Manager',
+	// 	'icon_class' => 'glyphicon glyphicon-user'
+	// ),
+	// 'group-manager6' => array(
+	// 	'label'      => 'Group Manager',
+	// 	'icon_class' => 'glyphicon glyphicon-user'
+	// ),
+	// 'group-manager7' => array(
+	// 	'label'      => 'Group Manager',
+	// 	'icon_class' => 'glyphicon glyphicon-user'
+	// ),
+	// 'group-manager8' => array(
+	// 	'label'      => 'Group Manager',
+	// 	'icon_class' => 'glyphicon glyphicon-user'
+	// ),
+	// 'group-manage9' => array(
+	// 	'label'      => 'Group Manager',
+	// 	'icon_class' => 'glyphicon glyphicon-user'
+	// ),
+	// 'group-manager10' => array(
+	// 	'label'      => 'Group Manager',
+	// 	'icon_class' => 'glyphicon glyphicon-user'
+	// ),
 );
+
+$config['YODA_MODULES'] = $YODA_MODULES;
 
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

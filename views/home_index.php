@@ -32,32 +32,30 @@
 </style>
 
 <div class="container-fluid portal-chooser">
-	<div class="row">
-		<div class="col-xs-12 col-md-0">
+	<?php foreach($modules as $mod):?>
+		<div class="row">
+			<div class="col-xs-12 col-md-0"></div>
+		<?php
+			$md_size = round(12 / sizeof($mod));
+			foreach ($mod as $moduleName => $module):
+		?>
+			<div class="col-xs-12 col-md-<?=$md_size;?>">
+				<a href="<?php echo base_url($moduleName)?>">
+					<div class="well">
+						<span class="<?php echo $module['icon_class']?>" aria-hidden="true"></span>
+						<?php echo $module['label']?>
+					</div>
+				</a>
+			</div>
+		<?php endforeach;?>
 		</div>
-<?php
-
-	global $YODA_MODULES; // FIXME.
-
-	foreach ($YODA_MODULES as $moduleName => $module) {
-?>
-		<div class="col-xs-12 col-md-4">
-			<a href="<?php echo base_url($moduleName)?>">
-				<div class="well">
-					<span class="<?php echo $module['icon_class']?>" aria-hidden="true"></span>
-					<?php echo $module['label']?>
-				</div>
-			</a>
-		</div>
-<?php
-	}
-?>
-	</div>
+	<?php endforeach; ?>
 </div>
+
 <div class="jumbotron">
 	<h1>Welcome to Yoda!</h1>
 	<p>
 		Yoda is a share-collaborate environment for research data.
 	</p>
-	<!--<a class="btn btn-default" href="#">Learn more</a>-->
+	<!-- <a class="btn btn-default" href="#">Learn more</a> -->
 </div>
