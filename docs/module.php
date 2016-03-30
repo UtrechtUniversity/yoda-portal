@@ -55,10 +55,10 @@
 | although this won't be harmful.
 */
 
-$module['name'] 		= "group-manager";
-$module['label'] 		= "Group Manager";
+$module['name'] 		= "module-name";
+$module['label'] 		= "Module Name";
 $module['glyph'] 		= "user";
-$module['menu_order'] 	= 100;
+$module['menu_order'] 	= 30;
 
 if (file_exists(dirname(__FILE__) . '/module_local.php'))
 	include(    dirname(__FILE__) . '/module_local.php');
