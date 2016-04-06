@@ -22,8 +22,7 @@ class Menu {
 	 * menu (i.e. same as used to be in constants.php)
 	 * @return 		List of modules prepared for menu
 	 */
-	public function getModules()
-	{
+	public function getModules() {
 		return $this->modules;
 	}
 
@@ -32,8 +31,7 @@ class Menu {
 	 * module
 	 * @return 		Array of configurations for modules
 	 */
-	public function getModuleConfiguration()
-	{
+	public function getModuleConfiguration() {
 		return $this->module_configs;
 	}
 
@@ -45,17 +43,14 @@ class Menu {
 	 * guess is made
 	 * @return 		array of module configurations
 	 */
-	private function read_modules_from_files()
-	{
+	private function read_modules_from_files() {
 		$menu_array = array();
 		$modules = scandir($this->module_dir);
-		foreach($modules as $module){
+		foreach($modules as $module) {
 			$f = $this->module_dir . "/" . $module;
-			if(is_dir($f) && $module != "." && $module != "..")
-			{
+			if(is_dir($f) && $module != "." && $module != "..") {
 				$conf = $f . "/config/module.php";
-				if (is_file($conf))
-				{
+				if (is_file($conf)) {
 					array_push($menu_array, $this->get_conf_from_file($conf, $module));
 				} else {
 					array_push($menu_array, $this->guess_conf_from_module($module));
@@ -72,8 +67,7 @@ class Menu {
 	 * @param 	$file	Configuration file path
 	 * @return 			Module configuration array
 	 */
-	private function get_conf_from_file($file, $module_name)
-	{
+	private function get_conf_from_file($file, $module_name) {
 		$module = array();
 
 		// Read config file for module
@@ -97,13 +91,12 @@ class Menu {
 	 * @param 	$module 	Module directory path
 	 * @return 				Module configuration array
 	 */
-	private function guess_conf_from_module($module_name)
-	{
+	private function guess_conf_from_module($module_name) {
 		$module = array(
-				"name" => $module_name,
-				"label" => $this->guess_label_from_module_name($module_name),
-				"glyph" => $this->ci->config->item("default_glyphicon"),
-				"menu_order" => $this->ci->config->item("default_menu_prevalence"),
+					"name" => $module_name,
+					"label" => $this->guess_label_from_module_name($module_name),
+					"glyph" => $this->ci->config->item("default_glyphicon"),
+					"menu_order" => $this->ci->config->item("default_menu_prevalence"),
 				);
 		return $module;
 	}
@@ -115,12 +108,10 @@ class Menu {
 	 * @param $module_name 		The modules directory name
 	 * @return 					Guessed label for module
 	 */
-	private function guess_label_from_module_name($module_name)
-	{
+	private function guess_label_from_module_name($module_name) {
 		$words = preg_split("/(?=[A-Z\d])|[-_ ]/", $module_name);
 		$newWords = array();
-		foreach($words as $word)
-		{
+		foreach($words as $word) {
 			array_push($newWords, ucfirst($word));
 		}
 
@@ -133,13 +124,11 @@ class Menu {
 	 * @param 	$module_list 	(Unsorted) list of modules
 	 * @return 					Ordered array of menu items
 	 */
-	private function prepare_yoda_modules($module_list)
-	{
+	private function prepare_yoda_modules($module_list) {
 		$ord_mod_list = $this->sort_by_menu_prevalence($module_list);
 		$menu = array();
 
-		foreach($ord_mod_list as $module)
-		{
+		foreach($ord_mod_list as $module) {
 			$menu[$module['name']] = array(
 					"label" => $module["label"],
 					"icon_class" => "glyphicon glyphicon-" . $module['glyph']
@@ -155,17 +144,13 @@ class Menu {
 	 * @param 		Array of menu entries
 	 * @return 		Param sorted by menu prevalence
 	 */
-	private function sort_by_menu_prevalence($arr)
-	{
+	private function sort_by_menu_prevalence($arr) {
 		$prevalence = array();
-		foreach($arr as $k => $a)
-		{
+		foreach($arr as $k => $a) {
 			$prevalence[$k] = $a['menu_order'];
 		}
 		array_multisort($prevalence, SORT_ASC, $arr);
 		return $arr;
 	}
-
-
 	
 }

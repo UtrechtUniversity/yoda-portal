@@ -30,8 +30,7 @@ class Home extends MY_Controller {
 	 * @param 	$modules 	Array of items
 	 * @return 				Array of array of items
 	 */
-	function split_modules($modules)
-	{
+	function split_modules($modules) {
 		$result = array();
 		$mod_size = sizeof($modules);
 		
