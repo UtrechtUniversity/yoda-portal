@@ -9,7 +9,7 @@ class Menu {
 	private $ci;
 	private $modules;
 	private $module_configs;
-	private static $module_dir;
+	private $module_dir;
 
 	function __construct() {
 		$this->ci =& get_instance();
