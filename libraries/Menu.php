@@ -81,6 +81,8 @@ class Menu {
 			$module["glyph"] = $this->ci->config->item("default_glyphicon");
 		if(!array_key_exists("menu_order", $module))
 			$module["menu_order"] = $this->ci->config->item("default_menu_prevalence");
+		if(!array_key_exists("hide_menu", $module))
+			$module["hide_menu"] = false;
 		
 		return $module;
 	}
@@ -97,6 +99,7 @@ class Menu {
 					"label" => $this->guess_label_from_module_name($module_name),
 					"glyph" => $this->ci->config->item("default_glyphicon"),
 					"menu_order" => $this->ci->config->item("default_menu_prevalence"),
+					"hide_menu"	=> false,
 				);
 		return $module;
 	}
@@ -129,10 +132,11 @@ class Menu {
 		$menu = array();
 
 		foreach($ord_mod_list as $module) {
-			$menu[$module['name']] = array(
-					"label" => $module["label"],
-					"icon_class" => "glyphicon glyphicon-" . $module['glyph']
-				);
+			if(!$module['hide_menu'])
+				$menu[$module['name']] = array(
+						"label" => $module["label"],
+						"icon_class" => "glyphicon glyphicon-" . $module['glyph']
+					);
 		}
 
 		return $menu;
