@@ -46,7 +46,7 @@ class Menu {
 	private function read_modules_from_files() {
 		$menu_array = array();
 		$modules = scandir($this->module_dir);
-		if(sizeof($modules) > 0) {
+		if($modules && sizeof($modules) > 0) {
 			foreach($modules as $module) {
 				$f = $this->module_dir . "/" . $module;
 				if(is_dir($f) && $module != "." && $module != "..") {

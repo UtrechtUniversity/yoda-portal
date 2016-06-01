@@ -33,11 +33,11 @@
 
 <div class="container-fluid portal-chooser">
 	<?php 
-	if(sizeof($modules) > 0):
+	if($modules && sizeof($modules) > 0):
 		foreach($modules as $mod):?>
 			<div class="row">
 			<?php
-				if(sizeof($mod) > 0):
+				if($mod && sizeof($mod) > 0):
 					$md_size = round(12 / sizeof($mod));
 					foreach ($mod as $moduleName => $module):
 				?>
