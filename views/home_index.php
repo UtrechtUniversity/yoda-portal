@@ -37,18 +37,21 @@
 		foreach($modules as $mod):?>
 			<div class="row">
 			<?php
-				$md_size = round(12 / sizeof($mod));
-				foreach ($mod as $moduleName => $module):
-			?>
-				<div class="col-xs-12 col-md-<?=$md_size;?>">
-					<a href="<?php echo base_url($moduleName)?>">
-						<div class="well">
-							<span class="<?php echo $module['icon_class']?>" aria-hidden="true"></span>
-							<?php echo $module['label']?>
-						</div>
-					</a>
-				</div>
-			<?php endforeach;?>
+				if(sizeof($mod) > 0):
+					$md_size = round(12 / sizeof($mod));
+					foreach ($mod as $moduleName => $module):
+				?>
+					<div class="col-xs-12 col-md-<?=$md_size;?>">
+						<a href="<?php echo base_url($moduleName)?>">
+							<div class="well">
+								<span class="<?php echo $module['icon_class']?>" aria-hidden="true"></span>
+								<?php echo $module['label']?>
+							</div>
+						</a>
+					</div>
+			<?php 
+				endforeach;
+			endif;?>
 			</div>
 		<?php 
 		endforeach; 
