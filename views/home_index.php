@@ -32,23 +32,27 @@
 </style>
 
 <div class="container-fluid portal-chooser">
-	<?php foreach($modules as $mod):?>
-		<div class="row">
-		<?php
-			$md_size = round(12 / sizeof($mod));
-			foreach ($mod as $moduleName => $module):
-		?>
-			<div class="col-xs-12 col-md-<?=$md_size;?>">
-				<a href="<?php echo base_url($moduleName)?>">
-					<div class="well">
-						<span class="<?php echo $module['icon_class']?>" aria-hidden="true"></span>
-						<?php echo $module['label']?>
-					</div>
-				</a>
+	<?php 
+	if(sizeof($modules) > 0):
+		foreach($modules as $mod):?>
+			<div class="row">
+			<?php
+				$md_size = round(12 / sizeof($mod));
+				foreach ($mod as $moduleName => $module):
+			?>
+				<div class="col-xs-12 col-md-<?=$md_size;?>">
+					<a href="<?php echo base_url($moduleName)?>">
+						<div class="well">
+							<span class="<?php echo $module['icon_class']?>" aria-hidden="true"></span>
+							<?php echo $module['label']?>
+						</div>
+					</a>
+				</div>
+			<?php endforeach;?>
 			</div>
-		<?php endforeach;?>
-		</div>
-	<?php endforeach; ?>
+		<?php 
+		endforeach; 
+	endif;?>
 </div>
 
 <div class="jumbotron">

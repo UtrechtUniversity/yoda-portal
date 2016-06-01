@@ -46,20 +46,22 @@ class Menu {
 	private function read_modules_from_files() {
 		$menu_array = array();
 		$modules = scandir($this->module_dir);
-		foreach($modules as $module) {
-			$f = $this->module_dir . "/" . $module;
-			if(is_dir($f) && $module != "." && $module != "..") {
-				$conf = $f . "/config/module.php";
-				if (is_file($conf)) {
-					array_push($menu_array, $this->get_conf_from_file($conf, $module));
-				} else {
-					array_push($menu_array, $this->guess_conf_from_module($module));
+		if(sizeof($modules) > 0) {
+			foreach($modules as $module) {
+				$f = $this->module_dir . "/" . $module;
+				if(is_dir($f) && $module != "." && $module != "..") {
+					$conf = $f . "/config/module.php";
+					if (is_file($conf)) {
+						array_push($menu_array, $this->get_conf_from_file($conf, $module));
+					} else {
+						array_push($menu_array, $this->guess_conf_from_module($module));
+					}
 				}
 			}
+			$this->modules = $this->prepare_yoda_modules($menu_array);
 		}
 
 		$this->module_configs = $menu_array;
-		$this->modules = $this->prepare_yoda_modules($menu_array);
 	}
 
 	/**
