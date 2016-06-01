@@ -88,17 +88,19 @@
 		</div>
 		<div id="navbar" class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
-				<?php 
-				foreach($module_items as $moduleName => $module): 
-					$active = (isset($activeModule) && $activeModule === $moduleName);
+				<?php
+				if($module_items && sizeof($module_items) > 0):
+					foreach($module_items as $moduleName => $module): 
+						$active = (isset($activeModule) && $activeModule === $moduleName);
 				?>
-					<li class="<?php echo $active ? 'active' : ''?>">
-						<a href="<?php echo base_url($moduleName)?>">
-							<?php echo htmlentities($module['label'])?>
-						</a>
-					</li>
+						<li class="<?php echo $active ? 'active' : ''?>">
+							<a href="<?php echo base_url($moduleName)?>">
+								<?php echo htmlentities($module['label'])?>
+							</a>
+						</li>
 				<?php 
-				endforeach; 
+					endforeach;
+				endif;
 				?>
 			</ul>
 		</div>

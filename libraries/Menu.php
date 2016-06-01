@@ -13,7 +13,7 @@ class Menu {
 
 	function __construct() {
 		$this->ci =& get_instance();
-		$this->module_dir = $_SERVER['DOCUMENT_ROOT'] . "/" . $_SERVER["CI_APPLICATION"] . "/modules";
+		$this->module_dir = $_SERVER['DOCUMENT_ROOT'] . "/" . $_SERVER["CI_APPLICATION"] . "/modules2";
 		$this->read_modules_from_files();
 	}
 
@@ -45,7 +45,7 @@ class Menu {
 	 */
 	private function read_modules_from_files() {
 		$menu_array = array();
-		$modules = scandir($this->module_dir);
+		$modules = @scandir($this->module_dir);
 		if($modules && sizeof($modules) > 0) {
 			foreach($modules as $module) {
 				$f = $this->module_dir . "/" . $module;
