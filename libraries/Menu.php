@@ -13,7 +13,7 @@ class Menu {
 
 	function __construct() {
 		$this->ci =& get_instance();
-		$this->module_dir = $_SERVER['DOCUMENT_ROOT'] . "/" . $_SERVER["CI_APPLICATION"] . "/modules2";
+		$this->module_dir = $_SERVER['DOCUMENT_ROOT'] . "/" . $_SERVER["CI_APPLICATION"] . "/modules";
 		$this->read_modules_from_files();
 	}
 
