@@ -31,6 +31,11 @@
 }
 </style>
 
+<?php
+if (file_exists(dirname(__FILE__) . '/../public/static/static_frontpage.php')) {
+	include(    dirname(__FILE__) . '/../public/static/static_frontpage.php');
+} else {
+?>
 <div class="container-fluid portal-chooser">
 <?php 
 	if($modules && sizeof($modules) > 0) {
@@ -68,3 +73,6 @@
 	</p>
 	<!-- <a class="btn btn-default" href="#">Learn more</a> -->
 </div>
+<?php 
+}
+?>
