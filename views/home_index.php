@@ -51,7 +51,7 @@ if (file_exists(dirname(__FILE__) . '/../public/static/static_frontpage.php')) {
 						<a href="<?php echo base_url($moduleName)?>">
 							<div class="well">
 								<span class="<?php echo $module['icon_class']?>" aria-hidden="true"></span>
-								<?php echo $module['label']?>
+								<?php echo htmlentities($module['label'])?>
 							</div>
 						</a>
 					</div>
