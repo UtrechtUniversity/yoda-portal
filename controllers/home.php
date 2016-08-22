@@ -3,7 +3,7 @@
 class Home extends MY_Controller {
 
 	public function index() {
-		$mods = $this->split_modules($this->menu->getModules());
+		$mods = $this->splitModules($this->menu->getModules());
 
 		$this->load->view(
 			'common-start', 
@@ -30,7 +30,7 @@ class Home extends MY_Controller {
 	 * @param 	$modules 	Array of items
 	 * @return 				Array of array of items
 	 */
-	function split_modules($modules) {
+	function splitModules($modules) {
 		$result = array();
 		$mod_size = sizeof($modules);
 		
@@ -40,8 +40,8 @@ class Home extends MY_Controller {
 		else {
 			// Split intelligently in multiple rows
 			$half = round(sizeof($modules) / 2);
-			$result = $this->split_modules(array_slice($modules, 0, $half));
-			$result = array_merge($result, $this->split_modules(array_slice($modules,$half)));
+			$result = $this->splitModules(array_slice($modules, 0, $half));
+			$result = array_merge($result, $this->splitModules(array_slice($modules,$half)));
 		}
 
 		return $result;

@@ -8,13 +8,13 @@ class Menu {
 
 	private $ci;
 	private $modules;
-	private $module_configs;
-	private $module_dir;
+	private $moduleConfigs;
+	private $moduleDir;
 
 	function __construct() {
 		$this->ci =& get_instance();
-		$this->module_dir = realpath(dirname(__FILE__) . "/../modules");
-		$this->read_modules_from_files();
+		$this->moduleDir = realpath(dirname(__FILE__) . "/../modules");
+		$this->readModulesFromFiles();
 	}
 
 	/**
@@ -32,7 +32,7 @@ class Menu {
 	 * @return 		Array of configurations for modules
 	 */
 	public function getModuleConfiguration() {
-		return $this->module_configs;
+		return $this->moduleConfigs;
 	}
 
 	/**
@@ -43,25 +43,25 @@ class Menu {
 	 * guess is made
 	 * @return 		array of module configurations
 	 */
-	private function read_modules_from_files() {
-		$menu_array = array();
-		$modules = @scandir($this->module_dir);
+	private function readModulesFromFiles() {
+		$menuArray = array();
+		$modules = @scandir($this->moduleDir);
 		if($modules && sizeof($modules) > 0) {
 			foreach($modules as $module) {
-				$f = $this->module_dir . "/" . $module;
+				$f = $this->moduleDir . "/" . $module;
 				if(is_dir($f) && $module != "." && $module != "..") {
 					$conf = $f . "/config/module.php";
 					if (is_file($conf)) {
-						array_push($menu_array, $this->get_conf_from_file($conf, $module));
+						array_push($menuArray, $this->getConfFromFile($conf, $module));
 					} else {
-						array_push($menu_array, $this->guess_conf_from_module($module));
+						array_push($menuArray, $this->guessConfFromModule($module));
 					}
 				}
 			}
-			$this->modules = $this->prepare_yoda_modules($menu_array);
+			$this->modules = $this->prepareYodaModules($menuArray);
 		}
 
-		$this->module_configs = $menu_array;
+		$this->moduleConfigs = $menuArray;
 	}
 
 	/**
@@ -69,16 +69,16 @@ class Menu {
 	 * @param 	$file	Configuration file path
 	 * @return 			Module configuration array
 	 */
-	private function get_conf_from_file($file, $module_name) {
+	private function getConfFromFile($file, $moduleName) {
 		$module = array();
 
 		// Read config file for module
 		require_once($file);
 		
 		if(!array_key_exists("name", $module))
-			$module["name"] = $module_name;
+			$module["name"] = $moduleName;
 		if(!array_key_exists("label", $module))
-			$module["label"] = $this->guess_label_from_module_name($module_name);
+			$module["label"] = $this->guessLabelFromModuleName($moduleName);
 		if(!array_key_exists("glyph", $module))
 			$module["glyph"] = $this->ci->config->item("default_glyphicon");
 		if(!array_key_exists("menu_order", $module))
@@ -95,10 +95,10 @@ class Menu {
 	 * @param 	$module 	Module directory path
 	 * @return 				Module configuration array
 	 */
-	private function guess_conf_from_module($module_name) {
+	private function guessConfFromModule($moduleName) {
 		$module = array(
-					"name" => $module_name,
-					"label" => $this->guess_label_from_module_name($module_name),
+					"name" => $moduleName,
+					"label" => $this->guessLabelFromModuleName($moduleName),
 					"glyph" => $this->ci->config->item("default_glyphicon"),
 					"menu_order" => $this->ci->config->item("default_menu_prevalence"),
 					"hide_menu"	=> false,
@@ -110,11 +110,11 @@ class Menu {
 	 * Guesses the label for a module from the module directory name,
 	 * by replacing all non-word and non-number characters with a
 	 * space and capitalizing each word
-	 * @param $module_name 		The modules directory name
+	 * @param $moduleName 		The modules directory name
 	 * @return 					Guessed label for module
 	 */
-	private function guess_label_from_module_name($module_name) {
-		$words = preg_split("/(?=[A-Z\d])|[-_ ]/", $module_name);
+	private function guessLabelFromModuleName($moduleName) {
+		$words = preg_split("/(?=[A-Z\d])|[-_ ]/", $moduleName);
 		$newWords = array();
 		foreach($words as $word) {
 			array_push($newWords, ucfirst($word));
@@ -126,14 +126,14 @@ class Menu {
 	/**
 	 * Method to prepare the configuration array for the yoda
 	 * menu as it used to be defined in the constants.php
-	 * @param 	$module_list 	(Unsorted) list of modules
+	 * @param 	$moduleList 	(Unsorted) list of modules
 	 * @return 					Ordered array of menu items
 	 */
-	private function prepare_yoda_modules($module_list) {
-		$ord_mod_list = $this->sort_by_menu_prevalence($module_list);
+	private function prepareYodaModules($moduleList) {
+		$orderedModulesList = $this->sortByMenuPrevalence($moduleList);
 		$menu = array();
 
-		foreach($ord_mod_list as $module) {
+		foreach($orderedModulesList as $module) {
 			if(!$module['hide_menu'])
 				$menu[$module['name']] = array(
 						"label" => $module["label"],
@@ -150,7 +150,7 @@ class Menu {
 	 * @param 		Array of menu entries
 	 * @return 		Param sorted by menu prevalence
 	 */
-	private function sort_by_menu_prevalence($arr) {
+	private function sortByMenuPrevalence($arr) {
 		$prevalence = array();
 		foreach($arr as $k => $a) {
 			$prevalence[$k] = $a['menu_order'];

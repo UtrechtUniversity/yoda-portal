@@ -32,15 +32,16 @@
 </style>
 
 <div class="container-fluid portal-chooser">
-	<?php 
-	if($modules && sizeof($modules) > 0):
-		foreach($modules as $mod):?>
+<?php 
+	if($modules && sizeof($modules) > 0) {
+		foreach($modules as $mod) {
+?>
 			<div class="row">
-			<?php
-				if($mod && sizeof($mod) > 0):
+<?php
+				if($mod && sizeof($mod) > 0) {
 					$md_size = round(12 / sizeof($mod));
-					foreach ($mod as $moduleName => $module):
-				?>
+					foreach ($mod as $moduleName => $module) {
+?>
 					<div class="col-xs-12 col-md-<?=$md_size;?>">
 						<a href="<?php echo base_url($moduleName)?>">
 							<div class="well">
@@ -49,13 +50,15 @@
 							</div>
 						</a>
 					</div>
-			<?php 
-				endforeach;
-			endif;?>
+<?php 
+				}
+			}
+?>
 			</div>
-		<?php 
-		endforeach; 
-	endif;?>
+<?php 
+		} 
+	}
+?>
 </div>
 
 <div class="jumbotron">
