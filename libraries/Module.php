@@ -59,6 +59,6 @@ class Module {
     private function getDefaultController($path, $module) {
         $route = array();
         include realpath($path . "/../config/routes.php");
-        return keyIsTrue($route, 'default_controller') ? $route["default_controller"] : '';
+        return array_key_exists('default_controller', $route) ? $route["default_controller"] : '';
     }
 }
