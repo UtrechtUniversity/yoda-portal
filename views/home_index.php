@@ -32,8 +32,8 @@
 </style>
 
 <?php
-if (file_exists(dirname(__FILE__) . '/../public/static/static_frontpage.php')) {
-	include(    dirname(__FILE__) . '/../public/static/static_frontpage.php');
+if (file_exists(dirname(__FILE__) . '/../public/static/static_frontpage.html')) {
+	readfile(    dirname(__FILE__) . '/../public/static/static_frontpage.html');
 } else {
 ?>
 <div class="container-fluid portal-chooser">
