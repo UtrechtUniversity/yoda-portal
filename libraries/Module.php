@@ -14,8 +14,11 @@ class Module {
 	public function __construct($params) {
         if(sizeof($params) === 0) return;
 		$module = array();
-        include $params[0] . "/../config/module.php";
-        $module['path'] = sprintf("%s/intake", $module['name']);
+        include realpath($params[0] . "/../config/module.php");
+
+        $controller = $this->getDefaultController($params[0], $module['name']);
+
+        $module['path'] = sprintf("%s/%s", $module['name'], $controller);
         $module['basepath'] = sprintf("%s%s", base_url(), $module['name']);
         $this->module = (object) $module;
     }
@@ -44,27 +47,18 @@ class Module {
     public function name() {
     	return $this->module->name;
     }
-
+    
     /**
-     * Method that generates a url that points to the current study if one
-     * is provided, and to the modules entry point otherwise
-     * @param $studyID (optional)       The identifying name of the study 
-     *                                  that should be redirected to.
-     *                                  The first of the valid studies
-     *                                  is used if not provided
-     * @param $foldername (optional) 	The name of the folder in the study
-     * @return  A relative URL that points back to the index of this
-     *          module and to a valid study, if one is available
+     * Method to read the routes file of a module and extract the
+     * default controller from there
+     * @param path      Module path to controller
+     * @param module    Name of the module
+     * @return string   Default controller name or empty string if
+     *                  no default controller is defined
      */
-    private function getRedirect($studyID = '', $foldername = '') {
-        $segments = array($this->name(), "intake", "index");
-        if(!empty($studyID)) {
-            // $url .= "/" . ($studyID ? $studyID : $this->studies[0]);
-            array_push($studyID);
-            if(!empty($foldername)) {
-            	array_push($foldername);
-            }
-        }
-        return site_url($segments);
+    private function getDefaultController($path, $module) {
+        $route = array();
+        include realpath($path . "/../config/routes.php");
+        return keyIsTrue($route, 'default_controller') ? $route["default_controller"] : '';
     }
 }
