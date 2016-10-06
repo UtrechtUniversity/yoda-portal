@@ -6,6 +6,7 @@
 !/public/.htaccess.template
 !/public/index.php
 !/public/static/
+/public/static/static_frontpage.html
 
 /modules/
 

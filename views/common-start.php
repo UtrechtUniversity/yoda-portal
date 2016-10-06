@@ -10,7 +10,10 @@
 	<link rel="stylesheet" href="<?php echo base_url('/static/css/yoda-portal.css')?>">
 <?php
 	$moduleBase = base_url($this->router->module);
-
+	if(!isset($module_items)){
+		$ci = get_instance();
+		$module_items = $ci->menu->getModules();
+	}
 	if (isset($styleIncludes)) {
 		foreach ($styleIncludes as $include) {
 ?>
@@ -85,21 +88,20 @@
 		</div>
 		<div id="navbar" class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
-<?php
-
-	global $YODA_MODULES; // FIXME.
-
-	foreach ($YODA_MODULES as $moduleName => $module) {
-		$active = (isset($activeModule) && $activeModule === $moduleName);
-?>
-				<li class="<?php echo $active ? 'active' : ''?>">
-					<a href="<?php echo base_url($moduleName)?>">
-						<?php echo htmlentities($module['label'])?>
-					</a>
-				</li>
-<?php
-	}
-?>
+				<?php
+				if($module_items && sizeof($module_items) > 0):
+					foreach($module_items as $moduleName => $module): 
+						$active = (isset($activeModule) && $activeModule === $moduleName);
+				?>
+						<li class="<?php echo $active ? 'active' : ''?>">
+							<a href="<?php echo base_url($moduleName)?>">
+								<?php echo htmlentities($module['label'])?>
+							</a>
+						</li>
+				<?php 
+					endforeach;
+				endif;
+				?>
 			</ul>
 		</div>
 	</div>

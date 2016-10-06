@@ -376,7 +376,9 @@ $config['proxy_ips'] = '';
 | directory.
 |
 */
-$config['modules_locations'] = array(APPPATH . 'modules/');
+$config['modules_locations'] 		= array(APPPATH . 'modules/');
+$config['default_glyphicon'] 		= "chevron-right";
+$config['default_menu_prevalence'] 	= 50;
 
 // }}}
 // Yoda Portal configuration {{{
