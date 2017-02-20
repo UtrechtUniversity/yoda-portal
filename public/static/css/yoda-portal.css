@@ -48,7 +48,7 @@
 }
 
 /* Table */
-table th {
+.yoda-table th {
 	background-color: #dcdcdc;
 	border-color: #ddd;
 	padding: 10px!important;
