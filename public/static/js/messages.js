@@ -7,6 +7,12 @@ toastr.options = {
     closeClass: 'close',
     timeOut: 0,
     extendedTimeOut: 0,
+    tapToDismiss: false,
+    showMethod: 'show',
+    fadeOut: 0,
+    fadeIn: 0,
+    showDuration: 0,
+    hideDuration: 0,
     iconClasses: {
         error: 'alert-danger',
         info: 'alert-info',
@@ -15,7 +21,7 @@ toastr.options = {
     }
 };
 
-function showMessage(type, text)
+function setMessage(type, text)
 {
     // Remove all messages
     toastr.remove();
