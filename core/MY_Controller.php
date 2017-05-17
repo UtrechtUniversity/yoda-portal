@@ -37,6 +37,15 @@ class MY_Controller extends CI_Controller {
 			);
 		}
 
+        // Messages & AJAX
+		$messageType = $this->session->flashdata('messageType');
+        $messageText = $this->session->flashdata('messageText');
+        if ($messageText) {
+            if ($this->input->is_ajax_request()) {
+                $this->session->keep_flashdata('messageType');
+                $this->session->keep_flashdata('messageText');
+            }
+        }
 		# XXX: FIXME: TEMPORARY HACK.
 		# Reloading the config is apparently required for HMVC modules that have their own config directory.
 		# However, reloading the config in the main application causes some strange problems.

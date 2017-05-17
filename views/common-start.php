@@ -7,7 +7,9 @@
 	<link rel="stylesheet" href="<?php echo base_url('/static/lib/bootstrap/css/bootstrap.min.css')?>">
 	<link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2.css')?>">
 	<link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2-bootstrap.min.css')?>">
+	<link rel="stylesheet" href="<?php echo base_url('/static/lib/toastr/toastr.min.css')?>">
 	<link rel="stylesheet" href="<?php echo base_url('/static/css/yoda-portal.css')?>">
+	<link rel="stylesheet" href="<?php echo base_url('/static/css/messages.css')?>">
 <?php
 	$moduleBase = base_url($this->router->module);
 	if(!isset($module_items)){
@@ -25,7 +27,9 @@
 	<script src="<?php echo base_url('/static/lib/jquery/js/jquery.min.js')?>"></script>
 	<script src="<?php echo base_url('/static/lib/bootstrap/js/bootstrap.min.js')?>"></script>
 	<script src="<?php echo base_url('/static/lib/select2/select2.min.js')?>"></script>
+	<script src="<?php echo base_url('/static/lib/toastr/toastr.min.js')?>"></script>
 	<script src="<?php echo base_url('/static/js/yoda-portal.js')?>"></script>
+	<script src="<?php echo base_url('/static/js/messages.js')?>"></script>
 <?php
 	if (isset($scriptIncludes)) {
 		foreach ($scriptIncludes as $include) {
@@ -107,4 +111,11 @@
 	</div>
 </nav>
 <div class="container page">
-<div id="messages"></div>
+<div id="messages">
+	<?php if ($messageText) { ?>
+		<div class="alert alert-<?php echo $messageType; ?>">
+			<a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+			<?php echo $messageText; ?>
+		</div>
+	<?php } ?>
+</div>
