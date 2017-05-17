@@ -2,7 +2,7 @@ toastr.options = {
     toastClass: 'alert',
     closeButton: true,
     target: '#messages',
-    containerId: 'messages #toast-container',
+    containerId: 'messages-container',
     closeHtml: '<a href="#" data-dismiss="alert" aria-label="close" title="close">×</a>',
     closeClass: 'close',
     timeOut: 0,
