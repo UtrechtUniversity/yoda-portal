@@ -4,12 +4,11 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Yoda Portal</title>
-	<link rel="stylesheet" href="<?php echo base_url('/static/lib/bootstrap/css/bootstrap.min.css')?>">
-	<link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2.css')?>">
-	<link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2-bootstrap.min.css')?>">
-	<link rel="stylesheet" href="<?php echo base_url('/static/lib/toastr/toastr.min.css')?>">
-	<link rel="stylesheet" href="<?php echo base_url('/static/css/yoda-portal.css')?>">
-	<link rel="stylesheet" href="<?php echo base_url('/static/css/messages.css')?>">
+	<link rel="stylesheet" href="<?php echo base_url('/static/lib/bootstrap/css/bootstrap.min.css?version=' . ASSETS_VERSION)?>">
+	<link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2.css?version=' . ASSETS_VERSION)?>">
+	<link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2-bootstrap.min.css?version=' . ASSETS_VERSION)?>">
+	<link rel="stylesheet" href="<?php echo base_url('/static/lib/toastr/toastr.min.css?version=' . ASSETS_VERSION)?>">
+	<link rel="stylesheet" href="<?php echo base_url('/static/css/yoda-portal.css?version=' . ASSETS_VERSION)?>">
 <?php
 	$moduleBase = base_url($this->router->module);
 	if(!isset($module_items)){
@@ -19,22 +18,21 @@
 	if (isset($styleIncludes)) {
 		foreach ($styleIncludes as $include) {
 ?>
-	<link rel="stylesheet" href="<?php echo $moduleBase . '/static/' . $include ?>" />
+	<link rel="stylesheet" href="<?php echo $moduleBase . '/static/' . $include . '?version=' . ASSETS_VERSION ?>" />
 <?php
 		}
 	}
 ?>
-	<script src="<?php echo base_url('/static/lib/jquery/js/jquery.min.js')?>"></script>
-	<script src="<?php echo base_url('/static/lib/bootstrap/js/bootstrap.min.js')?>"></script>
-	<script src="<?php echo base_url('/static/lib/select2/select2.min.js')?>"></script>
-	<script src="<?php echo base_url('/static/lib/toastr/toastr.min.js')?>"></script>
-	<script src="<?php echo base_url('/static/js/yoda-portal.js')?>"></script>
-	<script src="<?php echo base_url('/static/js/messages.js')?>"></script>
+	<script src="<?php echo base_url('/static/lib/jquery/js/jquery.min.js?version=' . ASSETS_VERSION)?>"></script>
+	<script src="<?php echo base_url('/static/lib/bootstrap/js/bootstrap.min.js?version=' . ASSETS_VERSION)?>"></script>
+	<script src="<?php echo base_url('/static/lib/select2/select2.min.js?version=' . ASSETS_VERSION)?>"></script>
+	<script src="<?php echo base_url('/static/lib/toastr/toastr.min.js?version=' . ASSETS_VERSION)?>"></script>
+	<script src="<?php echo base_url('/static/js/yoda-portal.js?version=' . ASSETS_VERSION)?>"></script>
 <?php
 	if (isset($scriptIncludes)) {
 		foreach ($scriptIncludes as $include) {
 ?>
-	<script src="<?php echo $moduleBase . '/static/' . $include ?>"></script>
+	<script src="<?php echo $moduleBase . '/static/' . $include . '?version=' . ASSETS_VERSION ?>"></script>
 <?php
 		}
 	}
@@ -111,11 +109,4 @@
 	</div>
 </nav>
 <div class="container page">
-<div id="messages">
-	<?php if ($messageText) { ?>
-		<div class="alert alert-<?php echo $messageType; ?>">
-			<a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
-			<?php echo $messageText; ?>
-		</div>
-	<?php } ?>
-</div>
+<div id="messages"></div>

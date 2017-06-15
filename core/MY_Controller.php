@@ -46,6 +46,12 @@ class MY_Controller extends CI_Controller {
                 $this->session->keep_flashdata('messageText');
             }
         }
+
+        // Load assets versioning for browser caching
+        $assetsVersion = $this->config->item('assetsVersion');
+        //$this->data['assetsVersion'] = $assetsVersion;
+        define("ASSETS_VERSION", $assetsVersion);
+
 		# XXX: FIXME: TEMPORARY HACK.
 		# Reloading the config is apparently required for HMVC modules that have their own config directory.
 		# However, reloading the config in the main application causes some strange problems.
