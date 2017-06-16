@@ -28,6 +28,7 @@
 	<script src="<?php echo base_url('/static/lib/select2/select2.min.js?version=' . ASSETS_VERSION)?>"></script>
 	<script src="<?php echo base_url('/static/lib/toastr/toastr.min.js?version=' . ASSETS_VERSION)?>"></script>
 	<script src="<?php echo base_url('/static/js/yoda-portal.js?version=' . ASSETS_VERSION)?>"></script>
+	<script src="<?php echo base_url('/static/js/messages.js?version=' . ASSETS_VERSION)?>"></script>
 <?php
 	if (isset($scriptIncludes)) {
 		foreach ($scriptIncludes as $include) {
