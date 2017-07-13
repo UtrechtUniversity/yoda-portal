@@ -6,6 +6,7 @@
 class RodsUser extends CI_Model {
 
     protected $_username;
+    protected $_userInfo;
     protected $_rodsAccount;
 
     public function __construct()
@@ -16,6 +17,10 @@ class RodsUser extends CI_Model {
 
     public function getUsername() {
         return $this->_username;
+    }
+
+    public function getUserInfo() {
+        return $this->_userInfo;
     }
 
     /**
@@ -39,7 +44,7 @@ class RodsUser extends CI_Model {
                         $this->config->item('rodsDefaultResource'),
                         $this->config->item('rodsAuthType')
                     );
-                    $this->_rodsAccount->getUserInfo();
+                    $this->_userInfo = $this->_rodsAccount->getUserInfo();
                     $this->_username = $username;
                 } catch (Exception $ex) {
                     // Assume the user is not logged in or the credentials are incorrect.
