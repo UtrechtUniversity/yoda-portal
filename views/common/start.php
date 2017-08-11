@@ -110,4 +110,11 @@
     </div>
 </nav>
 <div class="container page">
-    <div id="messages"></div>
+    <div id="messages">
+        <?php if ($messageText) { ?>
+            <div class="alert alert-<?php echo $messageType; ?>">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+                <?php echo $messageText; ?>
+            </div>
+        <?php } ?>
+    </div>
