@@ -554,7 +554,7 @@ $config['rodsServerZone']      = 'tempZone';
 $config['rodsDefaultResource'] = 'demoResc';
 $config['rodsAuthType']        = 'STANDARD'; // Either STANDARD or PAM.
 // Config for versioning assets (browser caching)
-$config['assetsVersion'] = "1.0";
+$config['assetsVersion'] = "1.0.0";
 if (file_exists(dirname(__FILE__) . '/config_local.php'))
     include(    dirname(__FILE__) . '/config_local.php');
 // }}}
