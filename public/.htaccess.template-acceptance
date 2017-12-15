@@ -29,9 +29,9 @@ SetEnvIf CI_APPLICATION ^$ CI_APPLICATION=../yoda-portal
 ## Disallow loading resources like scripts and stylesheets from third party sources.
 ## XXX: Consider getting rid of all inline JS and CSS so we can remove the 'unsafe-inline'
 ## option, allowing for additional protection against XSS attacks.
-Header set   Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' *.openstreetmap.org google.cn data:; frame-ancestors 'self'; form-action 'self'"
-Header set X-Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' *.openstreetmap.org google.cn data:; frame-ancestors 'self'; form-action 'self'"
-Header set              X-Webkit-CSP "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' *.openstreetmap.org google.cn data:; frame-ancestors 'self'; form-action 'self'"
+Header set   Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' *.openstreetmap.org *.google.cn data:; frame-ancestors 'self'; form-action 'self'"
+Header set X-Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' *.openstreetmap.org *.google.cn data:; frame-ancestors 'self'; form-action 'self'"
+Header set              X-Webkit-CSP "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' *.openstreetmap.org *.google.cn data:; frame-ancestors 'self'; form-action 'self'"
 
 ## Disallow embedding the application into a webpage from a different origin.
 ## This is a fallback for browsers that do not support the CSP directive above
