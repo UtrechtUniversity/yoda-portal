@@ -1,4 +1,4 @@
-RewriteEngine on
+ewriteEngine on
 
 ## Rewrite everything to index.php except for robots.txt, /static and module-static directories.
 RewriteCond $1 !^(index\.php|robots\.txt|([^/]+/)?static/)
@@ -6,8 +6,8 @@ RewriteRule ^(.*)$ index.php/$1 [L]
 
 ## CI_ENV: Set the CodeIgniter environment. Enables / disables error reporting to browser etc.
 ##         Uncomment the applicable line. Defaults to 'development' if unset.
-#SetEnvIf CI_ENV ^$ CI_ENV=development
-SetEnvIf CI_ENV ^$ CI_ENV=testing
+SetEnvIf CI_ENV ^$ CI_ENV=development
+#SetEnvIf CI_ENV ^$ CI_ENV=testing
 #SetEnvIf CI_ENV ^$ CI_ENV=production
 
 ## YODA_CODEIGNITER_ROOT: A relative path from the portal docroot to the codeigniter directory
