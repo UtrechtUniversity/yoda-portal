@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Yoda Portal</title>
+    <link rel="shortcut icon" href="/static/img/favicon.ico">
     <link rel="stylesheet" href="<?php echo base_url('/static/lib/bootstrap/css/bootstrap.min.css?version=' . ASSETS_VERSION)?>">
     <link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2.css?version=' . ASSETS_VERSION)?>">
     <link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2-bootstrap.min.css?version=' . ASSETS_VERSION)?>">
