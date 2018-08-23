@@ -397,6 +397,11 @@ class MX_Loader extends CI_Loader
 			{
 				$autoload = array_merge(Modules::load_file($file, $path, 'autoload'), $autoload);
 			}
+
+			// Composer autoload
+			if (file_exists(APPPATH .'modules/' . $this->_module . '/vendor/autoload.php')) {
+			    require_once(APPPATH .'modules/' . $this->_module . '/vendor/autoload.php');
+            }
 		}
 
 		/* nothing to do */
