@@ -1,5 +1,11 @@
 <?php
-
+/**
+ * User controller
+ *
+ * @package    Yoda
+ * @copyright  Copyright (c) 2017-2018, Utrecht University. All rights reserved.
+ * @license    GPLv3, see LICENSE.
+ */
 class User extends MY_Controller {
 
     public function login()
