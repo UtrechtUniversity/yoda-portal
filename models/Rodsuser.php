@@ -1,7 +1,10 @@
 <?php
-
 /**
- * User model
+ * RodsUser model
+ *
+ * @package    Yoda
+ * @copyright  Copyright (c) 2017-2018, Utrecht University. All rights reserved.
+ * @license    GPLv3, see LICENSE.
  */
 class RodsUser extends CI_Model {
 
@@ -12,7 +15,6 @@ class RodsUser extends CI_Model {
     public function __construct()
     {
         parent::__construct();
-        // Your own constructor code
     }
 
     public function getUsername() {

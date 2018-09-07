@@ -1,8 +1,13 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
 /**
+ * Menu library
+ *
  * Reads modules from the modules directory.
  * Uses config
+ *
+ * @package    Yoda
+ * @copyright  Copyright (c) 2017-2018, Utrecht University. All rights reserved.
+ * @license    GPLv3, see LICENSE.
  */
 class Menu {
 
@@ -158,5 +163,4 @@ class Menu {
         array_multisort($prevalence, SORT_ASC, $arr);
         return $arr;
     }
-
 }

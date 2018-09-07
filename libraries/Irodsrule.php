@@ -1,5 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
+/**
+ * Irodsrule library
+ *
+ * @package    Yoda
+ * @copyright  Copyright (c) 2017-2018, Utrecht University. All rights reserved.
+ * @license    GPLv3, see LICENSE.
+ */
 class Irodsrule
 {
     public $CI;

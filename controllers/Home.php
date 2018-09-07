@@ -1,6 +1,10 @@
 <?php
 /**
  * Home controller
+ *
+ * @package    Yoda
+ * @copyright  Copyright (c) 2017-2018, Utrecht University. All rights reserved.
+ * @license    GPLv3, see LICENSE.
  */
 class Home extends MY_Controller {
 
