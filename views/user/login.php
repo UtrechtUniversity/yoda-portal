@@ -17,10 +17,6 @@
                     <label class="col-sm-3 control-label" for="f-login-password">Password</label>
                     <div class="col-sm-9">
                         <input name="password" id="f-login-password" class="form-control" type="password" required />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-offset-3 col-sm-9">
                         <a href="#">Forgot password?</a>
                     </div>
                 </div>
