@@ -20,7 +20,12 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-3 col-sm-9">
-                        <input id="f-login-submit" class="btn btn-primary" type="submit" value="Sign in" />
+                        <a href="#">Forgot password?</a>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <input id="f-login-submit" class="btn btn-primary col-sm-3" type="submit" value="Sign in" />
                     </div>
                 </div>
                 <?php echo form_close(); ?>
