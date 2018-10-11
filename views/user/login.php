@@ -9,7 +9,7 @@
                 <div class="form-group">
                     <label class="col-sm-3 control-label" for="f-login-username">Username</label>
                     <div class="col-sm-9">
-                        <input name="username" id="f-login-username" class="form-control" type="text" placeholder="j.a.smith@uu.nl" required />
+                        <input name="username" id="f-login-username" class="form-control" type="text" placeholder="j.a.smith@uu.nl" autofocus="" required />
                     </div>
                 </div>
                 <div class="form-group">
