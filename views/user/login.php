@@ -17,7 +17,7 @@
                     <label class="col-sm-3 control-label" for="f-login-password">Password</label>
                     <div class="col-sm-9">
                         <input name="password" id="f-login-password" class="form-control" type="password" required />
-                        <a href="https://<?php echo $config['yoda_eus_fqdn'] ?>/user/forgot-password" title="Forgot / change password?">Forgot / change password?</a>
+                        <a href="https://<?php echo $this->config->item('yoda_eus_fqdn') ?>/user/forgot-password" title="Forgot / change password?">Forgot / change password?</a>
                     </div>
                 </div>
                 <div class="form-group">
