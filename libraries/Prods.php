@@ -12,7 +12,7 @@ $IRODS_PHP_ROOT =
         ? $_SERVER['YODA_IRODS_PHP_ROOT']
         : '../irods-php';
 
-require_once($IRODS_PHP_ROOT . '/prods/src/Prods.inc.php');
+require_once($IRODS_PHP_ROOT . '/src/Prods.inc.php');
 
 class Prods {
 }
