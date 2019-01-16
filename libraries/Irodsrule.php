@@ -74,11 +74,13 @@ class Irodsrule
 
             $ruleResult = $this->rule->execute();
             foreach ($this->outputParameters as $parameter) {
-                $result = json_decode($ruleResult[$parameter], true);
-                if (empty($result)) {
-                    $output[$parameter] = $ruleResult[$parameter];
-                } else {
-                    $output[$parameter] = json_decode($ruleResult[$parameter], true);
+                if (isset($ruleResult[$parameter])) {
+                    $result = json_decode($ruleResult[$parameter], true);
+                    if (empty($result)) {
+                        $output[$parameter] = $ruleResult[$parameter];
+                    } else {
+                        $output[$parameter] = json_decode($ruleResult[$parameter], true);
+                    }
                 }
             }
 
