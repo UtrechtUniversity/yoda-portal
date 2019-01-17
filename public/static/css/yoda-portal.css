@@ -51,11 +51,12 @@
 .yoda-table th {
 	background-color: #dcdcdc;
 	border-color: #ddd;
-	padding: 10px!important;
 	border-bottom: 1px solid transparent!important;
 	color: #333;
 	font-family: inherit;
 	font-weight: 500;
-	font-size: 16px;
-	border-color: #ddd;
+}
+
+.yoda-table tr.odd {
+        background-color: transparent !important;
 }
