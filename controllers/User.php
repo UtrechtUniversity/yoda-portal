@@ -10,6 +10,11 @@ class User extends MY_Controller {
 
     public function login()
     {
+        // Redirect logged in users to home.
+        if ($this->rodsuser->isLoggedIn()) {
+            redirect('home');
+        }
+
         $this->session->unset_userdata('username');
         $this->session->unset_userdata('password');
 
