@@ -66,7 +66,7 @@
 
 <div class="brandbar container">
     <div class="logo pull-left">
-        <a href="http://www.uu.nl">
+        <a href="https://www.uu.nl">
             <img src="<?php echo base_url('/static/img/logo-uu.svg')?>">
         </a>
     </div>
