@@ -1,41 +1,40 @@
-<style>
-    .portal-chooser .row > div {
-        text-align: center;
-        font-size: 22px;
-    }
-
-    .portal-chooser a {
-        text-shadow: 0 0 4px rgba(0,0,0,0.2);
-    }
-    .portal-chooser a span {
-        text-shadow: 0 0 6px rgba(0,0,0,0.3);
-    }
-
-    .portal-chooser a:hover {
-        text-decoration: none;
-    }
-
-    .portal-chooser .well {
-        color: #000;
-        transition: background-color 160ms;
-    }
-
-    .portal-chooser .well:hover {
-        background-color: #eaeaea;
-    }
-
-    .portal-chooser .well > .glyphicon {
-        vertical-align: middle;
-        font-size: 80px;
-        display: block;
-    }
-</style>
-
 <?php
 if (file_exists(dirname(__FILE__) . '/../public/static/static_frontpage.html')) {
     readfile(    dirname(__FILE__) . '/../public/static/static_frontpage.html');
 } else {
     ?>
+    <style>
+        .portal-chooser .row > div {
+            text-align: center;
+            font-size: 22px;
+        }
+
+        .portal-chooser a {
+            text-shadow: 0 0 4px rgba(0,0,0,0.2);
+        }
+        .portal-chooser a span {
+            text-shadow: 0 0 6px rgba(0,0,0,0.3);
+        }
+
+        .portal-chooser a:hover {
+            text-decoration: none;
+        }
+
+        .portal-chooser .well {
+            color: #000;
+            transition: background-color 160ms;
+        }
+
+        .portal-chooser .well:hover {
+            background-color: #eaeaea;
+        }
+
+        .portal-chooser .well > .glyphicon {
+            vertical-align: middle;
+            font-size: 80px;
+            display: block;
+        }
+    </style>    
     <div class="container-fluid portal-chooser">
         <?php
         if($modules && sizeof($modules) > 0) {
