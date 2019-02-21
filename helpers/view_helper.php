@@ -1,8 +1,17 @@
 <?php
 /**
  * Load view helper
- * @param $name
- * @param array $params
+ *
+ * @package    Yoda
+ * @copyright  Copyright (c) 2017-2019, Utrecht University. All rights reserved.
+ * @license    GPLv3, see LICENSE.
+ */
+
+/**
+ * Load a view.
+ *
+ * @param $name         Name of the view
+ * @param array $params Parameters for view
  * @return bool
  */
 function loadView($name, $params = array())
