@@ -53,7 +53,8 @@ class Irodsrule
         if (count($params) > 0) {
             $body = '
                 myRule {
-                    ' .  $this->name .'(' . implode(", ", $params) . ');
+                    ' . $this->castParameters() . '
+                    ' . $this->name .'(' . implode(", ", $params) . ');
                 }
             ';
         } else {
@@ -109,5 +110,18 @@ class Irodsrule
         $this->outputParameters = array();
 
         return true;
+    }
+
+    private function castParameters()
+    {
+        $output = '';
+        foreach ($this->inputParameters as $parameter => $value) {
+            // Cast to integer
+            if (is_int($value)) {
+                $output .= $parameter . ' = int(' . $parameter . ');' . PHP_EOL;
+            }
+        }
+
+        return $output;
     }
 }
