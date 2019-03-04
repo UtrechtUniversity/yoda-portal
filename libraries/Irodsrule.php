@@ -12,6 +12,7 @@ class Irodsrule
 
     private $account;
     private $name;
+    private $ruleParameters = array();
     private $inputParameters = array();
     private $outputParameters = array();
     private $rule;
@@ -48,13 +49,13 @@ class Irodsrule
     public function execute()
     {
         $output = array();
-        $params = array_merge(array_keys($this->inputParameters), $this->outputParameters);
+        $this->ruleParameters = array_merge(array_keys($this->inputParameters), $this->outputParameters);
 
-        if (count($params) > 0) {
+        if (count($this->ruleParameters) > 0) {
             $body = '
                 myRule {
                     ' . $this->castParameters() . '
-                    ' . $this->name .'(' . implode(", ", $params) . ');
+                    ' . $this->name .'(' . implode(", ", $this->ruleParameters) . ');
                 }
             ';
         } else {
@@ -118,7 +119,12 @@ class Irodsrule
         foreach ($this->inputParameters as $parameter => $value) {
             // Cast to integer
             if (is_int($value)) {
-                $output .= $parameter . ' = int(' . $parameter . ');' . PHP_EOL;
+                // Rename the parameter (*limit = *intlimit)
+                $castName = '*int' . substr($parameter, 1);
+                // Change the name of the rule parameter
+                $key = array_search($parameter, $this->ruleParameters);
+                $this->ruleParameters[$key] = $castName;
+                $output .= $castName . ' = int(' . $parameter . ');' . PHP_EOL;
             }
         }
 
