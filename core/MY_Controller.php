@@ -46,6 +46,8 @@ class MY_Controller extends CI_Controller {
         // Load Yoda version.
         $yodaVersion = $this->config->item('yodaVersion');
         define("YODA_VERSION", $yodaVersion);
+        $yodaCommit = $this->config->item('yodaCommit');
+        define("YODA_COMMIT", $yodaCommit);
 
         // Load assets version for browser caching.
         $assetsVersion = $this->config->item('assetsVersion');
