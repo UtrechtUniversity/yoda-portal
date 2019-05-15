@@ -60,3 +60,12 @@
 .yoda-table tr.odd {
         background-color: transparent !important;
 }
+
+/* Footer */
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: #f5f5f5;
+  font-size: 9px;
+}
