@@ -43,9 +43,12 @@ class MY_Controller extends CI_Controller {
             }
         }
 
-        // Load assets versioning for browser caching
+        // Load Yoda version.
+        $yodaVersion = $this->config->item('yodaVersion');
+        define("YODA_VERSION", $yodaVersion);
+
+        // Load assets version for browser caching.
         $assetsVersion = $this->config->item('assetsVersion');
-        //$this->data['assetsVersion'] = $assetsVersion;
         define("ASSETS_VERSION", $assetsVersion);
 
         // Require a valid login for all pages except Home and User/Login.
