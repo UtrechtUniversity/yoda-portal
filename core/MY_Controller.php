@@ -13,17 +13,9 @@ class MY_Controller extends CI_Controller {
     {
         parent::__construct();
 
-        // When not in a dev environment, enforce stricter security.
-        if (ENVIRONMENT !== 'development') {
-
-            if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')) {
-                // Remind the browser that it should only attempt to reach us over HTTPS.
-                // TODO: Determine a good value for 'max-age', perhaps allow setting it in config_local?
-                header('Strict-Transport-Security: max-age=60');
-            } else {
-                // Redirect to HTTPS.
-                redirect(str_replace("http://", "https://" , current_url()), "refresh");
-            }
+        // Redirect to HTTPS.
+        if (empty($_SERVER['HTTPS'])) {
+            redirect(str_replace("http://", "https://" , current_url()), "refresh");
         }
 
         $username = $this->session->userdata('username');
