@@ -3,75 +3,124 @@ if (file_exists(dirname(__FILE__) . '/../public/static/static_frontpage.html')) 
     readfile(    dirname(__FILE__) . '/../public/static/static_frontpage.html');
 } else {
     ?>
-    <style>
-        .portal-chooser .row > div {
-            text-align: center;
-            font-size: 22px;
+    <style type="text/css">
+        .header-logo {
+                width: 100%;
+                position: relative;
+        }
+        .header-logo .header-logo-text-content {
+                color: #fff;
+                font-family: "Open Sans", "Merriweather","Bembo",Georgia,Times,"Times New Roman",serif;
+                overflow: hidden;
+                font-weight: 300;
+        }
+        .header-logo .header-logo-text-link{
+                bottom: -42px;
+                right: 0px;
+                background-color: #ffcd00;
+                text-transform: uppercase;
+                font-weight: 700;
+                font-size: 15px;
+                display: inline-block;
+                padding: 0 19px;
+                line-height: 42px;
+                position: absolute;
+                height: 42px;
+                box-sizing: border-box;
+        }
+        .header-logo .header-logo-text-link span {
+                box-sizing: border-box;
+                height:42px;
+                width:42px;
+                float: right;
+                text-align: right;
+                display: block;
+                right: -19px;
+                top: 0px;
+                padding: 15px;
+        }
+        a.header-logo-text-link {
+                text-decoration: none;
+        }
+        .header-logo-text-link:hover span{
+                background-color: black;
+                color: #ffcd00;
+        }
+        div.header-logo img.header-logo-img {
+                display: none;
+                width: 100%;
+                clear: both;
+        }
+        .header-logo .header-logo-text-background{
+                position: absolute;
+                top: 27%;
+                background-color: rgba(0,0,0,.5);
+                right: 5%;
+                font-size: 20px;
+                padding: 15px 30px;
+                font-size: 20px;
+        }
+        @media(min-width: 1200px){
+                div.header-logo img.header-logo-img#logo-1200 {
+                        display: inline;
+                }
+        }
+        @media(min-width: 800px) and (max-width: 1199px){
+                div.header-logo img.header-logo-img#logo-800 {
+                        display: inline;
+                }
+                .header-logo .header-logo-text-background h1 {
+                        font-size: 1.8em;
+                }
+                .header-logo .header-logo-text-background{
+                        font-size: 16px;
+                        top: 18%;
+                }
+        }
+        @media(min-width: 480px) and (max-width: 799px){
+                div.header-logo img.header-logo-img#logo-480 {
+                        display: inline;
+                }
+                .header-logo .header-logo-text-background h1 {
+                        font-size: 1.5em;
+                }
+                .header-logo .header-logo-text-background{
+                        font-size: 16px;
+                        padding: 5px 10px;
+                        top: 12%;
+                }
+        }
+        @media(min-width: 0px) and (max-width: 479px){
+                div.header-logo img.header-logo-img#logo-0 {
+                        display: inline;
+                }
+                .header-logo .header-logo-text-background{
+                        font-size: 14px;
+                        position: relative;
+                        margin: 0px;
+                        right: 0px;
+                }
         }
 
-        .portal-chooser a {
-            text-shadow: 0 0 4px rgba(0,0,0,0.2);
-        }
-        .portal-chooser a span {
-            text-shadow: 0 0 6px rgba(0,0,0,0.3);
-        }
-
-        .portal-chooser a:hover {
-            text-decoration: none;
-        }
-
-        .portal-chooser .well {
-            color: #000;
-            transition: background-color 160ms;
-        }
-
-        .portal-chooser .well:hover {
-            background-color: #eaeaea;
-        }
-
-        .portal-chooser .well > .glyphicon {
-            vertical-align: middle;
-            font-size: 80px;
-            display: block;
-        }
-    </style>    
-    <div class="container-fluid portal-chooser">
-        <?php
-        if($modules && sizeof($modules) > 0) {
-            foreach($modules as $mod) {
-                ?>
-                <div class="row">
-                    <?php
-                    if($mod && sizeof($mod) > 0) {
-                        $md_size = round(12 / sizeof($mod));
-                        foreach ($mod as $moduleName => $module) {
-                            ?>
-                            <div class="col-xs-12 col-md-<?=$md_size;?>">
-                                <a href="<?php echo base_url($moduleName)?>">
-                                    <div class="well">
-                                        <span class="<?php echo $module['icon_class']?>" aria-hidden="true"></span>
-                                        <?php echo htmlentities($module['label'])?>
-                                    </div>
-                                </a>
-                            </div>
-                            <?php
-                        }
-                    }
-                    ?>
+    </style>
+    </div>
+    <div class="header-logo">
+        <img src="static/img/header_1600.jpg" alt="" title="" id="logo-1200" class="header-logo-img">
+        <img src="static/img/header_1200.jpg" alt="" title="" id="logo-800" class="header-logo-img">
+        <img src="static/img/header_800.jpg" alt="" title="" id="logo-480" class="header-logo-img">
+        <img src="static/img/header_480.jpg" alt="" title="" id="logo-0" class="header-logo-img">
+        <div class="header-logo-text-background">
+                <div class="header-logo-text-content">
+                        <h1>Welcome to Yoda!</h1>
+                        <p>
+                                Yoda is a share-collaborate environment for research data.
+                        </p>
                 </div>
-                <?php
-            }
-        }
-        ?>
-    </div>
+                <a class="header-logo-text-link" href="https://utrechtuniversity.github.io/yoda-docs/" target="_blank">Learn more<span class="glyphicon glyphicon-chevron-right"></span></a>
+        </div>
 
-    <div class="jumbotron">
-        <h1>Welcome to Yoda!</h1>
-        <p>
-            Yoda is a share-collaborate environment for research data.
-        </p>
-        <!-- <a class="btn btn-default" href="#">Learn more</a> -->
     </div>
+    <div>
     <?php
 }
 ?>
