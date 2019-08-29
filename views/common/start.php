@@ -6,8 +6,6 @@
     <title>Yoda Portal</title>
     <link rel="shortcut icon" href="/static/img/favicon.ico">
     <link rel="stylesheet" href="<?php echo base_url('/static/lib/bootstrap/css/bootstrap.min.css?version=' . ASSETS_VERSION)?>">
-    <link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2.css?version=' . ASSETS_VERSION)?>">
-    <link rel="stylesheet" href="<?php echo base_url('/static/lib/select2/select2-bootstrap.min.css?version=' . ASSETS_VERSION)?>">
     <link rel="stylesheet" href="<?php echo base_url('/static/lib/toastr/toastr.min.css?version=' . ASSETS_VERSION)?>">
     <link rel="stylesheet" href="<?php echo base_url('/static/css/yoda-portal.css?version=' . ASSETS_VERSION)?>">
     <?php
@@ -26,7 +24,6 @@
     ?>
     <script src="<?php echo base_url('/static/lib/jquery/js/jquery.min.js?version=' . ASSETS_VERSION)?>"></script>
     <script src="<?php echo base_url('/static/lib/bootstrap/js/bootstrap.min.js?version=' . ASSETS_VERSION)?>"></script>
-    <script src="<?php echo base_url('/static/lib/select2/select2.min.js?version=' . ASSETS_VERSION)?>"></script>
     <script src="<?php echo base_url('/static/lib/toastr/toastr.min.js?version=' . ASSETS_VERSION)?>"></script>
     <script src="<?php echo base_url('/static/js/yoda-portal.js?version=' . ASSETS_VERSION)?>"></script>
     <script src="<?php echo base_url('/static/js/messages.js?version=' . ASSETS_VERSION)?>"></script>
