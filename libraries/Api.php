@@ -58,9 +58,9 @@ class Api
                                   ['*data' => $json],
                                   ['ruleExecOut']);
 
-            $x = $rule->execute()['ruleExecOut'];
             $ret = json_decode($rule->execute()['ruleExecOut'],
                                false, 512, JSON_THROW_ON_ERROR);
+
         } catch (RODSException $e) {
             $err = sprintf("API call <$name> generated an iRODS error: %s", (string)$e);
             error_log($err);
