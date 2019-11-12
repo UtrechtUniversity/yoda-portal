@@ -42,12 +42,12 @@ class Api
             // Avoid sending garbage/manipulated rule bodies.
             $err = sprintf('API call with invalid name: <%s>', rawurlencode($name));
             error_log($err);
-            $ret = ['status'      => 'error_api',
-                    'status_info' => 'An internal error occurred (invalid API call)',
-                    'data'        => null];
+            $ret = (object)['status'      => 'error_api',
+                            'status_info' => 'An internal error occurred (invalid API call)',
+                            'data'        => null];
 
             if ($isDevel)
-                $ret['debug_info'] = $err;
+                $ret->debug_info = $err;
             return $ret;
         }
 
@@ -55,47 +55,47 @@ class Api
         try {
             $rule = new ProdsRule($this->acc,
                                   "rule { api_$name(*data); }",
-                                  array('*data' => $json),
-                                  array('ruleExecOut'));
+                                  ['*data' => $json],
+                                  ['ruleExecOut']);
 
+            $x = $rule->execute()['ruleExecOut'];
             $ret = json_decode($rule->execute()['ruleExecOut'],
-                               true, 512,
-                               JSON_THROW_ON_ERROR | JSON_OBJECT_AS_ARRAY);
+                               false, 512, JSON_THROW_ON_ERROR);
         } catch (RODSException $e) {
             $err = sprintf("API call <$name> generated an iRODS error: %s", (string)$e);
             error_log($err);
-            $ret = ['status'      => 'error_internal',
-                    'status_info' => 'An internal error occurred',
-                    'data'        => null];
+            $ret = (object)['status'      => 'error_internal',
+                            'status_info' => 'An internal error occurred',
+                            'data'        => null];
             if ($isDevel)
-                $ret['debug_info'] = $err;
+                $ret->debug_info = $err;
             return $ret;
 
         } catch (JsonException $e) {
             $err = "API call <$name> returned invalid JSON";
             error_log($err);
-            $ret = ['status'      => 'error_internal',
-                    'status_info' => 'An internal error occurred',
-                    'data'        => null];
+            $ret = (object)['status'      => 'error_internal',
+                            'status_info' => 'An internal error occurred',
+                            'data'        => null];
 
             if ($isDevel)
-                $ret['debug_info'] = $err;
+                $ret->debug_info = $err;
             return $ret;
         }
 
-        // These must always be present.
-        if (!array_key_exists('status',      $ret)
-         || !array_key_exists('status_info', $ret)
-         || !array_key_exists('data',        $ret)) {
+        // These must always be present, even if they're null.
+        if (!property_exists($ret, 'status')
+         || !property_exists($ret, 'status_info')
+         || !property_exists($ret, 'data')) {
 
             $err = "API call <$name> returned an invalid result (missing status/status_info)";
             error_log($err);
-            $ret = ['status'      => 'error_internal',
-                    'status_info' => 'An internal error occurred',
-                    'data'        => null];
+            $ret = (object)['status'      => 'error_internal',
+                            'status_info' => 'An internal error occurred',
+                            'data'        => null];
 
             if ($isDevel)
-                $ret['debug_info'] = $err;
+                $ret->debug_info = $err;
         }
         return $ret;
     }
@@ -109,14 +109,14 @@ class Api
         if (gettype($data) !== 'string')
             $data = json_encode($data);
         $result = $this->call_($name, $data);
-        if ($result['status'] !== 'ok') {
+        if ($result->status !== 'ok') {
             set_status_header(500);
             error_log(sprintf('{%s#%s} API call <%s> failed (status %s: %s)',
                               $this->CI->rodsuser->getUserInfo()['name'],
                               $this->CI->rodsuser->getUserInfo()['zone'],
                               $name,
-                              $result['status'],
-                              $result['status_info']));
+                              $result->status,
+                              $result->status_info));
         }
         return $result;
     }
