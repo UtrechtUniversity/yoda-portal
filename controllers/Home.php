@@ -8,6 +8,12 @@
  */
 class Home extends MY_Controller {
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->library('api');
+    }
+
     public function index()
     {
         $mods = $this->splitModules($this->menu->getModules());
@@ -45,4 +51,20 @@ class Home extends MY_Controller {
         return $result;
     }
 
+    public function apicall($name=null) {
+        if ($this->input->server('REQUEST_METHOD') !== 'POST') {
+            header('Allow: POST');
+            set_status_header(405);
+            echo 'Method not allowed';
+            exit;
+        }
+        $input = $this->input->post('data');
+        if ($input === null)
+            $input = '{}';
+
+        $result = $this->api->call($name, $input);
+
+        $this->output->set_content_type('application/json')
+                     ->set_output(json_encode($result));
+    }
 }

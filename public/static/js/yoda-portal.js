@@ -101,13 +101,105 @@ $(function(){
 					$messages.append(
 						  '<div class="alert alert-' + item.type + '">'
 							+ '<button class="close" data-dismiss="alert"><span>&times;</span></button>'
-							+ '<p>' + item.message + '</p>'
+							+ '<p>' + YodaPortal.escapeEntities(item.message) + '</p>'
 						+ '</div>'
 					);
 				});
 			}
 		},
 	};
+
+	YodaPortal.extend('api', {
+		// Bare API call.  Use call() instead -- see further down below.
+		call_: async function(path, data={}, options={}) {
+			// POST an API request, return results as a Promise.
+			//
+			// The result of the promise, whether resolved or rejected, is
+			// always an object containing status, status_info and data
+			// properties.
+			//
+			// Failure of any kind (network, bad request, or any type of
+			// non-'ok' status reported by the API rule itself) is returned as
+			// a rejected Promise, while an 'ok' API status results in a
+			// resolved Promise.
+
+			let formData = new FormData();
+			formData.append(YodaPortal.csrf.tokenName, YodaPortal.csrf.tokenValue);
+			formData.append('data', JSON.stringify(data));
+
+			let errorResult = (msg='Your request could not be completed due to an internal error') =>
+				Promise.reject({'data': null, 'status': 'error_internal', 'status_info': msg});
+
+			try {
+				var r = await fetch('/api/'+path, {
+					'method':      'POST',
+					'body':        formData,
+					'credentials': 'same-origin',
+				});
+			} catch (error) {
+				// Network failure / abort.
+				console.error(`API Error: ${error}`);
+				return errorResult('Your request could not be completed due to a network connection issue.'
+					              +' Please try again in a few minutes.');
+			}
+			if (!((r.status >= 200 && r.status < 300) || r.status == 500)) {
+				// API responses should either produce 200 or 500.
+				// Any other status code indicates an internal error without (human-readable) information.
+				console.error(`API Error: HTTP status ${r.status}`);
+				return errorResult();
+			}
+			try {
+				var j = await r.json();
+			} catch (error) {
+				console.error(`API Error: Bad response JSON: ${error}`);
+				return errorResult();
+			}
+			if (!('status' in j && 'status_info' in j && 'data' in j)) {
+				console.error('API Error: missing status/status_info/data in response JSON', j);
+				return errorResult();
+			}
+			if (j.status === 'ok')
+				return Promise.resolve(j);
+			return Promise.reject(j);
+		},
+
+		// Call an API function and log errors.
+		// By default, failures (responses containing non-ok API result
+		// 'status') are reported to the user as red boxes containing
+		// 'status_info'. Setting options.quiet to true inhibits this behavior.
+		//
+		// On API success, a Promise is resolved with as a value, the result's 'data' property.
+		// On failure, a Promise is rejected with the complete result (containing status and status_info).
+		//
+		// If options.rawResult is set to true, the promise is always resolved.
+		// The resolved value will be an object containing {status, status_info, data}.
+		// The caller is then responsible for handling any error that may occur.
+		// (an error message may still be printed unless 'quiet' is also set to true)
+		//
+		call: function(path, data={}, options={}) {
+			const quiet       = 'quiet'       in options ? options.quiet            : false;
+			const errorPrefix = 'errorPrefix' in options ? options.errorPrefix+': ' : '';
+			const rawResult   = 'rawResult'   in options ? options.rawResult        : false;
+
+			console.log(`API: ${path}()`);
+
+			return this.call_(path, data)
+				.then((x)  => {
+					if (YodaPortal.version === 'development')
+						console.log(`API: ${path} result: `, x);
+					return rawResult ? x : x.data;
+				}).catch((x) => {
+					console.error(`API: ${path} failed: `, x);
+					if (!quiet) {
+						if (YodaPortal.version === 'development' && 'debug_info' in x)
+							setMessage('error', `${errorPrefix}${x.status_info} //// debug information: ${path}: ${x.debug_info}`);
+						else
+							setMessage('error', errorPrefix+x.status_info);
+					}
+					return rawResult ? Promise.resolve(x) : Promise.reject(x);
+				});
+		},
+	});
 
 	/**
 	 * \brief Yoda storage component.
@@ -146,6 +238,12 @@ $(function(){
 			set:    function(key, value)        {        this.parent.any.set   (localStorage, key, value);        },
 			remove: function(key)               {        this.parent.any.remove(localStorage, key);               },
 		}
+	});
+
+	YodaPortal.extend('message', function(type, msg) {
+		// Saves a message to be shown on the next page-load.
+		YodaPortal.storage.session.set('messages',
+			YodaPortal.storage.session.get('messages', []).concat({ type: type, message: msg }));
 	});
 
 	/**

@@ -9,13 +9,11 @@
 class Api
 {
     public $CI;
-    private $acc; ///< iRODS account.
 
     public function __construct()
     {
         // Get the CI instance
         $this->CI  =& get_instance();
-        $this->acc =  $this->CI->rodsuser->getRodsAccount();
     }
 
     /**
@@ -33,6 +31,8 @@ class Api
      * - data        contains API return value(s). may be null.
      */
     private function call_($name, $json) {
+
+        $acc =  $this->CI->rodsuser->getRodsAccount();
 
         // Return extra debug info to the frontend, if available.
         $isDevel = $this->CI->config->item('yodaVersion') === 'development';
@@ -53,7 +53,7 @@ class Api
 
         // Try to call the rule and parse results, catch errors.
         try {
-            $rule = new ProdsRule($this->acc,
+            $rule = new ProdsRule($acc,
                                   "rule { api_$name(*data); }",
                                   ['*data' => $json],
                                   ['ruleExecOut']);

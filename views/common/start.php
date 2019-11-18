@@ -39,7 +39,8 @@
         ?>
         <script>
             $(function() {
-                YodaPortal.extend('baseUrl', <?php echo json_encode(base_url()) ?>);
+                YodaPortal.extend('basePath', <?php echo json_encode('/'.$this->config->item('rodsServerZone').'/home') ?>);
+                YodaPortal.extend('baseUrl',  <?php echo json_encode(base_url()) ?>);
                 <?php
                 if (isset($user) && isset($user['username'])) {
                 ?>
