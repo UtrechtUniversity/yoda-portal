@@ -28,35 +28,32 @@
     <script src="<?php echo base_url('/static/js/yoda-portal.js?version=' . ASSETS_VERSION)?>"></script>
     <script src="<?php echo base_url('/static/js/messages.js?version=' . ASSETS_VERSION)?>"></script>
     <?php
+    if (isset($user) && isset($user['username'])) {
+        ?>
+        <script>
+            $(function() {
+                Yoda.version  = <?php echo json_encode(YODA_VERSION) ?>;
+                Yoda.basePath = <?php echo json_encode('/'.$this->config->item('rodsServerZone').'/home') ?>;
+                Yoda.baseUrl  = <?php echo json_encode(base_url()) ?>;
+                <?php if (isset($user) && isset($user['username'])) { ?>
+                Yoda.user = {
+                    username: <?php echo json_encode($user['username']); ?>,
+                };
+                <?php } ?>
+                Yoda.csrf = {
+                    tokenName:  <?php echo json_encode($this->security->get_csrf_token_name()); ?>,
+                    tokenValue: <?php echo json_encode($this->security->get_csrf_hash()); ?>
+                };
+            });
+        </script>
+        <?php
+    }
     if (isset($scriptIncludes)) {
         foreach ($scriptIncludes as $include) {
             ?>
             <script src="<?php echo $moduleBase . '/static/' . $include . '?version=' . ASSETS_VERSION ?>"></script>
             <?php
         }
-    }
-    if (isset($user) && isset($user['username'])) {
-        ?>
-        <script>
-            $(function() {
-                YodaPortal.extend('basePath', <?php echo json_encode('/'.$this->config->item('rodsServerZone').'/home') ?>);
-                YodaPortal.extend('baseUrl',  <?php echo json_encode(base_url()) ?>);
-                <?php
-                if (isset($user) && isset($user['username'])) {
-                ?>
-                YodaPortal.extend('user', {
-                    username: <?php echo json_encode($user['username']); ?>,
-                });
-                <?php
-                }
-                ?>
-                YodaPortal.extend('csrf', {
-                    tokenName:  <?php echo json_encode($this->security->get_csrf_token_name()); ?>,
-                    tokenValue: <?php echo json_encode($this->security->get_csrf_hash()); ?>
-                });
-            });
-        </script>
-        <?php
     }
     ?>
 </head>

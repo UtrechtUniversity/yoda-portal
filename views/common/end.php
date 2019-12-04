@@ -5,6 +5,5 @@
     <!-- <?php echo YODA_COMMIT ?> -->
   </div>
 </footer>
-<script>$(() => YodaPortal.extend('version', <?php echo json_encode(YODA_VERSION) ?>));</script>
 </body>
 </html>
