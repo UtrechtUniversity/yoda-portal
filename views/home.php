@@ -105,10 +105,10 @@ if (file_exists(dirname(__FILE__) . '/../public/static/static_frontpage.html')) 
     </style>
     </div>
     <div class="header-logo">
-        <img src="static/img/header_1600.jpg" alt="" title="" id="logo-1200" class="header-logo-img">
-        <img src="static/img/header_1200.jpg" alt="" title="" id="logo-800" class="header-logo-img">
-        <img src="static/img/header_800.jpg" alt="" title="" id="logo-480" class="header-logo-img">
-        <img src="static/img/header_480.jpg" alt="" title="" id="logo-0" class="header-logo-img">
+        <img src="static/img/header_default_1600.jpg" alt="" title="" id="logo-1200" class="header-logo-img">
+        <img src="static/img/header_default_1200.jpg" alt="" title="" id="logo-800" class="header-logo-img">
+        <img src="static/img/header_default_800.jpg" alt="" title="" id="logo-480" class="header-logo-img">
+        <img src="static/img/header_default_480.jpg" alt="" title="" id="logo-0" class="header-logo-img">
         <div class="header-logo-text-background">
                 <div class="header-logo-text-content">
                         <h1>Welcome to Yoda!</h1>
