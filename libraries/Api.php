@@ -109,7 +109,7 @@ class Api
         if (gettype($data) !== 'string')
             $data = json_encode($data);
         $result = $this->call_($name, $data);
-        if ($result->status == 'internal') {
+        if ($result->status == 'error_internal') {
             set_status_header(500);
             error_log(sprintf('{%s#%s} API call <%s> failed (status %s: %s)',
                               $this->CI->rodsuser->getUserInfo()['name'],
