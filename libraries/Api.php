@@ -3,7 +3,7 @@
  * Yoda API library
  *
  * @package    Yoda
- * @copyright  Copyright (c) 2019, Utrecht University. All rights reserved.
+ * @copyright  Copyright (c) 2019-2020, Utrecht University. All rights reserved.
  * @license    GPLv3, see LICENSE.
  */
 class Api
@@ -109,8 +109,16 @@ class Api
         if (gettype($data) !== 'string')
             $data = json_encode($data);
         $result = $this->call_($name, $data);
-        if ($result->status !== 'ok') {
+        if ($result->status == 'error_internal') {
             set_status_header(500);
+            error_log(sprintf('{%s#%s} API call <%s> failed (status %s: %s)',
+                              $this->CI->rodsuser->getUserInfo()['name'],
+                              $this->CI->rodsuser->getUserInfo()['zone'],
+                              $name,
+                              $result->status,
+                              $result->status_info));
+        } else if ($result->status !== 'ok') {
+            set_status_header(400);
             error_log(sprintf('{%s#%s} API call <%s> failed (status %s: %s)',
                               $this->CI->rodsuser->getUserInfo()['name'],
                               $this->CI->rodsuser->getUserInfo()['zone'],
