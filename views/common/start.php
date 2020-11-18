@@ -22,7 +22,6 @@
     }
     ?>
     <script src="<?php echo base_url('/static/lib/jquery/js/jquery.min.js?version=' . ASSETS_VERSION)?>"></script>
-    <script src="<?php echo base_url('/static/lib/bootstrap/js/bootstrap.bundle.min.js?version=' . ASSETS_VERSION)?>"></script>
     <script src="<?php echo base_url('/static/lib/toastr/toastr.min.js?version=' . ASSETS_VERSION)?>"></script>
     <script src="<?php echo base_url('/static/js/yoda-portal.js?version=' . ASSETS_VERSION)?>"></script>
     <script src="<?php echo base_url('/static/js/messages.js?version=' . ASSETS_VERSION)?>"></script>
