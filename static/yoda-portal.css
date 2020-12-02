@@ -1,0 +1,78 @@
+/* Font faces {{{ */
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Open Sans'), local('OpenSans'), url(/static/font/open-sans/OpenSans-Regular.woff) format('woff');
+}
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Open Sans Bold'), local('OpenSans-Bold'), url(/static/font/open-sans/OpenSans-Bold.woff) format('woff');
+}
+@font-face {
+	font-family: 'Open Sans';
+	font-style: italic;
+	font-weight: 400;
+	src: local('Open Sans Italic'), local('OpenSans-Italic'), url(/static/font/open-sans/OpenSans-Italic.woff) format('woff');
+}
+@font-face {
+	font-family: 'Open Sans';
+	font-style: italic;
+	font-weight: 700;
+	src: local('Open Sans Bold Italic'), local('OpenSans-BoldItalic'), url(/static/font/open-sans/OpenSans-BoldItalic.woff) format('woff');
+}
+
+/* }}} */
+
+.brandbar {
+	height: 68px;
+	padding: 10px 20px;
+}
+.brandbar .logo,
+.brandbar .auth-action {
+	height: 100%;
+}
+.brandbar .logo img {
+	height: 48px;
+}
+.brandbar .auth-action {
+	line-height: 48px;
+}
+
+.navbar .nav > li > a {
+	font-size: 16px;
+	transition: color 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* Table */
+.yoda-table th {
+	background-color: #dcdcdc;
+	border-color: #ddd;
+	border-bottom: 1px solid transparent!important;
+	color: #333;
+	font-family: inherit;
+	font-weight: 500;
+}
+
+.yoda-table tr.odd {
+        background-color: transparent !important;
+}
+
+/* Sticky footer */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: 50px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  font-size: 9px;
+  text-align: center;
+}
