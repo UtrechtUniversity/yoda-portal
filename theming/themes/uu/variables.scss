@@ -1,0 +1,30 @@
+// colors
+$primary: #ffcd00;
+$black: #000;
+$black-alt: #333;
+$gray-alt: #dcdcdc;
+$gray-alt2: #ddd;
+
+// Yoda Navbar
+$navbar-bg: $black;
+$navbar-text: #fff;
+$navbar-hover: $primary;
+$navbar-active: $primary;
+
+// Bootstrap 4 theme color(s)
+$theme-colors: (
+    "primary": $primary
+);
+
+// Bootstrap card
+$card-cap-bg: $gray-alt;
+$card-cap-color: $black-alt;
+$card-border-color: $gray-alt2;
+
+// Bootstrap links
+$link-color: $black;
+
+// Bootstrap list group
+$list-group-active-color: $black;
+
+// $font-family-base: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
