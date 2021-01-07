@@ -10,7 +10,7 @@ class User extends MY_Controller {
 
     public function login()
     {
-	// Get these from a config file
+	// TODO: Get these from a config file/Ansible
 	$clientId = "myClientID";
 	$redirectUri = "https://portal.yoda.test/user/callback";
 	$authUri = "https://oauth.mocklab.io/oauth/authorize?response_type=code&client_id={$clientId}&redirect_uri={$redirectUri}";
@@ -20,45 +20,10 @@ class User extends MY_Controller {
             redirect('home');
         }
 
-        //$this->session->unset_userdata('username');
-        //$this->session->unset_userdata('password');
-
-        //$username = $this->input->post('username');
-        //$password = $this->input->post('password');
-
-        //$loginFailed = false;
-
-        /*if (isset($username) && isset($password) && $username !== false && $password !== false) {
-            if ($this->rodsuser->login($username, $password)) {
-                $this->session->set_userdata('username', $username);
-                $this->session->set_userdata('password', $password);
-                // TODO: Set iRODS temporary password instead.
-
-                $redirectTarget = $this->session->flashdata('redirect_after_login');
-
-                if ($redirectTarget === false)
-                    redirect('home');
-                else
-                    redirect($redirectTarget);
-            } else {
-                $loginFailed = true;
-            }
-        }
-
-        $this->session->keep_flashdata('redirect_after_login');
-
-        $viewParams = array(
-            'activeModule' => 'login',
-            'scriptIncludes' => array('js/login.js'),
-            'loginFailed'  => $loginFailed,
-        );
-
-        loadView('user/login', $viewParams);*/
-	//type redirect aanpassen (nu temporary)
 	redirect($authUri);
     }
 
-    public function callback($code = '') {
+    public function callback() {
 	$code = $this->input->get('code', TRUE);
 	
 	if($code == '') {
@@ -95,15 +60,15 @@ class User extends MY_Controller {
 	$claimElement = explode('.', $jsonresult['id_token'])[1];
 	$claimData = json_decode(base64_decode($claimElement), TRUE);
 
+        $this->session->unset_userdata('username');
+	$this->session->unset_userdata('password');
+
 	$username = $claimData['email'];
 	$password = $jsonresult['access_token'];
 	
-//	$data = array( 'code' => $code, 'result' => $result, 'user' => $username, 'token' => $password );
-//	$this->load->view('user/callback', $data);
-
 	$loginFailed = false;
-
-        if ($this->rodsuser->login($username, $password)) {
+	$loginSuccess =$this->rodsuser->login($username, $password);
+        if ($loginSuccess) {
 	    $this->session->set_userdata('username', $username);
 	    $this->session->set_userdata('password', $password);
 	    // TODO: Set iRODS temporary password instead.
@@ -127,7 +92,8 @@ class User extends MY_Controller {
             'loginFailed'  => $loginFailed,
         );
 
-        loadView('user/login', $viewParams);
+	$viewParams = array( 'loginSuccess' => false );
+	loadView('home', $viewParams);
 
     }
 

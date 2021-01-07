@@ -6,6 +6,7 @@ HOI
 	var_dump($result);
 
 	echo '<br/><br/>';
-	echo "User: $user, token: $token";
+	echo "User: $user,<br/> token: $token<br/>";
+	echo "LoginSucces: $success";
 ?>
 <a href="https://portal.yoda.test">Terug naar af</a>
