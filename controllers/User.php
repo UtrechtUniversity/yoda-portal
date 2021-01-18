@@ -10,37 +10,31 @@ class User extends MY_Controller {
 
     public function login_oidc()
     {
-	// TODO: Get these from a config file/Ansible
-	$clientId = "";
-	$redirectUri = "";
-	$authUri = "";
+	$clientId 	= $this->config->item('oidc_clientId');
+	$redirectUri 	= $this->config->item('oidc_callbackUrl');
+	$authUrl 	= $this->config->item('oidc_authUrl') . "?response_type=code&client_id={$clientId}&redirect_uri={$redirectUri}";
 
         // Redirect logged in users to home.
         if ($this->rodsuser->isLoggedIn()) {
             redirect('home');
         }
 
-	redirect($authUri);
+	redirect($authUrl);
     }
 
     public function callback() {
-	$code = $this->input->get('code', TRUE);
-	
-	if($code == '') {
-		$code = "abc123";
-	}
-	
-	$tokenUrl = '';
-	$callbackUri = '';
-	$clientId = '';
-	$clientSecret = '';
-	$grant_type = 'autorization_code';
-	$CREDS = base64_encode("$clientId:$clientSecret");
+	$code 		= $this->input->get('code', TRUE);
+	$tokenUrl 	= $this->config->item('oidc_tokenUrl');
+	$callbackUrl 	= $this->config->item('oidc_callbackUrl');
+	$clientId 	= $this->config->item('oidc_clientId');'';
+	$clientSecret 	= $this->config->item('oidc_clientSecret');'';
+	$grant_type 	= 'autorization_code';
+	$CREDS 		= base64_encode("$clientId:$clientSecret");
 
 	$formdata = array(
 		'grant_type' => 'authorization_code', 
 		'code' => $code, 
-		'redirect_uri' => $callbackUri
+		'redirect_uri' => $callbackUrl
 	);
 
 	$options = [
@@ -71,7 +65,6 @@ class User extends MY_Controller {
         if ($loginSuccess) {
 	    $this->session->set_userdata('username', $username);
 	    $this->session->set_userdata('password', $password);
-	    // TODO: Set iRODS temporary password instead.
 
             $redirectTarget = $this->session->flashdata('redirect_after_login');
 
