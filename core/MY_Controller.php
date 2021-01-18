@@ -46,7 +46,7 @@ class MY_Controller extends CI_Controller {
         define("ASSETS_VERSION", $assetsVersion);
 
         // Require a valid login for all pages except Home and User/Login.
-        if (!in_array(uri_string(), array('user/login', 'user/callback', '')) && !$this->rodsuser->isLoggedIn()) {
+        if (!in_array(uri_string(), array('user/login', 'user/login_oidc', 'user/callback', '')) && !$this->rodsuser->isLoggedIn()) {
             $this->session->set_flashdata('redirect_after_login', uri_string());
             redirect('user/login', 'refresh');
         }

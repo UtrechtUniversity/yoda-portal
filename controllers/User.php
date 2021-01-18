@@ -8,12 +8,12 @@
  */
 class User extends MY_Controller {
 
-    public function login()
+    public function login_oidc()
     {
 	// TODO: Get these from a config file/Ansible
-	$clientId = "myClientID";
-	$redirectUri = "https://portal.yoda.test/user/callback";
-	$authUri = "https://oauth.mocklab.io/oauth/authorize?response_type=code&client_id={$clientId}&redirect_uri={$redirectUri}";
+	$clientId = "";
+	$redirectUri = "";
+	$authUri = "";
 
         // Redirect logged in users to home.
         if ($this->rodsuser->isLoggedIn()) {
@@ -30,10 +30,10 @@ class User extends MY_Controller {
 		$code = "abc123";
 	}
 	
-	$tokenUrl = 'https://oauth.mocklab.io/oauth/token';
-	$callbackUri = 'https://portal.yoda.test/user/callback';
-	$clientId = 'myClientID';
-	$clientSecret = 'myClientPassword';
+	$tokenUrl = '';
+	$callbackUri = '';
+	$clientId = '';
+	$clientSecret = '';
 	$grant_type = 'autorization_code';
 	$CREDS = base64_encode("$clientId:$clientSecret");
 
@@ -97,7 +97,48 @@ class User extends MY_Controller {
 
     }
 
-    public function logout() {
+    public function login() { 
+	if ($this->rodsuser->isLoggedIn()) {
+            redirect('home');
+        }
+
+        $this->session->unset_userdata('username');
+        $this->session->unset_userdata('password');
+
+        $username = $this->input->post('username');
+        $password = $this->input->post('password');
+
+        $loginFailed = false;
+
+        if (isset($username) && isset($password) && $username !== false && $password !== false) {
+            if ($this->rodsuser->login($username, $password)) {
+                $this->session->set_userdata('username', $username);
+                $this->session->set_userdata('password', $password);
+                // TODO: Set iRODS temporary password instead.
+
+                $redirectTarget = $this->session->flashdata('redirect_after_login');
+
+                if ($redirectTarget === false)
+                    redirect('home');
+                else
+                    redirect($redirectTarget);
+            } else {
+                $loginFailed = true;
+            }
+        }
+
+        $this->session->keep_flashdata('redirect_after_login');
+
+        $viewParams = array(
+            'activeModule' => 'login',
+            'scriptIncludes' => array('js/login.js'),
+            'loginFailed'  => $loginFailed,
+        );
+
+        loadView('user/login', $viewParams);
+   }
+
+   public function logout() {
         $this->session->sess_destroy();
         redirect('home');
     }
