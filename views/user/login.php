@@ -10,27 +10,25 @@
                 <?php echo form_open('user/login'); ?>
                 <div class="form-group row">
                     <label class="col-sm-3 col-form-label" for="f-login-username">Username</label>
-                    <div class="col-sm-9">
-                        <input name="username" id="f-login-username" class="form-control" type="text" placeholder="j.a.smith@uu.nl" autofocus="" required />
-                        <span id="capitals" class="hidden error text-danger">Username should not contain capital letters.</span>
-                    </div>
+                    <input name="username" id="f-login-username" class="form-control col-sm-6" type="text" placeholder="j.a.smith@uu.nl" autofocus="" required />
+                    <span id="capitals" class="hidden error text-danger">Username should not contain capital letters.</span>
                 </div>
                 <div class="form-group row">
                     <label class="col-sm-3 col-form-label" for="f-login-password">Password</label>
-                    <div class="col-sm-9">
-                        <input name="password" id="f-login-password" class="form-control" type="password" required />
-                        <a href="https://<?php echo $this->config->item('yoda_eus_fqdn') ?>/user/forgot-password" title="Forgot / change password?">Forgot / change password?</a>
-                    </div>
+                    <input name="password" id="f-login-password" class="form-control col-sm-6" type="password" required />
+                    <a class="col-sm-6 offset-sm-3 pl-0" href="https://<?php echo $this->config->item('yoda_eus_fqdn') ?>/user/forgot-password" title="Forgot / change password?">Forgot / change password?</a>
                 </div>
                 <div class="form-group row">
-                    <div class="offset-sm-3 col-sm-9">
-                        <input id="f-login-submit" class="btn btn-primary col-sm-3" type="submit" value="Sign in" />
-                    </div>
+                    <input id="f-login-submit" class="btn btn-primary col-sm-6 offset-sm-3" type="submit" value="Sign in" />
+		<?php if ( $this->config->item('oidc_active') ): ?>
+		    <a class="btn btn-secondary col-sm-6 mt-2 offset-sm-3" href="<?php echo $authUrl; ?>"><?php echo $this->config->item('oidc_signin_text'); ?></a>
+		<?php endif; ?>
                 </div>
                 <?php echo form_close(); ?>
                 <?php if ($loginFailed) { ?>
                     <p>
-                        Login failed. Please check your username and password.
+                        <?php echo $error; ?>
+			Login failed. Please check your username and password.
                     </p>
                 <?php } ?>
             </div>

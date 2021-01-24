@@ -69,7 +69,6 @@
                 <a class="logout text-right" href="<?php echo base_url('user/logout')?>">Log out <?php echo htmlentities($user['username']) ?></a>
             <?php } else { ?>
                 <a class="btn btn-primary" href="<?php echo base_url('user/login')?>">Sign in</a>
-                <a class="btn btn-primary" href="<?php echo base_url('user/login_oidc')?>">Use Solis</a>
             <?php } ?>
         </div>
     </nav>

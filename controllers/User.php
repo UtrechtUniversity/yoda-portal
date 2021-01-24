@@ -12,7 +12,9 @@ class User extends MY_Controller {
     {
 	$clientId 	= $this->config->item('oidc_clientId');
 	$redirectUri 	= $this->config->item('oidc_callbackUrl');
-	$authUrl 	= $this->config->item('oidc_authUrl') . "?response_type=code&client_id={$clientId}&redirect_uri={$redirectUri}";
+	$scopes		= $this->config->item('oidc_scopes');
+	$acr		= $this->config->item('oidc_acrValues');
+	$authUrl 	= $this->config->item('oidc_authUrl') . "?response_type=code&client_id={$clientId}&redirect_uri={$redirectUri}&scope={$scopes}&acr_values={$acr}";
 
         // Redirect logged in users to home.
         if ($this->rodsuser->isLoggedIn()) {
@@ -27,8 +29,8 @@ class User extends MY_Controller {
 	$tokenUrl 	= $this->config->item('oidc_tokenUrl');
 	$callbackUrl 	= $this->config->item('oidc_callbackUrl');
 	$clientId 	= $this->config->item('oidc_clientId');'';
-	$clientSecret 	= $this->config->item('oidc_clientSecret');'';
-	$grant_type 	= 'autorization_code';
+	$clientSecret 	= $this->config->item('oidc_clientSecret');
+	$email_field	= $this->config->item('oidc_emailField');
 	$CREDS 		= base64_encode("$clientId:$clientSecret");
 
 	$formdata = array(
@@ -57,15 +59,12 @@ class User extends MY_Controller {
         $this->session->unset_userdata('username');
 	$this->session->unset_userdata('password');
 
-	$username = $claimData['email'];
+	$username = $claimData[ $email_field ];
 	$password = $jsonresult['access_token'];
-	
-	$loginFailed = false;
-	$loginSuccess =$this->rodsuser->login($username, $password);
-        if ($loginSuccess) {
+
+        if ($this->rodsuser->login($username, $password)) {
 	    $this->session->set_userdata('username', $username);
 	    $this->session->set_userdata('password', $password);
-
             $redirectTarget = $this->session->flashdata('redirect_after_login');
 
                 if ($redirectTarget === false)
@@ -73,27 +72,31 @@ class User extends MY_Controller {
                 else
                     redirect($redirectTarget);
         } 
-	else {
-            $loginFailed = true;
-        }
 
         $this->session->keep_flashdata('redirect_after_login');
 
-        $viewParams = array(
-            'activeModule' => 'login',
-            'scriptIncludes' => array('js/login.js'),
-            'loginFailed'  => $loginFailed,
-        );
-
-	$viewParams = array( 'loginSuccess' => false );
-	loadView('home', $viewParams);
-
+	//$viewParams = array( 'loginSuccess' => false );
+	$this->session->set_flashdata('error', 'Failed to login to Yoda. Please contact a data manager about your account.');
+	redirect('user/login');
     }
 
     public function login() { 
 	if ($this->rodsuser->isLoggedIn()) {
             redirect('home');
         }
+	
+	$authUrl 	= '';
+	$oidc_active	= $this->config->item('oidc_active');
+	$oidc_signin_text = '';
+
+	if($oidc_active) {
+		$clientId 	= $this->config->item('oidc_clientId');
+		$redirectUri 	= $this->config->item('oidc_callbackUrl');
+		$scopes		= $this->config->item('oidc_scopes');
+		$acr		= $this->config->item('oidc_acrValues');
+		$authUrl 	= $this->config->item('oidc_authUrl') . "?response_type=code&client_id={$clientId}&redirect_uri={$redirectUri}&scope={$scopes}&acr_values={$acr}";
+		$oidc_signin_text = 'Sign in with Solis ID';
+	}
 
         $this->session->unset_userdata('username');
         $this->session->unset_userdata('password');
@@ -102,17 +105,17 @@ class User extends MY_Controller {
         $password = $this->input->post('password');
 
         $loginFailed = false;
-
         if (isset($username) && isset($password) && $username !== false && $password !== false) {
             if ($this->rodsuser->login($username, $password)) {
                 $this->session->set_userdata('username', $username);
                 $this->session->set_userdata('password', $password);
                 // TODO: Set iRODS temporary password instead.
 
+                redirect('home', 'refresh');
                 $redirectTarget = $this->session->flashdata('redirect_after_login');
 
                 if ($redirectTarget === false)
-                    redirect('home');
+                    redirect('home', 'refresh');
                 else
                     redirect($redirectTarget);
             } else {
@@ -121,11 +124,20 @@ class User extends MY_Controller {
         }
 
         $this->session->keep_flashdata('redirect_after_login');
+	
+	$error = $this->session->flashdata('error');
+	if( isset( $error ) ) {
+	    $loginFailed = true;
+	}
 
         $viewParams = array(
-            'activeModule' => 'login',
-            'scriptIncludes' => array('js/login.js'),
-            'loginFailed'  => $loginFailed,
+            'activeModule' 	=> 'login',
+            'scriptIncludes' 	=> array('js/login.js'),
+            'loginFailed'  	=> $loginFailed,
+	    'error'		=> $error,
+	    'authUrl' 		=> $authUrl,
+	    'oidc_active' 	=> $oidc_active, 
+	    'oidc_signin_text'  => $oidc_signin_text,
         );
 
         loadView('user/login', $viewParams);
