@@ -8,29 +8,13 @@
  */
 class User extends MY_Controller {
 
-    public function login_oidc()
-    {
-	$clientId 	= $this->config->item('oidc_clientId');
-	$redirectUri 	= $this->config->item('oidc_callbackUrl');
-	$scopes		= $this->config->item('oidc_scopes');
-	$acr		= $this->config->item('oidc_acrValues');
-	$authUrl 	= $this->config->item('oidc_authUrl') . "?response_type=code&client_id={$clientId}&redirect_uri={$redirectUri}&scope={$scopes}&acr_values={$acr}";
-
-        // Redirect logged in users to home.
-        if ($this->rodsuser->isLoggedIn()) {
-            redirect('home');
-        }
-
-	redirect($authUrl);
-    }
-
     public function callback() {
 	$code 		= $this->input->get('code', TRUE);
-	$tokenUrl 	= $this->config->item('oidc_tokenUrl');
-	$callbackUrl 	= $this->config->item('oidc_callbackUrl');
-	$clientId 	= $this->config->item('oidc_clientId');'';
-	$clientSecret 	= $this->config->item('oidc_clientSecret');
-	$email_field	= $this->config->item('oidc_emailField');
+	$tokenUrl 	= $this->config->item('oidc_token_uri');
+	$callbackUrl 	= $this->config->item('oidc_callback_uri');
+	$clientId 	= $this->config->item('oidc_client_id');'';
+	$clientSecret 	= $this->config->item('oidc_client_secret');
+	$email_field	= $this->config->item('oidc_email_field');
 	$CREDS 		= base64_encode("$clientId:$clientSecret");
 
 	$formdata = array(
@@ -85,19 +69,6 @@ class User extends MY_Controller {
             redirect('home');
         }
 	
-	$authUrl 	= '';
-	$oidc_active	= $this->config->item('oidc_active');
-	$oidc_signin_text = '';
-
-	if($oidc_active) {
-		$clientId 	= $this->config->item('oidc_clientId');
-		$redirectUri 	= $this->config->item('oidc_callbackUrl');
-		$scopes		= $this->config->item('oidc_scopes');
-		$acr		= $this->config->item('oidc_acrValues');
-		$authUrl 	= $this->config->item('oidc_authUrl') . "?response_type=code&client_id={$clientId}&redirect_uri={$redirectUri}&scope={$scopes}&acr_values={$acr}";
-		$oidc_signin_text = 'Sign in with Solis ID';
-	}
-
         $this->session->unset_userdata('username');
         $this->session->unset_userdata('password');
 
@@ -120,11 +91,13 @@ class User extends MY_Controller {
                     redirect($redirectTarget);
             } else {
                 $loginFailed = true;
+		$error = "Login failed. Please check your username and password.";
             }
         }
 
         $this->session->keep_flashdata('redirect_after_login');
-	
+
+	// Check whether we were redirected from a failed callback	
 	$error = $this->session->flashdata('error');
 	if( isset( $error ) ) {
 	    $loginFailed = true;
@@ -135,9 +108,6 @@ class User extends MY_Controller {
             'scriptIncludes' 	=> array('js/login.js'),
             'loginFailed'  	=> $loginFailed,
 	    'error'		=> $error,
-	    'authUrl' 		=> $authUrl,
-	    'oidc_active' 	=> $oidc_active, 
-	    'oidc_signin_text'  => $oidc_signin_text,
         );
 
         loadView('user/login', $viewParams);

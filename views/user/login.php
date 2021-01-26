@@ -21,14 +21,13 @@
                 <div class="form-group row">
                     <input id="f-login-submit" class="btn btn-primary col-sm-6 offset-sm-3" type="submit" value="Sign in" />
 		<?php if ( $this->config->item('oidc_active') ): ?>
-		    <a class="btn btn-secondary col-sm-6 mt-2 offset-sm-3" href="<?php echo $authUrl; ?>"><?php echo $this->config->item('oidc_signin_text'); ?></a>
+		    <a class="btn btn-secondary col-sm-6 mt-2 offset-sm-3" href="<?php echo $this->config->item('oidc_auth_uri'); ?>"><?php echo $this->config->item('oidc_signin_text'); ?></a>
 		<?php endif; ?>
                 </div>
                 <?php echo form_close(); ?>
                 <?php if ($loginFailed) { ?>
                     <p>
                         <?php echo $error; ?>
-			Login failed. Please check your username and password.
                     </p>
                 <?php } ?>
             </div>
