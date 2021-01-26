@@ -21,6 +21,13 @@
                 <div class="form-group row">
                     <input id="f-login-submit" class="btn btn-primary col-sm-6 offset-sm-3" type="submit" value="Sign in" />
 		<?php if ( $this->config->item('oidc_active') ): ?>
+		</div>
+		<div class="row col-sm-6 offset-sm-3">
+			<hr class="col-sm-5 px-0"/>
+			<span class="col-sm-2">Or</span>
+			<hr class="col-sm-5 px-0"/>
+		</div> 
+		<div class="form-group row">
 		    <a class="btn btn-secondary col-sm-6 mt-2 offset-sm-3" href="<?php echo $this->config->item('oidc_auth_uri'); ?>"><?php echo $this->config->item('oidc_signin_text'); ?></a>
 		<?php endif; ?>
                 </div>
