@@ -18,18 +18,18 @@ class User extends MY_Controller {
         $CREDS          = base64_encode("$clientId:$clientSecret");
 
         $formdata = array(
-            'grant_type' => 'authorization_code', 
-            'code' => $code, 
+            'grant_type' => 'authorization_code',
+            'code' => $code,
             'redirect_uri' => $callbackUrl
         );
-    
+
         $options = [
             'http' => [
-                'header' => [ 
+                'header' => [
                     "Authorization: Basic $CREDS",
                     "Content-Type: application/x-www-form-urlencoded"
                 ],
-                'method' => 'POST'
+                'method' => 'POST',
                 'content' => http_build_query($formdata)
             ]
         ];
@@ -56,18 +56,18 @@ class User extends MY_Controller {
                 redirect('home');
             else
                 redirect($redirectTarget);
-        } 
+        }
 
         $this->session->keep_flashdata('redirect_after_login');
         $this->session->set_flashdata('error', 'Failed to login to Yoda. Please contact a data manager about your account.');
         redirect('user/login');
     }
 
-    public function login() { 
+    public function login() {
         if ($this->rodsuser->isLoggedIn()) {
             redirect('home');
         }
-    
+
         $this->session->unset_userdata('username');
         $this->session->unset_userdata('password');
 
@@ -77,7 +77,7 @@ class User extends MY_Controller {
         $loginFailed = false;
         if (isset($username) && isset($password) && $username !== false && $password !== false) {
             if ($this->rodsuser->login($username, $password)) {
-                
+
                 $this->session->set_userdata('username', $username);
                 $this->session->set_userdata('password', $password);
                 // TODO: Set iRODS temporary password instead.
@@ -97,7 +97,7 @@ class User extends MY_Controller {
 
         $this->session->keep_flashdata('redirect_after_login');
 
-        // Check whether we were redirected from a failed callback  
+        // Check whether we were redirected from a failed callback
         $error = $this->session->flashdata('error');
         if( isset( $error ) ) {
             $loginFailed = true;
