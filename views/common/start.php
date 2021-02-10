@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Yoda Portal</title>
-    <link rel="shortcut icon" href="/static/img/favicon.ico">
+    <title><?php echo $this->config->item('portalTitleText') ?></title>
+    <link rel="shortcut icon" href="<?php echo $this->config->item('portalShortcutIcon') ?>">
     <link rel="stylesheet" href="<?php echo base_url('/static/lib/toastr/toastr.min.css?version=' . ASSETS_VERSION)?>">
     <link rel="stylesheet" href="<?php echo base_url('/static/css/yoda-portal.css?version=' . ASSETS_VERSION)?>">
     <?php
@@ -61,7 +61,7 @@
 <div class="container">
     <nav class="navbar yoda-topnavbar">
         <a class="navbar-brand" href="<?php echo base_url(); ?>">
-            <img class="logo" src="<?php echo base_url('/static/img/logo.svg')?>">
+            <img class="logo" src="<?php echo base_url($this->config->item('portalLogo')) ?>">
         </a>
 
         <div class="auth-action pull-right">
@@ -77,7 +77,7 @@
 <nav class="navbar navbar-expand-lg yoda-navbar">
     <div class="container">
         <a class="navbar-brand" href="<?php echo base_url(); ?>">
-            Yoda Portal
+            <?php echo $this->config->item('portalTitleText') ?>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>

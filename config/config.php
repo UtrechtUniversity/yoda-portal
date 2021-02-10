@@ -553,6 +553,9 @@ $config['rodsServerPort']      = 1247;
 $config['rodsServerZone']      = 'tempZone';
 $config['rodsDefaultResource'] = 'demoResc';
 $config['rodsAuthType']        = 'STANDARD'; // Either STANDARD or PAM.
+$config['portalTitleText']     = 'Yoda Portal';
+$config['portalShortcutIcon']  = '/static/img/favicon.ico';
+$config['portalLogo']          = '/static/img/logo.svg';
 
 if (file_exists(dirname(__FILE__) . '/config_local.php'))
     include(    dirname(__FILE__) . '/config_local.php');
