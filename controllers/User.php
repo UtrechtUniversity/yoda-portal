@@ -3,7 +3,7 @@
  * User controller
  *
  * @package    Yoda
- * @copyright  Copyright (c) 2017-2018, Utrecht University. All rights reserved.
+ * @copyright  Copyright (c) 2017-2021, Utrecht University. All rights reserved.
  * @license    GPLv3, see LICENSE.
  */
 class User extends MY_Controller {
@@ -15,6 +15,7 @@ class User extends MY_Controller {
         $clientId       = $this->config->item('oidc_client_id');'';
         $clientSecret   = $this->config->item('oidc_client_secret');
         $email_field    = $this->config->item('oidc_email_field');
+        $publicKey      = $this->config->item('oidc_public_key');
         $CREDS          = base64_encode("$clientId:$clientSecret");
 
         $formdata = array(
@@ -38,16 +39,26 @@ class User extends MY_Controller {
         $result = file_get_contents($tokenUrl, false, $context);
         $jsonresult = json_decode($result, TRUE);
 
-        $claimElement = explode('.', $jsonresult['id_token'])[1];
-        $claimData = json_decode(base64_decode($claimElement), TRUE);
+        // Decode id token.
+        list($header, $payload, $signature) = explode(".", $jsonresult['id_token']);
+        $plainHeader = json_decode(base64_decode($header), TRUE);
+        $plainPayload = json_decode(base64_decode($payload), TRUE);
+        $plainSignature = base64_decode(strtr($signature, '-_', '+/'), true);
+
+        //$algorithm = $plainHeader["alg"];
+        $algorithm = OPENSSL_ALGO_SHA256;
+
+        // Verify id token.
+        $verified = openssl_verify($header.".".$payload, $plainSignature,
+                                   base64_decode($publicKey), $algorithm);
 
         $this->session->unset_userdata('username');
         $this->session->unset_userdata('password');
 
-        $username = $claimData[ $email_field ];
+        $username = $plainPayload[$email_field];
         $password = $jsonresult['access_token'];
 
-        if ($this->rodsuser->login($username, $password)) {
+        if ($verified == 1 && $this->rodsuser->login($username, $password)) {
             $this->session->set_userdata('username', $username);
             $this->session->set_userdata('password', $password);
             $redirectTarget = $this->session->flashdata('redirect_after_login');
