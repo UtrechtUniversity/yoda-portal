@@ -9,9 +9,21 @@ from flask_wtf.csrf import CSRFProtect
 import connman
 import json
 from irods import rule
+from general.general import general_bp
+from group_manager.group_manager import group_bp 
+from research.research import research_bp
+from vault.vault import vault_bp
+from stats.stats import stats_bp
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'bloep'  # XXX not for production use
+
+app.register_blueprint(general_bp)
+app.register_blueprint(group_bp, url_prefix = '/group')
+app.register_blueprint(research_bp, url_prefix = '/research')
+app.register_blueprint(stats_bp, url_prefix = '/statistics')
+app.register_blueprint(vault_bp, url_prefix = '/vault')
+
 
 # XXX CSRF needs to be disabled for API testing.
 csrf = CSRFProtect(app)

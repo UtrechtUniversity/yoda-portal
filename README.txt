@@ -37,6 +37,22 @@ pip3 install -U Flask-WTF
 pip3 install mod-wsgi
 mod_wsgi-express install-module > /etc/httpd/conf.modules.d/02-wsgi.conf
 
+To run the flask app in debug mode, apply the following changes to yoda.wsgi:
+diff --git a/yoda.wsgi b/yoda.wsgi
+index b15cb1b..7091321 100644
+--- a/yoda.wsgi
++++ b/yoda.wsgi
+@@ -5,4 +5,6 @@ import sys
+
+ sys.path = [os.path.dirname(__file__)] + sys.path
+
+-from app import app as application
++from app import app
++from werkzeug.debug import DebuggedApplication
++application = DebuggedApplication(app, True)
+
+If changes do not take effect immediately, you can use 'touch yoda.wsgi' to
+reload all templates and such.  
 
 Copyright (c) 2020, Utrecht University
 All rights reserved.
