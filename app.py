@@ -17,6 +17,10 @@ from stats.stats import stats_bp
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'bloep'  # XXX not for production use
+app.config['portalTitleText'] = 'Yoda Portal'
+app.config['logoUrl'] = 'https://www.uu.nl'
+app.config['YODA_VERSION'] = 2 # Replace by yoda_version in j2 template
+app.config['YODA_COMMIT'] = 1 # Replace by portalchanges.results.2.after in j2 template
 
 app.register_blueprint(general_bp)
 app.register_blueprint(group_bp, url_prefix = '/group')
@@ -32,7 +36,7 @@ csrf = CSRFProtect(app)
 
 @app.before_request
 def check_irods():
-    if not request.endpoint or request.endpoint in ['login', 'static']:
+    if not request.endpoint or request.endpoint in ['general_bp.index', 'login', 'static']:
         # No auth or iRODS session needed.
         # print('EP '+request.endpoint)
         return
@@ -84,29 +88,32 @@ def release_irods(x):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        s = connman.get(request.form['username'], request.form['password'])
-        if s is None:
-            return render_template('login.html')
-        g.session = s
-        session['username'] = request.form['username']
-        session['password'] = request.form['password']
-        return redirect('/browse', code=302)
-    else:
-        return render_template('login.html')
+    return ''
+    #if request.method == 'POST':
+        #s = connman.get(request.form['username'], request.form['password'])
+        #if s is None:
+            #return render_template('login.html')
+        #g.session = s
+        #session['username'] = request.form['username']
+        #session['password'] = request.form['password']
+        #return redirect('/browse', code=302)
+    #else:
+        #return render_template('login.html')
 
 @app.route('/logout', methods=['GET'])
 def logout():
-    session.clear()
-    return redirect('/', code=302)
+    return ''
+    #session.clear()
+    #return redirect('/', code=302)
 
 @app.route('/browse', methods=['GET'])
 def browse():
-    return render_template('browse.html')
+    return ''
+    #return render_template('browse.html')
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+#@general_bp.route('/')
+#def index():
+    #return render_template('index.html')
 
 @app.route('/api/<fn>', methods=['POST'])
 def api(fn):
