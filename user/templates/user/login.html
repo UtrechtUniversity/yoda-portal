@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Sign in{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="offset-md-2 col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <div class="panel-title">Login to Yoda</div>
+            </div>
+            <div class="card-body">
+                <form method="post" class="form-horizontal">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label" for="f-login-username">Username</label>
+                        <input name="username" id="f-login-username" class="form-control col-sm-6" type="text" placeholder="j.a.smith@uu.nl" autofocus="" required />
+                        <span id="capitals" class="hidden error text-danger">Username should not contain capital letters.</span>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label" for="f-login-password">Password</label>
+                        <input name="password" id="f-login-password" class="form-control col-sm-6" type="password" required />
+                        <a class="col-sm-6 offset-sm-3 pl-0" href="{{ url_for('user_bp.forgot_password') }}" title="Forgot / change password?">Forgot / change password?</a>
+                    </div>
+                    <div class="form-group row">
+                        <input id="f-login-submit" class="btn btn-primary col-sm-6 offset-sm-3" type="submit" value="Sign in" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

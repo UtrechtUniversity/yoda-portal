@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template
 
-group_bp = Blueprint('group_manager', __name__,
-    template_folder='templates',
-    static_folder='static')
+group_bp = Blueprint('group_bp', __name__,
+    template_folder='templates/group_manager',
+    static_folder='static/group_manager')
 
 
 @group_bp.route('/example')
-def example():
-    return render_template('group_manager/example.html')
+def index():
+    return render_template('example.html')

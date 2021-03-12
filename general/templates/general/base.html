@@ -10,48 +10,49 @@
             {% endblock meta %}
 
             {% block style %}
-                <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+                <!--link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}"-->
                 <link rel="stylesheet" href="{{ url_for('static', filename='toastr/toastr.min.css') }}">
                 <link rel="stylesheet" href="{{ url_for('static', filename='yoda-portal.css') }}">
                 <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
             {% endblock style %}
 
             {% block head_scripts %}{% endblock %}
+            <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+            <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
         {% endblock head %}
     </head>
   
-    <body>
-     
+    <body class="d-flex flex-column min-vh-100">
+        
         <header class="brandbar container">
-            <div class="logo pull-left">
-                <a href="{{ config.logoUrl }}">
-                    <img src="{{ url_for('static', filename='img/logo-uu.svg') }}">
+            <div class="navbar yoda-topnavbar">
+                <a class="navbar-brand" href="{{ config.logoUrl }}">
+                    <img class="logo" src="{{ url_for('static', filename='img/logo-uu.svg') }}">
                 </a>
-            </div>
-            <div class="auth-action pull-right">
-                {% if g.user %}
-                    <a class="logout text-right" href="{{ url_for('logout') }}">Log out</a>
-                {% else %}
-                    <a class="login text-right" href="{{ url_for('login') }}">Log in</a>
-                {% endif %}
+                <div class="auth-action pull-right">
+                    {% if g.user %}
+                        <a class="logout text-right" href="{{ url_for('user_bp.logout') }}">Log out {{ g.user }}</a>
+                    {% else %}
+                        <a class="btn btn-primary" href="{{ url_for('user_bp.login') }}">Sign in</a>
+                    {% endif %}
+                </div>
             </div>
         </header>
      
-        <nav class="navbar navbar-inverse navbar-static-top">
+        <nav class="navbar navbar-inverse navbar-static-top navbar-expand-lg yoda-navbar">
             <div class="container">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"i aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
                     </button>
                     <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
                 </div>
                 <div id="navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
-                        {% for module in modules %}
-                            <li class=""><a href="{{ url_for( module.route ) }}">{{ module.name }}</a></li>
+                        {% for module in config.modules %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for( module.function ) }}">{{ module.name }}</a>
+                            </li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -78,8 +79,6 @@
         </footer>
 
         {% block footer_scripts %}
-            <script src="{{ url_for('static', filename='jquery.js') }}"></script>
-            <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
             <script src="{{ url_for('static', filename='yoda.js') }}"></script>
             <script> Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'}; </script>
         {% endblock footer_scripts %}
