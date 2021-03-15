@@ -8,6 +8,7 @@ from flask import render_template, redirect, url_for
 from flask_wtf.csrf import CSRFProtect
 from flask_session import Session
 import json
+import config
 from general.general import general_bp
 from group_manager.group_manager import group_bp 
 from research.research import research_bp
@@ -17,16 +18,12 @@ from user.user import user_bp
 from api.api import api_bp
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'bloep'  # XXX not for production use
-app.config['portalTitleText'] = 'Yoda Portal'
-app.config['logoUrl'] = 'https://www.uu.nl'
-app.config['YODA_VERSION'] = 2 # Replace by yoda_version in j2 template
-app.config['YODA_COMMIT'] = 1 # Replace by portalchanges.results.2.after in j2 template
-app.config['modules'] = [
-    {'name':'Research'      , 'function':'research_bp.index'},
-    {'name':'Vault'         , 'function':'vault_bp.index'},
-    {'name':'Statistics'    , 'function':'stats_bp.index'},
-    {'name':'Group Manager' , 'function':'group_bp.index'}]
+app.config['SECRET_KEY']        = config.secret_key
+app.config['portalTitleText']   = config.portal_title_text
+app.config['logoUrl']           = config.logo_url
+app.config['YODA_VERSION']      = config.yoda_version
+app.config['YODA_COMMIT']       = config.yoda_commit
+app.config['modules']           = config.modules
 
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_COOKIE_HTTPONLY'] = True 
