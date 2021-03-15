@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
 from flask import Blueprint, render_template
 
 stats_bp = Blueprint('stats_bp', __name__,
-    template_folder='templates/stats',
-    static_folder='static/stats')
+                     template_folder='templates/stats',
+                     static_folder='static/stats')
 
 
 @stats_bp.route('/example')

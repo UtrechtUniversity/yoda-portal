@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
 from flask import Blueprint, render_template
 
 group_bp = Blueprint('group_bp', __name__,
-    template_folder='templates/group_manager',
-    static_folder='static/group_manager')
+                     template_folder='templates/group_manager',
+                     static_folder='static/group_manager')
 
 
 @group_bp.route('/example')
