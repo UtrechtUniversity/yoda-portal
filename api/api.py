@@ -22,10 +22,14 @@ def api(fn):
                         'status_info': 'Missing \'data\' field',
                         'data': '{}'})
 
+    sanitized_params = json.dumps(data) \
+        .replace('\\', '\\\\') \
+        .replace('"', '\\"')
+
     x = rule.Rule(
         g.irods,
         body='a {{ api_{}(*x); }}'.format(fn),
-        params={'*x': '"{}"'.format(json.dumps(data).replace('"', '\\"'))},
+        params={'*x': '"{}"'.format(sanitized_params)},
         output='ruleExecOut')
 
     x = x.execute()
