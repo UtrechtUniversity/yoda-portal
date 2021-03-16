@@ -31,11 +31,11 @@
                 </a>
                 <div class="auth-action pull-right">
                     {% if g.user %}
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-secondary dropdown-toggle" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{ g.user }}
                             </button>
-                            <div class="dropdown-menu">
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">>
                                 <a class="dropdown-item" href="{{ url_for('user_bp.settings') }}">Settings</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="{{ url_for('user_bp.logout') }}">Log out</a>
