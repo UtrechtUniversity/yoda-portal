@@ -65,6 +65,11 @@ def forgot_password():
     return render_template('login.html')
 
 
+@user_bp.route('/settings')
+def forgot_password():
+    return render_template('settings.html')
+
+
 @user_bp.before_app_request
 def prepare_user():
     user_id = session.get('user_id', None)
