@@ -67,6 +67,9 @@ def forgot_password():
 
 @user_bp.route('/settings')
 def settings():
+    if request.method == 'POST':
+        flash("Settings saved successfully")
+
     return render_template('settings.html')
 
 
