@@ -2,3 +2,4 @@ python_irodsclient==0.8.5
 Flask==1.1.2
 flask_session==0.3.2
 flask_wtf==0.14.3
+mod-wsgi==4.7.1
