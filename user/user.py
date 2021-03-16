@@ -66,7 +66,7 @@ def forgot_password():
 
 
 @user_bp.route('/settings')
-def forgot_password():
+def settings():
     return render_template('settings.html')
 
 
