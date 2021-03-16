@@ -55,7 +55,7 @@ csrf = CSRFProtect(app)
 def protect_pages():
     if not request.endpoint or request.endpoint in ['general_bp.index', 'user_bp.login', 'static']:
         return
-    elif g.user is not None:
+    elif g.get('user', None) is not None:
         return
     else:
         return redirect(url_for('user_bp.login'))
