@@ -2,7 +2,7 @@
 <html>
     <head>
         {% block head %}
-            <title>{% block title %}{{ config.portalTitleText }}{% endblock %}</title>
+            <title>{% block title %}{{ config.get('PORTAL_TITLE_TEXT') }}{% endblock %}</title>
 
             {% block meta %}
                 <meta charset="utf-8">
@@ -26,7 +26,7 @@
         
         <header class="brandbar container">
             <div class="navbar yoda-topnavbar">
-                <a class="navbar-brand" href="{{ config.logoUrl }}">
+                <a class="navbar-brand" href="{{ config.get('LOGO_URL') }}">
                     <img class="logo" src="{{ url_for('static', filename='img/logo-uu.svg') }}">
                 </a>
                 <div class="auth-action pull-right">
@@ -49,7 +49,7 @@
                 </div>
                 <div id="navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
-                        {% for module in config.modules %}
+                        {% for module in config.get('MODULES') %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ url_for( module.function ) }}">{{ module.name }}</a>
                             </li>
