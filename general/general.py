@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from flask import Blueprint, render_template, g
-from api import api
+import api
 import json
 
 general_bp = Blueprint('general_bp', __name__,
@@ -17,7 +17,7 @@ def index():
 @general_bp.route('/test')
 def api_test():
     data = {"coll":"/tempZone/home"} 
-    response = api('browse_folder', data)
+    response = api.call('browse_folder', data)
     response_dict = json.loads(response)
     
     # Uit de data het veld 'total' halen: 

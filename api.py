@@ -8,7 +8,7 @@ api_bp = Blueprint('api_bp', __name__)
 
 
 @api_bp.route('/<fn>', methods=['POST'])
-def api(fn, data=None):
+def call(fn, data=None):
     if not authenticated():
         return jsonify({'status': 'nok',
                         'status_info': 'Not authenticated',
