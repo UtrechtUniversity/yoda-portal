@@ -47,7 +47,7 @@ def call(fn, data=None):
 
 
 def authenticated():
-    return g.user is not None and g.irods is not None
+    return g.get('user') is not None and g.get('irods') is not None
 
 
 @api_bp.errorhandler(Exception)
