@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import json
-
-from flask import Blueprint, g, jsonify, request
+from flask import Blueprint, g, jsonify, request, Response
 from irods import rule
 
 api_bp = Blueprint('api_bp', __name__)
@@ -37,8 +36,17 @@ def call(fn, data=None):
     x = x.buf[:x.buflen]
     if b'\x00' in x:
         x = x[:x.find(b'\x00')]
+    
+    result = x.decode()
+    result_json = json.loads(result)
+    code = 200
 
-    return x.decode()
+    if result_json['status'] == 'error_internal':
+        code = 500
+    elif result_json['status'] != 'ok':
+        code = 400
+
+    return Response(result, code, mimetype='application/json')
 
 
 def authenticated():
