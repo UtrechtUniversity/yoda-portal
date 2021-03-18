@@ -55,5 +55,5 @@ def api_error_handler(error):
         {
             "status": status,
             "status_info": status_info,
-            "data": data 
+            "data": data
         }), 500
