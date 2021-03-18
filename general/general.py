@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-from flask import Blueprint, render_template, g
-import api
 import json
+
+from flask import Blueprint, render_template
+
+import api
 
 general_bp = Blueprint('general_bp', __name__,
                        template_folder='templates/general',
@@ -16,7 +18,7 @@ def index():
 
 @general_bp.route('/test')
 def api_test():
-    data = {"coll":"/tempZone/home"} 
+    data = {"coll": "/tempZone/home"}
     response = api.call('browse_folder', data)
     status = response.status
     response_dict = response.get_json()
