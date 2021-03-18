@@ -2,6 +2,7 @@
 import json
 from flask import Blueprint, g, jsonify, request, Response
 from irods import rule
+from errors import UnauthorizedAPIAccessError, MissingDataError
 
 api_bp = Blueprint('api_bp', __name__)
 
@@ -9,17 +10,13 @@ api_bp = Blueprint('api_bp', __name__)
 @api_bp.route('/<fn>', methods=['POST'])
 def call(fn, data=None):
     if not authenticated():
-        return jsonify({'status': 'nok',
-                        'status_info': 'Not authenticated',
-                        'data': '{}'})
+        raise UnauthorizedAPIAccessError
 
     form_data = request.form
     if 'data' in form_data:
         data = json.loads(request.form['data'])  # does this need sanitizing for remote code execution?
     elif data is None:
-        return jsonify({'status': 'nok',
-                        'status_info': 'Missing \'data\' field',
-                        'data': '{}'})
+        raise MissingDataError
 
     sanitized_params = json.dumps(data) \
         .replace('\\', '\\\\') \
@@ -55,13 +52,20 @@ def authenticated():
 
 @api_bp.errorhandler(Exception)
 def api_error_handler(error):
+    print('API Error: {}'.format(error))
     status = "internal_error"
     status_info = "Something went wrong"
-    data = ""
+    data = {}
+    code = 500
+
+    if type(error) == MissingDataError:
+        status_info = "The API request was missing the 'data' parameter"
+    elif type(error) == UnauthorizedAPIAccessError:
+        status_info = "Not authorized to use the API"
 
     return jsonify(
         {
             "status": status,
             "status_info": status_info,
             "data": data
-        }), 500
+        }), code
