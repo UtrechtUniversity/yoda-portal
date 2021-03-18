@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+import json
 import ssl
 
 from flask import Blueprint, flash, g, redirect, render_template, request, session, url_for
 from irods.session import iRODSSession
 
+import api
 import connman
 
 ssl_context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH, cafile=None, capath=None, cadata=None)
@@ -69,6 +71,11 @@ def forgot_password():
 def settings():
     if request.method == 'POST':
         flash("Settings saved successfully")
+
+    response = json.loads(api.call('settings_load', data={}))
+    settings = {}
+    if response['status'] == 'ok':
+        settings = response['data']
 
     return render_template('settings.html')
 
