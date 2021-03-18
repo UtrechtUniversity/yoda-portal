@@ -4,7 +4,7 @@ from flask import Flask, g, redirect, request, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 
-from api.api import api_bp
+from api import api_bp
 from general.general import general_bp
 from group_manager.group_manager import group_bp
 from research.research import research_bp
