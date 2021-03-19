@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-import json
+
+__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__license__   = 'GPLv3, see LICENSE'
+
 import ssl
 
 from flask import Blueprint, flash, g, redirect, render_template, request, session, url_for
@@ -72,10 +75,11 @@ def settings():
     if request.method == 'POST':
         flash("Settings saved successfully")
 
-    response = json.loads(api.call('settings_load', data={}))
+    response = api.call('settings_load', data={})
+    response_dict = response.get_json()
     settings = {}
-    if response['status'] == 'ok':
-        settings = response['data']
+    if response_dict['status'] == 'ok':
+        settings = response_dict['data']
 
     return render_template('settings.html')
 
