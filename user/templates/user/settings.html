@@ -10,7 +10,7 @@
     <fieldset>
         <legend>Notifications</legend>
         <div class="form-group form-check">
-            <input class="form-check-input" type="checkbox" value="" id="mail_notifications">
+            <input class="form-check-input" type="checkbox" id="mail_notifications" name="mail_notifications" {% if mail_notifications == 'True' %}checked{% else %}{% endif %}>
             <label class="form-check-label" for="mail_notifications">
                 Receive mail notifications
             </label>
