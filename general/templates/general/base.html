@@ -17,13 +17,13 @@
             {% endblock style %}
 
             {% block head_scripts %}{% endblock %}
-            <script src="{{ url_for('static', filename='jquery.js') }}"></script>
-            <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='jquery-1.11.2/js/jquery.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='bootstrap-4.4.1/js/bootstrap.min.js') }}"></script>
         {% endblock head %}
     </head>
-  
+
     <body class="d-flex flex-column min-vh-100">
-        
+
         <header class="brandbar container">
             <div class="navbar yoda-topnavbar">
                 <a class="navbar-brand" href="{{ config.logoUrl }}">
@@ -38,7 +38,7 @@
                 </div>
             </div>
         </header>
-     
+
         <nav class="navbar navbar-inverse navbar-static-top navbar-expand-lg yoda-navbar">
             <div class="container">
                 <div class="navbar-header">
@@ -58,7 +58,7 @@
                 </div>
             </div>
         </nav>
-        
+
         <div class="container page">
             <div id="messages">
                 {% for message in get_flashed_messages() %}
