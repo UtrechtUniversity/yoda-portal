@@ -10,15 +10,14 @@
             {% endblock meta %}
 
             {% block style %}
-                <!--link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}"-->
-                <link rel="stylesheet" href="{{ url_for('static', filename='toastr/toastr.min.css') }}">
-                <link rel="stylesheet" href="{{ url_for('static', filename='yoda-portal.css') }}">
-                <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
+                <link rel="stylesheet" href="{{ url_for('static', filename='lib/toastr/toastr.min.css') }}">
+                <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
+                <link rel="stylesheet" href="{{ url_for('static', filename='css/messages.css') }}">
             {% endblock style %}
 
             {% block head_scripts %}{% endblock %}
-            <script src="{{ url_for('static', filename='jquery-1.11.2/js/jquery.min.js') }}"></script>
-            <script src="{{ url_for('static', filename='bootstrap-4.4.1/js/bootstrap.bundle.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='lib/jquery-1.11.2/js/jquery.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='lib/bootstrap-4.4.1/js/bootstrap.bundle.min.js') }}"></script>
         {% endblock head %}
     </head>
 
@@ -79,7 +78,7 @@
         </footer>
 
         {% block footer_scripts %}
-            <script src="{{ url_for('static', filename='yoda.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
             <script> Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'}; </script>
         {% endblock footer_scripts %}
     </body>
