@@ -73,10 +73,12 @@ def forgot_password():
 @user_bp.route('/settings', methods=['GET', 'POST'])
 def settings():
     if request.method == 'POST':
+        # Build user settings dict.
         settings = {'mail_notifications': 'False'}
-        if request.form['mail_notifications'] == 'on':
-            settings['mail_notifications'] = 'True'
+        if request.form.get('mail_notifications') == 'on':
+                settings['mail_notifications'] = 'True'
 
+        # Save user settings and handle API response.
         data = {"settings": settings}
         response = api.call('settings_save', data)
         response_dict = response.get_json()
@@ -85,6 +87,7 @@ def settings():
         else:
             flash('Saving settings failed!', 'error')
 
+    # Load user settings.
     response = api.call('settings_load', data={})
     response_dict = response.get_json()
     settings = response_dict['data']
