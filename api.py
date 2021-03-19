@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
+
+__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__license__   = 'GPLv3, see LICENSE'
+
 import json
+
 from flask import Blueprint, g, jsonify, request, Response
 from irods import rule
-from errors import UnauthorizedAPIAccessError, MissingDataError
+
+from errors import MissingDataError, UnauthorizedAPIAccessError
 
 api_bp = Blueprint('api_bp', __name__)
 
@@ -33,7 +39,7 @@ def call(fn, data=None):
     x = x.buf[:x.buflen]
     if b'\x00' in x:
         x = x[:x.find(b'\x00')]
-    
+
     result = x.decode()
     result_json = json.loads(result)
     code = 200

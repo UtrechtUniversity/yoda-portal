@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Manages iRODS session keep-alive."""
+
+__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__license__   = 'GPLv3, see LICENSE'
 
 import threading
 import time
