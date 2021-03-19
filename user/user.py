@@ -76,7 +76,7 @@ def settings():
         # Build user settings dict.
         settings = {'mail_notifications': 'False'}
         if request.form.get('mail_notifications') == 'on':
-                settings['mail_notifications'] = 'True'
+            settings['mail_notifications'] = 'True'
 
         # Save user settings and handle API response.
         data = {"settings": settings}
