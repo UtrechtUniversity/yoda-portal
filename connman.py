@@ -6,7 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 import threading
 import time
 
-TTL = 60
+TTL = 60 * 30
 
 
 class Session(object):
