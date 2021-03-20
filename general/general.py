@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-import json
+
+__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__license__   = 'GPLv3, see LICENSE'
 
 from flask import Blueprint, render_template
 
@@ -21,7 +23,8 @@ def api_test():
     data = {"coll": "/tempZone/home"}
     response = api.call('browse_folder', data)
     status = response['status']
-    
-    # Uit de data het veld 'total' halen: 
     total = response['data']['total'] 
-    return render_template('api_test.html', in_app={'status': status, 'total': total, 'response':response})
+
+    return render_template('api_test.html', in_app={'status': status,
+                                                    'total': total,
+                                                    'response': response})
