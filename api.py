@@ -1,22 +1,38 @@
 #!/usr/bin/env python3
 import json
-from flask import Blueprint, g, jsonify, request, Response
+from flask import Blueprint, g, jsonify, request
 from irods import rule
-from errors import UnauthorizedAPIAccessError, MissingDataError
+from errors import UnauthorizedAPIAccessError
+
 
 api_bp = Blueprint('api_bp', __name__)
 
 
 @api_bp.route('/<fn>', methods=['POST'])
-def call(fn, data=None):
+def _call(fn):
     if not authenticated():
         raise UnauthorizedAPIAccessError
 
-    form_data = request.form
-    if 'data' in form_data:
-        data = json.loads(request.form['data'])  # does this need sanitizing for remote code execution?
-    elif data is None:
-        raise MissingDataError
+    if 'data' in request.form:
+        data = json.loads(request.form['data'])
+    else:
+        data = {}
+
+    result = call(fn, data)
+    code = 200
+
+    if result['status'] == 'error_internal':
+        code = 500
+    elif result['status'] != 'ok':
+        code = 400
+
+    response = jsonify(result)
+    response.status_code = code
+    return response
+
+def call(fn, data=None):
+    if data is None:
+        data = {}
 
     sanitized_params = json.dumps(data) \
         .replace('\\', '\\\\') \
@@ -35,15 +51,9 @@ def call(fn, data=None):
         x = x[:x.find(b'\x00')]
     
     result = x.decode()
-    result_json = json.loads(result)
-    code = 200
+    print("x.decode: {}".format(result), file=sys.stderr) 
 
-    if result_json['status'] == 'error_internal':
-        code = 500
-    elif result_json['status'] != 'ok':
-        code = 400
-
-    return Response(result, code, mimetype='application/json')
+    return json.loads(result)
 
 
 def authenticated():
