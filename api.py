@@ -4,8 +4,10 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
+
 from flask import Blueprint, g, jsonify, request
 from irods import rule
+
 from errors import UnauthorizedAPIAccessError
 
 api_bp = Blueprint('api_bp', __name__)
