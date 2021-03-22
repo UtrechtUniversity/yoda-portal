@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+
+__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__license__   = 'GPLv3, see LICENSE'
+
 import ssl
 
 from flask import Blueprint, flash, g, redirect, render_template, request, session, url_for
