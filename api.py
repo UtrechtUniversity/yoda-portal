@@ -33,6 +33,7 @@ def _call(fn):
     response.status_code = code
     return response
 
+
 def call(fn, data=None):
     if data is None:
         data = {}
@@ -70,9 +71,7 @@ def api_error_handler(error):
     data = {}
     code = 500
 
-    if type(error) == MissingDataError:
-        status_info = "The API request was missing the 'data' parameter"
-    elif type(error) == UnauthorizedAPIAccessError:
+    if type(error) == UnauthorizedAPIAccessError:
         status_info = "Not authorized to use the API"
 
     return jsonify(

@@ -23,7 +23,7 @@ def api_test():
     data = {"coll": "/tempZone/home"}
     response = api.call('browse_folder', data)
     status = response['status']
-    total = response['data']['total'] 
+    total = response['data']['total']
 
     return render_template('api_test.html', in_app={'status': status,
                                                     'total': total,
