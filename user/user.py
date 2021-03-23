@@ -81,16 +81,14 @@ def settings():
         # Save user settings and handle API response.
         data = {"settings": settings}
         response = api.call('settings_save', data)
-        response_dict = response.get_json()
-        if response_dict['status'] == 'ok':
+        if response['status'] == 'ok':
             flash('Settings saved successfully', 'info')
         else:
             flash('Saving settings failed!', 'error')
 
     # Load user settings.
     response = api.call('settings_load', data={})
-    response_dict = response.get_json()
-    settings = response_dict['data']
+    settings = response['data']
 
     return render_template('settings.html', **settings)
 
