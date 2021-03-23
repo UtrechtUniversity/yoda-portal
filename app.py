@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
+__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__license__   = 'GPLv3, see LICENSE'
+
 from flask import Flask, g, redirect, request, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 
-from api.api import api_bp
+from api import api_bp
 from general.general import general_bp
 from group_manager.group_manager import group_bp
 from research.research import research_bp
@@ -54,9 +57,9 @@ csrf = CSRFProtect(app)
 # Restricted access protection
 @app.before_request
 def protect_pages():
-    if not request.endpoint or request.endpoint in ['general_bp.index', 'user_bp.login', 'static']:
+    if not request.endpoint or request.endpoint in ['general_bp.index', 'user_bp.login', 'api_bp.call', 'static']:
         return
-    elif g.user is not None:
+    elif g.get('user', None) is not None:
         return
     else:
         return redirect(url_for('user_bp.login'))
