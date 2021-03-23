@@ -58,6 +58,7 @@
             </div>
         </nav>
 
+        {% block container %}
         <div class="container page">
             <div id="messages">
                 {% for message in get_flashed_messages() %}
@@ -67,6 +68,7 @@
 
             {% block content %}{% endblock %}
         </div>
+        {% endblock %}
 
         <footer class="footer">
             {% block footer %}
