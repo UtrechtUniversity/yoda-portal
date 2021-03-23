@@ -10,6 +10,6 @@ stats_bp = Blueprint('stats_bp', __name__,
                      static_folder='static/stats')
 
 
-@stats_bp.route('/example')
+@stats_bp.route('/')
 def index():
-    return render_template('example.html')
+    return render_template('stats.html')
