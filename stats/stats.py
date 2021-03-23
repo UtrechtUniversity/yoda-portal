@@ -5,6 +5,8 @@ __license__   = 'GPLv3, see LICENSE'
 
 from flask import Blueprint, render_template
 
+import api
+
 stats_bp = Blueprint('stats_bp', __name__,
                      template_folder='templates/stats',
                      static_folder='static/stats')
@@ -12,4 +14,6 @@ stats_bp = Blueprint('stats_bp', __name__,
 
 @stats_bp.route('/')
 def index():
-    return render_template('stats.html')
+    response = api.call('resource_user_research_groups', data={})
+    groups = response['data']
+    return render_template('stats.html', groups=groups)

@@ -2,6 +2,41 @@
 
 {% block title %}{{ super() }} &dash; Statistics{% endblock %}
 
+{% block head_scripts %}
+    <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
+{% endblock %}
+
 {% block content %}
     <h1>Statistics</h1>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    Groups
+                </div>
+                <div class="list-group" id="groups-list">
+                    {% for group in groups %}
+                    <a class="list-group-item list-group-item-action group" data-name="{{ group }}">{{ group }}</a>
+                    {% endfor %}
+                </div>
+                <div class="card-footer">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="group-details">
+                <div class="card">
+                    <div class="card-header">
+                        Group
+                    </div>
+                    <div class="card-body">
+                        <p class="placeholder-text">
+                            Please select a group.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
