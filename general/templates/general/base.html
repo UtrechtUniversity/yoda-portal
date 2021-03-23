@@ -34,7 +34,16 @@
                 </a>
                 <div class="auth-action pull-right">
                     {% if g.user %}
-                        <a class="logout text-right" href="{{ url_for('user_bp.logout') }}">Log out {{ g.user }}</a>
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-primary dropdown-toggle" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ g.user }}
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="{{ url_for('user_bp.settings') }}">Settings</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ url_for('user_bp.logout') }}">Log out</a>
+                            </div>
+                        </div>
                     {% else %}
                         <a class="btn btn-primary" href="{{ url_for('user_bp.login') }}">Sign in</a>
                     {% endif %}

@@ -8,6 +8,7 @@ import ssl
 from flask import Blueprint, flash, g, redirect, render_template, request, session, url_for
 from irods.session import iRODSSession
 
+import api
 import connman
 
 ssl_context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH, cafile=None, capath=None, cadata=None)
@@ -67,6 +68,29 @@ def logout():
 @user_bp.route('/forgot-password')
 def forgot_password():
     return render_template('login.html')
+
+
+@user_bp.route('/settings', methods=['GET', 'POST'])
+def settings():
+    if request.method == 'POST':
+        # Build user settings dict.
+        settings = {'mail_notifications': 'False'}
+        if request.form.get('mail_notifications') == 'on':
+            settings['mail_notifications'] = 'True'
+
+        # Save user settings and handle API response.
+        data = {"settings": settings}
+        response = api.call('settings_save', data)
+        if response['status'] == 'ok':
+            flash('Settings saved successfully', 'info')
+        else:
+            flash('Saving settings failed!', 'error')
+
+    # Load user settings.
+    response = api.call('settings_load', data={})
+    settings = response['data']
+
+    return render_template('settings.html', **settings)
 
 
 @user_bp.before_app_request
