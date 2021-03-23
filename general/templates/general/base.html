@@ -4,6 +4,10 @@
         {% block head %}
             <title>{% block title %}{{ config.portalTitleText }}{% endblock %}</title>
 
+            {% block favicon %}
+            <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+            {% endblock favicon %}
+
             {% block meta %}
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -68,7 +72,7 @@
 
             {% block content %}{% endblock %}
         </div>
-        {% endblock %}
+        {% endblock container %}
 
         <footer class="footer">
             {% block footer %}
