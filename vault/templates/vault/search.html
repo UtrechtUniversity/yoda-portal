@@ -1,6 +1,6 @@
 <script>
-    var searchTerm = '{{ rawurlencode(searchTerm) }}';   https://stackoverflow.com/questions/5607551/how-to-urlencode-a-querystring-in-python
-    var searchStatusValue = '{{ addslashes($searchStatusValue) }}'; https://mail.python.org/pipermail/python-list/2002-July/131394.html
+    var searchTerm = '{{ searchTerm | urlencode | replace("+", "%20") }}';
+    var searchStatusValue = '{{ searchStatusValue | addslashes }}';
     var searchType = '{{ searchType }}';
     var searchStart = {{ searchStart }};
     var searchOrderDir = '{{ searchOrderDir }}';
@@ -38,7 +38,7 @@ htmlentities - https://wiki.python.org/moin/EscapingHtml
         <div class="search-term">
             <input type="hidden" name="search_param" value="all" id="search_param">
         </div>
-        <input type="text" class="form-control search-term{{ ' hide' if showStatus else '' }}" id="search-filter" placeholder="Search term..." value="{{ htmlentities(searchTerm) }}" maxlength="255">
+        <input type="text" class="form-control search-term{{ ' hide' if showStatus else '' }}" id="search-filter" placeholder="Search term..." value="{{ searchTerm | safe }}" maxlength="255">
         <div class="input-group-append search-term{{ ' hide' if showStatus else '' }}">
             <button class="btn btn-outline-secondary" data-items-per-page="{{ searchItemsPerPage }}" type="button">
                 <i class="fa fa-search" aria-hidden="true"></i>

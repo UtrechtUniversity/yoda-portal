@@ -1,13 +1,12 @@
 items
 dir
+searchHtml
 <script>
     var browsePageItems = {{ items }};
-    var browseStartDir = {{ json_encode($dir) }}; // {{ json_encode}}
+    var browseStartDir = {{ dir | jsonencode ) }};
     var browseDlgPageItems = {{ items }};
     var view = 'browse';
 </script>
-
-json_encode
 
 <div class="modal" id="dlg-select-folder">
     <div class="modal-dialog modal-lg">
@@ -149,7 +148,7 @@ json_encode
     </div>
 </div>
 
-<?php echo $searchHtml; ?>
+{{ searchHtml }}
 
 <div class="row d-block">
     <nav aria-label="breadcrumb flex-column">

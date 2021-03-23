@@ -1,3 +1,12 @@
+https://stackoverflow.com/questions/39047657/base64-decode-string-in-jinja/39047765
+# add filter to jinja2 env
+environment.filters['b64decode'] = base64.b64decode
+
+# in template use
+{{ value|b64decode }}
+
+========================
+
 path
 tokenName
 tokenHash
@@ -17,10 +26,10 @@ base64_encode
         <div class="card">
             <div class="card-header clearfix">
                 <h3 class="card-title pull-left">
-                    Metadata form - {{ }}<?php echo str_replace(' ', '&nbsp;', htmlentities(trim($path))); ?>
+                    Metadata form - {{ path | trim | safe }}
                 </h3>
                 <div class="input-group-sm has-feedback pull-right">
-                    <a class="btn btn-secondary" href="/vault/browse?dir=<?php echo rawurlencode($path); ?>">Close</a>
+                    <a class="btn btn-secondary" href="/vault/browse?dir={{ path | urlencode | replace("+", "%20") }}">Close</a>
                 </div>
             </div>
             <div class="card-body">
@@ -42,10 +51,10 @@ base64_encode
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title pull-left">
-                    Metadata form - <?php echo str_replace(' ', '&nbsp;', htmlentities(trim($path))); ?>
+                    Metadata form - {{ path | trim | safe
                 </h3>
                 <div class="input-group-sm has-feedback pull-right close-button">
-                    <a class="btn btn-light btn-sm" href="/vault/browse?dir=<?php echo rawurlencode($path); ?>">Close</a>
+                    <a class="btn btn-light btn-sm" href="/vault/browse?dir={{ path | urlencode | replace("+", "%20") }}">Close</a>
                 </div>
             </div>
             <div class="card-body">
@@ -53,9 +62,9 @@ base64_encode
                     <p>There is no metadata present for this folder.</p>
                 </div>
                 <div id="form"
-                     data-path="<?php echo htmlentities($path); ?>"
-                     data-csrf_token_name="<?php echo rawurlencode($tokenName); ?>"
-                     data-csrf_token_hash="<?php echo rawurlencode($tokenHash); ?>">
+                     data-path="{{ path | safe }}"
+                     data-csrf_token_name="{{ tokenName | urlencode | replace("+", "%20") }}"
+                     data-csrf_token_hash="{{ tokenHash | urlencode | replace("+", "%20") }}">
                     <p>Loading metadata <i class="fa fa-spinner fa-spin fa-fw"></i></p>
                 </div>
             </div>
@@ -74,16 +83,7 @@ setTimeout(function(){
 }, 800);
 </script>
 <script src="/vault/static/js/metadata/form.js" async></script>
-<script id="form-properties" type="text/plain"><?php
+<script id="form-properties" type="text/plain">{{
 // base64-encode to make sure no script tag can be embedded.
-echo base64_encode(json_encode($formProperties))
-?></script>
-
-base64_encode => https://stackoverflow.com/questions/24831543/base-64-encode-a-json-variable-in-python
-
-https://docs.python.org/3/library/json.html
-json_encode
- import json
->>> json.dumps(['foo', {'bar': ('baz', None, 1.0, 2)}])
-'["foo", {"bar": ["baz", null, 1.0, 2]}]'
-
+formProperties | b64encode | tojson
+}}</script>
