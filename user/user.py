@@ -70,6 +70,11 @@ def forgot_password():
     return render_template('login.html')
 
 
+@user_bp.route('/notifications')
+def notifications():
+    return render_template('notifications.html')
+
+
 @user_bp.route('/settings', methods=['GET', 'POST'])
 def settings():
     if request.method == 'POST':
