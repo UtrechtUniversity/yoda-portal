@@ -15,6 +15,6 @@ stats_bp = Blueprint('stats_bp', __name__,
 
 @stats_bp.route('/')
 def index():
-    response = api.call('resource_user_research_groups', data={})
+    response = api.call('resource_list_groups', data={})
     groups = response['data']
     return render_template('stats.html', groups=groups)

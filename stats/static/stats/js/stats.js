@@ -59,6 +59,13 @@ function getDetails(resource)
 
 function getGroupDetails(group)
 {
+    let result = Yoda.call('resource_full_year_group_data',
+        {group_name: group, current_month: 3},
+        {rawResult: true}
+    );
+    console.log(result);
+    return
+
     var url = "statistics/group_details?group=" + encodeURIComponent(group);
     $.getJSON(url, function( data ) {
         if (data.status == 'success') {

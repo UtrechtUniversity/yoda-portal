@@ -17,11 +17,12 @@
                 </div>
                 <div class="list-group" id="groups-list">
                     {% for group in groups %}
-                    <a class="list-group-item list-group-item-action group" data-name="{{ group }}">{{ group }}</a>
+                    <a class="list-group-item list-group-item-action group" data-name="{{ group[0] }}">
+                        {{ group[0] }} ({{ group[1] }})
+                    </a>
                     {% endfor %}
                 </div>
-                <div class="card-footer">
-                </div>
+                <div class="card-footer"></div>
             </div>
         </div>
         <div class="col-md-7">
