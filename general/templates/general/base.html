@@ -4,20 +4,24 @@
         {% block head %}
             <title>{% block title %}{{ config.portalTitleText }}{% endblock %}</title>
 
+            {% block favicon %}
+            <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+            {% endblock favicon %}
+
             {% block meta %}
-                <meta charset="utf-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
             {% endblock meta %}
 
             {% block style %}
-                <link rel="stylesheet" href="{{ url_for('static', filename='lib/toastr/toastr.min.css') }}">
-                <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
-                <link rel="stylesheet" href="{{ url_for('static', filename='css/messages.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='lib/toastr/toastr.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/messages.css') }}">
             {% endblock style %}
 
-            {% block head_scripts %}{% endblock %}
             <script src="{{ url_for('static', filename='lib/jquery-1.11.2/js/jquery.min.js') }}"></script>
             <script src="{{ url_for('static', filename='lib/bootstrap-4.4.1/js/bootstrap.bundle.min.js') }}"></script>
+            {% block head_scripts %}{% endblock %}
         {% endblock head %}
     </head>
 
@@ -30,7 +34,16 @@
                 </a>
                 <div class="auth-action pull-right">
                     {% if g.user %}
-                        <a class="logout text-right" href="{{ url_for('user_bp.logout') }}">Log out {{ g.user }}</a>
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-primary dropdown-toggle" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ g.user }}
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="{{ url_for('user_bp.settings') }}">Settings</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ url_for('user_bp.logout') }}">Log out</a>
+                            </div>
+                        </div>
                     {% else %}
                         <a class="btn btn-primary" href="{{ url_for('user_bp.login') }}">Sign in</a>
                     {% endif %}
@@ -58,6 +71,7 @@
             </div>
         </nav>
 
+        {% block container %}
         <div class="container page">
             <div id="messages">
                 {% for message in get_flashed_messages() %}
@@ -67,6 +81,7 @@
 
             {% block content %}{% endblock %}
         </div>
+        {% endblock container %}
 
         <footer class="footer">
             {% block footer %}
@@ -77,9 +92,8 @@
             {% endblock footer %}
         </footer>
 
-        {% block footer_scripts %}
-            <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
-            <script> Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'}; </script>
-        {% endblock footer_scripts %}
+        <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
+        <script> Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'}; </script>
+        {% block footer_scripts %}{% endblock %}
     </body>
 </html>
