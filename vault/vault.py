@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__license__   = 'GPLv3, see LICENSE'
+
+
 from flask import Blueprint, render_template
 
 import api
@@ -8,7 +13,140 @@ vault_bp = Blueprint('vault_bp', __name__,
                      template_folder='templates/vault',
                      static_folder='static/vault')
 
-import browse, metadata, search
+
+@vault_bp.route('/index', methods=['GET'])
+def index():
+    items = app.config['browser-items-per-page']
+    dir = request.args.get('dir')
+
+    # Hoe dit te vertalen??
+    if dir == None:
+        dir = ''
+
+    # Search results data
+    searchTerm = ''
+    searchStatusValue = ''
+    searchType = 'filename'
+    searchStart = 0
+    searchOrderDir = 'asc'
+    searchOrderColumn = 0
+    searchItemsPerPage = app.config['search-items-per-page']
+
+    if 'research-search-term' in session or 'research-search-status-value' in session:
+            if 'research-search-term' in session:
+                    searchTerm = reseach['research-search-term']
+                if 'research-search-status-value' in session:
+                    searchStatusValue = session['research-search-status-value']
+
+        searchType = session['research-search-type']
+        searchStart = session['research-search-start']
+        searchOrderDir = session['research-search-order-dir']
+        searchOrderColumn = session['research-search-order-column']
+
+    showStatus = False
+    showTerm = False
+    if searchType == 'status':
+        showStatus = True
+    else:
+        showTerm = True
+
+    # Get the HTML for search part
+    searchHtml = render_template('search.html',
+        searchTerm=searchTerm,
+        searchStatusValue=searchStatusValue,
+        searchType=searchType,
+        searchStart=searchStart,
+        searchOrderDir=searchOrderDir,
+        searchOrderColumn=searchOrderColumn,
+        showStatus=showStatus,
+        showTerm=showTerm,
+        searchItemsPerPage=searchItemsPerPage)
+
+    return render_template('browse.html',
+            activeModule='vault',
+            searchHtml=searchHtml,
+            items=items,
+            dir=dir
+            )
+
+
+@vault_bp.route('/download', methods=['GET'])
+def download():
+    path_start = app.config['path_start']
+    filepath = path_start + request.args.get('filepath')
+
+############
+@app.route('/uploads/<path:filename>', methods=['GET', 'POST'])
+#def download(filename):
+#    # Appending app path to upload folder path within app root folder
+#    uploads = os.path.join(current_app.root_path, app.config['UPLOAD_FOLDER'])
+#
+#    # Returning file from appended path
+#    return send_from_directory(directory=uploads, filename=filename)
+ 
+
+@vault_bp.route('/form')
+def form():
+    try:
+        path = request.args.get('path')
+    except:
+        # REDIRECT research/browse
+        return redirect(url_for('index')) ??
+
+    path_start = app.config['path_start']
+
+    full_path = path_start + path
+
+    # Flash message handling
+    try:
+        flashMessage = session['flashMessage']
+        flashMessageType = session['flashMessageType']
+    except KeyError:
+        flashMessage = ''
+        flashMessageType = ''
+
+    # https://flask-wtf.readthedocs.io/en/stable/csrf.html
+    # CSRF protection requires a secret key to securely sign the token. By default this will use the Flask app's SECRET_KEY. If you'd like to use a separate token you can set WTF_CSRF_SECRET_KEY.
+    # Load CSRF token ??
+#    from flask_wtf.csrf import CSRFProtect
+    csrf = CSRFProtect(app)
+#    $tokenName = $this->security->get_csrf_token_name();
+#    $tokenHash = $this->security->get_csrf_hash();
+
+    formProperties = api.call('meta_form_load', ['coll': full_path])
+
+    return render_template('metadata/form.html',
+        path=path,
+        tokenName=tokenName,
+        tokenHash=tokenHash,
+        flashMessage=flashMessage,
+        flashMessageType=flashMessageType,
+        formProperties=formProperties)
+
+@vault_bp.route('/unset_session')
+def unset_session():
+    session.pop('research-search-term', None)
+    session.pop('research-search-start', None)
+    session.pop('research-search-type', None)
+    session.pop('research-search-order-dir', None)
+    session.pop('research-search-order-column', None)
+    session.pop('research-search-status-value', None)
+
+
+@vault_bp.route('/set_session')
+def set_session()
+    value = request.args.get('value')
+    type = request.args.get('type')
+
+    if type == 'status':
+        session['research-search-status-value'] = value
+    else:
+        session['research-search-term'] = value
+        session.pop('research-search-status-value', None)
+
+    session['research-search-type'] = type
+    session['research-search-start'] = 0
+
 
 @vault_bp.route('/access')
 def access():
@@ -23,24 +161,3 @@ def access():
         response =  api.call('revoke_read_access_research_group', {"coll": full_path})
 
     return jsonify(response)
-
-@vault_bp.route('/copyVaultPackageToDynamicArea')
-def copyVaultPackageToDynamicArea():
-
-    path_start = configuration['path_start']
-
-    fulltarget_path = path_start + request.args.get('targetdir')
-    fullorg_path = path_start + request.args.get('targetdir')
-
-    ### OPLOSSEN
-#    result = $this->Data_Request_model->copy_package_from_vault($fullOrgPath, $fullTargetPath);
-#    # iiFrontRequestCopyVaultPackage
-#    output = {('status': result['status'],
-#               'statusInfo': result['statusInfo']}
-
-    result =  api.call('request_copy_vault_package', {"coll": full_path})
-
-    output = {('status': result['status'],
-               'statusInfo': result['statusInfo']}
-
-    return jsonify(output)
