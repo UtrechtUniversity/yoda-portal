@@ -61,21 +61,18 @@ function getGroupDetails(group) {
     Yoda.call('resource_full_year_group_data',
               {group_name: group}).then((data) => {
 
-          $('.group-details').html(data.html);
-
           if (data.total_storage > 0) {
+              $("#storage-chart").html("<canvas class=\"storage-data\" width=\"400\" height=\"400\"></canvas>");
               var ctx = $('.storage-data');
               var datasets = [];
               var labels = [];
 
               $.each(data.tiers, function (name, storageData) {
-
                   var storageChartData = [];
                   $.each(data.months, function (index, month) {
                       if ($.inArray(month, labels) === -1) {
                           labels.push(months[month]);
                       }
-
                       storageChartData.push(storageData[month]);
                   });
 
@@ -106,7 +103,7 @@ function getGroupDetails(group) {
                       yAxes: [{
                           scaleLabel: {
                               display: true,
-                              labelString: $('canvas').data('storage'),
+                              labelString: 'TB',
                           },
                           ticks: {
                               min: 0, // it is for ignoring negative step.
@@ -130,7 +127,9 @@ function getGroupDetails(group) {
                   data: chartData,
                   options: chartOptions
               });
-          }
+         } else {
+              $("#storage-chart").html("<p>No storage information found.</p>");
+         }
     });
 }
 
