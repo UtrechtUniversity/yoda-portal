@@ -33,7 +33,13 @@ def copyVaultPackageToDynamicArea():
     fullorg_path = path_start + request.args.get('targetdir')
 
     ### OPLOSSEN
-    result = $this->Data_Request_model->copy_package_from_vault($fullOrgPath, $fullTargetPath);
+#    result = $this->Data_Request_model->copy_package_from_vault($fullOrgPath, $fullTargetPath);
+#    # iiFrontRequestCopyVaultPackage
+#    output = {('status': result['status'],
+#               'statusInfo': result['statusInfo']}
+
+    result =  api.call('request_copy_vault_package', {"coll": full_path})
+
     output = {('status': result['status'],
                'statusInfo': result['statusInfo']}
 
