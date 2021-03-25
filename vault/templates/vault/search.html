@@ -1,24 +1,17 @@
 <script>
-    var searchTerm = '{{ searchTerm | urlencode | replace("+", "%20") }}';
-    var searchStatusValue = '{{ searchStatusValue | addslashes }}';
-    var searchType = '{{ searchType }}';
-    var searchStart = {{ searchStart }};
-    var searchOrderDir = '{{ searchOrderDir }}';
-    var searchOrderColumn = '{{ searchOrderColumn }}';
-    var searchPageItems = {{ searchItemsPerPage }};
+        var searchTerm = '{{ searchTerm | urlencode | replace("+", "%20") }}';
+        var searchStatusValue = '{{ searchStatusValue }}';
+        var searchType = '{{ searchType }}';
+        var searchStart = {{ searchStart }};
+        var searchOrderDir = '{{ searchOrderDir }}';
+        var searchOrderColumn = '{{ searchOrderColumn }}';
+        var searchPageItems = {{ searchItemsPerPage }};
 </script>
-showTerm
-showStatus
-
-{{ 'Update' if files else 'Continue' }} Ternary
-
-htmlentities - https://wiki.python.org/moin/EscapingHtml
-
 
 <div class="row">
     <div class="input-group mb-3">
         <div class="input-group-prepend search-panel">
-            <{% if searchType == 'revision' %}
+            {% if searchType == 'revision' %}
                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span id="search_concept" data-type="{{ searchType }}">Search revision by name</span>
                 </button>

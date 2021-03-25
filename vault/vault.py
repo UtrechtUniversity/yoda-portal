@@ -4,19 +4,21 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, session
 
 import api
 
 
 vault_bp = Blueprint('vault_bp', __name__,
                      template_folder='templates/vault',
-                     static_folder='static/vault')
+                     static_folder='static/vault',
+                     static_url_path='/static')
 
 
 @vault_bp.route('/index', methods=['GET'])
 def index():
-    items = app.config['browser-items-per-page']
+    items = 10 
+    #app.config['browser-items-per-page']
     dir = request.args.get('dir')
 
     # Hoe dit te vertalen??
@@ -30,13 +32,14 @@ def index():
     searchStart = 0
     searchOrderDir = 'asc'
     searchOrderColumn = 0
-    searchItemsPerPage = app.config['search-items-per-page']
+    searchItemsPerPage = 10  
+    # app.config['search-items-per-page']
 
     if 'research-search-term' in session or 'research-search-status-value' in session:
-            if 'research-search-term' in session:
-                    searchTerm = reseach['research-search-term']
-                if 'research-search-status-value' in session:
-                    searchStatusValue = session['research-search-status-value']
+        if 'research-search-term' in session:
+            searchTerm = reseach['research-search-term']
+        if 'research-search-status-value' in session:
+            searchStatusValue = session['research-search-status-value']
 
         searchType = session['research-search-type']
         searchStart = session['research-search-start']
@@ -76,7 +79,7 @@ def download():
     filepath = path_start + request.args.get('filepath')
 
 ############
-@app.route('/uploads/<path:filename>', methods=['GET', 'POST'])
+# @app.route('/uploads/<path:filename>', methods=['GET', 'POST'])
 #def download(filename):
 #    # Appending app path to upload folder path within app root folder
 #    uploads = os.path.join(current_app.root_path, app.config['UPLOAD_FOLDER'])
@@ -90,8 +93,8 @@ def form():
     try:
         path = request.args.get('path')
     except:
-        # REDIRECT research/browse
-        return redirect(url_for('index')) ??
+        # REDIRECT research/browse ???????
+        return redirect(url_for('index'))
 
     path_start = app.config['path_start']
 
@@ -108,12 +111,12 @@ def form():
     # https://flask-wtf.readthedocs.io/en/stable/csrf.html
     # CSRF protection requires a secret key to securely sign the token. By default this will use the Flask app's SECRET_KEY. If you'd like to use a separate token you can set WTF_CSRF_SECRET_KEY.
     # Load CSRF token ??
-#    from flask_wtf.csrf import CSRFProtect
+    #    from flask_wtf.csrf import CSRFProtect
     csrf = CSRFProtect(app)
-#    $tokenName = $this->security->get_csrf_token_name();
-#    $tokenHash = $this->security->get_csrf_hash();
+    #    $tokenName = $this->security->get_csrf_token_name();
+    #    $tokenHash = $this->security->get_csrf_hash();
 
-    formProperties = api.call('meta_form_load', ['coll': full_path])
+    formProperties = api.call('meta_form_load', {'coll': full_pat})
 
     return render_template('metadata/form.html',
         path=path,
@@ -134,7 +137,7 @@ def unset_session():
 
 
 @vault_bp.route('/set_session')
-def set_session()
+def set_session():
     value = request.args.get('value')
     type = request.args.get('type')
 

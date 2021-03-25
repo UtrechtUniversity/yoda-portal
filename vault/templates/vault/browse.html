@@ -1,14 +1,23 @@
-items
-dir
-searchHtml
-<script>
-    var browsePageItems = {{ items }};
-    var browseStartDir = {{ dir | jsonencode ) }};
-    var browseDlgPageItems = {{ items }};
-    var view = 'browse';
-</script>
+{% extends 'base.html' %}
 
-<div class="modal" id="dlg-select-folder">
+{% block title %}{{ super() }} &dash; Vault{% endblock title %}
+
+{% block head_scripts %}
+    <script src="{{ url_for('vault_bp.static', filename='lib/datatables/js/datatables.min.js') }}"></script>
+    <script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
+    <script src="{{ url_for('vault_bp.static', filename='js/search.js') }}"></script>
+    <script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
+
+    <script type="text/javascript">
+        var browsePageItems = {{ items }};
+        var browseStartDir = {{ dir | tojson }};
+        var browseDlgPageItems = {{ items }};
+        var view = 'browse';
+    </script>
+{% endblock head_scripts %}
+
+{% block content %}
+<div class="modal" id="dlg-select-folder222">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="card-body">
@@ -148,7 +157,9 @@ searchHtml
     </div>
 </div>
 
+{% autoescape false %}
 {{ searchHtml }}
+{% endautoescape %}
 
 <div class="row d-block">
     <nav aria-label="breadcrumb flex-column">
@@ -206,4 +217,4 @@ searchHtml
         </div>
     </div>
 </div>
-
+{% endblock content %}
