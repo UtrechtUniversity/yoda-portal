@@ -57,92 +57,80 @@ function getDetails(resource)
     });
 }
 
-function getGroupDetails(group)
-{
-    let result = Yoda.call('resource_full_year_group_data',
-        {group_name: group, current_month: 3},
-        {rawResult: true}
-    );
-    console.log(result);
-    return
+function getGroupDetails(group) {
+    Yoda.call('resource_full_year_group_data',
+              {group_name: group}).then((data) => {
 
-    var url = "statistics/group_details?group=" + encodeURIComponent(group);
-    $.getJSON(url, function( data ) {
-        if (data.status == 'success') {
+          $('.group-details').html(data.html);
 
-            $('.group-details').html(data.html);
+          if (data.total_storage > 0) {
+              var ctx = $('.storage-data');
+              var datasets = [];
+              var labels = [];
 
-            if (data.storageData.totalStorage > 0) {
-                var ctx = $('.storage-data');
-                var datasets = [];
-                var labels = [];
+              $.each(data.tiers, function (name, storageData) {
 
-                $.each(data.storageData.tiers, function (name, storageData) {
+                  var storageChartData = [];
+                  $.each(data.months, function (index, month) {
+                      if ($.inArray(month, labels) === -1) {
+                          labels.push(months[month]);
+                      }
 
-                    var storageChartData = [];
-                    $.each(data.storageData.months, function (index, month) {
-                        if ($.inArray(month, labels) === -1) {
-                            labels.push(months[month]);
-                        }
+                      storageChartData.push(storageData[month]);
+                  });
 
-                        storageChartData.push(storageData[month]);
-                    });
+                  var tierObject = {
+                      label: name,
+                      data: storageChartData,
+                      backgroundColor: darkColorGenerator()
+                  };
 
-                    var tierObject = {
-                        label: name,
-                        data: storageChartData,
-                        backgroundColor: darkColorGenerator()
-                    };
+                  datasets.push(tierObject);
+              });
 
-                    datasets.push(tierObject);
-                });
+              var chartData = {
+                  labels: labels,
+                  datasets: datasets,
+              };
 
-                var chartData = {
-                    labels: labels,
-                    datasets: datasets,
-                };
+              var chartOptions = {
+                  scales: {
+                      xAxes: [{
+                          barPercentage: 1,
+                          categoryPercentage: 0.6,
+                          scaleLabel: {
+                              display: true,
+                              labelString: 'Months'
+                          }
+                      }],
+                      yAxes: [{
+                          scaleLabel: {
+                              display: true,
+                              labelString: $('canvas').data('storage'),
+                          },
+                          ticks: {
+                              min: 0, // it is for ignoring negative step.
+                              beginAtZero: true,
+                              callback: function(value, index, values) {
+                                  if ($('canvas').data('storage') == 'Terabytes') {
+                                      if (value.countDecimals() < 2) {
+                                          return value;
+                                      }
+                                  } else {
+                                      return value;
+                                  }
+                              }
+                          }
+                      }]
+                  }
+              };
 
-                var chartOptions = {
-                    scales: {
-
-                        xAxes: [{
-                            barPercentage: 1,
-                            categoryPercentage: 0.6,
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Months'
-                            }
-                        }],
-
-                        yAxes: [{
-                            scaleLabel: {
-                                display: true,
-                                labelString: $('canvas').data('storage'),
-                            },
-                            ticks: {
-                                min: 0, // it is for ignoring negative step.
-                                beginAtZero: true,
-                                callback: function(value, index, values) {
-                                    if ($('canvas').data('storage') == 'Terabytes') {
-                                        if (value.countDecimals() < 2) {
-                                            return value;
-                                        }
-                                    } else {
-                                        return value;
-                                    }
-                                }
-                            }
-                        }]
-                    }
-                };
-
-                var chart = new Chart(ctx, {
-                    type: 'bar',
-                    data: chartData,
-                    options: chartOptions
-                });
-            }
-        }
+              var chart = new Chart(ctx, {
+                  type: 'bar',
+                  data: chartData,
+                  options: chartOptions
+              });
+          }
     });
 }
 
