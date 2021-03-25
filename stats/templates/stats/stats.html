@@ -3,7 +3,7 @@
 {% block title %}{{ super() }} &dash; Statistics{% endblock %}
 
 {% block head_scripts %}
-    <script src="{{ url_for('stats_bp.static', filename='lib/chart-2.7.3/chart.min.js') }}"></script>
+    <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-2.7.3/chart.min.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='js/stats.js') }}"></script>
 {% endblock %}
 
