@@ -36,6 +36,17 @@ app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_USE_SIGNER'] = True                 # Use signer for cookie session sid
 app.config['SESSION_FILE_DIR'] = '/tmp/flask_session/'  # default flask_session under current working dir
 
+# Default nr of items in browser list
+app.config['browser-items-per-page'] = 10
+# Default nr of items in search list
+app.config['search-items-per-page'] = 10
+# Default nr of items for revision list
+app.config['revision-items-per-page'] = 25 
+# Default nr of items in revision list when used in a dialog
+app.config['revision-dialog-items-per-page'] = 5
+app.config['rodsServerZone'] = 'tempZone'
+app.config['app_path_start'] = '/' + app.config['rodsServerZone'] + '/home/'
+
 Session(app)
 
 # add datarequest + other optional modules via ansible

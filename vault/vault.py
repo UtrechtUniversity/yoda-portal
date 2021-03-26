@@ -4,7 +4,7 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, render_template, request, session, current_app
 
 import api
 
@@ -17,8 +17,7 @@ vault_bp = Blueprint('vault_bp', __name__,
 
 @vault_bp.route('/index', methods=['GET'])
 def index():
-    items = 10 
-    #app.config['browser-items-per-page']
+    items = current_app.config['browser-items-per-page']
     dir = request.args.get('dir')
 
     # Hoe dit te vertalen??
@@ -32,12 +31,11 @@ def index():
     searchStart = 0
     searchOrderDir = 'asc'
     searchOrderColumn = 0
-    searchItemsPerPage = 10  
-    # app.config['search-items-per-page']
+    searchItemsPerPage = current_app.config['search-items-per-page']
 
     if 'research-search-term' in session or 'research-search-status-value' in session:
         if 'research-search-term' in session:
-            searchTerm = reseach['research-search-term']
+            searchTerm = session['research-search-term']
         if 'research-search-status-value' in session:
             searchStatusValue = session['research-search-status-value']
 
@@ -75,7 +73,7 @@ def index():
 
 @vault_bp.route('/download', methods=['GET'])
 def download():
-    path_start = app.config['path_start']
+    path_start = current_app.config['app_path_start']
     filepath = path_start + request.args.get('filepath')
 
 ############
@@ -88,7 +86,7 @@ def download():
 #    return send_from_directory(directory=uploads, filename=filename)
  
 
-@vault_bp.route('/form')
+@vault_bp.route('/metadata/form')
 def form():
     try:
         path = request.args.get('path')
@@ -96,7 +94,7 @@ def form():
         # REDIRECT research/browse ???????
         return redirect(url_for('index'))
 
-    path_start = app.config['path_start']
+    path_start = current_app.config['app_path_start']
 
     full_path = path_start + path
 
@@ -112,11 +110,11 @@ def form():
     # CSRF protection requires a secret key to securely sign the token. By default this will use the Flask app's SECRET_KEY. If you'd like to use a separate token you can set WTF_CSRF_SECRET_KEY.
     # Load CSRF token ??
     #    from flask_wtf.csrf import CSRFProtect
-    csrf = CSRFProtect(app)
+    csrf = CSRFProtect(current_app)
     #    $tokenName = $this->security->get_csrf_token_name();
     #    $tokenHash = $this->security->get_csrf_hash();
 
-    formProperties = api.call('meta_form_load', {'coll': full_pat})
+    formProperties = api.call('meta_form_load', {'coll': full_path})
 
     return render_template('metadata/form.html',
         path=path,
@@ -156,7 +154,7 @@ def access():
     path = request.args.get('path')
     action = request.args.get('action')
 
-    full_path = configuration['path_start'] + path
+    full_path = configuration['app_path_start'] + path
 
     if action == 'grant':
         response =  api.call('grant_read_access_research_group', {"coll": full_path})
