@@ -2,7 +2,9 @@
 
 {% block title %}{{ super() }} &dash; Vault{% endblock title %}
 
-{% block head_scripts %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='lib/toastr/toastr.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
     <script src="{{ url_for('vault_bp.static', filename='lib/datatables/js/datatables.min.js') }}"></script>
     <script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
     <script src="{{ url_for('vault_bp.static', filename='js/search.js') }}"></script>
@@ -14,7 +16,7 @@
         var browseDlgPageItems = {{ items }};
         var view = 'browse';
     </script>
-{% endblock head_scripts %}
+{% endblock scripts %}
 
 {% block content %}
 <div class="modal" id="dlg-select-folder222">
