@@ -10,6 +10,38 @@
 {% block content %}
     <h1>Statistics</h1>
 
+    {% if categories %}
+    <div class="row mb-4">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    Storage
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped storage-table">
+                        <tr>
+                            <th>Category</th>
+                            <th>Tier</th>
+                            <th>Storage</th>
+                        </tr>
+                        {% for category in categories %}
+                            <tr>
+                                <td>{{ category.category }}</td>
+                                <td>{{ category.tier }}</td>
+                                <td>{{ category.storage }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+
+                    <a href="<?php echo base_url('statistics/export') ?>" class="btn btn-primary btn-sm">
+                        Export all details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="row">
         <div class="col-md-5">
             <div class="card">
