@@ -51,7 +51,12 @@ def login():
             session.clear()
             session['user_id'] = username
             session['password'] = password
-            return redirect(url_for('general_bp.index'))
+
+            redirect_target = request.args.get('redirect_target')
+            if redirect_target is None:
+                redirect_target = url_for('general_bp.index')
+
+            return redirect(redirect_target)
 
         flash(error)
 

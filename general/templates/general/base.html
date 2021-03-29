@@ -2,26 +2,23 @@
 <html>
     <head>
         {% block head %}
-            <title>{% block title %}{{ config.portalTitleText }}{% endblock %}</title>
+            <title>{% block title %}{{ config.get('PORTAL_TITLE_TEXT') }}{% endblock %}</title>
 
-            {% block favicon %}
             <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-            {% endblock favicon %}
 
-            {% block meta %}
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            {% endblock meta %}
 
-            {% block style %}
             <link rel="stylesheet" href="{{ url_for('static', filename='lib/toastr/toastr.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/messages.css') }}">
-            {% endblock style %}
+            {% block style %}{% endblock style %}
 
             <script src="{{ url_for('static', filename='lib/jquery-1.11.2/js/jquery.min.js') }}"></script>
             <script src="{{ url_for('static', filename='lib/bootstrap-4.4.1/js/bootstrap.bundle.min.js') }}"></script>
-            {% block head_scripts %}{% endblock %}
+            <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
+            <script> Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'}; </script>
+            {% block scripts %}{% endblock %}
         {% endblock head %}
     </head>
 
@@ -29,7 +26,7 @@
 
         <header class="brandbar container">
             <div class="navbar yoda-topnavbar">
-                <a class="navbar-brand" href="{{ config.logoUrl }}">
+                <a class="navbar-brand" href="{{ config.get('LOGO_URL') }}">
                     <img class="logo" src="{{ url_for('static', filename='img/logo-uu.svg') }}">
                 </a>
                 <div class="auth-action pull-right">
@@ -61,7 +58,7 @@
                 </div>
                 <div id="navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
-                        {% for module in config.modules %}
+                        {% for module in config.get('modules') %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ url_for( module.function ) }}">{{ module.name }}</a>
                             </li>
@@ -91,9 +88,5 @@
             </div>
             {% endblock footer %}
         </footer>
-
-        <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
-        <script> Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'}; </script>
-        {% block footer_scripts %}{% endblock %}
     </body>
 </html>

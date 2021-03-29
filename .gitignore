@@ -1,0 +1,5 @@
+# Editor swap files
+*.swp
+
+# Ansible controlled config files
+flask.cfg
