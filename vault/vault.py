@@ -124,7 +124,7 @@ def form():
         flashMessageType=flashMessageType,
         formProperties=formProperties)
 
-@vault_bp.route('/unset_session')
+@vault_bp.route('/search/unset_session')
 def unset_session():
     session.pop('research-search-term', None)
     session.pop('research-search-start', None)
@@ -133,8 +133,10 @@ def unset_session():
     session.pop('research-search-order-column', None)
     session.pop('research-search-status-value', None)
 
+    return 'OK' # Dummy response
 
-@vault_bp.route('/set_session')
+
+@vault_bp.route('/search/set_session')
 def set_session():
     value = request.args.get('value')
     type = request.args.get('type')
@@ -147,6 +149,8 @@ def set_session():
 
     session['research-search-type'] = type
     session['research-search-start'] = 0
+
+    return 'OK' # Dummy response
 
 
 @vault_bp.route('/access')
