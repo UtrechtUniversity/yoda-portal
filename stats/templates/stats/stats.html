@@ -33,7 +33,7 @@
                         {% endfor %}
                     </table>
 
-                    <a href="<?php echo base_url('statistics/export') ?>" class="btn btn-primary btn-sm">
+                    <a href="{{ url_for( stats_bp.export ) }}" class="btn btn-primary btn-sm">
                         Export all details
                     </a>
                 </div>
