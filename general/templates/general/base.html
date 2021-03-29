@@ -17,7 +17,17 @@
             <script src="{{ url_for('static', filename='lib/jquery-1.11.2/js/jquery.min.js') }}"></script>
             <script src="{{ url_for('static', filename='lib/bootstrap-4.4.1/js/bootstrap.bundle.min.js') }}"></script>
             <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
-            <script> Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'}; </script>
+            <script> 
+            $(function() {
+                Yoda.version  = {{ 'harm_version' | tojson }};
+                Yoda.basePath = {{ '/tempZone/home' | tojson }};
+                // Yoda.baseUrl  = {{ 'https://portal.yoda.test/' | tojson }};
+                Yoda.user = {
+                    username: {{ 'datamanager' | tojson }},
+                };
+            });
+
+             Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'}; </script>
             {% block scripts %}{% endblock %}
         {% endblock head %}
     </head>
