@@ -128,7 +128,6 @@ def form():
 
 @vault_bp.route('/search/unset_session')
 def unset_session():
-    print('UNSET_SESSION')
     session.pop('research-search-term', None)
     session.pop('research-search-start', None)
     session.pop('research-search-type', None)
@@ -139,11 +138,8 @@ def unset_session():
     return 'OK' # Dummy response
 
 
-@vault_bp.route('/search/set_session')
+@vault_bp.route('/search/set_session', methods=['POST'])
 def set_session():
-    print('SEARCH - SET_SESSION')
-    return 'OK'
-
     value = request.args.get('value')
     type = request.args.get('type')
 
