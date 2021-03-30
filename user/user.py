@@ -77,7 +77,9 @@ def forgot_password():
 
 @user_bp.route('/notifications')
 def notifications():
-    return render_template('notifications.html')
+    response = api.call('notifications_load', data={})
+    return render_template('notifications.html',
+                           notifications=response['data'])
 
 
 @user_bp.route('/settings', methods=['GET', 'POST'])
