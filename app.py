@@ -69,6 +69,7 @@ csrf = CSRFProtect(app)
 # Restricted access protection
 @app.before_request
 def protect_pages():
+    print(request.endpoint)
     if not request.endpoint or request.endpoint in ['general_bp.index',
                                                     'user_bp.login',
                                                     'api_bp.call',

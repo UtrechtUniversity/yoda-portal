@@ -17,6 +17,7 @@ vault_bp = Blueprint('vault_bp', __name__,
 
 @vault_bp.route('/index', methods=['GET'])
 def index():
+    print('HARM')
     items = current_app.config['browser-items-per-page']
     dir = request.args.get('dir')
 
@@ -124,8 +125,10 @@ def form():
         flashMessageType=flashMessageType,
         formProperties=formProperties)
 
+
 @vault_bp.route('/search/unset_session')
 def unset_session():
+    print('UNSET_SESSION')
     session.pop('research-search-term', None)
     session.pop('research-search-start', None)
     session.pop('research-search-type', None)
@@ -138,6 +141,9 @@ def unset_session():
 
 @vault_bp.route('/search/set_session')
 def set_session():
+    print('SEARCH - SET_SESSION')
+    return 'OK'
+
     value = request.args.get('value')
     type = request.args.get('type')
 

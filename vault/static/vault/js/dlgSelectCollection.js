@@ -1,5 +1,4 @@
-var urlEncodedPath = '',
-urlEncodedOrigin = '';
+var urlEncodedPath = '', urlEncodedOrigin = '';
 folderSelectBrowser = null;
 dlgCurrentFolder = '';
 

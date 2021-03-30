@@ -272,6 +272,8 @@ function showSearchResults() {
 }
 
 function saveSearchRequest() {
+    // $.get("search/set_session");
+    // return; 
     if (typeof currentSearchString != 'undefined' && currentSearchString.length > 0) {
         var url = "search/set_session";
         $.ajax({
