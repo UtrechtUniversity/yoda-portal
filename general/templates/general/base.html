@@ -10,6 +10,7 @@
             <meta name="viewport" content="width=device-width, initial-scale=1">
 
             <link rel="stylesheet" href="{{ url_for('static', filename='lib/toastr/toastr.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='lib/font-awesome-4.7.0/css/font-awesome.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/messages.css') }}">
             {% block style %}{% endblock style %}
@@ -37,7 +38,7 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="{{ url_for('user_bp.settings') }}">Settings</a>
-                                <a class="dropdown-item" href="{{ url_for('user_bp.notifications') }}">Notifications</a>                                
+                                <a class="dropdown-item" href="{{ url_for('user_bp.notifications') }}">Notifications</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="{{ url_for('user_bp.logout') }}">Log out</a>
                             </div>
