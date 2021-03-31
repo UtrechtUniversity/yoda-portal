@@ -77,14 +77,15 @@ def download():
     path_start = current_app.config['app_path_start']
     filepath = path_start + request.args.get('filepath')
 
-############
-# @app.route('/uploads/<path:filename>', methods=['GET', 'POST'])
-#def download(filename):
-#    # Appending app path to upload folder path within app root folder
-#    uploads = os.path.join(current_app.root_path, app.config['UPLOAD_FOLDER'])
-#
-#    # Returning file from appended path
-#    return send_from_directory(directory=uploads, filename=filename)
+    response = api.call('get_content', data={'path': file_path})
+
+    output = make_response(response['data']['content'])
+
+    output.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(request.args.get('filepath'))
+    output.headers['Content-Type'] = 'application/octet'
+    output.headers['Content-Length'] = response['data']['size']
+
+    return output
  
 
 @vault_bp.route('/metadata/form')
