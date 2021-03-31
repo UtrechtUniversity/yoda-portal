@@ -120,11 +120,13 @@ def prepare_user():
         g.user = user_id
         g.irods = irods
 
-        notifications = session.get('notifications', 0)
-        if notifications > 0:
+        notifications = session.get('notifications', None)
+        if notifications is None:
             response = api.call('notifications_load', data={})
             session['notifications'] = len(response['data'])
             g.notifications = notifications
+        else:
+            g.notifications = session.get('notifications', None)
     else:
         redirect('user_bp.login')
 
