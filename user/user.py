@@ -52,6 +52,11 @@ def login():
             session['user_id'] = username
             session['password'] = password
 
+            # Retrieve notifications for user.
+            response = api.call('notifications_load', data={})
+            if len(response['data']) > 0:
+                session['notifications'] = response['data']
+
             redirect_target = request.args.get('redirect_target')
             if redirect_target is None:
                 redirect_target = url_for('general_bp.index')
@@ -78,6 +83,10 @@ def forgot_password():
 @user_bp.route('/notifications')
 def notifications():
     response = api.call('notifications_load', data={})
+
+    if len(response['data']) > 0:
+        session['notifications'] = response['data']
+
     return render_template('notifications.html',
                            notifications=response['data'])
 
@@ -108,12 +117,14 @@ def settings():
 @user_bp.before_app_request
 def prepare_user():
     user_id = session.get('user_id', None)
+    notifications = session.get('notifications', None)
     irods = connman.get(session.sid)
 
     if user_id is None:
         g.user = None
     elif irods is not None:
         g.user = user_id
+        g.notifications = notifications
         g.irods = irods
     else:
         redirect('user_bp.login')
