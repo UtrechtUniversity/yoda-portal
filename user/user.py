@@ -55,7 +55,7 @@ def login():
             # Retrieve notifications for user.
             response = api.call('notifications_load', data={})
             if len(response['data']) > 0:
-                session['notifications'] = response['data']
+                session['notifications'] = len(response['data'])
 
             redirect_target = request.args.get('redirect_target')
             if redirect_target is None:
@@ -85,7 +85,7 @@ def notifications():
     response = api.call('notifications_load', data={})
 
     if len(response['data']) > 0:
-        session['notifications'] = response['data']
+        session['notifications'] = len(response['data'])
 
     return render_template('notifications.html',
                            notifications=response['data'])
