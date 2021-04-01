@@ -16,8 +16,8 @@ ssl_settings = {'ssl_context': ssl_context}
 
 user_bp = Blueprint('user_bp', __name__,
                     template_folder='templates/user',
-                    static_folder='static/user')
-
+                    static_folder='static/user',
+                    static_url_path='/static')
 
 @user_bp.route('/login', methods=['GET', 'POST'])
 def login():
