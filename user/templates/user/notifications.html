@@ -20,9 +20,9 @@
       <tbody>
         {% for notification in notifications %}
         <tr data-id="{{ notification.timestamp }}">
-          <th scope="row">{{ notification.datetime }}</th>
+          <th class="col-md-2" scope="row">{{ notification.datetime }}</th>
           <td>{{ notification.message }}</td>
-          <td><a class="dismiss-notification"><i class="fa fa-times" aria-hidden="true"></i></a></td>
+          <td class="col-md-1"><a class="dismiss-notification"><i class="fa fa-times" aria-hidden="true"></i></a></td>
         </tr>
         {% endfor %}
       </tbody>

@@ -19,6 +19,7 @@ user_bp = Blueprint('user_bp', __name__,
                     static_folder='static/user',
                     static_url_path='/static')
 
+
 @user_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
