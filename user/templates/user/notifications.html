@@ -2,6 +2,10 @@
 
 {% block title %}{{ super() }} &dash; Notifications{% endblock %}
 
+{% block scripts %}
+    <script src="{{ url_for('user_bp.static', filename='js/notifications.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <h1>Notifications</h1>
     {% if notifications %}
@@ -15,10 +19,10 @@
       </thead>
       <tbody>
         {% for notification in notifications %}
-        <tr>
+        <tr data-id="{{ notification.timestamp }}">
           <th scope="row">{{ notification.datetime }}</th>
           <td>{{ notification.message }}</td>
-          <td><a href="#{{ notification.timestamp }}"><i class="fa fa-times" aria-hidden="true"></i></a></td>
+          <td><a class="dismiss-notification"><i class="fa fa-times" aria-hidden="true"></i></a></td>
         </tr>
         {% endfor %}
       </tbody>
