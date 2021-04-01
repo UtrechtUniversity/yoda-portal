@@ -108,8 +108,6 @@ Yoda.call = async function(path, data={}, options={}) {
 
     if (Yoda.version === 'development')
         console.log(`API: ${path}()`, data);
-    else
-        console.log(`API: ${path}()`);
 
     try {
         let x = await call_(path, data);
