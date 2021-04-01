@@ -79,10 +79,7 @@ def forgot_password():
 @user_bp.route('/notifications')
 def notifications():
     response = api.call('notifications_load', data={})
-
-    if len(response['data']) > 0:
-        session['notifications'] = len(response['data'])
-
+    session['notifications'] = len(response['data'])
     return render_template('notifications.html',
                            notifications=response['data'])
 
