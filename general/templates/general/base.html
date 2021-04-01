@@ -21,6 +21,7 @@
             <script>
                 Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'};
                 {% if g.user %}
+                Yoda.basePath = '/tempZone/home';
                 Yoda.user = {
                     username: {{ g.user }},
                 };
