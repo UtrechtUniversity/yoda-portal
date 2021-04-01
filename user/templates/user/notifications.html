@@ -16,9 +16,9 @@
       <tbody>
         {% for notification in notifications %}
         <tr>
-          <th scope="row"></th>
-          <td>{{ notification }}</td>
-          <td></td>
+          <th scope="row">{{ notification.datetime }}</th>
+          <td>{{ notification.message }}</td>
+          <td><a href="#{{ notification.timestamp }}"><i class="fa fa-times" aria-hidden="true"></i></a></td>
         </tr>
         {% endfor %}
       </tbody>
