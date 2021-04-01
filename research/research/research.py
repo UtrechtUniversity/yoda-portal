@@ -10,9 +10,9 @@ research_bp = Blueprint('research_bp', __name__,
                         static_folder='static/research',
                         static_url_path='/static')
 
-@research_bp.route('/')
+@research_bp.route('/index')
 def index():
-    #items = config['browser-items-per-page']
+    #items = current_app.config['browser-items-per-page']
     items = 10
     dir = request.args.get('dir')
 
@@ -26,7 +26,7 @@ def index():
     searchStart = 0
     searchOrderDir = 'asc'
     searchOrderColumn = 0
-    #searchItemsPerPage = config['search-items-per-page']
+    #searchItemsPerPage = current_app.config['search-items-per-page']
     searchItemsPerPage = 10
 
 
