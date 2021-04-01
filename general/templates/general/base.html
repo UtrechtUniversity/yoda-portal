@@ -23,7 +23,7 @@
                 {% if g.user %}
                 Yoda.basePath = '/tempZone/home';
                 Yoda.user = {
-                    username: {{ g.user }},
+                    username: '{{ g.user }}',
                 };
                 {% endif %}
             </script>
