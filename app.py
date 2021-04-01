@@ -23,8 +23,7 @@ app.config['modules'] = [
     {'name': 'Research',       'function': 'research_bp.index'},
     {'name': 'Vault',          'function': 'vault_bp.index'},
     {'name': 'Statistics',     'function': 'stats_bp.index'},
-    {'name': 'Group Manager',  'function': 'group_bp.index'},
-    {'name': 'Datarequest',    'function': 'datarequest_bp.index'}
+    {'name': 'Group Manager',  'function': 'group_bp.index'}
 ]
 if app.config.get('INTAKE_ENABLED'):
     app.config['modules'].append(
