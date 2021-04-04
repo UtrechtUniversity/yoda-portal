@@ -10,6 +10,7 @@
             <meta name="viewport" content="width=device-width, initial-scale=1">
 
             <link rel="stylesheet" href="{{ url_for('static', filename='lib/toastr/toastr.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='lib/font-awesome-4.7.0/css/font-awesome.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/messages.css') }}">
             {% block style %}{% endblock style %}
@@ -17,17 +18,15 @@
             <script src="{{ url_for('static', filename='lib/jquery-1.11.2/js/jquery.min.js') }}"></script>
             <script src="{{ url_for('static', filename='lib/bootstrap-4.4.1/js/bootstrap.bundle.min.js') }}"></script>
             <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
-            <script> 
-            $(function() {
-                Yoda.version  = {{ 'harm_version' | tojson }};
-                Yoda.basePath = {{ '/tempZone/home' | tojson }};
-                // Yoda.baseUrl  = {{ 'https://portal.yoda.test/' | tojson }};
+            <script>
+                Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'};
+                {% if g.user %}
+                Yoda.basePath = '/tempZone/home';
                 Yoda.user = {
-                    username: {{ 'datamanager' | tojson }},
+                    username: {{ g.user }},
                 };
-            });
-
-             Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'}; </script>
+                {% endif %}
+            </script>
             {% block scripts %}{% endblock %}
         {% endblock head %}
     </head>

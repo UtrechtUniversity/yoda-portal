@@ -1,26 +1,3 @@
-https://stackoverflow.com/questions/39047657/base64-decode-string-in-jinja/39047765
-# add filter to jinja2 env
-environment.filters['b64decode'] = base64.b64decode
-
-# in template use
-{{ value|b64decode }}
-
-========================
-
-path
-tokenName
-tokenHash
-formProperties
-
-{% autoescape false %}
-  {{ path | replace(" ", "&nbsp;") }}
-{% endautoescape %}
-{% autoescape false %}
-    <p>autoescaping is disabled here
-    <p>{{ will_not_be_escaped }}
-{% endautoescape %}
-base64_encode
-
 <div id="form-errors" class="row hide">
     <div class="col-md-12">
         <div class="card">
@@ -51,7 +28,7 @@ base64_encode
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title pull-left">
-                    Metadata form - {{ path | trim | safe
+                    Metadata form - {{ path | trim | safe }}
                 </h3>
                 <div class="input-group-sm has-feedback pull-right close-button">
                     <a class="btn btn-light btn-sm" href="/vault/browse?dir={{ path | urlencode | replace("+", "%20") }}">Close</a>
@@ -63,8 +40,8 @@ base64_encode
                 </div>
                 <div id="form"
                      data-path="{{ path | safe }}"
-                     data-csrf_token_name="{{ tokenName | urlencode | replace("+", "%20") }}"
-                     data-csrf_token_hash="{{ tokenHash | urlencode | replace("+", "%20") }}">
+                     data-csrf_token_name="{{ 'csrf_token' | urlencode | replace("+", "%20") }}"
+                     data-csrf_token_hash="{{ csrf_token() | urlencode | replace("+", "%20") }}">
                     <p>Loading metadata <i class="fa fa-spinner fa-spin fa-fw"></i></p>
                 </div>
             </div>
@@ -84,6 +61,5 @@ setTimeout(function(){
 </script>
 <script src="/vault/static/js/metadata/form.js" async></script>
 <script id="form-properties" type="text/plain">{{
-// base64-encode to make sure no script tag can be embedded.
 formProperties | b64encode | tojson
 }}</script>

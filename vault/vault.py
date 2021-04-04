@@ -4,7 +4,8 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 
-from flask import Blueprint, render_template, request, session, current_app
+from flask import Blueprint, make_response, render_template, request, session, current_app
+
 
 import api
 
@@ -17,7 +18,7 @@ vault_bp = Blueprint('vault_bp', __name__,
 
 @vault_bp.route('/index', methods=['GET'])
 def index():
-    print('HARM')
+    print('HARM- VAULT')
     items = current_app.config['browser-items-per-page']
     dir = request.args.get('dir')
 
@@ -53,7 +54,7 @@ def index():
         showTerm = True
 
     # Get the HTML for search part
-    searchHtml = render_template('search.html',
+    searchHtml = render_template('search2.html',
         searchTerm=searchTerm,
         searchStatusValue=searchStatusValue,
         searchType=searchType,
@@ -64,7 +65,7 @@ def index():
         showTerm=showTerm,
         searchItemsPerPage=searchItemsPerPage)
 
-    return render_template('browse.html',
+    return render_template('browse2.html',
             activeModule='vault',
             searchHtml=searchHtml,
             items=items,
@@ -74,10 +75,13 @@ def index():
 
 @vault_bp.route('/download', methods=['GET'])
 def download():
+    print('IN DOWNLOAD')
+    print(request.args.get('filepath'))
     path_start = current_app.config['app_path_start']
-    filepath = path_start + request.args.get('filepath')
+    filepath = '/tempZone/home' + request.args.get('filepath')
 
-    response = api.call('get_content', data={'path': file_path})
+    response = api.call('get_content', data={'path': filepath})
+    print(response)
 
     output = make_response(response['data']['content'])
 
@@ -112,7 +116,6 @@ def form():
     # CSRF protection requires a secret key to securely sign the token. By default this will use the Flask app's SECRET_KEY. If you'd like to use a separate token you can set WTF_CSRF_SECRET_KEY.
     # Load CSRF token ??
     #    from flask_wtf.csrf import CSRFProtect
-    csrf = CSRFProtect(current_app)
     #    $tokenName = $this->security->get_csrf_token_name();
     #    $tokenHash = $this->security->get_csrf_hash();
 
@@ -120,8 +123,6 @@ def form():
 
     return render_template('metadata/form.html',
         path=path,
-        tokenName=tokenName,
-        tokenHash=tokenHash,
         flashMessage=flashMessage,
         flashMessageType=flashMessageType,
         formProperties=formProperties)
