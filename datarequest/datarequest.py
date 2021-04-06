@@ -14,4 +14,4 @@ datarequest_bp = Blueprint(
 
 @datarequest_bp.route('/example')
 def index():
-    return render_template('example.html')
+    return render_template('datarequest/example.html')

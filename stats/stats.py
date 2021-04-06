@@ -10,7 +10,7 @@ from flask import Blueprint, make_response, render_template
 import api
 
 stats_bp = Blueprint('stats_bp', __name__,
-                     template_folder='templates/stats',
+                     template_folder='templates',
                      static_folder='static/stats',
                      static_url_path='/static')
 
@@ -19,7 +19,7 @@ stats_bp = Blueprint('stats_bp', __name__,
 def index():
     group_response = api.call('resource_list_groups', data={})
     category_response = api.call('resource_category_stats', data={})
-    return render_template('stats.html',
+    return render_template('stats/stats.html',
                            groups=group_response['data'],
                            categories=category_response['data'])
 

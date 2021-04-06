@@ -14,4 +14,4 @@ intake_bp = Blueprint(
 
 @intake_bp.route('/example')
 def index():
-    return render_template('example.html')
+    return render_template('intake/example.html')
