@@ -26,5 +26,5 @@ def api_test():
     total = response['data']['total']
 
     return render_template('general/api_test.html', in_app={'status': status,
-                                                    'total': total,
-                                                    'response': response})
+                                                            'total': total,
+                                                            'response': response})
