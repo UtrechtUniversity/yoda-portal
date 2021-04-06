@@ -8,14 +8,14 @@ from flask import Blueprint, render_template
 import api
 
 general_bp = Blueprint('general_bp', __name__,
-                       template_folder='templates',
+                       template_folder='templates/general',
                        static_folder='static/general',
                        static_url_path='/static')
 
 
 @general_bp.route('/')
 def index():
-    return render_template('general/index.html')
+    return render_template('index.html')
 
 
 @general_bp.route('/test')
@@ -25,6 +25,6 @@ def api_test():
     status = response['status']
     total = response['data']['total']
 
-    return render_template('general/api_test.html', in_app={'status': status,
+    return render_template('api_test.html', in_app={'status': status,
                                                     'total': total,
                                                     'response': response})
