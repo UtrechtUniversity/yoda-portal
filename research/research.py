@@ -6,10 +6,10 @@ __license__   = 'GPLv3, see LICENSE'
 from flask import Blueprint, render_template
 
 research_bp = Blueprint('research_bp', __name__,
-                        template_folder='templates/research',
+                        template_folder='templates',
                         static_folder='static/research')
 
 
 @research_bp.route('/example')
 def index():
-    return render_template('example.html')
+    return render_template('research/example.html')
