@@ -3,6 +3,13 @@
 {% block title %}{{ super() }} &dash; Internal server error{% endblock %}
 
 {% block content %}
-<h1>Internal server error</h1>
-<p>Holy moly, something went wrong!<p>
+<div class="text-center">
+    <h1>Internal server error</h1>
+
+    <p>
+        Holy moly, something went wrong! <br>
+        You can click the button below to go back home.
+    </p>
+    <a href="/" title="Home" class="btn btn-primary">Go home</a>
+</div>
 {% endblock content %}
