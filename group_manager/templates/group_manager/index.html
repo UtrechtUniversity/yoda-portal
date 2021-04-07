@@ -11,6 +11,11 @@
 {% block scripts %}
     <script src="{{ url_for('group_bp.static', filename='js/group_manager.js') }}"></script>
     <script src="{{ url_for('group_bp.static', filename='lib/select2/select2.min.js') }}"></script>
+    <script>
+    $(function() {
+        Yoda.groupManager.load({{ group_hierarchy }}, {{ user_type }}, {{ user_zone }});
+    });
+    </script>
 {% endblock %}
 
 {% block content %}

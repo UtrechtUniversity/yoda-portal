@@ -13,4 +13,13 @@ group_bp = Blueprint('group_bp', __name__,
 
 @group_bp.route('/example')
 def index():
-    return render_template('group_manager/index.html')
+    group_response = api.call('group_data', data={})
+    
+    group_hierarchy = {}
+    user_type = "rodsuser"
+    user_zone = "tempZone"
+
+    return render_template('group_manager/index.html',
+                            group_hierarchy=group_hierarchy,
+                            user_type=user_type,
+                            user_zone=user_zone)
