@@ -2,6 +2,17 @@
 
 {% block title %}{{ super() }} &dash; Group Manager{% endblock %}
 
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('group_bp.static', filename='css/group_manager.css') }}">
+    <link rel="stylesheet" href="{{ url_for('group_bp.static', filename='lib/select2/select2.css') }}">
+    <link rel="stylesheet" href="{{ url_for('group_bp.static', filename='lib/select2/select2-bootstrap.min.css') }}">
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('group_bp.static', filename='js/group_manager.js') }}"></script>
+    <script src="{{ url_for('group_bp.static', filename='lib/select2/select2.min.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <h1>Group Manager</h1>
 
