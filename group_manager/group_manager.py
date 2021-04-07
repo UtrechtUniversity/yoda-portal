@@ -3,8 +3,6 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-import json
-
 from flask import Blueprint, render_template
 
 import api
@@ -24,6 +22,6 @@ def index():
     user_zone = response['data']['user_zone']
 
     return render_template('group_manager/index.html',
-                            group_hierarchy=group_hierarchy,
-                            user_type=user_type,
-                            user_zone=user_zone)
+                           group_hierarchy=group_hierarchy,
+                           user_type=user_type,
+                           user_zone=user_zone)
