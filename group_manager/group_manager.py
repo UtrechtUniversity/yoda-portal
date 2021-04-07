@@ -12,4 +12,4 @@ group_bp = Blueprint('group_bp', __name__,
 
 @group_bp.route('/example')
 def index():
-    return render_template('group_manager/example.html')
+    return render_template('group_manager/index.html')
