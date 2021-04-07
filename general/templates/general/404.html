@@ -11,6 +11,6 @@
         How you got here is a mystery. <br>
         But you can click the button below to go back home.
     </p>
-    <a href="/" title="Home" class="btn btn-primary">Go home</a>
+    <a href="{{ url_for('general_bp.index') }}" title="Home" class="btn btn-primary">Go home</a>
 </div>
 {% endblock content %}
