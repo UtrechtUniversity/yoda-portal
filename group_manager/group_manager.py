@@ -26,7 +26,7 @@ def index():
                            user_type=user_type,
                            user_zone=user_zone)
 
-@user_bp.route('/user_update', methods=['POST'])
+@group_bp.route('/user_update', methods=['POST'])
 def user_update():
     response = api.call('group_user_update_role', data={'username': request.form['user_name'],
                                                         'group_name': request.form['group_name'],
