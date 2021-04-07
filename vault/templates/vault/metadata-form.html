@@ -60,6 +60,7 @@ setTimeout(function(){
 }, 800);
 </script>
 <script src="/vault/static/js/metadata/form.js" async></script>
-<script id="form-properties" type="text/plain">{{
-formProperties | b64encode | tojson
-}}</script>
+<script id="form-properties" type="text/plain">
+    /* base64-encode to make sure no script tag can be embedded. */
+    {{ formProperties | tojson | safe }}
+</script>

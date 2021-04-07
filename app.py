@@ -6,8 +6,6 @@ __license__   = 'GPLv3, see LICENSE'
 from flask import Flask, g, redirect, request, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
-# from jinja2_base64_filters import jinja2_base64_filters
-# jinja2-base64-filters
 
 from api import api_bp
 from datarequest.datarequest import datarequest_bp

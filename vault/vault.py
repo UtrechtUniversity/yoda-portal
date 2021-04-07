@@ -5,18 +5,18 @@ __license__   = 'GPLv3, see LICENSE'
 
 
 from flask import Blueprint, make_response, render_template, request, session, current_app
-
+from flask import g
 
 import api
 
 
 vault_bp = Blueprint('vault_bp', __name__,
-                     template_folder='templates/vault',
+                     template_folder='templates',
                      static_folder='static/vault',
                      static_url_path='/static')
 
 
-@vault_bp.route('/index', methods=['GET'])
+@vault_bp.route('/', methods=['GET'])
 def index():
     print('HARM- VAULT')
     items = current_app.config['browser-items-per-page']
@@ -54,7 +54,7 @@ def index():
         showTerm = True
 
     # Get the HTML for search part
-    searchHtml = render_template('search2.html',
+    searchHtml = render_template('vault/search.html',
         searchTerm=searchTerm,
         searchStatusValue=searchStatusValue,
         searchType=searchType,
@@ -65,7 +65,7 @@ def index():
         showTerm=showTerm,
         searchItemsPerPage=searchItemsPerPage)
 
-    return render_template('browse2.html',
+    return render_template('vault/browse.html',
             activeModule='vault',
             searchHtml=searchHtml,
             items=items,
@@ -73,21 +73,25 @@ def index():
             )
 
 
-@vault_bp.route('/download', methods=['GET'])
+@vault_bp.route('/browse/download', methods=['GET'])
 def download():
-    print('IN DOWNLOAD')
-    print(request.args.get('filepath'))
-    path_start = current_app.config['app_path_start']
+    # path_start = current_app.config['app_path_start']
     filepath = '/tempZone/home' + request.args.get('filepath')
+    content = ''
+    size = 0
+    session = g.irods
 
-    response = api.call('get_content', data={'path': filepath})
-    print(response)
+    obj = session.data_objects.get(filepath)
+    with obj.open('r') as f:
+        content = f.read()
+        f.seek(0, 2)
+        size = f.tell()
 
-    output = make_response(response['data']['content'])
+    output = make_response(content)
 
     output.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(request.args.get('filepath'))
     output.headers['Content-Type'] = 'application/octet'
-    output.headers['Content-Length'] = response['data']['size']
+    output.headers['Content-Length'] = size
 
     return output
  
@@ -121,7 +125,7 @@ def form():
 
     formProperties = api.call('meta_form_load', {'coll': full_path})
 
-    return render_template('metadata/form.html',
+    return render_template('vault/metadata-form.html',
         path=path,
         flashMessage=flashMessage,
         flashMessageType=flashMessageType,
