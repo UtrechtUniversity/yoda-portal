@@ -25,3 +25,13 @@ def index():
                            group_hierarchy=group_hierarchy,
                            user_type=user_type,
                            user_zone=user_zone)
+
+@user_bp.route('/user_update', methods=['POST'])
+def user_update():
+    response = api.call('group_user_update_role', data={'username': request.form['user_name'],
+                                                        'group_name': request.form['group_name'],
+                                                        'new_role': request.form['new_role']})
+
+    output = make_response({'status': response['status'], 'message': response['status_info']})
+    output.headers["Content-type"] = "application/json"
+    return output

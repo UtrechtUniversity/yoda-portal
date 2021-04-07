@@ -153,8 +153,8 @@
 			<div class="card-footer">
 				<div class="input-group-sm float-left">
 					Change role:
-                    <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="<?php echo base_url('group-manager/user-update')?>" title="Promote the selected user">&uarr;<i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
-                    <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="<?php echo base_url('group-manager/user-update')?>" title="Demote the selected user">&darr;<i class="fa fa-eye" aria-hidden="true"></i></i></a>
+                    <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_bp.user_update'}}" title="Promote the selected user">&uarr;<i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
+                    <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_bp.user_update'}}" title="Demote the selected user">&darr;<i class="fa fa-eye" aria-hidden="true"></i></i></a>
 
 					<a class="btn btn-sm btn-danger disabled delete-button" data-action="<?php echo base_url('group-manager/user-delete')?>" data-toggle="modal" data-target="#modal-user-delete" title="Remove the selected user from this group">Remove user</a>
 				</div>
