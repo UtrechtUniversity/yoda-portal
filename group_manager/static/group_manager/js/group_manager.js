@@ -546,8 +546,8 @@ $(function() {
                 $el.select2({
                     ajax: {
                         quietMillis: 200,
-                        url:      Yoda.baseUrl + 'group-manager/get-categories',
-                        type:     'get',
+                        url:      Yoda.baseUrl + 'group/get_categories',
+                        type:     'post',
                         dataType: 'json',
                         data: function (term, page) {
                             return { query: term };
@@ -646,8 +646,8 @@ $(function() {
                 $el.select2({
                     ajax: {
                         quietMillis: 200,
-                        url:      Yoda.baseUrl + 'group-manager/get-subcategories',
-                        type:     'get',
+                        url:      Yoda.baseUrl + 'group/get_subcategories',
+                        type:     'post',
                         dataType: 'json',
                         data: function (term, page) {
                             return {
@@ -714,8 +714,8 @@ $(function() {
                     minimumInputLength: 3,
                     ajax: {
                         quietMillis: 400,
-                        url:      Yoda.baseUrl + 'group-manager/get-users',
-                        type:     'get',
+                        url:      Yoda.baseUrl + 'group/get_users',
+                        type:     'post',
                         dataType: 'json',
                         data: function (term, page) {
                             return {

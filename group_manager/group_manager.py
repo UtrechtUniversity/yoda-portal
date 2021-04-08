@@ -27,6 +27,49 @@ def index():
                            user_zone=user_zone)
 
 
+@group_bp.route('/get_categories', methods=['POST'])
+def get_categories():
+    response = api.call('group_categories', data={})
+    filter = request.form['query']
+
+    categories = []
+    for category in response['data']:
+        if filter in category:
+            categories.append(category)
+
+    output = make_response(categories)
+    output.headers["Content-type"] = "application/json"
+    return output
+
+
+@group_bp.route('/get_subcategories', methods=['POST'])
+def get_subcategories():
+    response = api.call('group_categories', data={})
+    categories = response['data']
+    category = request.form['category']
+    filter = request.form['query']
+
+    subcategories = []
+    if category in categories:
+        response = api.call('group_subcategories', data={'category': category})
+        for subcategory in response['data']:
+            if filter in subcategory:
+                subcategories.append(subcategory)
+
+    output = make_response(subcategories)
+    output.headers["Content-type"] = "application/json"
+    return output
+
+
+@group_bp.route('/get_users', methods=['POST'])
+def get_users():
+    response = api.call('group_search_users', data={'pattern': request.form['query']})
+
+    output = make_response(response['data'])
+    output.headers["Content-type"] = "application/json"
+    return output
+
+
 @group_bp.route('/group_create', methods=['POST'])
 def group_create():
     data_classification = request.form['group_data_classification'] if 'group_data_classification' in request.form else ''
