@@ -552,7 +552,8 @@ $(function() {
                         data: function (term, page) {
                             return { query: term };
                         },
-                        results: function (categories) {
+                        results: function (data) {
+                            var categories = data.categories
                             var results = [];
                             var query   = $el.data('select2').search.val();
                             var inputMatches = false;
@@ -655,7 +656,8 @@ $(function() {
                                 query: term
                             };
                         },
-                        results: function (subcategories) {
+                        results: function (data) {
+                            var subcategories = data.subcategories
                             var results = [];
                             var query   = $el.data('select2').search.val();
                             var inputMatches = false;
@@ -722,7 +724,8 @@ $(function() {
                                 query: term.toLowerCase()
                             };
                         },
-                        results: function (users) {
+                        results: function (data) {
+                            var users = data.users
                             var query   = $el.data('select2').search.val().toLowerCase();
                             var results = [];
                             var inputMatches = false;

@@ -37,7 +37,7 @@ def get_categories():
         if filter in category:
             categories.append(category)
 
-    output = make_response(categories)
+    output = make_response({'categories': categories})
     output.headers["Content-type"] = "application/json"
     return output
 
@@ -56,7 +56,7 @@ def get_subcategories():
             if filter in subcategory:
                 subcategories.append(subcategory)
 
-    output = make_response(subcategories)
+    output = make_response({'subcategories': subcategories})
     output.headers["Content-type"] = "application/json"
     return output
 
@@ -65,7 +65,7 @@ def get_subcategories():
 def get_users():
     response = api.call('group_search_users', data={'pattern': request.form['query']})
 
-    output = make_response(response['data'])
+    output = make_response({'users': response['data']})
     output.headers["Content-type"] = "application/json"
     return output
 
