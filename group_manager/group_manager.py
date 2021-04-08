@@ -27,10 +27,34 @@ def index():
                            user_zone=user_zone)
 
 
+@group_bp.route('/group_create', methods=['POST'])
+def group_create():
+    data_classification = request.form['group_data_classification'] if 'group_data_classification' in request.form else ''
+
+    response = api.call('group_create', data={'group_name': request.form['group_name'],
+                                              'category': request.form['group_category'],
+                                              'subcategory': request.form['group_subcategory'],
+                                              'description': request.form['group_description'],
+                                              'data_classification': data_classification})
+
+    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
+    output.headers["Content-type"] = "application/json"
+    return output
+
+
+@group_bp.route('/group_delete', methods=['POST'])
+def group_delete():
+    response = api.call('group_delete', data={'group_name': request.form['group_name']})
+
+    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
+    output.headers["Content-type"] = "application/json"
+    return output
+
+
 @group_bp.route('/user_create', methods=['POST'])
 def user_create():
     response = api.call('group_user_add', data={'username': request.form['user_name'],
-                                                        'group_name': request.form['group_name']})
+                                                'group_name': request.form['group_name']})
 
     output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
     output.headers["Content-type"] = "application/json"
@@ -42,6 +66,16 @@ def user_update():
     response = api.call('group_user_update_role', data={'username': request.form['user_name'],
                                                         'group_name': request.form['group_name'],
                                                         'new_role': request.form['new_role']})
+
+    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
+    output.headers["Content-type"] = "application/json"
+    return output
+
+
+@group_bp.route('/user_delete', methods=['POST'])
+def user_delete():
+    response = api.call('group_remove_user_from_group', data={'username': request.form['user_name'],
+                                                              'group_name': request.form['group_name']})
 
     output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
     output.headers["Content-type"] = "application/json"

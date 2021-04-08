@@ -58,7 +58,7 @@
 			</div>
 			<div class="card-footer">
 				<div class="input-group-sm float-left">
-					<a class="btn btn-sm btn-danger disabled delete-button" data-action="<?php echo base_url('group-manager/group-delete')?>" data-toggle="modal" data-target="#modal-group-delete">Remove group</a>
+					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_bp.group_delete') }}" data-toggle="modal" data-target="#modal-group-delete">Remove group</a>
 				</div>
 				<div class="input-group-sm float-right">
 					<a class="btn btn-sm btn-primary create-button disabled" data-toggle="modal" data-target="#modal-group-create">Add group</a>
@@ -154,9 +154,8 @@
 				<div class="input-group-sm float-left">
 					Change role:
                     <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_bp.user_update') }}" title="Promote the selected user">&uarr;<i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
-                    <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_bp.user_update') }}" title="Demote the selected user">&darr;<i class="fa fa-eye" aria-hidden="true"></i></i></a>
-
-					<a class="btn btn-sm btn-danger disabled delete-button" data-action="<?php echo base_url('group-manager/user-delete')?>" data-toggle="modal" data-target="#modal-user-delete" title="Remove the selected user from this group">Remove user</a>
+                    <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_bp.user_update') }}" title="Demote the selected user">&darr;<i class="fa fa-eye" aria-hidden="true"></i></a>
+					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_bp.user_delete') }}" data-toggle="modal" data-target="#modal-user-delete" title="Remove the selected user from this group">Remove user</a>
 				</div>
 			</div>
 		</div>
@@ -173,7 +172,7 @@
               </button>
             </div>
 			<div class="modal-body">
-				<form class="form-horizontal" id="f-group-create" action="<?php echo base_url('group-manager/group-create')?>" method="POST">
+				<form class="form-horizontal" id="f-group-create" action="{{ url_for('group_bp.group_create') }}" method="POST">
 					<div class="form-group row">
 						<label class="col-sm-4 form-control-label" for="f-group-create-category">Category</label>
 						<div class="col-sm-8">
