@@ -85,6 +85,26 @@ def group_create():
     return output
 
 
+@group_bp.route('/group_update', methods=['POST'])
+def group_update():
+    properties = ['description', 'data_classification', 'category', 'subcategory']
+
+    for property in properties:
+        property_name = "group_{}".format(property)
+        if property_name in request.form:
+            value = request.form[property_name]
+            response = api.call('group_update', data={'group_name': request.form['group_name'],
+                                                      'property_name': property,
+                                                      'property_value': value})
+
+            if response['status'] != 'ok':
+                break;
+
+    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
+    output.headers["Content-type"] = "application/json"
+    return output
+
+
 @group_bp.route('/group_delete', methods=['POST'])
 def group_delete():
     response = api.call('group_delete', data={'group_name': request.form['group_name']})
