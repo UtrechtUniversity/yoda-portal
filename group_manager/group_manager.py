@@ -13,7 +13,7 @@ group_bp = Blueprint('group_bp', __name__,
                      static_url_path='/static')
 
 
-@group_bp.route('/example')
+@group_bp.route('')
 def index():
     response = api.call('group_data', data={})
 
@@ -98,7 +98,7 @@ def group_update():
                                                       'property_value': value})
 
             if response['status'] != 'ok':
-                break;
+                break
 
     output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
     output.headers["Content-type"] = "application/json"
