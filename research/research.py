@@ -49,7 +49,7 @@ def index():
         showTerm = True
 
     # Get the HTML for search part
-    searchHtml = render_template('search.html',
+    searchHtml = render_template('research/search.html',
         searchTerm=searchTerm,
         searchStatusValue=searchStatusValue,
         searchType=searchType,
