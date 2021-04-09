@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Page not found{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <h1>Page not found</h1>
+
+    <p>
+        The page you are looking for does not exist.
+        How you got here is a mystery. <br>
+        But you can click the button below to go back home.
+    </p>
+    <a href="{{ url_for('general_bp.index') }}" title="Home" class="btn btn-primary">Go home</a>
+</div>
+{% endblock content %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Notifications{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('user_bp.static', filename='js/notifications.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h1>Notifications</h1>
+    {% if notifications %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">Message</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for notification in notifications %}
+        <tr>
+          <th class="col-md-2" scope="row">{{ notification.datetime }}</th>
+          <td>{{ notification.message }}</td>
+          <td class="col-md-1"><a class="dismiss-notification" data-id="{{ notification.timestamp }}" href="#"><i class="fa fa-times" aria-hidden="true"></i></a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>No notifications!</p>
+    {% endif %}
+{% endblock content %}

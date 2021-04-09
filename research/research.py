@@ -6,11 +6,11 @@ __license__   = 'GPLv3, see LICENSE'
 from flask import Blueprint, render_template, request, session, current_app
 
 research_bp = Blueprint('research_bp', __name__,
-                        template_folder='templates/research',
+                        template_folder='templates',
                         static_folder='static/research',
                         static_url_path='/static')
 
-@research_bp.route('/')
+@research_bp.route('')
 def index():
     #items = config['browser-items-per-page']
     items = 10
@@ -60,7 +60,7 @@ def index():
         showTerm=showTerm,
         searchItemsPerPage=searchItemsPerPage)
 
-    return render_template('browse.html',
+    return render_template('research/browse.html',
             activeModule='research',
             searchHtml=searchHtml,
             items=items,

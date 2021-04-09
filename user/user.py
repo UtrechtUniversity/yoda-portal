@@ -15,8 +15,9 @@ ssl_context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH, cafile
 ssl_settings = {'ssl_context': ssl_context}
 
 user_bp = Blueprint('user_bp', __name__,
-                    template_folder='templates/user',
-                    static_folder='static/user')
+                    template_folder='templates',
+                    static_folder='static/user',
+                    static_url_path='/static')
 
 
 @user_bp.route('/login', methods=['GET', 'POST'])
@@ -60,7 +61,7 @@ def login():
 
         flash(error)
 
-    return render_template('login.html')
+    return render_template('user/login.html')
 
 
 @user_bp.route('/logout')
@@ -72,7 +73,15 @@ def logout():
 
 @user_bp.route('/forgot-password')
 def forgot_password():
-    return render_template('login.html')
+    return render_template('user/login.html')
+
+
+@user_bp.route('/notifications')
+def notifications():
+    response = api.call('notifications_load', data={})
+    session['notifications'] = len(response['data'])
+    return render_template('user/notifications.html',
+                           notifications=response['data'])
 
 
 @user_bp.route('/settings', methods=['GET', 'POST'])
@@ -95,7 +104,7 @@ def settings():
     response = api.call('settings_load', data={})
     settings = response['data']
 
-    return render_template('settings.html', **settings)
+    return render_template('user/settings.html', **settings)
 
 
 @user_bp.before_app_request
@@ -108,6 +117,14 @@ def prepare_user():
     elif irods is not None:
         g.user = user_id
         g.irods = irods
+
+        notifications = session.get('notifications', None)
+        if notifications is None:
+            response = api.call('notifications_load', data={})
+            session['notifications'] = len(response['data'])
+            g.notifications = notifications
+        else:
+            g.notifications = session.get('notifications', None)
     else:
         redirect('user_bp.login')
 
