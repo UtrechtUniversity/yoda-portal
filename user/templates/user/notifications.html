@@ -11,13 +11,13 @@
     {% if notifications %}
     <div class="list-group">
         {% for notification in notifications %}
-        <a href="#" class="list-group-item list-group-item-action">
+        <a href="{% if notification.link %}{{ notification.link }}{% else %}#{% endif %}" class="list-group-item list-group-item-action">
             <div class="d-flex w-100 justify-content-between">
                 <p class="mb-1">{{ notification.message }}</p>
                 <small class="text-muted">{{ notification.datetime }}</small>
             </div>
-            {% if notifications.actor %}<small class="pull-left mr-2"><i class="fa fa-user" aria-hidden="true"></i> {{ notification.actor }}</small>{% endif %}
-            {% if notifications.data_package %}<small class="pull-left"><i class="fa fa-archive" aria-hidden="true"></i> {{ notification.data_package }}</small>{% endif %}
+            {% if notification.actor %}<small class="pull-left mr-2"><i class="fa fa-user" aria-hidden="true"></i> {{ notification.actor }}</small>{% endif %}
+            {% if notification.data_package %}<small class="pull-left"><i class="fa fa-archive" aria-hidden="true"></i> {{ notification.data_package }}</small>{% endif %}
             <h5 class="dismiss-notification pull-right" data-id="{{ notification.timestamp }}" title="Done"><i class="fa fa-check" aria-hidden="true"></i></h5>
         </a>
         {% endfor %}
