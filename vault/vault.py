@@ -18,7 +18,6 @@ vault_bp = Blueprint('vault_bp', __name__,
 
 @vault_bp.route('/', methods=['GET'])
 def index():
-    print('HARM- VAULT')
     items = current_app.config['browser-items-per-page']
     dir = request.args.get('dir')
 
@@ -75,8 +74,7 @@ def index():
 
 @vault_bp.route('/browse/download', methods=['GET'])
 def download():
-    # path_start = current_app.config['app_path_start']
-    filepath = '/tempZone/home' + request.args.get('filepath')
+    filepath =  '/' + g.irods.zone + '/home' + request.args.get('filepath')
     content = ''
     size = 0
     session = g.irods
@@ -84,6 +82,7 @@ def download():
     obj = session.data_objects.get(filepath)
     with obj.open('r') as f:
         content = f.read()
+        # seek EOF to get file size
         f.seek(0, 2)
         size = f.tell()
 
@@ -104,9 +103,11 @@ def form():
         # REDIRECT research/browse ???????
         return redirect(url_for('index'))
 
-    path_start = current_app.config['app_path_start']
+    path_start = '/' + g.irods.zone + '/home' # current_app.config['app_path_start']
 
     full_path = path_start + path
+
+    print(full_path)
 
     # Flash message handling
     try:
@@ -115,13 +116,6 @@ def form():
     except KeyError:
         flashMessage = ''
         flashMessageType = ''
-
-    # https://flask-wtf.readthedocs.io/en/stable/csrf.html
-    # CSRF protection requires a secret key to securely sign the token. By default this will use the Flask app's SECRET_KEY. If you'd like to use a separate token you can set WTF_CSRF_SECRET_KEY.
-    # Load CSRF token ??
-    #    from flask_wtf.csrf import CSRFProtect
-    #    $tokenName = $this->security->get_csrf_token_name();
-    #    $tokenHash = $this->security->get_csrf_hash();
 
     formProperties = api.call('meta_form_load', {'coll': full_path})
 
@@ -166,7 +160,8 @@ def access():
     path = request.args.get('path')
     action = request.args.get('action')
 
-    full_path = configuration['app_path_start'] + path
+    # full_path = configuration['app_path_start'] + path
+    full_path = '/' + g.irods.zone + '/home/' + path
 
     if action == 'grant':
         response =  api.call('grant_read_access_research_group', {"coll": full_path})

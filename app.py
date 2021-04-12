@@ -42,8 +42,6 @@ app.config['search-items-per-page'] = 10
 app.config['revision-items-per-page'] = 25
 # Default nr of items in revision list when used in a dialog
 app.config['revision-dialog-items-per-page'] = 5
-app.config['rodsServerZone'] = 'tempZone'
-app.config['app_path_start'] = '/' + app.config['rodsServerZone'] + '/home/'
 
 # Start Flask-Session
 Session(app)
