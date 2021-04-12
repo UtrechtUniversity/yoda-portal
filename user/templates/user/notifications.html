@@ -9,25 +9,19 @@
 {% block content %}
 <h1>Notifications</h1>
     {% if notifications %}
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col"></th>
-          <th scope="col">Message</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
+    <div class="list-group">
         {% for notification in notifications %}
-        <tr>
-          <th class="col-md-2" scope="row">{{ notification.datetime }}</th>
-          <td>{{ notification.message }}</td>
-          <td class="col-md-1"><a class="dismiss-notification" data-id="{{ notification.timestamp }}" href="#"><i class="fa fa-times" aria-hidden="true"></i></a></td>
-        </tr>
+        <a href="#" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ notification.message }}</h5>
+                <small class="text-muted">{{ notification.datetime }}</small>
+            </div>
+            <a class="dismiss-notification pull-right" data-id="{{ notification.timestamp }}" href="#" title="Done"><i class="fa fa-check" aria-hidden="true"></i></a>
+        </a>
         {% endfor %}
       </tbody>
-    </table>
+    </div>
     {% else %}
-    <p>No notifications!</p>
+    <p>All caught up! You have no new notifications.</p>
     {% endif %}
 {% endblock content %}
