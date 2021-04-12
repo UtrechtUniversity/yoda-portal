@@ -16,7 +16,7 @@
                 <h5 class="mb-1">{{ notification.message }}</h5>
                 <small class="text-muted">{{ notification.datetime }}</small>
             </div>
-            <a class="dismiss-notification pull-right" data-id="{{ notification.timestamp }}" href="#" title="Done"><i class="fa fa-check" aria-hidden="true"></i></a>
+            <h5 class="dismiss-notification pull-right" data-id="{{ notification.timestamp }}" title="Done"><i class="fa fa-check" aria-hidden="true"></i></h5>
         </a>
         {% endfor %}
       </tbody>
