@@ -761,7 +761,7 @@ function vaultAccess(action, folder)
 {
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
-    $.post("vault/access", {"path" : decodeURIComponent(folder), "action" : action}, function(data) {
+    $.post("access", {"path" : decodeURIComponent(folder), "action" : action}, function(data) {
         if (data.status != 'Success') {
             setMessage('error', data.statusInfo);
         }

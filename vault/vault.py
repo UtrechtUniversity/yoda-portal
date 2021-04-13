@@ -103,7 +103,7 @@ def form():
         # REDIRECT research/browse ???????
         return redirect(url_for('index'))
 
-    path_start = '/' + g.irods.zone + '/home' # current_app.config['app_path_start']
+    path_start = '/' + g.irods.zone + '/home'
 
     full_path = path_start + path
 
@@ -140,8 +140,8 @@ def unset_session():
 
 @vault_bp.route('/search/set_session', methods=['POST'])
 def set_session():
-    value = request.args.get('value')
-    type = request.args.get('type')
+    value = request.form.get('value')
+    type = request.form.get('type')
 
     if type == 'status':
         session['research-search-status-value'] = value
@@ -155,17 +155,21 @@ def set_session():
     return 'OK' # Dummy response
 
 
-@vault_bp.route('/access')
+@vault_bp.route('/access', methods=['POST'])
 def access():
-    path = request.args.get('path')
-    action = request.args.get('action')
+    path = request.form.get('path')
+    action = request.form.get('action')
 
-    # full_path = configuration['app_path_start'] + path
-    full_path = '/' + g.irods.zone + '/home/' + path
+    full_path = '/' + g.irods.zone + '/home' + path
 
     if action == 'grant':
-        response =  api.call('grant_read_access_research_group', {"coll": full_path})
+        # function not implemented in api yet
+        # response =  api.call('grant_read_access_research_group', {"coll": full_path})
+        response = 'nonsense'
     else:
-        response =  api.call('revoke_read_access_research_group', {"coll": full_path})
+        # function not implemented in api yet
+        # response =  api.call('revoke_read_access_research_group', {"coll": full_path})
+        response = 'nonsense'
 
-    return jsonify(response)
+    # return jsonify(response)
+    return response
