@@ -19,7 +19,7 @@ from vault.vault import vault_bp
 
 app = Flask(__name__)
 app.config.from_pyfile('flask.cfg')
-app.config['JSON_SORT_KEYS'] = False
+app.config['JSON_SORT_KEYS'] = False  # Check if this is still needed with Python v3.7?
 app.config['modules'] = [
     {'name': 'Research',       'function': 'research_bp.index'},
     {'name': 'Vault',          'function': 'vault_bp.index'},
