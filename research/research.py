@@ -3,14 +3,15 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, render_template, request, session, current_app
+from flask import Blueprint, render_template, request, session, current_app, g
 
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
                         static_folder='static/research',
                         static_url_path='/static')
 
-@research_bp.route('')
+@research_bp.route('/')
+@research_bp.route('/browse')
 def index():
     #items = config['browser-items-per-page']
     items = 10
@@ -70,7 +71,7 @@ def index():
 
 @research_bp.route('/download')
 def download():
-    path_start = current_app.config['app_path_start']
+    path_start = '/' + g.irods.zone + '/home'
     filepath = path_start + request.args.get('filepath')
 
     response = api.call('get_content', data={'path': file_path})
@@ -82,6 +83,17 @@ def download():
     output.headers['Content-Length'] = response['data']['size']
 
     return output
+
+
+@research_bp.route('/metadata/form')
+def form():
+    try:
+        path = request.args.get('path')
+    except:
+        # REDIRECT research/browse ???????
+        return redirect(url_for('index'))
+
+    return render_template('research/metadata-form.html', path=path)
 
 
 @research_bp.route('/search/set_session', methods=['POST'])
