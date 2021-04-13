@@ -3,3 +3,6 @@
 
 # Ansible controlled config files
 flask.cfg
+
+# Pycache
+__pycache__
