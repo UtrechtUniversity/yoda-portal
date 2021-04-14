@@ -160,7 +160,7 @@ def callback():
             signing_key.key,
             algorithms,
             options=app.config.get('OIDC_JWT_OPTIONS'),
-            audience=app.config.get('OIDC_CLIENTID'),
+            audience=app.config.get('OIDC_CLIENT_ID'),
             issuer=app.config.get('OIDC_JWT_ISSUER')
         )
 
