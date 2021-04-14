@@ -18,7 +18,6 @@ from user.user import user_bp
 from vault.vault import vault_bp
 
 app = Flask(__name__)
-<<<<<<< HEAD
 
 # Load configurations
 with app.app_context():
