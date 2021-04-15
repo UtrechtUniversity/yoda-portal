@@ -4,7 +4,7 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 
-from flask import Blueprint, make_response, render_template, request, session, current_app
+from flask import Blueprint, current_app, make_response, render_template, request, session
 from flask import g
 
 import api
@@ -22,7 +22,7 @@ def index():
     dir = request.args.get('dir')
 
     # Hoe dit te vertalen??
-    if dir == None:
+    if dir is None:
         dir = ''
 
     # Search results data
@@ -54,27 +54,26 @@ def index():
 
     # Get the HTML for search part
     searchHtml = render_template('vault/search.html',
-        searchTerm=searchTerm,
-        searchStatusValue=searchStatusValue,
-        searchType=searchType,
-        searchStart=searchStart,
-        searchOrderDir=searchOrderDir,
-        searchOrderColumn=searchOrderColumn,
-        showStatus=showStatus,
-        showTerm=showTerm,
-        searchItemsPerPage=searchItemsPerPage)
+                                 searchTerm=searchTerm,
+                                 searchStatusValue=searchStatusValue,
+                                 searchType=searchType,
+                                 searchStart=searchStart,
+                                 searchOrderDir=searchOrderDir,
+                                 searchOrderColumn=searchOrderColumn,
+                                 showStatus=showStatus,
+                                 showTerm=showTerm,
+                                 searchItemsPerPage=searchItemsPerPage)
 
     return render_template('vault/browse.html',
-            activeModule='vault',
-            searchHtml=searchHtml,
-            items=items,
-            dir=dir
-            )
+                           activeModule='vault',
+                           searchHtml=searchHtml,
+                           items=items,
+                           dir=dir)
 
 
 @vault_bp.route('/browse/download', methods=['GET'])
 def download():
-    filepath =  '/' + g.irods.zone + '/home' + request.args.get('filepath')
+    filepath = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     content = ''
     size = 0
     session = g.irods
@@ -93,15 +92,16 @@ def download():
     output.headers['Content-Length'] = size
 
     return output
- 
+
 
 @vault_bp.route('/metadata/form')
 def form():
     try:
         path = request.args.get('path')
-    except:
+    except Exception:
         # REDIRECT research/browse ???????
-        return redirect(url_for('index'))
+        # return redirect(url_for('index'))
+        to_be_changed = True
 
     path_start = '/' + g.irods.zone + '/home'
 
@@ -120,10 +120,10 @@ def form():
     formProperties = api.call('meta_form_load', {'coll': full_path})
 
     return render_template('vault/metadata-form.html',
-        path=path,
-        flashMessage=flashMessage,
-        flashMessageType=flashMessageType,
-        formProperties=formProperties)
+                           path=path,
+                           flashMessage=flashMessage,
+                           flashMessageType=flashMessageType,
+                           formProperties=formProperties)
 
 
 @vault_bp.route('/search/unset_session')
@@ -135,7 +135,7 @@ def unset_session():
     session.pop('research-search-order-column', None)
     session.pop('research-search-status-value', None)
 
-    return 'OK' # Dummy response
+    return 'OK'
 
 
 @vault_bp.route('/search/set_session', methods=['POST'])
@@ -152,7 +152,7 @@ def set_session():
     session['research-search-type'] = type
     session['research-search-start'] = 0
 
-    return 'OK' # Dummy response
+    return 'OK'
 
 
 @vault_bp.route('/access', methods=['POST'])
@@ -163,9 +163,8 @@ def access():
     full_path = '/' + g.irods.zone + '/home' + path
 
     if action == 'grant':
-        response =  api.call('grant_read_access_research_group', {"coll": full_path})
+        response = api.call('grant_read_access_research_group', {"coll": full_path})
     else:
-        response =  api.call('revoke_read_access_research_group', {"coll": full_path})
+        response = api.call('revoke_read_access_research_group', {"coll": full_path})
 
-    # return jsonify(response)
     return response
