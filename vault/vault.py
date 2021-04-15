@@ -163,13 +163,9 @@ def access():
     full_path = '/' + g.irods.zone + '/home' + path
 
     if action == 'grant':
-        # function not implemented in api yet
-        # response =  api.call('grant_read_access_research_group', {"coll": full_path})
-        response = 'nonsense'
+        response =  api.call('grant_read_access_research_group', {"coll": full_path})
     else:
-        # function not implemented in api yet
-        # response =  api.call('revoke_read_access_research_group', {"coll": full_path})
-        response = 'nonsense'
+        response =  api.call('revoke_read_access_research_group', {"coll": full_path})
 
     # return jsonify(response)
     return response
