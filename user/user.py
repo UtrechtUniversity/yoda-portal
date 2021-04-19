@@ -109,23 +109,23 @@ def settings():
 @user_bp.route('/callback')
 def callback():
     code = request.args.get('code')
-    creds = '{}:{}'.format(
-        app.config.get('OIDC_CLIENTID'),
-        app.config.get('OIDC_CLIENTSECRET')
-    )
-    creds_b64 = base64.urlsafe_b64encode(creds.encode('ascii'))
-    headers = {
-        'Authorization': creds_b64,
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
     data = {
         'grant_type': 'authorization_code',
         'code': code,
-        'redirect_url': app.config.get('OIDC_CALLBACK_URI')
+        'redirect_uri': app.config.get('OIDC_CALLBACK_URI')
     }
+    
     token_uri = app.config.get('OIDC_TOKEN_URI')
 
-    response = requests.post(token_uri, data, headers)
+    # Content-type is application/x-www-form-urlencoded by default when data is a dict 
+    response = requests.post(
+        token_uri, 
+        data, 
+        auth=(
+            app.config.get('OIDC_CLIENT_ID'), 
+            app.config.get('OIDC_CLIENT_SECRET')
+        )
+    )
 
     # Did the server respond nicely?
     if response.status_code != 200:
@@ -138,7 +138,7 @@ def callback():
         print(
             'Error: {}:\n{}'.format(
                 response.status_code,
-                response.reason
+                response.text
             ),
             file=sys.stderr
         )

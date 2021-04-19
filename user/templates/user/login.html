@@ -3,7 +3,7 @@
 {% block title %}{{ super() }} &dash; Sign in{% endblock %}
 
 {% if config.get('OIDC_ENABLED') %}
-    {% set OIDC_AUTH_URI = config.get('OIDC_AUTH_BASE_URI') ~ '?response_type=code&client_id=' ~ config.get('OIDC_CLIENT_ID') ~ '&redirect_uri=' ~ config.get('OIDC_CALLBACK_URI') ~ '&scope=' ~ config.get('OIDC_SCOPES') ~ 'acr_values=' ~ config.get('OIDC_ACR_VALUES') %}
+    {% set OIDC_AUTH_URI = config.get('OIDC_AUTH_BASE_URI') ~ '?response_type=code&client_id=' ~ config.get('OIDC_CLIENT_ID') ~ '&redirect_uri=' ~ config.get('OIDC_CALLBACK_URI') ~ '&scope=' ~ config.get('OIDC_SCOPES') ~ '&acr_values=' ~ config.get('OIDC_ACR_VALUES') %}
 {% endif %}
 
 {% block content %}
