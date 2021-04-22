@@ -87,13 +87,8 @@ def notifications():
 @user_bp.route('/settings', methods=['GET', 'POST'])
 def settings():
     if request.method == 'POST':
-        # Build user settings dict.
-        settings = {'mail_notifications': 'False'}
-        if request.form.get('mail_notifications') == 'on':
-            settings['mail_notifications'] = 'True'
-
         # Save user settings and handle API response.
-        data = {"settings": settings}
+        data = {"settings": request.form}
         response = api.call('settings_save', data)
         if response['status'] == 'ok':
             flash('Settings saved successfully', 'info')
