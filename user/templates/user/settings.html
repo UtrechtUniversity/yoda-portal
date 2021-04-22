@@ -18,6 +18,13 @@
                     <label class="custom-control-label" for="mail_notifications">Receive mail notifications</label>
                 </div>
                 <div class="form-group">
+                    <select name="mail_notifications_type" class="custom-select" {% if mail_notifications == 'False' %}disabled{% else %}{% endif %}>
+                        <option value="IMMEDIATE" {% if mail_notifications_type == 'IMMEDIATE' %}selected{% else %}{% endif %}>Immediate report</option>
+                        <option value="DAILY" {% if mail_notifications_type == 'DAILY' %}selected{% else %}{% endif %}>Daily report</option>
+                        <option value="WEEKLY" {% if mail_notifications_type == 'WEEKLY' %}selected{% else %}{% endif %}>Weekly report</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </fieldset>
