@@ -59,7 +59,14 @@ def login():
 
             return redirect(redirect_target)
 
-        flash(error)
+        flash(error, 'error')
+
+    text = 'Dit is tekst'
+    lange_text = 'Dit is hele lange tekst waarvan ik hoop dat die lange ris dan de breedte van mijn scherm voor Yoda zodat er een linebreak inzit. Op die manier kan ik controleren of de css properties die ik geset heb wel goed zijn voor multiline error. Ik heb namelijk het origineel een beetje aangepast.'
+    flash(text, 'error')
+    flash(text, 'success')
+    flash(text, 'warning')
+    flash(lange_text, 'info')
 
     return render_template('user/login.html')
 
