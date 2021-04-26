@@ -88,8 +88,8 @@
                 {% if category is sameas 'error' %}
                 {% set category = 'danger' %}
                 {% endif %}
-                <div class="alert alert-{{ category }}">
-                    <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close"></a>
+                <div class="alert alert-{{ category }} alert-dismissable">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">&times;</a>
                     <span>{{ message }}</span>
                 </div>
                 {% endfor %}

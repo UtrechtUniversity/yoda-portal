@@ -48,12 +48,3 @@
 #messages > .alert-danger {
     color: #a94442;
 }
-
-#messages > .alert > .close {
-    font-family: FontAwesome;
-    font-size: 24px;
-}
-
-#messages > .alert > .close:before {
-    content: "\f00d";
-}
