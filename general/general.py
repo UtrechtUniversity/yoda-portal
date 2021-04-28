@@ -3,7 +3,8 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, render_template
+from flask import Blueprint, redirect, render_template, url_for
+from flask_wtf.csrf import CSRFError
 
 general_bp = Blueprint('general_bp', __name__,
                        template_folder='templates/general',
@@ -14,6 +15,11 @@ general_bp = Blueprint('general_bp', __name__,
 @general_bp.route('/')
 def index():
     return render_template('index.html')
+
+
+@general_bp.app_errorhandler(CSRFError)
+def csrf_error(e):
+    return redirect(url_for('user_bp.login'))
 
 
 @general_bp.app_errorhandler(404)
