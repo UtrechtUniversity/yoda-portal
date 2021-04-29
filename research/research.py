@@ -3,7 +3,7 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, file_path, g, make_response, render_template, request, session
+from flask import Blueprint, g, make_response, render_template, request, session
 
 import api
 
@@ -71,7 +71,7 @@ def index():
 @research_bp.route('/download')
 def download():
     path_start = '/' + g.irods.zone + '/home'
-    filepath = path_start + request.args.get('filepath')
+    file_path = path_start + request.args.get('filepath')
 
     response = api.call('get_content', data={'path': file_path})
 
