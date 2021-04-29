@@ -9,24 +9,24 @@ from flask import Blueprint, make_response, render_template
 
 import api
 
-statistics_bp = Blueprint('statistics_bp', __name__,
-                          template_folder='templates',
-                          static_folder='static/statistics',
-                          static_url_path='/static')
+stats_bp = Blueprint('stats_bp', __name__,
+                     template_folder='templates',
+                     static_folder='static/stats',
+                     static_url_path='/static')
 
 
-@statistics_bp.route('/')
+@stats_bp.route('/')
 def index():
     group_response = api.call('resource_list_groups', data={})
-    category_response = api.call('resource_category_statistics', data={})
-    return render_template('statistics/statistics.html',
+    category_response = api.call('resource_category_stats', data={})
+    return render_template('stats/stats.html',
                            groups=group_response['data'],
                            categories=category_response['data'])
 
 
-@statistics_bp.route('/export')
+@stats_bp.route('/export')
 def export():
-    response = api.call('resource_monthly_category_statistics', data={})
+    response = api.call('resource_monthly_category_stats', data={})
 
     csv = "category;subcategory;groupname;tier;"
 

@@ -13,7 +13,7 @@ from general.general import general_bp
 from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
 from research.research import research_bp
-from statistics.statistics import statistics_bp
+from stats.stats import stats_bp
 from user.user import user_bp
 from vault.vault import vault_bp
 
@@ -23,7 +23,7 @@ app.config['JSON_SORT_KEYS'] = False  # Check if this is still needed with Pytho
 app.config['modules'] = [
     {'name': 'Research',       'function': 'research_bp.index'},
     {'name': 'Vault',          'function': 'vault_bp.index'},
-    {'name': 'Statistics',     'function': 'statistics_bp.index'},
+    {'name': 'Statistics',     'function': 'stats_bp.index'},
     {'name': 'Group Manager',  'function': 'group_manager_bp.index'}
 ]
 if app.config.get('INTAKE_ENABLED'):
@@ -42,7 +42,7 @@ Session(app)
 app.register_blueprint(general_bp)
 app.register_blueprint(group_manager_bp, url_prefix='/group_manager')
 app.register_blueprint(research_bp, url_prefix='/research')
-app.register_blueprint(statistics_bp, url_prefix='/statistics')
+app.register_blueprint(stats_bp, url_prefix='/stats')
 app.register_blueprint(user_bp, url_prefix='/user')
 app.register_blueprint(vault_bp, url_prefix='/vault')
 app.register_blueprint(api_bp, url_prefix='/api/')
