@@ -7,4 +7,12 @@ $(function() {
         $(this).closest('a.list-group-item').remove();
         Yoda.call('notifications_dismiss', {identifier: identifier});
     });
+
+    $("body").on("click", "a#notifications_dismiss_all", function(e) {
+        e.preventDefault();
+        Yoda.call('notifications_dismiss_all',
+                  {}).then((data) => {
+            location.reload();
+        });
+    });
 });
