@@ -20,9 +20,11 @@ Yoda.set_message = function(type, msg) {
     // Insert message if a #messages container is present.
     let $messages = $('#messages');
     if ($messages.length) {
-        $messages.append(`<div class="alert alert-${type}">`
-                         + '<button class="close" data-dismiss="alert"><span>&times;</span></button>'
-                         + `<p>${Yoda.escapeEntities(msg)}</p>`
+        $messages.append(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">`
+                         + `${Yoda.escapeEntities(msg)}`
+                         + '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+                         + '<span aria-hidden="true">&times;</span>'
+                         + '</button>'
                          + '</div>');
     }
 };
@@ -35,9 +37,11 @@ Yoda.load = function() {
         Yoda.storage.session.remove('messages');
 
         messages.forEach(item =>
-            $messages.append(`<div class="alert alert-${item.type}">`
-                             + '<button class="close" data-dismiss="alert"><span>&times;</span></button>'
-                             + `<p>${Yoda.escapeEntities(item.message)}</p>`
+            $messages.append(`<div class="alert alert-${item.type} alert-dismissible fade show" role="alert">`
+                             + `${Yoda.escapeEntities(item.message)}`
+                             + '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+                             + '<span aria-hidden="true">&times;</span>'
+                             + '</button>'
                              + '</div>'));
     }
 };
