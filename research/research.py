@@ -153,3 +153,5 @@ def unset_session():
     session.pop('research-search-order-dir', None)
     session.pop('research-search-order-column', None)
     session.pop('research-search-status-value', None)
+
+    return 'OK'
