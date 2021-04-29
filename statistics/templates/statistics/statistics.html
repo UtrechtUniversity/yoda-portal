@@ -3,12 +3,12 @@
 {% block title %}{{ super() }} &dash; Statistics{% endblock %}
 
 {% block style %}
-    <link rel="stylesheet" href="{{ url_for('stats_bp.static', filename='css/stats.css') }}">
+    <link rel="stylesheet" href="{{ url_for('statistics_bp.static', filename='css/statistics.css') }}">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-2.7.3/chart.min.js') }}"></script>
-    <script src="{{ url_for('stats_bp.static', filename='js/stats.js') }}"></script>
+    <script src="{{ url_for('statistics_bp.static', filename='lib/chartjs-2.7.3/chart.min.js') }}"></script>
+    <script src="{{ url_for('statistics_bp.static', filename='js/statistics.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -37,7 +37,7 @@
                         {% endfor %}
                     </table>
 
-                    <a href="{{ url_for('stats_bp.export') }}" class="btn btn-primary btn-sm">
+                    <a href="{{ url_for('statistics_bp.export') }}" class="btn btn-primary btn-sm">
                         Export all details
                     </a>
                 </div>
