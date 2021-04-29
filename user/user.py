@@ -88,12 +88,13 @@ def notifications():
 def settings():
     if request.method == 'POST':
         # Build user settings dict.
-        settings = {'mail_notifications': 'False'}
-        if request.form.get('mail_notifications') == 'on':
-            settings['mail_notifications'] = 'True'
+        settings = request.form.to_dict()
+        if request.form.get('mail_notifications') != 'on':
+            settings['mail_notifications'] = 'off'
 
         # Save user settings and handle API response.
         data = {"settings": settings}
+
         response = api.call('settings_save', data)
         if response['status'] == 'ok':
             flash('Settings saved successfully', 'info')
@@ -118,13 +119,9 @@ def prepare_user():
         g.user = user_id
         g.irods = irods
 
-        notifications = session.get('notifications', None)
-        if notifications is None:
-            response = api.call('notifications_load', data={})
-            session['notifications'] = len(response['data'])
-            g.notifications = notifications
-        else:
-            g.notifications = session.get('notifications', None)
+        # Check for notifications.
+        response = api.call('notifications_load', data={})
+        g.notifications = len(response['data'])
     else:
         redirect('user_bp.login')
 

@@ -7,27 +7,31 @@
 {% endblock %}
 
 {% block content %}
-<h1>Notifications</h1>
+    <div class="row">
+        <div class="col-md-10">
+            <h1>Notifications</h1>
+        </div>
+        <div class="col-md-2">
+            {% if notifications %}
+            <a href="#" id="notifications_dismiss_all" title="Mark all done" class="btn btn-primary pull-right mt-2">Mark all done <i class="fa fa-check" aria-hidden="true"></i></a>
+            {% endif %}
+        </div>
+    </div>
     {% if notifications %}
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col"></th>
-          <th scope="col">Message</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
+    <div class="list-group">
         {% for notification in notifications %}
-        <tr>
-          <th class="col-md-2" scope="row">{{ notification.datetime }}</th>
-          <td>{{ notification.message }}</td>
-          <td class="col-md-1"><a class="dismiss-notification" data-id="{{ notification.timestamp }}" href="#"><i class="fa fa-times" aria-hidden="true"></i></a></td>
-        </tr>
+        <a href="{% if notification.link %}{{ notification.link }}{% else %}#{% endif %}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <p class="mb-1">{{ notification.message }}</p>
+                <small class="text-muted">{{ notification.datetime }}</small>
+            </div>
+            {% if notification.actor %}<small class="pull-left mr-2"><i class="fa fa-user" aria-hidden="true"></i> {{ notification.actor }}</small>{% endif %}
+            {% if notification.data_package %}<small class="pull-left"><i class="fa fa-archive" aria-hidden="true"></i> {{ notification.data_package }}</small>{% endif %}
+            <h5 class="dismiss-notification pull-right" data-id="{{ notification.timestamp }}" title="Done"><i class="fa fa-check" aria-hidden="true"></i></h5>
+        </a>
         {% endfor %}
-      </tbody>
-    </table>
+    </div>
     {% else %}
-    <p>No notifications!</p>
+    <p>All caught up! You have no new notifications.</p>
     {% endif %}
 {% endblock content %}
