@@ -16,7 +16,8 @@ vault_bp = Blueprint('vault_bp', __name__,
                      static_url_path='/static')
 
 
-@vault_bp.route('/', methods=['GET'])
+@vault_bp.route('/')
+@vault_bp.route('/browse')
 def index():
     items = current_app.config['browser-items-per-page']
     dir = request.args.get('dir')
@@ -71,7 +72,7 @@ def index():
                            dir=dir)
 
 
-@vault_bp.route('/browse/download', methods=['GET'])
+@vault_bp.route('/browse/download')
 def download():
     filepath = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     content = ''
