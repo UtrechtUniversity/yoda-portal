@@ -1,3 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Research{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('vault_bp.static', filename='lib/sweetalert/sweetalert.min.js') }}"></script>
+<script>
+    var formLoaded = false;
+</script>
+<script src="{{ url_for('vault_bp.static', filename='js/metadata-form.js') }}" async></script>
+{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
+<link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
+<link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/metadata/form.css') }}">
+<link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/metadata/leaflet.css') }}">
+{% endblock %}
+
+{% block content %}
 <div id="form-errors" class="row hide">
     <div class="col-md-12">
         <div class="card">
@@ -6,7 +26,7 @@
                     Metadata form - {{ path | trim | safe }}
                 </h3>
                 <div class="input-group-sm has-feedback pull-right">
-                    <a class="btn btn-secondary" href="/vault/browse?dir={{ path | urlencode | replace("+", "%20") }}">Close</a>
+                    <a class="btn btn-secondary" href="/vault/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
                 </div>
             </div>
             <div class="card-body">
@@ -27,11 +47,11 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title pull-left">
+                <h5 class="card-title pull-left">
                     Metadata form - {{ path | trim | safe }}
-                </h3>
+                </h5>
                 <div class="input-group-sm has-feedback pull-right close-button">
-                    <a class="btn btn-light btn-sm" href="/vault/browse?dir={{ path | urlencode | replace("+", "%20") }}">Close</a>
+                    <a class="btn btn-light btn-sm" href="/vault/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
                 </div>
             </div>
             <div class="card-body">
@@ -39,28 +59,11 @@
                     <p>There is no metadata present for this folder.</p>
                 </div>
                 <div id="form"
-                     data-path="{{ path | safe }}"
-                     data-csrf_token_name="{{ 'csrf_token' | urlencode | replace("+", "%20") }}"
-                     data-csrf_token_hash="{{ csrf_token() | urlencode | replace("+", "%20") }}">
+                     data-path="{{ path | safe }}">
                     <p>Loading metadata <i class="fa fa-spinner fa-spin fa-fw"></i></p>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-// Show "loading" text if loading the form takes longer than expected.
-var formLoaded = false;
-setTimeout(function(){
-    if (!formLoaded) {
-        $('#metadata-form').fadeIn(200);
-        $('#metadata-form').removeClass('hide');
-    }
-}, 800);
-</script>
-<script src="/vault/static/js/metadata/form.js" async></script>
-<script id="form-properties" type="text/plain">
-    /* base64-encode to make sure no script tag can be embedded. */
-    {{ formProperties | tojson | safe }}
-</script>
+{% endblock %}

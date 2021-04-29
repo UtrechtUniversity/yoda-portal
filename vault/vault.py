@@ -96,34 +96,9 @@ def download():
 
 @vault_bp.route('/metadata/form')
 def form():
-    try:
-        path = request.args.get('path')
-    except Exception:
-        # REDIRECT research/browse ???????
-        # return redirect(url_for('index'))
-        to_be_changed = True
+    path = request.args.get('path')
 
-    path_start = '/' + g.irods.zone + '/home'
-
-    full_path = path_start + path
-
-    print(full_path)
-
-    # Flash message handling
-    try:
-        flashMessage = session['flashMessage']
-        flashMessageType = session['flashMessageType']
-    except KeyError:
-        flashMessage = ''
-        flashMessageType = ''
-
-    formProperties = api.call('meta_form_load', {'coll': full_path})
-
-    return render_template('vault/metadata-form.html',
-                           path=path,
-                           flashMessage=flashMessage,
-                           flashMessageType=flashMessageType,
-                           formProperties=formProperties)
+    return render_template('vault/metadata-form.html', path=path)
 
 
 @vault_bp.route('/search/unset_session')
