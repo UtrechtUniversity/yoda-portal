@@ -303,7 +303,7 @@ function deleteMetadata() {
                     {coll: Yoda.basePath+path},
                     {errorPrefix: 'Metadata could not be deleted'});
 
-                Yoda.message('success', `Deleted metadata of folder <${path}>`);
+                Yoda.store_message('success', `Deleted metadata of folder <${path}>`);
                 browse();
             }
         });
@@ -413,7 +413,7 @@ async function submitData(data) {
             {coll: Yoda.basePath+path, metadata: data},
             {errorPrefix: 'Metadata could not be saved'});
 
-        Yoda.message('success', `Updated metadata of folder <${path}>`);
+        Yoda.store_message('success', `Updated metadata of folder <${path}>`);
         browse();
     } catch (e) {
         // Allow retry.

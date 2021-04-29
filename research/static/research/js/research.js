@@ -278,7 +278,7 @@ async function handleFolderAdd(new_folder, collection) {
     );
 
     if (result.status == 'ok') {
-        setMessage('success', 'Successfully added new folder: ' + new_folder + ' to ' + collection );
+        Yoda.set_message('success', 'Successfully added new folder: ' + new_folder + ' to ' + collection );
         browse(collection, true);
         $('#folder-create').modal('hide');
     }
@@ -303,7 +303,7 @@ async function handleFolderRename(new_folder_name, collection, org_folder_name) 
     );
 
     if (result.status == 'ok') {
-        setMessage('success', 'Successfully renamed folder to ' + new_folder_name );
+        Yoda.set_message('success', 'Successfully renamed folder to ' + new_folder_name );
         browse(collection, true);
         $('#folder-rename').modal('hide');
     }
@@ -323,7 +323,7 @@ async function handleFolderDelete(collection, folder_name) {
     );
 
     if (result.status == 'ok') {
-        setMessage('success', 'Successfully deleted folder ' + folder_name );
+        Yoda.set_message('success', 'Successfully deleted folder ' + folder_name );
         browse(collection, true);
         $('#folder-delete').modal('hide');
     }
@@ -347,7 +347,7 @@ async function handleFileRename(new_file_name, collection, org_file_name) {
     );
 
     if (result.status == 'ok') {
-        setMessage('success', 'Successfully renamed file to ' + new_file_name );
+        Yoda.set_message('success', 'Successfully renamed file to ' + new_file_name );
         browse(collection, true);
         $('#file-rename').modal('hide');
     }
@@ -366,7 +366,7 @@ async function handleFileDelete(collection, file_name) {
     );
 
     if (result.status == 'ok') {
-        setMessage('success', 'Successfully deleted file ' + file_name );
+        Yoda.set_message('success', 'Successfully deleted file ' + file_name );
         browse(collection, true);
         $('#file-delete').modal('hide');
     }
@@ -1018,7 +1018,7 @@ async function rejectFolder(folder)
         $('#statusBadge').html('Rejected');
     } catch (e) {
         $('#statusBadge').html(btnText);
-        setMessage('error', data.statusInfo);
+        Yoda.set_message('error', data.statusInfo);
     }
     topInformation(folder, false);
 }
