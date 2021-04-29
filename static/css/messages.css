@@ -1,0 +1,50 @@
+#messages > div {
+    opacity: 1;
+    -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+    filter: alpha(opacity=100);
+}
+
+#messages > .alert {
+    background-image: none !important;
+}
+
+#messages > .alert:before {
+    font-family: FontAwesome;
+    font-size: 24px;
+    float: left;
+    color: #FFF;
+    padding-right: 0.5em;
+    line-height: 1;
+}
+
+#messages > .alert-info:before {
+    content: "\f05a";
+}
+#messages > .alert-info:before,
+#messages > .alert-info {
+    color: #31708f;
+}
+
+#messages > .alert-success:before {
+    content: "\f00c";
+}
+#messages > .alert-success:before,
+#messages > .alert-success {
+    color: #3c763d;
+}
+
+#messages > .alert-warning:before {
+    content: "\f06a";
+}
+#messages > .alert-warning:before,
+#messages > .alert-warning {
+    color: #8a6d3b;
+}
+
+#messages > .alert-danger:before {
+    content: "\f071";
+}
+#messages > .alert-danger:before,
+#messages > .alert-danger {
+    color: #a94442;
+}
