@@ -1,12 +1,25 @@
 {% extends 'base.html' %}
 
-{% block content %}
+{% block title %}{{ super() }} &dash; Research{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('research_bp.static', filename='lib/datatables/js/datatables.min.js') }}"></script>
+<script src="{{ url_for('research_bp.static', filename='js/revision.js') }}"></script>
+<script src="{{ url_for('research_bp.static', filename='js/search.js') }}"></script>
 <script>
     var revisionItemsPerPage = {{ items }};
     var browseDlgPageItems = {{ dlgPageItems }};
     var view = 'revision';
 </script>
+{% endblock %}
 
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/research.css') }}">
+<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='lib/datatables/css/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
+{% endblock %}
+
+{% block content %}
 <div class="modal fade" id="select-folder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">

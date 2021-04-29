@@ -13,7 +13,6 @@ research_bp = Blueprint('research_bp', __name__,
 @research_bp.route('/')
 @research_bp.route('/browse')
 def index():
-    #items = config['browser-items-per-page']
     items = 10
     dir = request.args.get('dir')
 
@@ -27,7 +26,6 @@ def index():
     searchStart = 0
     searchOrderDir = 'asc'
     searchOrderColumn = 0
-    #searchItemsPerPage = config['search-items-per-page']
     searchItemsPerPage = 10
 
 
@@ -85,13 +83,47 @@ def download():
     return output
 
 
+@research_bp.route('/revision')
+def revision():
+    items = 10
+    dlgPageItems = 10
+    filter = request.args.get('filter')
+
+    # Search results data
+    searchTerm = filter
+    searchStatusValue = ''
+    searchType = 'revision'
+    searchStart = 0
+    searchOrderDir = 'asc'
+    searchOrderColumn = 0
+    searchItemsPerPage = 10
+    showStatus = False
+    showTerm = True
+
+    # Get the HTML for search part
+    searchHtml = render_template('research/search.html',
+        searchTerm = searchTerm,
+        searchStatusValue=searchStatusValue,
+        searchType=searchType,
+        searchStart=searchStart,
+        searchOrderDir=searchOrderDir,
+        searchOrderColumn=searchOrderColumn,
+        showStatus=showStatus,
+        showTerm=showTerm,
+        searchItemsPerPage=searchItemsPerPage)
+
+    return render_template('research/revision.html',
+            activeModule='research',
+            searchHtml=searchHtml,
+            items=items,
+            dlgPageItems=dlgPageItems,
+            filter=filter
+            )
+
+
 @research_bp.route('/metadata/form')
 def form():
-    try:
-        path = request.args.get('path')
-    except:
-        # REDIRECT research/browse ???????
-        return redirect(url_for('index'))
+    path = request.args.get('path')
 
     return render_template('research/metadata-form.html', path=path)
 
@@ -109,6 +141,8 @@ def set_session():
 
     session['research-search-type'] = type
     session['research-search-start'] = 0
+
+    return 'OK'
 
 
 @research_bp.route('/search/unset_session')
