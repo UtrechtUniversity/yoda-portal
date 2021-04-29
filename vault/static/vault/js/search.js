@@ -219,7 +219,7 @@ function search() {
          *  maxLength of characters (255) * max bytes in UTF-8 encoded character (4) * URL encoding of byte (%HH) (3)
          */
         if (encodedSearchString.length > 3060) {
-            setMessage('error', 'The search string is too long');
+            Yoda.set_message('error', 'The search string is too long');
             return true;
         }
 
@@ -273,7 +273,7 @@ function showSearchResults() {
 
 function saveSearchRequest() {
     // $.get("search/set_session");
-    // return; 
+    // return;
     if (typeof currentSearchString != 'undefined' && currentSearchString.length > 0) {
         var url = "search/set_session";
         $.ajax({

@@ -585,7 +585,7 @@ function topInformation(dir, showAlert) {
                 $('.top-info-buttons').show();
                 if (isDatamanager) {
                     if (researchGroupAccess) {
-                        actions['revoke-vault-access'] = 'Revoke read access to research group';                        
+                        actions['revoke-vault-access'] = 'Revoke read access to research group';
                     } else {
                         actions['grant-vault-access'] = 'Grant read access to research group';
                     }
@@ -763,7 +763,7 @@ function vaultAccess(action, folder)
 
     $.post("access", {"path" : decodeURIComponent(folder), "action" : action}, function(data) {
         if (data.data.status != 'Success') {
-            setMessage('error', data.statusInfo);
+            Yoda.set_message('error', data.statusInfo);
         }
 
         topInformation(folder, false);
