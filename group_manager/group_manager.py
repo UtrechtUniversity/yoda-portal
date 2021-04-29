@@ -7,13 +7,13 @@ from flask import Blueprint, make_response, render_template, request
 
 import api
 
-group_bp = Blueprint('group_bp', __name__,
-                     template_folder='templates',
-                     static_folder='static/group_manager',
-                     static_url_path='/static')
+group_manager_bp = Blueprint('group_manager_bp', __name__,
+                             template_folder='templates',
+                             static_folder='static/group_manager',
+                             static_url_path='/static')
 
 
-@group_bp.route('')
+@group_manager_bp.route('')
 def index():
     response = api.call('group_data', data={})
 
@@ -27,7 +27,7 @@ def index():
                            user_zone=user_zone)
 
 
-@group_bp.route('/get_categories', methods=['POST'])
+@group_manager_bp.route('/get_categories', methods=['POST'])
 def get_categories():
     response = api.call('group_categories', data={})
     filter = request.form['query']
@@ -42,7 +42,7 @@ def get_categories():
     return output
 
 
-@group_bp.route('/get_subcategories', methods=['POST'])
+@group_manager_bp.route('/get_subcategories', methods=['POST'])
 def get_subcategories():
     response = api.call('group_categories', data={})
     categories = response['data']
@@ -61,7 +61,7 @@ def get_subcategories():
     return output
 
 
-@group_bp.route('/get_users', methods=['POST'])
+@group_manager_bp.route('/get_users', methods=['POST'])
 def get_users():
     response = api.call('group_search_users', data={'pattern': request.form['query']})
 
@@ -70,7 +70,7 @@ def get_users():
     return output
 
 
-@group_bp.route('/group_create', methods=['POST'])
+@group_manager_bp.route('/group_create', methods=['POST'])
 def group_create():
     data_classification = request.form['group_data_classification'] if 'group_data_classification' in request.form else ''
 
@@ -85,7 +85,7 @@ def group_create():
     return output
 
 
-@group_bp.route('/group_update', methods=['POST'])
+@group_manager_bp.route('/group_update', methods=['POST'])
 def group_update():
     properties = ['description', 'data_classification', 'category', 'subcategory']
 
@@ -105,7 +105,7 @@ def group_update():
     return output
 
 
-@group_bp.route('/group_delete', methods=['POST'])
+@group_manager_bp.route('/group_delete', methods=['POST'])
 def group_delete():
     response = api.call('group_delete', data={'group_name': request.form['group_name']})
 
@@ -114,7 +114,7 @@ def group_delete():
     return output
 
 
-@group_bp.route('/user_create', methods=['POST'])
+@group_manager_bp.route('/user_create', methods=['POST'])
 def user_create():
     response = api.call('group_user_add', data={'username': request.form['user_name'],
                                                 'group_name': request.form['group_name']})
@@ -124,7 +124,7 @@ def user_create():
     return output
 
 
-@group_bp.route('/user_update', methods=['POST'])
+@group_manager_bp.route('/user_update', methods=['POST'])
 def user_update():
     response = api.call('group_user_update_role', data={'username': request.form['user_name'],
                                                         'group_name': request.form['group_name'],
@@ -135,7 +135,7 @@ def user_update():
     return output
 
 
-@group_bp.route('/user_delete', methods=['POST'])
+@group_manager_bp.route('/user_delete', methods=['POST'])
 def user_delete():
     response = api.call('group_remove_user_from_group', data={'username': request.form['user_name'],
                                                               'group_name': request.form['group_name']})

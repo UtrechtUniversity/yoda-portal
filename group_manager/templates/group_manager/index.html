@@ -3,14 +3,14 @@
 {% block title %}{{ super() }} &dash; Group Manager{% endblock %}
 
 {% block style %}
-    <link rel="stylesheet" href="{{ url_for('group_bp.static', filename='css/group_manager.css') }}">
-    <link rel="stylesheet" href="{{ url_for('group_bp.static', filename='lib/select2/select2.css') }}">
-    <link rel="stylesheet" href="{{ url_for('group_bp.static', filename='lib/select2/select2-bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='css/group_manager.css') }}">
+    <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.css') }}">
+    <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2/select2-bootstrap.min.css') }}">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('group_bp.static', filename='js/group_manager.js') }}"></script>
-    <script src="{{ url_for('group_bp.static', filename='lib/select2/select2.min.js') }}"></script>
+    <script src="{{ url_for('group_manager_bp.static', filename='js/group_manager.js') }}"></script>
+    <script src="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.min.js') }}"></script>
     <script>
     $(function() {
         Yoda.groupManager.load({{ group_hierarchy | safe }}, '{{ user_type }}', '{{ user_zone }}');
@@ -58,7 +58,7 @@
 			</div>
 			<div class="card-footer">
 				<div class="input-group-sm float-left">
-					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_bp.group_delete') }}" data-toggle="modal" data-target="#modal-group-delete">Remove group</a>
+					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.group_delete') }}" data-toggle="modal" data-target="#modal-group-delete">Remove group</a>
 				</div>
 				<div class="input-group-sm float-right">
 					<a class="btn btn-sm btn-primary create-button disabled" data-toggle="modal" data-target="#modal-group-create">Add group</a>
@@ -73,7 +73,7 @@
 				<p class="placeholder-text">
 					Please select a group.
 				</p>
-				<form action="{{ url_for('group_bp.group_update') }}" method="POST" class=" hidden" id="f-group-update">
+				<form action="{{ url_for('group_manager_bp.group_update') }}" method="POST" class=" hidden" id="f-group-update">
 					<div class="form-group row">
 						<label class="col-sm-4 col-form-label" for="f-group-update-category">Category</label>
 						<div class="col-sm-8">
@@ -139,7 +139,7 @@
 					<a class="user-create-text" href="#" onclick="return false;">
 						Click here to add a new user to this group
 					</a>
-					<form action="{{ url_for('group_bp.user_create') }}" method="POST" class="form-inline" id="f-user-create" hidden>
+					<form action="{{ url_for('group_manager_bp.user_create') }}" method="POST" class="form-inline" id="f-user-create" hidden>
 						<input name="group_name" id="f-user-create-group" type="hidden" />
 						<div class="input-group" style="width: 100%;">
 							<input name="user_name" id="f-user-create-name" class="form-control form-control-sm selectify-user-name" type="hidden" required placeholder="Enter a username" data-group="#f-user-create-group" />
@@ -153,9 +153,9 @@
 			<div class="card-footer">
 				<div class="input-group-sm float-left">
 					Change role:
-                    <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_bp.user_update') }}" title="Promote the selected user">&uarr;<i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
-                    <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_bp.user_update') }}" title="Demote the selected user">&darr;<i class="fa fa-eye" aria-hidden="true"></i></a>
-					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_bp.user_delete') }}" data-toggle="modal" data-target="#modal-user-delete" title="Remove the selected user from this group">Remove user</a>
+                    <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Promote the selected user">&uarr;<i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
+                    <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Demote the selected user">&darr;<i class="fa fa-eye" aria-hidden="true"></i></a>
+					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-toggle="modal" data-target="#modal-user-delete" title="Remove the selected user from this group">Remove user</a>
 				</div>
 			</div>
 		</div>
@@ -172,7 +172,7 @@
               </button>
             </div>
 			<div class="modal-body">
-				<form class="form-horizontal" id="f-group-create" action="{{ url_for('group_bp.group_create') }}" method="POST">
+				<form class="form-horizontal" id="f-group-create" action="{{ url_for('group_manager_bp.group_create') }}" method="POST">
 					<div class="form-group row">
 						<label class="col-sm-4 form-control-label" for="f-group-create-category">Category</label>
 						<div class="col-sm-8">
