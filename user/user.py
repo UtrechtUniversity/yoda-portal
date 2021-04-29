@@ -59,7 +59,7 @@ def login():
 
             return redirect(redirect_target)
 
-        flash(error)
+        flash(error, 'error')
 
     return render_template('user/login.html')
 
