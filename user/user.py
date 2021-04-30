@@ -92,7 +92,7 @@ def settings():
         if request.form.get('mail_notifications') != 'on':
             settings['mail_notifications'] = 'OFF'
         else:
-            settings['mail_notifications'] = request.form.get('mail_notifications_type', "IMMEDIATE")
+            settings['mail_notifications'] = request.form.get('mail_notifications_type', "DAILY")
 
         # Save user settings and handle API response.
         data = {"settings": settings}
