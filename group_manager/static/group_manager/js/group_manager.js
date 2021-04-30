@@ -546,7 +546,7 @@ $(function() {
                 $el.select2({
                     ajax: {
                         quietMillis: 200,
-                        url:      '/group/get_categories',
+                        url:      '/group_manager/get_categories',
                         type:     'post',
                         dataType: 'json',
                         data: function (term, page) {
@@ -647,7 +647,7 @@ $(function() {
                 $el.select2({
                     ajax: {
                         quietMillis: 200,
-                        url:      '/group/get_subcategories',
+                        url:      '/group_manager/get_subcategories',
                         type:     'post',
                         dataType: 'json',
                         data: function (term, page) {
@@ -716,7 +716,7 @@ $(function() {
                     minimumInputLength: 3,
                     ajax: {
                         quietMillis: 400,
-                        url:      '/group/get_users',
+                        url:      '/group_manager/get_users',
                         type:     'post',
                         dataType: 'json',
                         data: function (term, page) {
