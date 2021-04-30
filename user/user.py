@@ -88,9 +88,11 @@ def notifications():
 def settings():
     if request.method == 'POST':
         # Build user settings dict.
-        settings = request.form.to_dict()
+        settings = {}
         if request.form.get('mail_notifications') != 'on':
-            settings['mail_notifications'] = 'off'
+            settings['mail_notifications'] = 'OFF'
+        else:
+            settings['mail_notifications_type'] = request.form.get('mail_notifications_type')
 
         # Save user settings and handle API response.
         data = {"settings": settings}
