@@ -35,6 +35,11 @@ if app.config.get('DATAREQUEST_ENABLED'):
         {'name': 'Datarequest', 'function': 'datarequest_bp.index'}
     )
 
+# Default nr of items in browser list
+app.config['browser-items-per-page'] = 10
+# Default nr of items in search list
+app.config['search-items-per-page'] = 10
+
 # Start Flask-Session
 Session(app)
 

@@ -1,0 +1,14 @@
+.hide {
+    display: none;
+}
+
+.yoda-array-field {
+    border: 1px solid #e1e1e1;
+    margin: 20px 0px;
+}
+
+.yoda-array-field legend {
+    padding: 0.2em 0.5em;
+    font-size: 100%;
+    width: revert;
+}

@@ -10,6 +10,8 @@
 let Yoda = {};
 
 Yoda.store_message = function(type, msg) {
+    type = (type === 'error') ? 'danger' : type;
+
     // Stores a message to be shown on the next page-load.
     Yoda.storage.session.set('messages',
                              Yoda.storage.session.get('messages', [])
@@ -17,6 +19,8 @@ Yoda.store_message = function(type, msg) {
 };
 
 Yoda.set_message = function(type, msg) {
+    type = (type === 'error') ? 'danger' : type;
+
     // Insert message if a #messages container is present.
     let $messages = $('#messages');
     if ($messages.length) {
