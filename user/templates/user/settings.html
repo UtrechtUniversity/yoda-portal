@@ -25,9 +25,9 @@
                     <div class="input-group-prepend">
                       <label class="input-group-text" for="mail_notifications_type">Type</label>
                     </div>
-                    <select class="custom-select col-md-2" name="mail_notifications_type" {% if mail_notifications == 'OFF' %}disabled{% else %}{% endif %}>
+                    <select class="custom-select col-md-2" id="mail_notifications_type" name="mail_notifications_type" {% if mail_notifications == 'OFF' %}disabled{% else %}{% endif %}>
                         <option value="IMMEDIATE" {% if mail_notifications == 'IMMEDIATE' %}selected{% else %}{% endif %}>Immediate</option>
-                        <option value="DAILY" {% if mail_notifications == 'DAILY' %}selected{% else %}{% endif %}>Daily</option>
+                        <option value="DAILY" {% if mail_notifications == 'DAILY' or mail_notifications == 'OFF' %}selected{% else %}{% endif %}>Daily</option>
                         <option value="WEEKLY" {% if mail_notifications == 'WEEKLY' %}selected{% else %}{% endif %}>Weekly</option>
                     </select>
                 </div>
