@@ -92,14 +92,14 @@ def settings():
         if request.form.get('mail_notifications') != 'on':
             settings['mail_notifications'] = 'OFF'
         else:
-            settings['mail_notifications_type'] = request.form.get('mail_notifications_type')
+            settings['mail_notifications'] = request.form.get('mail_notifications_type', "IMMEDIATE")
 
         # Save user settings and handle API response.
         data = {"settings": settings}
 
         response = api.call('settings_save', data)
         if response['status'] == 'ok':
-            flash('Settings saved successfully', 'info')
+            flash('Settings saved successfully', 'success')
         else:
             flash('Saving settings failed!', 'error')
 
