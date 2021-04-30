@@ -4,7 +4,7 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 
-from flask import Blueprint, current_app, make_response, render_template, request, session
+from flask import Blueprint, make_response, render_template, request, session
 from flask import g
 
 import api
@@ -19,10 +19,9 @@ vault_bp = Blueprint('vault_bp', __name__,
 @vault_bp.route('/')
 @vault_bp.route('/browse')
 def index():
-    items = current_app.config['browser-items-per-page']
+    items = 10
     dir = request.args.get('dir')
 
-    # Hoe dit te vertalen??
     if dir is None:
         dir = ''
 
@@ -33,7 +32,7 @@ def index():
     searchStart = 0
     searchOrderDir = 'asc'
     searchOrderColumn = 0
-    searchItemsPerPage = current_app.config['search-items-per-page']
+    searchItemsPerPage = 10
 
     if 'research-search-term' in session or 'research-search-status-value' in session:
         if 'research-search-term' in session:

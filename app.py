@@ -39,10 +39,6 @@ if app.config.get('DATAREQUEST_ENABLED'):
 app.config['browser-items-per-page'] = 10
 # Default nr of items in search list
 app.config['search-items-per-page'] = 10
-# Default nr of items for revision list
-app.config['revision-items-per-page'] = 25
-# Default nr of items in revision list when used in a dialog
-app.config['revision-dialog-items-per-page'] = 5
 
 # Start Flask-Session
 Session(app)
@@ -67,7 +63,6 @@ csrf = CSRFProtect(app)
 # Restricted access protection
 @app.before_request
 def protect_pages():
-    print(request.endpoint)
     if not request.endpoint or request.endpoint in ['general_bp.index',
                                                     'user_bp.login',
                                                     'api_bp.call',
