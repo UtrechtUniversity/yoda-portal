@@ -3,7 +3,6 @@
 {% block title %}{{ super() }} &dash; Research{% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('vault_bp.static', filename='lib/sweetalert/sweetalert.min.js') }}"></script>
 <script>
     var formLoaded = false;
 </script>
@@ -12,7 +11,6 @@
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
-<link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/metadata/form.css') }}">
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/metadata/leaflet.css') }}">
 {% endblock %}
