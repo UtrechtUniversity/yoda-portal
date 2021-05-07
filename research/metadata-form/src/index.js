@@ -620,7 +620,7 @@ function updateCompleteness()
     let mandatoryTotal = 0;
     let mandatoryFilled = 0;
     $(".form-control").each(function() {
-        if ($(this)[0].required) {
+        if ($(this)[0].required && !$(this)[0].id.startsWith("yoda_links_")) {
             mandatoryTotal++;
             if ($(this)[0].value != "") {
                 mandatoryFilled++;
