@@ -85,8 +85,8 @@ Yoda.call = async function(path, data={}, options={}) {
             return errorResult('Your request could not be completed due to a network connection issue.'
                                +' Please try again in a few minutes.');
         }
-        if (!((r.status >= 200 && r.status < 300) || r.status == 500)) {
-            // API responses should either produce 200 or 500.
+        if (!((r.status >= 200 && r.status < 300) || r.status == 400 || r.status == 500)) {
+            // API responses should either produce 200, 400 or 500.
             // Any other status code indicates an internal error without (human-readable) information.
             console.error(`API Error: HTTP status ${r.status}`);
             return errorResult();
