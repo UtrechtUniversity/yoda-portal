@@ -107,16 +107,23 @@ def upload():
 
     session = g.irods
     filepath = request.form.get('filepath')
-    file = request.files['file']
-    filename = secure_filename(file.filename)
+    file_upload = request.files['file']
+    filename = secure_filename(file_upload.filename)
     path = '/' + g.irods.zone + '/home' + filepath + "/" + filename
 
     if not session.data_objects.exists(path):
         try:
-            tmp_path = os.path.join("/var/www/yoda/uploads", filename)
-            file.save(tmp_path)
-            session.data_objects.put(tmp_path, path)
-            os.remove(tmp_path)
+            obj = session.data_objects.create(path)
+
+            file_upload.seek(0, os.SEEK_END)
+            file_length = file_upload.tell()
+            file_upload.seek(0, 0)
+
+            with obj.open('w+') as f:
+                f.seek(0)
+                f.write(file_upload.stream.read())
+
+            f.close()
             return {"status": "OK", "statusInfo": ""}
         except Exception:
             return {"status": "ERROR", "statusInfo": "Upload failed"}
