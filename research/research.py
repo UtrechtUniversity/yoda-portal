@@ -68,18 +68,25 @@ def index():
                            dir=dir)
 
 
-@research_bp.route('/download')
+@research_bp.route('/browse/download')
 def download():
-    path_start = '/' + g.irods.zone + '/home'
-    file_path = path_start + request.args.get('filepath')
+    filepath = '/' + g.irods.zone + '/home' + request.args.get('filepath')
+    content = ''
+    size = 0
+    session = g.irods
 
-    response = api.call('get_content', data={'path': file_path})
+    obj = session.data_objects.get(filepath)
+    with obj.open('r') as f:
+        content = f.read()
+        # seek EOF to get file size
+        f.seek(0, 2)
+        size = f.tell()
 
-    output = make_response(response['data']['content'])
+    output = make_response(content)
 
     output.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(request.args.get('filepath'))
     output.headers['Content-Type'] = 'application/octet'
-    output.headers['Content-Length'] = response['data']['size']
+    output.headers['Content-Length'] = size
 
     return output
 

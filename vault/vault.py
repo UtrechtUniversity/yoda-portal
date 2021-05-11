@@ -3,12 +3,9 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-
-from flask import Blueprint, make_response, render_template, request, session
-from flask import g
+from flask import Blueprint, g, make_response, render_template, request, session
 
 import api
-
 
 vault_bp = Blueprint('vault_bp', __name__,
                      template_folder='templates',
