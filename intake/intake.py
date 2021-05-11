@@ -4,10 +4,11 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 
-import api, time
+import time
 
 from flask import Blueprint, g, make_response, render_template, request, session
 
+import api
 
 intake_bp = Blueprint('intake_bp', __name__,
                       template_folder='templates',
@@ -139,7 +140,7 @@ def get_dataset_detail_view():
     datasetErrors = result['data']['dataset_errors']
     datasetWarnings = result['data']['dataset_warnings']
     datasetComments = result['data']['comments']
- 
+
     list_comments = []
     for comment in datasetComments:
         print(comment)
@@ -201,7 +202,7 @@ def export():
     for data_row in export_data:
         data = export_data[data_row]
         content += "'" + study_id + "',"
-        content += "'" +  data['wave'] + "',"
+        content += "'" + data['wave'] + "',"
         content += "'" + data['experiment_type'] + "',"
         content += "'" + data['pseudocode'] + "',"
         content += "'" + data['version'] + "',"
