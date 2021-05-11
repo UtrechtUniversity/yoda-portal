@@ -5,8 +5,6 @@ __license__   = 'GPLv3, see LICENSE'
 
 from flask import Blueprint, g, make_response, render_template, request, session
 
-import api
-
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
                         static_folder='static/research',
