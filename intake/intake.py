@@ -4,28 +4,28 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 
-from flask import Blueprint, current_app, make_response, render_template, request, session
-from flask import g
-
 import api, time
+
+from flask import Blueprint, g, make_response, render_template, request, session
 
 
 intake_bp = Blueprint('intake_bp', __name__,
-                     template_folder='templates',
-                     static_folder='static/intake',
-                     static_url_path='/intake')
+                      template_folder='templates',
+                      static_folder='static/intake',
+                      static_url_path='/intake')
+
 
 @intake_bp.route('/', methods=['GET'])
 def index():
     study_id = request.args.get('studyID')
     study_folder = request.args.get('studyFolder')
     alert_nr = request.args.get('alertNr')
-    if alert_nr is None or len(alert_nr)==0:
+    if alert_nr is None or len(alert_nr) == 0:
         alert_nr = ''
 
     studies = api.call('intake_list_studies')['data']
 
-    if study_id is None or len(study_id)==0:
+    if study_id is None or len(study_id) == 0:
         try:
             study_id = session['study_id']
         except Exception:
@@ -37,14 +37,14 @@ def index():
                     study_id = study
                     break
             # If not default study can be found - NO ACCESS
-            if study_id is None or len(study_id)==0:
-                alert_nr = 100 # NO ACCESS
+            if study_id is None or len(study_id) == 0:
+                alert_nr = 100  # NO ACCESS
 
     # check whether user is part of the study-group.
     # if not, stop access
     permissions = get_intake_study_permissions(study_id)
     if not (permissions['manager'] or permissions['assistant']):
-        alert_nr = 100 # NO ACCESS
+        alert_nr = 100  # NO ACCESS
 
     if alert_nr == 100:
         permissions = {}
@@ -57,18 +57,18 @@ def index():
         study_folder = ''
         full_path = ''
         study_title = ''
-    else: 
+    else:
         # Store in current session for purpose when study_id is missing in requests
         session['study_id'] = study_id
 
         intake_path = '/' + g.irods.zone + '/home/grp-intake-' + study_id
 
         result = api.call('browse_collections', {'coll': intake_path,
-                          'sort_on': 'name',
-                          'sort_order': 'asc',
-                          'offset': 0,
-                          'limit': 10,
-                          'space': 'Space.INTAKE'})
+                                                 'sort_on': 'name',
+                                                 'sort_order': 'asc',
+                                                 'offset': 0,
+                                                 'limit': 10,
+                                                 'space': 'Space.INTAKE'})
 
         valid_folders = result['data']['items']
 
@@ -98,46 +98,48 @@ def index():
             study_folder = ''
 
     return render_template('/intake/intake.html',
-            activeModule='intake',
-            permissions=permissions,
-            studies=studies,
-            intakePath=intake_path,
-            alertNr=alert_nr,
-            selectableScanFolders=valid_folders,
-            dataSets=datasets,
-            totalDatasetFiles=total_dataset_files,
-            dataErroneousFiles=data_erroneous_files,
-            totalErrorCount=len(data_erroneous_files),
-            totalFileCount=total_file_count,
-            study_id=study_id,
-            study_folder=study_folder,
-            full_path=full_path,
-            title='Study ' + study_title)
+                           activeModule='intake',
+                           permissions=permissions,
+                           studies=studies,
+                           intakePath=intake_path,
+                           alertNr=alert_nr,
+                           selectableScanFolders=valid_folders,
+                           dataSets=datasets,
+                           totalDatasetFiles=total_dataset_files,
+                           dataErroneousFiles=data_erroneous_files,
+                           totalErrorCount=len(data_erroneous_files),
+                           totalFileCount=total_file_count,
+                           study_id=study_id,
+                           study_folder=study_folder,
+                           full_path=full_path,
+                           title='Study ' + study_title)
 
 
 def get_intake_study_permissions(study_id):
-    return {'assistant': api.call('group_user_is_member', {'username': g.user, 'group_name': 'grp-intake-' + study_id})['data'],
-            'manager': api.call('group_user_is_member', {'username': g.user, 'group_name': 'grp-datamanager-' + study_id})['data']}
+    return {'assistant': api.call('group_user_is_member',
+                                  {'username': g.user, 'group_name': 'grp-intake-' + study_id})['data'],
+            'manager': api.call('group_user_is_member',
+                                {'username': g.user, 'group_name': 'grp-datamanager-' + study_id})['data']}
 
 
 @intake_bp.route('getDatasetDetailView', methods=['POST'])
 def get_dataset_detail_view():
     study_id = request.form.get('studyID')
     path = request.form.get('path')
-    tbl_id = request.form.get('tbl_id')  ## ???? Nog nodig in call - want vanuit javascript
+    tbl_id = request.form.get('tbl_id')
     dataset_id = request.form.get('datasetID')
 
     intake_path = '/' + g.irods.zone + '/home/grp-' + study_id
 
     result = api.call('intake_dataset_get_details',
-            {"coll": path, "dataset_id": dataset_id})
+                      {"coll": path, "dataset_id": dataset_id})
 
     path_items = result['data']['files']
 
     datasetErrors = result['data']['dataset_errors']
     datasetWarnings = result['data']['dataset_warnings']
     datasetComments = result['data']['comments']
-    
+ 
     list_comments = []
     for comment in datasetComments:
         print(comment)
@@ -149,15 +151,15 @@ def get_dataset_detail_view():
     scan_data[1] = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(int(scan_data[1])))
 
     table_definition = render_template('intake/dataset_detail_view.html',
-        path_nodes_ordered=sorted(path_items.keys()),
-        pathItems=path_items,
-        tbl_id=tbl_id,
-        datasetPath=path,
-        scannedByWhen=scan_data,
-        datasetErrors=datasetErrors,
-        datasetWarnings=datasetWarnings,
-        datasetComments=list_comments,
-        datasetID=dataset_id)
+                                       path_nodes_ordered=sorted(path_items.keys()),
+                                       pathItems=path_items,
+                                       tbl_id=tbl_id,
+                                       datasetPath=path,
+                                       scannedByWhen=scan_data,
+                                       datasetErrors=datasetErrors,
+                                       datasetWarnings=datasetWarnings,
+                                       datasetComments=list_comments,
+                                       datasetID=dataset_id)
 
     return {'output': table_definition,
             'hasError': False}
@@ -184,22 +186,22 @@ def export():
 
     export_data = result['data']
 
-    content = '"Study",';
-    content += '"Wave",';
-    content += '"ExpType",';
-    content += '"Pseudo",';
-    content += '"Version",';
-    content += '"ToVaultDay",';
-    content += '"ToVaultMonth",';
-    content += '"ToVaultYear",';
-    content += '"DatasetSize",';
-    content += '"DatasetFiles"';
-    content += "\r\n";
+    content = '"Study",'
+    content += '"Wave",'
+    content += '"ExpType",'
+    content += '"Pseudo",'
+    content += '"Version",'
+    content += '"ToVaultDay",'
+    content += '"ToVaultMonth",'
+    content += '"ToVaultYear",'
+    content += '"DatasetSize",'
+    content += '"DatasetFiles"'
+    content += "\r\n"
 
     for data_row in export_data:
         data = export_data[data_row]
         content += "'" + study_id + "',"
-        content += "'" +  data['wave']  + "',"
+        content += "'" +  data['wave'] + "',"
         content += "'" + data['experiment_type'] + "',"
         content += "'" + data['pseudocode'] + "',"
         content += "'" + data['version'] + "',"
@@ -229,13 +231,13 @@ def export():
 
 #     public function index($studyID=null)
 @intake_bp.route('reports', methods=['GET'])
-def reports(): 
+def reports():
     access_denied = True
     study_id = request.args.get('studyID')
 
     studies = api.call('intake_list_studies')['data']
 
-    if study_id is None or len(study_id)==0:
+    if study_id is None or len(study_id) == 0:
         try:
             study_id = session['study_id']
         except Exception:
@@ -246,15 +248,12 @@ def reports():
                 if temp_permissions['manager']:
                     study_id = study
                     break
-            # If not default study can be found - NO ACCESS
-            #if study_id is None or len(study_id)==0:
-            #    return 'NO ACCESS'
 
     # check whether user is part of the study-group.
     # if not, stop access
     permissions = get_intake_study_permissions(study_id)
     if permissions['manager']:
-       access_denied = False
+        access_denied = False
 
     intake_path = ''
     counts = {}
@@ -277,14 +276,14 @@ def reports():
                            'datasetsMonthGrowth': 'Datasets growth in a month',
                            'distinctPseudoCodes': 'Pseudocodes'}
 
-    return render_template('/intake/reports.html', 
-            access_denied=access_denied,
-            activeModule='intake',
-            studies=studies,
-            study_id=study_id,
-            studyFolder='',
-            intakePath=intake_path,
-            datasetTypeCounts=counts,
-            aggregatedInfo=aggregated_info,
-            title_translate=title_translate,
-            title='VAULT: Study ' + study_id)
+    return render_template('/intake/reports.html',
+                           access_denied=access_denied,
+                           activeModule='intake',
+                           studies=studies,
+                           study_id=study_id,
+                           studyFolder='',
+                           intakePath=intake_path,
+                           datasetTypeCounts=counts,
+                           aggregatedInfo=aggregated_info,
+                           title_translate=title_translate,
+                           title='VAULT: Study ' + study_id)
