@@ -23,6 +23,21 @@
     </tr>
     </thead>
     <tbody>
+        {% for row in dataErroneousFiles %}
+        <tr data-filename="{{ row.name }}"
+            data-path="{{ row.path }}"
+            data-error="{{ row.error }}"
+            >
+            <td style="max-width:200px;"><div class="ellipseDivText">{{ row.name }}</div></td>
+            <td>{{ row.date }}</td>
+            <td>{{ row.pseudocode }}</td>
+            <td>{{ row.experiment_type }}</td>
+            <td>{{ row.wave }}</td>
+            <td>{{ row.version }}</td>
+            <td>Unrecognised</td>
+            <td>{{ row.creator }}</td>
+        </tr>
+        {% endfor %}
     </tbody>
 </table>
 

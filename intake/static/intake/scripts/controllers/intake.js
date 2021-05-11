@@ -1,9 +1,9 @@
 $(function() {
 //    # ??? wat doet dit nu??
-    get_studies();
-    get_studies_dm();
-    get_datasets('grp-intake-initial');
-    get_unrecognized_files('grp-intake-initial')
+//    get_studies();
+//   get_studies_dm();
+//    get_datasets('grp-intake-initial');
+//    get_unrecognized_files('grp-intake-initial')
 
     var tableUnrecognised = $('#datatable_unrecognised').DataTable({
         "language": {
@@ -45,72 +45,20 @@ $(function() {
     });
 
     $('#btn-start-scan').click(function(){
-        Yoda.baseUrl = '';
-        var url_org = Yoda.baseUrl + ['intake','scanSelection'].join('/'),
-            url = 'scanSelection',
-            collection=$('#collection').val();
-
         var study_id = 'grp-intake-' + $('#studyID').val();
-        var parameters = {
-            "studyID": study_id,
-            "collection": collection,
-            "csrf_token": Yoda.csrf.tokenValue
-        };
 
-        console.log(url);
-        console.log(parameters);
-        console.log(Yoda.basePath);
-        // return;
-
-        console.log('ervoor');
+        $(this).prop('disabled', true);
+        inProgressStart('Scanning in progress...');
         Yoda.call('intake_scan_for_datasets',
                   {coll: Yoda.basePath + '/' + study_id}).then((data) => {
             console.log(data);
-            location.reload();
+            if (data.proc_status=='OK') {
+                reload_page_with_alert('5');
+            }
+            else {
+                reload_page_with_alert('6')
+            }
         })
-        console.log('erna');
-
-        inProgressStart('Scanning in progress...');
-        // console.log('$.post');
-        // $.post(
-        //    url,
-        //    parameters,
-        //    function (data) {
-        //        console.log(data);
-        //        location.reload();
-        //    }
-        // );
-    });
-
-    // Obsolete
-    $('#btn-start-scan-selection').click(function(){
-        var url = Yoda.baseUrl + ['intake','scanSelection'].join('/'),
-            collections=[],
-            csrf_key = $('input[name="csrf_yoda"]').val();
-
-        $('.scanFolder').each(function(){
-            if($(this).prop('checked')){
-                //alert($(this).data('target'));
-                collections.push($(this).data('target'));
-            }
-        });
-
-        var parameters = {
-            "studyID": $('#studyID').val(),
-            "collections[]": collections,
-            "csrf_yoda": csrf_key
-
-        };
-
-        inProgressStart('Scanning in progress...');
-
-        $.post(
-            url,
-            parameters,
-            function (data) {
-                location.reload();
-            }
-        );
     });
 
     // datamanager only
@@ -130,26 +78,16 @@ $(function() {
             if($(this).prop('checked')){
                 // datasets.push($(this).parent().parent().data('dataset-id'));
                 dataset_id = $(this).parent().parent().data('dataset-id');
-                Yoda.call('intake_lock_dataset', {"path": intake_path, "dataset_id": dataset_id});
+                Yoda.call('intake_lock_dataset', {"path": intake_path, "dataset_id": dataset_id}).then((data) => {
+                    console.log(data);
+                    if (data.proc_status!='OK') {
+                        reload_page_with_alert('2');
+                    }
+                })
             }
         });
-        location.reload();
-
+        reload_page_with_alert('1');
         return;
-
-        var parameters = {
-            "studyID": $('#studyID').val(),
-            "datasets[]": datasets,
-            "csrf_yoda": csrf_key
-        };
-
-        $.post(
-            url,
-            parameters,
-            function (data) {
-                location.reload();
-            }
-        );
     });
 
     // datamanager only
@@ -168,69 +106,39 @@ $(function() {
         $('.cbDataSet').each(function(){
             if($(this).prop('checked')){
                 dataset_id = $(this).parent().parent().data('dataset-id');
-                Yoda.call('intake_unlock_dataset', {"path": intake_path, "dataset_id": dataset_id});
+                Yoda.call('intake_unlock_dataset', {"path": intake_path, "dataset_id": dataset_id}).then((data) => {
+                    console.log(data);
+                    if (data.proc_status!='OK') {
+                        reload_page_with_alert('4');
+                    }
+                })
             }
         });
-        location.reload();
-
+        reload_page_with_alert('3');
         return;
-
-
-// ----------------------
-        $('.cbDataSet').each(function(){
-            if($(this).prop('checked')){
-                datasets.push($(this).parent().parent().data('dataset-id'));
-            }
-        });
-
-        if(datasets.length==0){
-            return alert('Please select at least one dataset.');
-        }
-
-        var parameters = {
-            "studyID": $('#studyID').val(),
-            "datasets[]": datasets,
-            csrf_yoda: csrf_key
-        };
-
-        inProgressStart('Unlocking in progress...');
-
-        $.post(
-            url,
-            parameters,
-            function (data) {
-                location.reload();
-            }
-        );
     });
 
-    // obsolete - test for comments dialog
-    $('#btn-show-comments').click(function(){
-        var title='Comments on data set',
-            url = Yoda.baseUrl+'intake/dlg_dataset_comments';
-
-        modalDialog('Comments on data set', url);
-        return;
-
-        var modal = $('#select-generic-modal'),
-            iframeDocument = $('iframe', modal).get(0).contentWindow.document;
-
-        $('.modal-header h3', modal).html(title);
-        //alert( Yoda.baseUrl+'/intake/dlg_dataset_comments' );
-
-        iframeDocument.location.href = Yoda.baseUrl+'intake/dlg_dataset_comments';
-
-        $('.modal-body iframe', modal).show();
-        $('#select-generic-modal').modal('show');
-    });
-
-    function addCommentToDataset(study, table, datasetId, comment)
+    function addCommentToDataset(studyId, table, datasetId, comment)
     {
         if(comment.length==0){
             alert('Please enter a comment first.');
         }
         else{
-            var csrf_key = $('input[name="csrf_yoda"]').val();
+            Yoda.call('intake_dataset_add_comment',
+                      {"study_id": studyId,
+                       "dataset_id": datasetId,
+                       "comment": comment}).then((data) => {
+                console.log(data);
+                $('tr:last', table).before(
+                                 '<tr><td>'  + $('<div>').text(data.user).html()
+                               + '</td><td>' + $('<div>').text(data.timestamp).html()
+                               + '</td><td>' + $('<div>').text(data.comment).html()
+                               + '</td></tr>'
+                );
+                $('input[name="comments"]', table).val('');           
+            })
+
+            return;
 
             $.post(
                 Yoda.baseUrl + ['intake','saveDatasetComment'].join('/'),
@@ -297,7 +205,57 @@ $(function() {
     $('#select-study-folder tr').click(function(){
         document.location = $(this).data('study-folder-url');
     });
+
+    msg = ''
+    // Alert Handling after reload
+    if (alertNr=='1') {
+        msg = 'Successfully locked the selected dataset(s).';
+        alertType = 'success';
+    }
+    else if (alertNr=='2') {
+        msg = 'There was a problem locking the selected dataset(s).';
+        alertType = 'danger';
+    }
+    else if (alertNr=='3') {
+        msg = 'Successfully unlocked the selected dataset(s).';
+        alertType = 'success';
+    }
+    else if (alertNr=='4') {
+        msg = 'There was a problem unlocking the selected dataset(s)';
+        alertType = 'danger';
+    }
+    else if (alertNr=='5') {
+        msg = 'Successfully scanned for datasets.';
+        alertType = 'success';
+    }
+    else if (alertNr=='6') {
+        msg = 'There was a problem during the scanning process.';
+        alertType = 'danger';
+    }
+
+    if (msg.length) {
+        $('#messages').html('<div class="alert alert-' + alertType + '"><button class="close" data-dismiss="alert"><span>×</span></button><p>' + msg + '</p></div>');
+    }
+
+    console.log($("#studyID").val())
+    console.log($("#studyFolder").val());
+    console.log(window.location.origin);
+    console.log(window.location.pathname);
+    
 });
+
+function reload_page_with_alert(alertNr) {
+    console.log($("#studyID").val())
+    console.log($("#studyFolder").val());
+    var studyID = $("#studyID").val(),
+        studyFolder= $("#studyFolder").val();
+
+    params = '?studyID=' + studyID;
+    if (studyFolder) {
+        params += '&studyFolder=' + studyFolder;
+    }
+    window.location.replace(window.location.origin + window.location.pathname + params + '&alertNr=' + alertNr);
+}
 
 function datasetRowClickForDetails(obj, mainTable)
 {
