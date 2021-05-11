@@ -102,24 +102,26 @@ def download():
 
 @research_bp.route('/browse/upload', methods=['POST'])
 def upload():
-    try:
-        import os
-        from werkzeug.utils import secure_filename
+    import os
+    from werkzeug.utils import secure_filename
 
-        filepath = request.form.get('filepath')
-        file = request.files['file']
-        filename = secure_filename(file.filename)
-        tmp_path = os.path.join("/var/www/yoda/uploads", filename)
-        file.save(tmp_path)
+    session = g.irods
+    filepath = request.form.get('filepath')
+    file = request.files['file']
+    filename = secure_filename(file.filename)
+    path = '/' + g.irods.zone + '/home' + filepath + "/" + filename
 
-        path = '/' + g.irods.zone + '/home' + filepath + "/" + filename
-        session = g.irods
-        session.data_objects.put(tmp_path, path)
-
-        os.remove(tmp_path)
-        return {"status": "OK", "statusInfo": ""}
-    except Exception:
-        return {"status": "ERROR", "statusInfo": "Upload failed"}
+    if not session.data_objects.exists(path):
+        try:
+            tmp_path = os.path.join("/var/www/yoda/uploads", filename)
+            file.save(tmp_path)
+            session.data_objects.put(tmp_path, path)
+            os.remove(tmp_path)
+            return {"status": "OK", "statusInfo": ""}
+        except Exception:
+            return {"status": "ERROR", "statusInfo": "Upload failed"}
+    else:
+        return {"status": "ERROR", "statusInfo": "File already exists"}
 
 
 @research_bp.route('/revision')
