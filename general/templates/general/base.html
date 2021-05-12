@@ -2,12 +2,12 @@
 <html lang="en">
     <head>
         {% block head %}
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+
             <title>{% block title %}{{ config.get('PORTAL_TITLE_TEXT') }}{% endblock %}</title>
 
             <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
 
             <link rel="stylesheet" href="{{ url_for('static', filename='lib/font-awesome-4.7.0/css/font-awesome.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
