@@ -4,6 +4,7 @@
 thumbs.db
 activate.bat
 .idea/
+/.idea/
 
 # Ansible controlled config files
 flask.cfg
