@@ -1,8 +1,9 @@
 # Local/Editor files
 *.swp
-.idea
 .DS_STORE
 thumbs.db
+activate.bat
+.idea/
 
 # Ansible controlled config files
 flask.cfg
