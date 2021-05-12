@@ -4,49 +4,7 @@
 
 {% block style %}
 {{ super() }}
-<style type="text/css">
-        .header-logo {
-                width: 100%;
-                position: relative;
-        }
-        .header-logo .header-logo-text-content {
-                color: #fff;
-                font-family: "Open Sans", "Merriweather","Bembo",Georgia,Times,"Times New Roman",serif;
-                overflow: hidden;
-                font-weight: 300;
-        }
-        .header-logo .header-logo-text-link {
-                bottom: -42px;
-                right: 0px;
-                background-color: #ffcd00;
-                text-transform: uppercase;
-                font-weight: 700;
-                font-size: 15px;
-                display: inline-block;
-                padding: 0 19px;
-                line-height: 42px;
-                position: absolute;
-                height: 42px;
-                box-sizing: border-box;
-        }
-        a.header-logo-text-link {
-                text-decoration: none;
-        }
-        div.header-logo img.header-logo-img {
-                display: inline;
-                width: 100%;
-                clear: both;
-        }
-        .header-logo .header-logo-text-background {
-                position: absolute;
-                top: 27%;
-                background-color: rgba(0,0,0,.5);
-                right: 5%;
-                font-size: 20px;
-                padding: 15px 30px;
-                font-size: 20px;
-        }
-</style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
 {% endblock %}
 
 {% block container %}
@@ -63,8 +21,15 @@
             <div class="header-logo-text-content">
                 <h1>Welcome to Yoda!</h1>
                 <p>Yoda is a share-collaborate environment for research data.</p>
+                <p>This is a Yoda <strong>development</strong> instance. You can follow the latest developments of Yoda on
+                    <a href="https://github.com/UtrechtUniversity/yoda" style="color:white; text-decoration: underline">Github</a></p>
             </div>
-            <a class="header-logo-text-link" href="https://utrechtuniversity.github.io/yoda-docs/" target="_blank">Learn more</a>
+            <div id="header-logo-links">
+                <a class="header-logo-text-link" href="https://www.uu.nl/en/research/yoda" target="_blank">Introduction</a>
+                <a class="header-logo-text-link" href="https://utrechtuniversity.github.io/yoda-docs/" target="_blank">Documentation</a>
+                <a class="header-logo-text-link" href="https://github.com/UtrechtUniversity/yoda" target="_blank">Github</a>
+            </div>
+
         </div>
     </div>
 </div>
