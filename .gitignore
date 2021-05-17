@@ -1,5 +1,10 @@
-# Editor swap files
+# Local/Editor files
 *.swp
+.DS_STORE
+thumbs.db
+activate.bat
+.idea/
+/.idea/
 
 # Ansible controlled config files
 flask.cfg
