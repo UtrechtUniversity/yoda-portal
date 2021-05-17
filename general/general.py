@@ -3,9 +3,8 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, redirect, render_template, url_for, session
+from flask import Blueprint, redirect, render_template, url_for
 from flask_wtf.csrf import CSRFError
-import connman
 
 general_bp = Blueprint('general_bp', __name__,
                        template_folder='templates/general',
@@ -15,10 +14,8 @@ general_bp = Blueprint('general_bp', __name__,
 
 @general_bp.route('/')
 def index():
-    conn = connman.get(session.sid)
-    if conn:
-        return render_template('index_loggedin.html')
     return render_template('index.html')
+
 
 @general_bp.app_errorhandler(CSRFError)
 def csrf_error(e):
