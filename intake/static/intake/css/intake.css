@@ -1,0 +1,93 @@
+#select-study,#select-study-folder tbody tr {
+    cursor:pointer;
+}
+table.table-outside-borders {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c0c0c0;
+}
+table.tbl-fullwidth {
+    width:100%;
+}
+td.details-control {
+    background: url('../images/datatables/triangle_details_open.png') no-repeat center center;
+    background-size: 20px 20px;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+}
+tr.shown td.details-control {
+    background: url('../images/datatables/triangle_details_close.png') no-repeat center center;
+    background-size: 20px 20px;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+}
+
+div.datasetstatus_frozen{
+    background: url('../images/datatables/status_frozen.png') no-repeat center center;
+    background-size: 20px 20px;
+    width:20px;
+    height:20px;
+}
+div.datasetstatus_locked{
+    background: url('../images/datatables/status_locked.png') no-repeat center center;
+    background-size: 20px 20px;
+    width:20px;
+    height:20px;
+}
+div.datasetstatus_scanned{
+    background: url('../images/datatables/status_scanned.png') no-repeat center center;
+    background-size: 20px 20px;
+    width:20px;
+    height:20px;
+}
+
+#datatable tbody tr.detailrow {
+    cursor:pointer;
+}
+
+#datatable_unrecognised tbody tr {
+    cursor:pointer;
+}
+
+.modal-body span.glyphicon-info-sign {
+    font-size: 6.2em;
+    color: #DCDCDC;
+    padding-top: 13px;
+}
+
+.ellipseDivText {
+    overflow:hidden;
+    text-overflow-multiline:ellipsis;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+}
+
+.btn-primary:hover, .btn-primary:visited, .btn-primary:focus {
+    color: #ffffff;
+}
+
+.btn-primary:active:hover,
+.btn-primary.active:hover,
+.open > .dropdown-toggle.btn-primary:hover,
+.btn-primary:active:focus,
+.btn-primary.active:focus,
+.open > .dropdown-toggle.btn-primary:focus,
+.btn-primary:active.focus,
+.btn-primary.active.focus,
+.open > .dropdown-toggle.btn-primary.focus {
+    color: #FFFFFF;
+    background-color: #337ab7;
+    border-color: rgba(0, 0, 0, 0);
+}
+.btn-primary:active,
+.btn-primary.active,
+.open > .dropdown-toggle.btn-primary {
+    background-image: none;
+    color: #FFFFFF;
+}

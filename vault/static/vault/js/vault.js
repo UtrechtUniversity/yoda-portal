@@ -377,24 +377,28 @@ const tableRenderer = {
          return elem[0].outerHTML;
      },
     context: (_, __, row) => {
+        let actions = $('<div class="dropdown-menu">');
+
         if (row.type === 'coll')
             return '';
 
         // Render context menu for files.
-        const viewExts = {image: ['jpg', 'jpeg', 'gif', 'png'],
-                          audio: ['mp3', 'ogg', 'wav'],
-                          video: ['mp4', 'ogg', 'webm']};
+        const viewExts = {
+            image: ['jpg', 'jpeg', 'gif', 'png'],
+            audio: ['mp3', 'ogg', 'wav'],
+            video: ['mp4', 'ogg', 'webm']
+        };
         let ext = row.name.replace(/.*\./, '').toLowerCase();
 
-        let actions = $('<div class="dropdown-menu">');
-        actions.append(`<a class="dropdown-item" href="browse/download?filepath=${encodeURIComponent(currentFolder+'/'+row.name)}">Download</a>`);
+        actions.append(`<a class="dropdown-item" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file">Download</a>`);
 
         // Generate dropdown "view" actions for different media types.
-        for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext))))
-            actions.append(`<li><a class="view-${type}" data-path="${htmlEncode(currentFolder+'/'+row.name)}">View</a>`);
+        for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
+            actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`);
+        }
 
         let dropdown = $(`<div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
                             </button>`);
         dropdown.append(actions);

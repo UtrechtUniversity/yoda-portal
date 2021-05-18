@@ -3,9 +3,9 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, g, make_response, render_template, request, session
+import io
 
-import api
+from flask import abort, Blueprint, g, render_template, request, Response, session, stream_with_context
 
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
@@ -68,20 +68,67 @@ def index():
                            dir=dir)
 
 
-@research_bp.route('/download')
+@research_bp.route('/browse/download')
 def download():
-    path_start = '/' + g.irods.zone + '/home'
-    file_path = path_start + request.args.get('filepath')
+    path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
+    filename = path.rsplit('/', 1)[1]
+    content = ''
+    size = 0
+    session = g.irods
 
-    response = api.call('get_content', data={'path': file_path})
+    READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
 
-    output = make_response(response['data']['content'])
+    def read_file_chunks(path):
+        obj = session.data_objects.get(path)
+        with obj.open('r') as fd:
+            while True:
+                buf = fd.read(READ_BUFFER_SIZE)
+                if buf:
+                    yield buf
+                else:
+                    break
 
-    output.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(request.args.get('filepath'))
-    output.headers['Content-Type'] = 'application/octet'
-    output.headers['Content-Length'] = response['data']['size']
+    if session.data_objects.exists(path):
+        return Response(
+            stream_with_context(read_file_chunks(path)),
+            headers={
+                'Content-Disposition': f'attachment; filename={filename}',
+                'Content-Type': 'application/octet'
+            }
+        )
+    else:
+        abort(404)
 
-    return output
+
+@research_bp.route('/browse/upload', methods=['POST'])
+def upload():
+    import os
+    from werkzeug.utils import secure_filename
+
+    session = g.irods
+    filepath = request.form.get('filepath')
+    file_upload = request.files['file']
+    filename = secure_filename(file_upload.filename)
+    path = '/' + g.irods.zone + '/home' + filepath + "/" + filename
+
+    if not session.data_objects.exists(path):
+        try:
+            obj = session.data_objects.create(path)
+
+            file_upload.seek(0, os.SEEK_END)
+            file_length = file_upload.tell()
+            file_upload.seek(0, 0)
+
+            with obj.open('w+') as f:
+                f.seek(0)
+                f.write(file_upload.stream.read())
+
+            f.close()
+            return {"status": "OK", "statusInfo": ""}
+        except Exception:
+            return {"status": "ERROR", "statusInfo": "Upload failed"}
+    else:
+        return {"status": "ERROR", "statusInfo": "File already exists"}
 
 
 @research_bp.route('/revision')

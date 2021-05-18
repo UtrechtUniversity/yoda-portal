@@ -1250,6 +1250,7 @@ $(function() {
             $groupList.on('shown.bs.collapse', function(e) {
                 // Once a category is fully opened, open its subcategory (if there is only one).
                 var subs = $(e.target).children(".subcategory");
+                subs.children('.subcategory-ul').collapse('hide');
                 if (subs.length == 1) {
                     // Only one subcategory, expand it automatically.
                     subs.first().children('a.name').removeClass('collapsed');

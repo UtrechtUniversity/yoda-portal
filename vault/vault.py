@@ -3,12 +3,11 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import io
 
-from flask import Blueprint, make_response, render_template, request, session
-from flask import g
+from flask import abort, Blueprint, g, render_template, request, Response, session, stream_with_context
 
 import api
-
 
 vault_bp = Blueprint('vault_bp', __name__,
                      template_folder='templates',
@@ -73,25 +72,34 @@ def index():
 
 @vault_bp.route('/browse/download')
 def download():
-    filepath = '/' + g.irods.zone + '/home' + request.args.get('filepath')
+    path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
+    filename = path.rsplit('/', 1)[1]
     content = ''
     size = 0
     session = g.irods
 
-    obj = session.data_objects.get(filepath)
-    with obj.open('r') as f:
-        content = f.read()
-        # seek EOF to get file size
-        f.seek(0, 2)
-        size = f.tell()
+    READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
 
-    output = make_response(content)
+    def read_file_chunks(path):
+        obj = session.data_objects.get(path)
+        with obj.open('r') as fd:
+            while True:
+                buf = fd.read(READ_BUFFER_SIZE)
+                if buf:
+                    yield buf
+                else:
+                    break
 
-    output.headers['Content-Disposition'] = 'attachment; filename="{}"'.format(request.args.get('filepath'))
-    output.headers['Content-Type'] = 'application/octet'
-    output.headers['Content-Length'] = size
-
-    return output
+    if session.data_objects.exists(path):
+        return Response(
+            stream_with_context(read_file_chunks(path)),
+            headers={
+                'Content-Disposition': f'attachment; filename={filename}',
+                'Content-Type': 'application/octet'
+            }
+        )
+    else:
+        abort(404)
 
 
 @vault_bp.route('/metadata/form')
