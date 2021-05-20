@@ -3,41 +3,6 @@
     position: relative;
 }
 
-.header-logo-text-content {
-    color: #fff;
-    font-family: "Open Sans", "Merriweather", "Bembo", Georgia, Times, "Times New Roman", serif;
-    overflow: hidden;
-    font-weight: 300;
-}
-
-#header-logo-links {
-}
-
-#header-logo-links-at-bottom {
-    width: 100%;
-    height: 42px;
-    position: absolute;
-    margin-top: 30px;
-    text-align: right;
-    right: 0;
-}
-
-.header-logo-text-link {
-    background-color: #ffcd00;
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 15px;
-    display: inline-block;
-    padding: 0 19px;
-    line-height: 42px;
-    height: 42px;
-    box-sizing: border-box;
-}
-
-a.header-logo-text-link {
-    text-decoration: none;
-}
-
 img.header-logo-img {
     display: inline;
     width: 100%;
@@ -47,15 +12,13 @@ img.header-logo-img {
 
 .header-logo-text-background {
     position: absolute;
-    top: 27%;
+    top: 20%;
     background-color: rgba(0, 0, 0, .5);
     right: 5%;
-    font-size: 20px;
     padding: 15px 30px;
 }
 
-@media (min-width: 1200px) {
-    img.header-logo-img {
-        height: 750px;
-    }
+.header-logo-text-content {
+    color: #fff;
+    overflow: hidden;
 }
