@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Deposit{% endblock %}
+
+{% block style %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('deposit_bp.static', filename='js/deposit.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row page-header">
+        <div class="col-sm-12">
+            <h1>Deposit</h1>
+            {% if g.user %}
+                <p>Welcome</p>
+            {% else %}
+                <p>You have no access to the deposit page at the moment</p>
+            {% endif %}
+
+        </div>
+    </div>
+
+{% endblock %}
