@@ -21,9 +21,9 @@
              title="Yoda is a share-collaborate environment for research data" class="header-logo-img">
 
         {% if g.user %}
-            {% include 'index_loggedin_part.html' %}
+            {% include 'index_authenticated.html' %}
         {% else %}
-            {% include 'index_normal_part.html' %}
+            {% include 'index_not_authenticated.html' %}
         {% endif %}
 
     </div>
