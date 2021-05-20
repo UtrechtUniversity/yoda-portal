@@ -16,6 +16,7 @@ from research.research import research_bp
 from stats.stats import stats_bp
 from user.user import user_bp
 from vault.vault import vault_bp
+from deposit.deposit import deposit_bp
 
 app = Flask(__name__)
 app.config.from_pyfile('flask.cfg')
@@ -23,8 +24,9 @@ app.config['JSON_SORT_KEYS'] = False  # Check if this is still needed with Pytho
 app.config['modules'] = [
     {'name': 'Research',       'function': 'research_bp.index'},
     {'name': 'Vault',          'function': 'vault_bp.index'},
+    {'name': 'Deposit',        'function': 'deposit_bp.index'},
     {'name': 'Statistics',     'function': 'stats_bp.index'},
-    {'name': 'Group Manager',  'function': 'group_manager_bp.index'}
+    {'name': 'Group Manager',  'function': 'group_manager_bp.index'},
 ]
 if app.config.get('INTAKE_ENABLED'):
     app.config['modules'].append(
@@ -50,6 +52,7 @@ app.register_blueprint(research_bp, url_prefix='/research')
 app.register_blueprint(stats_bp, url_prefix='/stats')
 app.register_blueprint(user_bp, url_prefix='/user')
 app.register_blueprint(vault_bp, url_prefix='/vault')
+app.register_blueprint(deposit_bp, url_prefix='/deposit')
 app.register_blueprint(api_bp, url_prefix='/api/')
 if app.config.get('INTAKE_ENABLED'):
     app.register_blueprint(intake_bp, url_prefix='/intake/')
