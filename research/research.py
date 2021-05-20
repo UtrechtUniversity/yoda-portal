@@ -4,8 +4,10 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
+import os
 
 from flask import abort, Blueprint, g, render_template, request, Response, session, stream_with_context
+from werkzeug.utils import secure_filename
 
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
@@ -102,9 +104,6 @@ def download():
 
 @research_bp.route('/browse/upload', methods=['POST'])
 def upload():
-    import os
-    from werkzeug.utils import secure_filename
-
     session = g.irods
     filepath = request.form.get('filepath')
     file_upload = request.files['file']
@@ -129,6 +128,82 @@ def upload():
             return {"status": "ERROR", "statusInfo": "Upload failed"}
     else:
         return {"status": "ERROR", "statusInfo": "File already exists"}
+
+
+def get_chunk_name(uploaded_filename, chunk_number):
+    return uploaded_filename + "_part_%03d" % chunk_number
+
+
+@research_bp.route('/flow_upload', methods=['GET'])
+def flow_upload_get():
+    flow_identfier = request.args.get('flowIdentifier', type=str)
+    flow_filename = request.args.get('flowFilename', type=str)
+    flow_chunk_number = request.args.get('flowChunkNumber', type=int)
+
+    # filepath = request.form.get('filepath', type=str)
+    filepath = "research-initial"
+
+    if not flow_identfier or not flow_filename or not flow_chunk_number or not filepath:
+        # Parameters are missing or invalid.
+        abort(500, 'Parameter error')
+
+    # Build chunk folder path based on the parameters.
+    temp_dir = os.path.join(g.irods.zone, 'home', filepath, flow_identfier)
+
+    # Chunk path based on the parameters.
+    chunk_path = os.path.join(temp_dir, get_chunk_name(flow_filename, flow_chunk_number))
+
+    session = g.irods
+    if session.data_objects.exists(chunk_path):
+        # Chunk already exists.
+        return 'OK'
+    else:
+        # Chunk does not exists and needs to be uploaded.
+        abort(404, 'Not found')
+
+
+@research_bp.route('/flow_upload', methods=['POST'])
+def flow_upload_post():
+    flow_identfier = request.args.get('flowIdentifier', type=str)
+    flow_filename = request.args.get('flowFilename', type=str)
+    flow_chunk_number = request.args.get('flowChunkNumber', type=int)
+    flow_total_chunks = request.form.get('flowTotalChunks', type=int)
+
+    # filepath = request.form.get('filepath')
+    filepath = "research-initial"
+
+    session = g.irods
+
+    # Ensure temp chunk collection exists.
+    temp_dir = os.path.join(g.irods.zone, 'home', filepath, flow_identfier)
+    if not session.collections.exists(temp_dir):
+        session.collections.create(temp_dir)
+
+    # Get the chunk data.
+    chunk_data = request.files['file']
+
+    # Save the chunk data.
+    chunk_path = os.path.join(temp_dir, get_chunk_name(flow_filename, flow_chunk_number))
+    try:
+        obj = session.data_objects.create(chunk_path)
+
+        with obj.open('w+') as f:
+            f.seek(0)
+            f.write(chunk_data.stream.read())
+
+        f.close()
+    except Exception:
+        abort(500, 'Internal error')
+
+    # Check if the upload is complete.
+    chunk_paths = [os.path.join(temp_dir, get_chunk_name(flow_filename, x)) for x in range(1, flow_total_chunks + 1)]
+    upload_complete = all([session.data_objects.exists(p) for p in chunk_paths])
+
+    # Combine all the chunks to create the final file.
+    # if upload_complete:
+    #     combine all chunks
+
+    return 'OK'
 
 
 @research_bp.route('/revision')
