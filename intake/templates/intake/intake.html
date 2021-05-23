@@ -114,7 +114,7 @@
     <div class="row" id="toprow">
         <div class="col-sm-12">
             <div class="btn-group">
-                <button class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" id="dropdown-select-study">
                     <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
@@ -122,7 +122,7 @@
                     <br/>
                     <table class="table table-striped hover" id="select-study">
                         {% for study in studies %}
-                            <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}"> 
+                            <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}" class="ta-{{ study }}"> 
                                 <td>
                                     <i class="fa fa-graduation-cap" aria-hidden="true"></i>
                                 </td>
