@@ -161,6 +161,10 @@ def flow_upload_get():
         # Chunk does not exists and needs to be uploaded.
         abort(404, 'Not found')
 
+@research_bp.route('/prototype_upload')
+def prototype_upload():
+    return render_template('research/upload.html')
+
 
 @research_bp.route('/flow_upload', methods=['POST'])
 def flow_upload_post():
