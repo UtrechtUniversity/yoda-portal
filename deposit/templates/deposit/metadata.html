@@ -14,21 +14,11 @@
 {% block content %}
 
 {% if g.user %}
-
-    <h1 style="margin: 40px 0;">Deposit your data</h1>
-    <p>Here you can upload your data:</p>
-    <ul>
-        <li>Upload</li>
-        <li>Add metadata</li>
-        <li>Submit</li>
-    </ul>
-
-    <form id="upload_form" action="" method="POST">
+    <h1 style="margin: 40px 0;">Deposit: Add Metadata</h1>
+    <form id="metadata_form" action="" method="POST">
     </form>
-
 {% else %}
-    <p>You have no access to the deposit page - please log in.</p>
+    <p>You have no access to the deposit metadata page - please log in.</p>
 {% endif %}
-
 
 {% endblock %}
