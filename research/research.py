@@ -141,20 +141,20 @@ def get_chunk_name(uploaded_filename, chunk_number):
 
 @research_bp.route('/flow_upload', methods=['GET'])
 def flow_upload_get():
-    flow_identfier = request.args.get('flowIdentifier', type=str)
+    flow_identifier = request.args.get('flowIdentifier', type=str)
     flow_filename = request.args.get('flowFilename', type=str)
     flow_chunk_number = request.args.get('flowChunkNumber', type=int)
 
-    filepath = request.form.get('filepath', type=str)
+    filepath = request.args.get('filepath', type=str)
 
-    if not flow_identfier or not flow_filename or not flow_chunk_number or not filepath:
+    if not flow_identifier or not flow_filename or not flow_chunk_number or not filepath:
         # Parameters are missing or invalid.
         response = make_response(jsonify({"message": "Parameter missing or invalid"}), 500)
         response.headers["Content-Type"] = "application/json"
         return response
 
     # Build chunk folder path based on the parameters.
-    temp_dir = os.path.join("/" + g.irods.zone, 'home', filepath, flow_identfier)
+    temp_dir = os.path.join("/" + g.irods.zone, 'home', filepath, flow_identifier)
 
     # Chunk path based on the parameters.
     chunk_path = os.path.join(temp_dir, get_chunk_name(flow_filename, flow_chunk_number))
@@ -174,14 +174,14 @@ def flow_upload_get():
 
 @research_bp.route('/flow_upload', methods=['POST'])
 def flow_upload_post():
-    flow_identfier = request.form.get('flowIdentifier', type=str)
+    flow_identifier = request.form.get('flowIdentifier', type=str)
     flow_filename = request.form.get('flowFilename', type=str)
     flow_chunk_number = request.form.get('flowChunkNumber', type=int)
     flow_total_chunks = request.form.get('flowTotalChunks', type=int)
 
     filepath = request.form.get('filepath', type=str)
 
-    if not flow_identfier or not flow_filename or not flow_chunk_number or not flow_total_chunks or not filepath:
+    if not flow_identifier or not flow_filename or not flow_chunk_number or not flow_total_chunks or not filepath:
         # Parameters are missing or invalid.
         response = make_response(jsonify({"message": "Parameter missing or invalid"}), 500)
         response.headers["Content-Type"] = "application/json"
@@ -190,7 +190,7 @@ def flow_upload_post():
     session = g.irods
 
     # Ensure temp chunk collection exists.
-    temp_dir = os.path.join("/" + g.irods.zone, 'home', filepath, flow_identfier)
+    temp_dir = os.path.join("/" + g.irods.zone, 'home', filepath, flow_identifier)
     if not session.collections.exists(temp_dir):
         session.collections.create(temp_dir)
 
