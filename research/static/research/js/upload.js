@@ -1,7 +1,8 @@
 $(function() {
     console.log('ready');
     var r = new Flow({
-        target: '/research/flow_upload'
+        target: '/research/flow_upload',
+        query: {'csrf_token': Yoda.csrf.tokenValue, 'filepath': 'research-initial'}
     });
     // Flow.js isn't supported, fall back on a different method
     if (!r.support) {

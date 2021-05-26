@@ -130,6 +130,11 @@ def upload():
         return {"status": "ERROR", "statusInfo": "File already exists"}
 
 
+@research_bp.route('/prototype_upload')
+def prototype_upload():
+    return render_template('research/upload.html')
+
+
 def get_chunk_name(uploaded_filename, chunk_number):
     return uploaded_filename + "_part_%03d" % chunk_number
 
@@ -140,8 +145,7 @@ def flow_upload_get():
     flow_filename = request.args.get('flowFilename', type=str)
     flow_chunk_number = request.args.get('flowChunkNumber', type=int)
 
-    # filepath = request.form.get('filepath', type=str)
-    filepath = "research-initial"
+    filepath = request.form.get('filepath', type=str)
 
     if not flow_identfier or not flow_filename or not flow_chunk_number or not filepath:
         # Parameters are missing or invalid.
@@ -150,7 +154,7 @@ def flow_upload_get():
         return response
 
     # Build chunk folder path based on the parameters.
-    temp_dir = os.path.join(g.irods.zone, 'home', filepath, flow_identfier)
+    temp_dir = os.path.join(g.irods.zone, 'home', path, flow_identfier)
 
     # Chunk path based on the parameters.
     chunk_path = os.path.join(temp_dir, get_chunk_name(flow_filename, flow_chunk_number))
@@ -168,20 +172,14 @@ def flow_upload_get():
         return response
 
 
-@research_bp.route('/prototype_upload')
-def prototype_upload():
-    return render_template('research/upload.html')
-
-
 @research_bp.route('/flow_upload', methods=['POST'])
 def flow_upload_post():
-    flow_identfier = request.args.get('flowIdentifier', type=str)
-    flow_filename = request.args.get('flowFilename', type=str)
-    flow_chunk_number = request.args.get('flowChunkNumber', type=int)
+    flow_identfier = request.form.get('flowIdentifier', type=str)
+    flow_filename = request.form.get('flowFilename', type=str)
+    flow_chunk_number = request.form.get('flowChunkNumber', type=int)
     flow_total_chunks = request.form.get('flowTotalChunks', type=int)
 
-    # filepath = request.form.get('filepath')
-    filepath = "research-initial"
+    filepath = request.form.get('filepath', type=str)
 
     if not flow_identfier or not flow_filename or not flow_chunk_number or not flow_total_chunks or not filepath:
         # Parameters are missing or invalid.
