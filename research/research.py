@@ -154,7 +154,7 @@ def flow_upload_get():
         return response
 
     # Build chunk folder path based on the parameters.
-    temp_dir = os.path.join(g.irods.zone, 'home', path, flow_identfier)
+    temp_dir = os.path.join(g.irods.zone, 'home', filepath, flow_identfier)
 
     # Chunk path based on the parameters.
     chunk_path = os.path.join(temp_dir, get_chunk_name(flow_filename, flow_chunk_number))
