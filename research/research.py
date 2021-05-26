@@ -6,7 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 import io
 import os
 
-from flask import abort, Blueprint, g, render_template, request, Response, session, stream_with_context
+from flask import abort, Blueprint, g, jsonify, make_response, render_template, request, Response, session, stream_with_context
 from werkzeug.utils import secure_filename
 
 research_bp = Blueprint('research_bp', __name__,
@@ -145,7 +145,9 @@ def flow_upload_get():
 
     if not flow_identfier or not flow_filename or not flow_chunk_number or not filepath:
         # Parameters are missing or invalid.
-        abort(500, 'Parameter error')
+        response = make_response(jsonify({"message": "Parameter missing or invalid"}), 500)
+        response.headers["Content-Type"] = "application/json"
+        return response
 
     # Build chunk folder path based on the parameters.
     temp_dir = os.path.join(g.irods.zone, 'home', filepath, flow_identfier)
@@ -156,10 +158,15 @@ def flow_upload_get():
     session = g.irods
     if session.data_objects.exists(chunk_path):
         # Chunk already exists.
-        return 'OK'
+        response = make_response(jsonify({"message": "Chunk found"}), 200)
+        response.headers["Content-Type"] = "application/json"
+        return response
     else:
         # Chunk does not exists and needs to be uploaded.
-        abort(404, 'Not found')
+        response = make_response(jsonify({"message": "Chunk not found"}), 404)
+        response.headers["Content-Type"] = "application/json"
+        return response
+
 
 @research_bp.route('/prototype_upload')
 def prototype_upload():
@@ -175,6 +182,12 @@ def flow_upload_post():
 
     # filepath = request.form.get('filepath')
     filepath = "research-initial"
+
+    if not flow_identfier or not flow_filename or not flow_chunk_number or not flow_total_chunks or not filepath:
+        # Parameters are missing or invalid.
+        response = make_response(jsonify({"message": "Parameter missing or invalid"}), 500)
+        response.headers["Content-Type"] = "application/json"
+        return response
 
     session = g.irods
 
@@ -197,7 +210,9 @@ def flow_upload_post():
 
         f.close()
     except Exception:
-        abort(500, 'Internal error')
+        response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
+        response.headers["Content-Type"] = "application/json"
+        return response
 
     # Check if the upload is complete.
     chunk_paths = [os.path.join(temp_dir, get_chunk_name(flow_filename, x)) for x in range(1, flow_total_chunks + 1)]
@@ -207,7 +222,9 @@ def flow_upload_post():
     # if upload_complete:
     #     combine all chunks
 
-    return 'OK'
+    response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
+    response.headers["Content-Type"] = "application/json"
+    return response
 
 
 @research_bp.route('/revision')
