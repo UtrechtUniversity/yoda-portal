@@ -167,7 +167,7 @@ def flow_upload_get():
         return response
     else:
         # Chunk does not exists and needs to be uploaded.
-        response = make_response(jsonify({"message": "Chunk not found"}), 404)
+        response = make_response(jsonify({"message": "Chunk not found"}), 204)
         response.headers["Content-Type"] = "application/json"
         return response
 
