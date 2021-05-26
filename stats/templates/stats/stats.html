@@ -4,15 +4,86 @@
 
 {% block style %}
     <link rel="stylesheet" href="{{ url_for('stats_bp.static', filename='css/stats.css') }}">
+    <link rel="stylesheet" href="{{ url_for('stats_bp.static', filename='lib/select2/css/select2.min.css') }}">
 {% endblock %}
 
 {% block scripts %}
     <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-2.7.3/chart.min.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='js/stats.js') }}"></script>
+    <script src="{{ url_for('stats_bp.static', filename='lib/select2/js/select2.full.min.js') }}"></script>
 {% endblock %}
 
 {% block content %}
     <h1>Statistics</h1>
+
+    {% if 1==2 %}
+    <div class="card properties">
+        <div class="card-header">
+            Resource properties (<?php echo htmlentities($name); ?>)
+        </div>
+        <div class="card-body">
+            <form method="POST" id="resource-properties-form">
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Name</label>
+                    <div class="col-sm-8">
+                        <p class="form-control-static">{# php echo htmlentities($name); #}</p>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Tier</label>
+                    <div class="col-sm-8">
+                        <select type="text" class="tier-select" value="{# htmlentities($tier); #}">
+                            <option value="{# htmlentities($tier); #}">{# echo htmlentities($tier); #}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <input class="btn btn-primary update-resource-properties-btn" type="submit" value="Update">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if resources %}
+    <div class="row mb-4">
+        <div class="col-md-5">
+            <div class="card resources">
+                <div class="card-header">
+                    Resources
+                </div>
+                <div class="list-group" id="resource-list">
+                    {% for resource in resources %}
+                        <a class="list-group-item list-group-item-action resource" data-name="{{ resource['name'] }}">
+                            {{ resource['name'] }}
+                            <small class="float-right resource-tier" title="<{{ resource['tier'] }}">
+                                {{ resource['tier'] }}
+                            </small>
+                        </a>
+                    {% endfor %}
+                </div>
+                <div class="card-footer">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="resource-details">
+                <div class="card">
+                    <div class="card-header">
+                        Resource properties
+                    </div>
+                    <div class="card-body">
+                        <p class="placeholder-text">
+                            Please select a resource.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     {% if categories %}
     <div class="row mb-4">
