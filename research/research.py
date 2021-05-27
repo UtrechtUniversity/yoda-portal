@@ -181,6 +181,7 @@ def flow_upload_post():
     flow_chunk_size = request.form.get('flowChunkSize', type=int)
     flow_relative_path = request.form.get('flowRelativePath', type=str)
 
+    relative_path = os.path.dirname(flow_relative_path)
     filepath = request.form.get('filepath', type=str)
 
     if (not flow_identifier or not flow_filename or not flow_chunk_number
@@ -192,16 +193,23 @@ def flow_upload_post():
 
     session = g.irods
 
+    # Ensure temp chunk collection exists.
+    if relative_path:
+        base_dir = os.path.join("/" + g.irods.zone, 'home', filepath, relative_path)
+        if not session.collections.exists(base_dir):
+            session.collections.create(base_dir)
+    else:
+        base_dir = os.path.join("/" + g.irods.zone, 'home', filepath)
+
     # Get the chunk data.
     chunk_data = request.files['file']
 
     if flow_total_chunks == 1:
-        file_path = os.path.join("/" + g.irods.zone, 'home', filepath, flow_filename)
+        file_path = os.path.join(base_dir, flow_filename)
 
         try:
             obj = session.data_objects.create(file_path)
             with obj.open('w+') as f:
-                f.seek(0)
                 f.write(chunk_data.stream.read())
             f.close()
         except Exception:
@@ -210,7 +218,7 @@ def flow_upload_post():
             return response
     else:
         # Ensure temp chunk collection exists.
-        temp_dir = os.path.join("/" + g.irods.zone, 'home', filepath, flow_identifier)
+        temp_dir = os.path.join(base_dir, flow_identifier)
         if not session.collections.exists(temp_dir):
             session.collections.create(temp_dir)
 
@@ -220,7 +228,6 @@ def flow_upload_post():
             obj = session.data_objects.create(chunk_path)
 
             with obj.open('w+') as f:
-                f.seek(0)
                 f.write(chunk_data.stream.read())
             f.close()
         except Exception:
@@ -234,7 +241,7 @@ def flow_upload_post():
 
         # Combine all the chunks to create the final file.
         if upload_complete:
-            file_path = os.path.join("/" + g.irods.zone, 'home', filepath, flow_filename)
+            file_path = os.path.join(base_dir, flow_filename)
 
             obj = session.data_objects.create(file_path, force=True)
 

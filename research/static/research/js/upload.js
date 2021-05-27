@@ -40,7 +40,7 @@ $(function() {
             '</span>'
         );
         var $self = $('.flow-file-'+file.uniqueIdentifier);
-        $self.find('.flow-file-name').text(file.name);
+        $self.find('.flow-file-name').text(file.relativePath);
         $self.find('.flow-file-size').text(readablizeBytes(file.size));
         $self.find('.flow-file-pause').on('click', function () {
             file.pause();
