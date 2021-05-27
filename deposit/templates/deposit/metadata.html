@@ -3,8 +3,7 @@
 {% block title %}{{ super() }} &dash; Deposit{% endblock %}
 
 {% block style %}
-{{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/deposit.css') }}">
 {% endblock %}
 
 {% block scripts %}

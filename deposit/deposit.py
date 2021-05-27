@@ -11,10 +11,10 @@ deposit_bp = Blueprint('deposit_bp', __name__,
 
 
 """
-Deposit pages:
-1. upload data
-2. add metadata
-3. submit
+Deposit flow:
+1. upload data:     /deposit/
+2. add metadata:    /deposit/metadata/
+3. submit:          /deposit/submit/
 """
 
 
@@ -23,16 +23,9 @@ def index():
     return render_template('deposit.html')
 
 
-@deposit_bp.route('/upload', methods=['POST'])
+@deposit_bp.route('/', methods=['POST'])
 def upload():
     """ POST to this url to upload your deposit """
-    # TODO
-    # from werkzeug.utils import secure_filename
-    # session = g.irods
-    # filepath = request.form.get('filepath')
-    # file_upload = request.files['file']
-    # filename = secure_filename(file_upload.filename)
-    # path = '/' + g.irods.zone + '/home' + filepath + "/" + filename
     return redirect(url_for('deposit_bp.metadata'))
 
 
@@ -41,7 +34,7 @@ def metadata():
     return render_template('metadata.html')
 
 
-@deposit_bp.route('/metadata/upload', methods=['POST'])
+@deposit_bp.route('/metadata', methods=['POST'])
 def metadata_upload():
     """ Step2: Add metadata to your upload """
     return redirect(url_for('deposit_bp.submit'))
@@ -53,7 +46,7 @@ def submit():
     return render_template('submit.html')
 
 
-@deposit_bp.route('/submit_handler', methods=['POST'])
+@deposit_bp.route('/submit', methods=['POST'])
 def submit_handler():
     """ Step 3: Submit upload """
     return render_template('thankyou.html')
