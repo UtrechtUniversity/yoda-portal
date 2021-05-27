@@ -17,34 +17,7 @@ stats_bp = Blueprint('stats_bp', __name__,
 
 @stats_bp.route('/')
 def index():
-    '''
-        $userType = $this->api->call('resource_user_get_type')->data;
-        $isDatamanager = $this->api->call('resource_user_is_datamanager')->data;
-
-        $isRodsAdmin = 'no';
-        $isResearcher = 'no';
-        if ($userType == 'rodsadmin') {
-            $isRodsAdmin = 'yes';
-            $isResearcher = 'yes';
-        } else if ($userType == 'rodsuser') {
-            $isResearcher = 'yes';
-        }
-
-        $storageTableAdmin = false;
-        $storageTableDatamanager = false;
-        $resources = false;
-
-
-
-            $result = $this->obj_to_array($this->api->call('resource_monthly_stats'));
-            $storageTableData = array('data' => $result['data']);
-
-            $storageTable = $this->load->view('storage_table', $storageTableData, true);
-            $storageTableAdmin = $storageTable;
-    '''
-
     resource_tiers_response = api.call('resource_resource_and_tier_data', data={})
-
     group_response = api.call('resource_list_groups', data={})
     category_response = api.call('resource_category_stats', data={})
     return render_template('stats/stats.html',
@@ -66,7 +39,7 @@ def get_resource_details():
     html = render_template('stats/resource_tier_mgmt.html',
                            name=resource,
                            tier=result['data'])
-    return {'status': 'success', 'html': html} 
+    return {'status': 'success', 'html': html}
 
 
 @stats_bp.route('/export')
