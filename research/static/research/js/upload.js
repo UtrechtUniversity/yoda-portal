@@ -3,6 +3,7 @@ $(function() {
     var r = new Flow({
         target: '/research/flow_upload',
         chunkSize: 10 * 1024 * 1024,
+        simultaneousUploads: 5,
         query: {'csrf_token': Yoda.csrf.tokenValue, 'filepath': 'research-initial'}
     });
     // Flow.js isn't supported, fall back on a different method
