@@ -4,30 +4,64 @@
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/deposit.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/upload.css') }}">
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('deposit_bp.static', filename='js/deposit.js') }}"></script>
+<script src="{{ url_for('research_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/upload.js') }}"></script>
 {% endblock %}
 
 {% block content %}
 
-{% if g.user %}
+<h1 style="margin: 40px 0;">Deposit your data</h1>
+<p>You can deposit your data with the following steps:</p>
+<ol>
+    <li>Upload (up to 300mb per file)</li>
+    <li>Add metadata</li>
+    <li>Submit</li>
+</ol>
 
-    <h1 style="margin: 40px 0;">Deposit your data</h1>
-    <p>Here you can upload your data:</p>
-    <ul>
-        <li>Upload</li>
-        <li>Add metadata</li>
-        <li>Submit</li>
-    </ul>
+<div id="upload_files">
 
-    <form id="upload_form" action="" method="POST">
-    </form>
+    <div class="flow-drop" ondragenter="jQuery(this).addClass('flow-dragover');" ondragend="jQuery(this).removeClass('flow-dragover');" ondrop="jQuery(this).removeClass('flow-dragover');">
+        Drop files or folders here to upload or <a class="flow-browse-folder"><u>select folders</u></a> or <a class="flow-browse"><u>select files</u></a> from your computer
+    </div>
+    <ul class="flow-list"></ul>
 
-{% else %}
-    <p>You have no access to the deposit page - please log in.</p>
-{% endif %}
+    <div class="btn-group" role="group">
+        <input type="file" id="upload" multiple style="display:none" data-path="" />
+        <button type="button" class="btn btn-outline-secondary upload" data-path="" title="Upload files up to 300MB"><i class="fa fa-upload" aria-hidden="true"></i> Upload</button>
+    </div>
+
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="uploads">
+    <div class="modal-dialog mw-100 w-50">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Uploads</h5>
+                <div id="files"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="viewMedia">
+    <div class="modal-dialog mw-100 w-50">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div id="viewer"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 {% endblock %}

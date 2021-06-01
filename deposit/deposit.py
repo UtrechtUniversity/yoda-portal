@@ -4,10 +4,11 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
 import os
-from flask import Blueprint, render_template, redirect, url_for, g, jsonify, make_response, request, session
+from flask import Blueprint, render_template, redirect, url_for, g, flash, jsonify, make_response, request, session
+from werkzeug.utils import secure_filename
 
 deposit_bp = Blueprint('deposit_bp', __name__,
-                       template_folder='templates/deposit',
+                       template_folder='templates',
                        static_folder='static/deposit',
                        static_url_path='/deposit')
 
@@ -20,39 +21,46 @@ Deposit flow:
 """
 
 
-@deposit_bp.route('/', methods=['GET'])
+@deposit_bp.route('', methods=['GET'])
 def index():
-    return render_template('deposit.html')
+    flash('test')
+    return render_template('deposit/deposit.html')
 
 
-@deposit_bp.route('/', methods=['POST'])
+@deposit_bp.route('', methods=['POST'])
 def upload():
-    """ POST to this url to upload your deposit """
-    return redirect(url_for('deposit_bp.metadata'))
+    """ Upload your deposit """
 
+    # flash('init')
+    session = g.irods
+    # filepath = request.form.get('filepath')
+    filepath = 'deposits'
+    file_upload = request.files['file']
+    filename = secure_filename(file_upload.filename)
+    # path = '/' + g.irods.zone + '/home' + filepath + "/" + filename
+    path = "/{}/home/{}/{}".format(g.irods.zone, filepath, filename)
 
-@deposit_bp.route('/metadata', methods=['GET'])
-def metadata():
-    return render_template('metadata.html')
+    # create path if not exists
+    if session.data_objects.exists(path):
+        return {"status": "ERROR", "statusInfo": "File already exists"}
 
+    try:
+        obj = session.data_objects.create(path)
 
-@deposit_bp.route('/metadata', methods=['POST'])
-def metadata_upload():
-    """ Step2: Add metadata to your upload """
-    return redirect(url_for('deposit_bp.submit'))
+        file_upload.seek(0, os.SEEK_END)
+        file_length = file_upload.tell()
+        file_upload.seek(0, 0)
 
+        with obj.open('w+') as f:
+            f.seek(0)
+            f.write(file_upload.stream.read())
 
-@deposit_bp.route('/submit', methods=['GET'])
-def submit():
-    """ Step 3: Submit upload """
-    return render_template('submit.html')
+        f.close()
+        return {"status": "OK", "statusInfo": ""}
+        # return redirect(url_for('deposit_bp.metadata'))
 
-
-@deposit_bp.route('/submit', methods=['POST'])
-def submit():
-    """ Step 3: Submit upload """
-    return render_template('thankyou.html')
-
+    except Exception:
+        return {"status": "ERROR", "statusInfo": "Upload failed"}
 
 
 @deposit_bp.route('/prototype_upload')
@@ -188,3 +196,33 @@ def flow_upload_post():
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
     response.headers["Content-Type"] = "application/json"
     return response
+
+
+@deposit_bp.route('/metadata/form')
+@deposit_bp.route('/metadata', methods=['GET'])
+def metadata():
+    path = request.args.get('path')
+    return render_template('deposit/metadata.html', path=path)
+
+
+@deposit_bp.route('/metadata', methods=['POST'])
+def metadata_upload():
+    """ Step2: Add metadata to your upload """
+    return redirect(url_for('deposit_bp.submit'))
+
+
+@deposit_bp.route('/submit', methods=['GET'])
+def submit():
+    """ Step 3: Submit upload """
+    return render_template('deposit/submit.html')
+
+
+@deposit_bp.route('/submit', methods=['POST'])
+def submit_upload():
+    """ Step 3: Submit upload """
+    return render_template('deposit/thankyou.html')
+
+
+
+
+
