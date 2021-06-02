@@ -60,9 +60,9 @@ if app.config.get('DATAREQUEST_ENABLED'):
 csrf = CSRFProtect(app)
 
 
-# Restricted access protection
 @app.before_request
 def protect_pages():
+    """Restricted pages access protection."""
     if not request.endpoint or request.endpoint in ['general_bp.index',
                                                     'user_bp.login',
                                                     'api_bp.call',
@@ -72,3 +72,13 @@ def protect_pages():
         return
     else:
         return redirect(url_for('user_bp.login', redirect_target=request.full_path))
+
+
+@app.after_request
+def content_security_policy(response):
+    """Add Content-Security-Policy headers."""
+    if request.endpoint in ['research_bp.form', 'vault_bp.form']:
+        response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data: *.openstreetmap.org; frame-ancestors 'self'; form-action 'self'"  # noqa: E501
+    else:
+        response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'self'; form-action 'self'"  # noqa: E501
+    return response
