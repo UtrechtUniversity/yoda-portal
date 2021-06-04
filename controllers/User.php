@@ -68,7 +68,11 @@ class User extends MY_Controller {
             else
                 redirect($redirectTarget);
         }
-
+        error_log("Id token: {$jsonresult['id_token']}");
+        error_log("Error during verification/authentication. Id token verified: {$verified}, username: {$username}");
+        if($verified != 1) {
+            error_log("Id token: {$jsonresult['id_token']}");
+	} 
         $this->session->keep_flashdata('redirect_after_login');
         $this->session->set_flashdata('error', 'Failed to login to Yoda. Please contact a data manager about your account.');
         redirect('user/login');
