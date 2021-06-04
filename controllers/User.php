@@ -68,8 +68,9 @@ class User extends MY_Controller {
             else
                 redirect($redirectTarget);
         }
-        error_log("Id token: {$jsonresult['id_token']}");
-        error_log("Error during verification/authentication. Id token verified: {$verified}, username: {$username}");
+
+        $verified_string = $verified ? 'success' : 'failed';
+        error_log("Error during verification/authentication. Id token verified: {$verified_string}, username: {$username}");
         if($verified != 1) {
             error_log("Id token: {$jsonresult['id_token']}");
 	} 
