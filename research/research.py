@@ -114,7 +114,7 @@ def get_chunk_name(uploaded_filename, chunk_number):
 @research_bp.route('/upload', methods=['GET'])
 def upload_get():
     flow_identifier = request.args.get('flowIdentifier', type=str)
-    flow_filename = request.args.get('flowFilename', type=str)
+    flow_filename = secure_filename(request.args.get('flowFilename', type=str))
     flow_chunk_number = request.args.get('flowChunkNumber', type=int)
 
     filepath = request.args.get('filepath', type=str)
@@ -147,7 +147,7 @@ def upload_get():
 @research_bp.route('/upload', methods=['POST'])
 def upload_post():
     flow_identifier = request.form.get('flowIdentifier', type=str)
-    flow_filename = request.form.get('flowFilename', type=str)
+    flow_filename = secure_filename(request.form.get('flowFilename', type=str))
     flow_chunk_number = request.form.get('flowChunkNumber', type=int)
     flow_total_chunks = request.form.get('flowTotalChunks', type=int)
     flow_chunk_size = request.form.get('flowChunkSize', type=int)
