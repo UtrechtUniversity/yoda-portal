@@ -102,34 +102,6 @@ def download():
         abort(404)
 
 
-@research_bp.route('/browse/upload', methods=['POST'])
-def upload():
-    session = g.irods
-    filepath = request.form.get('filepath')
-    file_upload = request.files['file']
-    filename = secure_filename(file_upload.filename)
-    path = '/' + g.irods.zone + '/home' + filepath + "/" + filename
-
-    if not session.data_objects.exists(path):
-        try:
-            obj = session.data_objects.create(path)
-
-            file_upload.seek(0, os.SEEK_END)
-            file_length = file_upload.tell()
-            file_upload.seek(0, 0)
-
-            with obj.open('w+') as f:
-                f.seek(0)
-                f.write(file_upload.stream.read())
-
-            f.close()
-            return {"status": "OK", "statusInfo": ""}
-        except Exception:
-            return {"status": "ERROR", "statusInfo": "Upload failed"}
-    else:
-        return {"status": "ERROR", "statusInfo": "File already exists"}
-
-
 @research_bp.route('/prototype_upload')
 def prototype_upload():
     return render_template('research/upload.html')
@@ -139,8 +111,8 @@ def get_chunk_name(uploaded_filename, chunk_number):
     return uploaded_filename + "_part_%03d" % chunk_number
 
 
-@research_bp.route('/flow_upload', methods=['GET'])
-def flow_upload_get():
+@research_bp.route('/upload', methods=['GET'])
+def upload_get():
     flow_identifier = request.args.get('flowIdentifier', type=str)
     flow_filename = request.args.get('flowFilename', type=str)
     flow_chunk_number = request.args.get('flowChunkNumber', type=int)
@@ -172,8 +144,8 @@ def flow_upload_get():
         return response
 
 
-@research_bp.route('/flow_upload', methods=['POST'])
-def flow_upload_post():
+@research_bp.route('/upload', methods=['POST'])
+def upload_post():
     flow_identifier = request.form.get('flowIdentifier', type=str)
     flow_filename = request.form.get('flowFilename', type=str)
     flow_chunk_number = request.form.get('flowChunkNumber', type=int)
