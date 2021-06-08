@@ -21,50 +21,13 @@ Deposit flow:
 """
 
 
-@deposit_bp.route('', methods=['GET'])
+@deposit_bp.route('/', methods=['GET'])
 def index():
-    flash('test')
     return render_template('deposit/deposit.html')
-
-
-@deposit_bp.route('', methods=['POST'])
-def upload():
-    """ Upload your deposit """
-
-    # flash('init')
-    session = g.irods
-    # filepath = request.form.get('filepath')
-    filepath = 'deposits'
-    file_upload = request.files['file']
-    filename = secure_filename(file_upload.filename)
-    # path = '/' + g.irods.zone + '/home' + filepath + "/" + filename
-    path = "/{}/home/{}/{}".format(g.irods.zone, filepath, filename)
-
-    # create path if not exists
-    if session.data_objects.exists(path):
-        return {"status": "ERROR", "statusInfo": "File already exists"}
-
-    try:
-        obj = session.data_objects.create(path)
-
-        file_upload.seek(0, os.SEEK_END)
-        file_length = file_upload.tell()
-        file_upload.seek(0, 0)
-
-        with obj.open('w+') as f:
-            f.seek(0)
-            f.write(file_upload.stream.read())
-
-        f.close()
-        return {"status": "OK", "statusInfo": ""}
-        # return redirect(url_for('deposit_bp.metadata'))
-
-    except Exception:
-        return {"status": "ERROR", "statusInfo": "Upload failed"}
-
 
 @deposit_bp.route('/prototype_upload')
 def prototype_upload():
+    """ alternative for above """
     return render_template('deposit/upload.html')
 
 
@@ -196,6 +159,8 @@ def flow_upload_post():
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
     response.headers["Content-Type"] = "application/json"
     return response
+
+
 
 
 @deposit_bp.route('/metadata/form')

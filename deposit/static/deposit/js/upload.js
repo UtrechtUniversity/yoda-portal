@@ -1,14 +1,14 @@
 $(function() {
     console.log('ready');
     var r = new Flow({
-        target: '/deposit/flow_upload',
+        target: '/research/flow_upload',       //todo change when functionality is made
         chunkSize: 10 * 1024 * 1024,
         simultaneousUploads: 5,
-        query: {'csrf_token': Yoda.csrf.tokenValue, 'filepath': 'research-initial'}
+        query: {'csrf_token': Yoda.csrf.tokenValue, 'filepath': 'research-initial'} //todo change
     });
     // Flow.js isn't supported, fall back on a different method
     if (!r.support) {
-        Yoda.set_message('error', 'No browser support for Flow file uploads');
+        Yoda.set_message('error', 'No browser support.');
         return ;
     }
 
@@ -29,15 +29,9 @@ $(function() {
             'Uploading <span class="flow-file-name"></span> ' +
             '<span class="flow-file-size"></span> ' +
             '<span class="flow-file-progress"></span> ' +
-            '<span class="flow-file-pause">' +
-            '<u>Pause upload</u>' +
-            '</span>' +
-            '<span class="flow-file-resume">' +
-            '<u>Resume upload</u>' +
-            '</span>' +
-            '<span class="flow-file-cancel">' +
-            '<u>Cancel upload</u>' +
-            '</span>'
+            '<span class="flow-file-pause"><u>Pause upload</u></span>' +
+            '<span class="flow-file-resume"><u>Resume upload</u></span>' +
+            '<span class="flow-file-cancel"><u>Cancel upload</u></span>'
         );
         var $self = $('.flow-file-'+file.uniqueIdentifier);
         $self.find('.flow-file-name').text(file.relativePath);
@@ -62,13 +56,13 @@ $(function() {
     });
     r.on('complete', function(){
         // Hide pause/resume when the upload has completed
-        $('.flow-progress .progress-resume-link, .flow-progress .progress-pause-link').hide();
+        $('.flow-file-pause, flow-file-resume, flow-file-cancel').hide();
     });
     r.on('fileSuccess', function(file,message){
         var $self = $('.flow-file-'+file.uniqueIdentifier);
         // Reflect that the file upload has completed
         $self.find('.flow-file-progress').text('(completed)');
-        $self.find('.flow-file-pause, .flow-file-resume').remove();
+        $self.find('.flow-file-pause, .flow-file-resume', '.flow-file-cancel').remove();
     });
     r.on('fileError', function(file, message){
         // Reflect that the file upload has resulted in error
@@ -84,8 +78,8 @@ $(function() {
     });
     r.on('uploadStart', function(){
         // Show pause, hide resume
-        $('.flow-progress .progress-resume-link').hide();
-        $('.flow-progress .progress-pause-link').show();
+        $('.flow-file-pause').show();
+        $('.flow-file-resume').hide();
     });
     r.on('catchAll', function() {
         console.log.apply(console, arguments);

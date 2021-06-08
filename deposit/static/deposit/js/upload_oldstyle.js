@@ -1,5 +1,13 @@
 "use strict";
 
+/* Copied from research
+
+Code not needed
+
+*/
+
+
+/*
 $(document).ajaxSend(function(e, request, settings) {
     // Append a CSRF token to all AJAX POST requests.
     if (settings.type === 'POST' && settings.data.length) {
@@ -8,14 +16,6 @@ $(document).ajaxSend(function(e, request, settings) {
               + '=' + encodeURIComponent(Yoda.csrf.tokenValue);
     }
 });
-
-
-/* TODO
-
-Copied from research js
-* Permission check
-* flow uploads
-*/
 
 
 $(function() {
@@ -39,178 +39,92 @@ function htmlEncode(value){
 }
 
 
-
-function startBrowsing(items)
-{
-    $('#file-browser').DataTable({
-        "bFilter": false,
-        "bInfo": false,
-        "bLengthChange": true,
-        "language": {
-            "emptyTable": "No accessible files/folders present",
-            "lengthMenu": "_MENU_"
-        },
-        "dom": '<"top">frt<"bottom"lp><"clear">',
-        'columns': [{render: tableRenderer.name,    data: 'name'},
-                    // Size and date should be orderable, but limitations
-                    // on how queries work prevent us from doing this
-                    // correctly without significant overhead.
-                    // (enabling this as is may result in duplicated results for data objects)
-                    {render: tableRenderer.size,    orderable: false, data: 'size'},
-                    {render: tableRenderer.date,    orderable: false, data: 'modify_time'},
-                    {render: tableRenderer.context, orderable: false }],
-        "ajax": getFolderContents,
-        "processing": true,
-        "serverSide": true,
-        "iDeferLoading": 0,
-        "pageLength": items
-    });
-    browse(currentFolder);
-}
-
-function toggleLocksList(folder)
-{
-    var isVisible = $('.lock').is(":visible");
-
-    // toggle locks list
-    if (isVisible) {
-        $('.lock').hide();
-    } else {
-        // Get locks
-        Yoda.call('folder_get_locks', {'coll':  Yoda.basePath + folder}).then((data) => {
-            $('.lock').hide();
-
-            var html = '';
-            $.each(data, function (index, value) {
-                html += '<a class="list-group-item list-group-item-action"><span class="browse" data-path="' + htmlEncode(value) + '">' + htmlEncode(value) + '</span></a>';
-            });
-            $('.lock-items').html(html);
-            $('.lock').show();
-        });
-    }
-}
-
-
-
-function toggleSystemMetadata(folder)
-{
-    let systemMetadata = $('.system-metadata');
-    let systemMetadataItems = $('.system-metadata-items');
-
-    let isVisible = systemMetadata.is(":visible");
-
-    // Toggle system metadata.
-    if (isVisible) {
-        systemMetadata.hide();
-    } else {
-        // Retrieve system metadata of folder.
-        Yoda.call('research_system_metadata', {coll: Yoda.basePath + folder}).then((data) => {
-            systemMetadata.hide();
-            var html = '';
-            if (data) {
-                $.each(data, function(index, value) {
-                    html += '<a class="list-group-item list-group-item-action"><strong>' +
-                        htmlEncode(index) +
-                        '</strong>: ' +
-                        htmlEncode(value) +
-                        '</a>';
-                });
-            } else {
-                html += '<a class="list-group-item list-group-item-action">No system metadata present</a>';
-            }
-            systemMetadataItems.html(html);
-            systemMetadata.show();
-        });
-    }
-}
-
-
 $(function maybeUseAllThis() {
 
-            if (userType == 'reader') {
+        if (userType == 'reader') {
+            var actions = [];
+            hasWriteRights = false;
+        }
+
+        if (isDatamanager) {
+            // Check rights as datamanager.
+            if (userType != 'manager' && userType != 'normal') {
                 var actions = [];
                 hasWriteRights = false;
             }
 
-            if (isDatamanager) {
-                // Check rights as datamanager.
-                if (userType != 'manager' && userType != 'normal') {
-                    var actions = [];
-                    hasWriteRights = false;
-                }
-
-                if (typeof status != 'undefined') {
-                    if (status == 'SUBMITTED') {
-                        actions['accept'] = 'Accept';
-                        actions['reject'] = 'Reject';
-                    }
-                }
-            }
-
-            // Check if folder is writable.
-            if (hasWriteRights && (status == '' || status == 'SECURED')) {
-                // Enable uploads.
-                $('#upload').attr('data-path', dir);
-                $('.btn-group button.upload').prop("disabled", false);
-
-                // Enable folder / file manipulations.
-                $('.btn-group button.folder-create').attr('data-path', dir);
-                $('.btn-group button.folder-create').prop("disabled", false);
-
-                $('a.folder-delete').prop("disabled", false);
-                $('a.folder-rename').prop("disabled", false);
-                $('a.file-delete').prop("disabled", false);
-                $('a.file-rename').prop("disabled", false);
-            }
-
-            // Lock icon
-            $('.lock').hide();
-            var lockIcon = '';
-            if (lockCount != '0' && typeof lockCount != 'undefined') {
-                lockIcon = `<i class="fa fa-exclamation-circle lock-icon" data-folder="${htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`;
-            }
-
-            // Provenance action log
-            $('.actionlog').hide();
-            let actionLogIcon = ` <i class="fa fa-book actionlog-icon" style="cursor:pointer" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
-
-            // System metadata.
-            $('.system-metadata').hide();
-            let systemMetadataIcon = ` <i class="fa fa-info-circle system-metadata-icon" style="cursor:pointer" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
-
-            $('.btn-group button.folder-status').attr('data-write', hasWriteRights);
-
-            // Add unpreservable files check to actions.
-            actions['check-for-unpreservable-files'] = 'Check for compliance with policy';
-
-            // Add go to vault to actions.
-            if (typeof vaultPath != 'undefined' ) {
-                actions['go-to-vault'] = 'Go to vault';
-            }
-
-            // Handle actions
-            handleActionsList(actions, dir);
-
-            // Set vault paths.
-            if (typeof vaultPath != 'undefined' ) {
-                $('a.action-go-to-vault').attr('vault-path', vaultPath);
-            }
-
-            let folderName = htmlEncode(basename).replace(/ /g, "&nbsp;");
-            let statusBadge = '<span id="statusBadge" class="ml-2 badge badge-pill badge-primary">' + statusText + '</span>';
-
-            // Reset action dropdown.
-            $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
-
-            var icon = '<i class="fa fa-folder-open-o" aria-hidden="true"></i>';
-            $('.top-information h2').html(`<span class="icon">${icon}</span> ${folderName}${lockIcon}${systemMetadataIcon}${actionLogIcon}${statusBadge}`);
-
-            // Show top information and buttons.
             if (typeof status != 'undefined') {
-                $('.top-information').show();
-                $('.top-info-buttons').show();
+                if (status == 'SUBMITTED') {
+                    actions['accept'] = 'Accept';
+                    actions['reject'] = 'Reject';
+                }
             }
-        });
+        }
+
+        // Check if folder is writable.
+        if (hasWriteRights && (status == '' || status == 'SECURED')) {
+            // Enable uploads.
+            $('#upload').attr('data-path', dir);
+            $('.btn-group button.upload').prop("disabled", false);
+
+            // Enable folder / file manipulations.
+            $('.btn-group button.folder-create').attr('data-path', dir);
+            $('.btn-group button.folder-create').prop("disabled", false);
+
+            $('a.folder-delete').prop("disabled", false);
+            $('a.folder-rename').prop("disabled", false);
+            $('a.file-delete').prop("disabled", false);
+            $('a.file-rename').prop("disabled", false);
+        }
+
+        // Lock icon
+        $('.lock').hide();
+        var lockIcon = '';
+        if (lockCount != '0' && typeof lockCount != 'undefined') {
+            lockIcon = `<i class="fa fa-exclamation-circle lock-icon" data-folder="${htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`;
+        }
+
+        // Provenance action log
+        $('.actionlog').hide();
+        let actionLogIcon = ` <i class="fa fa-book actionlog-icon" style="cursor:pointer" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
+
+        // System metadata.
+        $('.system-metadata').hide();
+        let systemMetadataIcon = ` <i class="fa fa-info-circle system-metadata-icon" style="cursor:pointer" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
+
+        $('.btn-group button.folder-status').attr('data-write', hasWriteRights);
+
+        // Add unpreservable files check to actions.
+        actions['check-for-unpreservable-files'] = 'Check for compliance with policy';
+
+        // Add go to vault to actions.
+        if (typeof vaultPath != 'undefined' ) {
+            actions['go-to-vault'] = 'Go to vault';
+        }
+
+        // Handle actions
+        handleActionsList(actions, dir);
+
+        // Set vault paths.
+        if (typeof vaultPath != 'undefined' ) {
+            $('a.action-go-to-vault').attr('vault-path', vaultPath);
+        }
+
+        let folderName = htmlEncode(basename).replace(/ /g, "&nbsp;");
+        let statusBadge = '<span id="statusBadge" class="ml-2 badge badge-pill badge-primary">' + statusText + '</span>';
+
+        // Reset action dropdown.
+        $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
+
+        var icon = '<i class="fa fa-folder-open-o" aria-hidden="true"></i>';
+        $('.top-information h2').html(`<span class="icon">${icon}</span> ${folderName}${lockIcon}${systemMetadataIcon}${actionLogIcon}${statusBadge}`);
+
+        // Show top information and buttons.
+        if (typeof status != 'undefined') {
+            $('.top-information').show();
+            $('.top-info-buttons').show();
+        }
+    });
     } else {
         $('#upload').attr('data-path', "");
 
