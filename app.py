@@ -26,7 +26,6 @@ with app.app_context():
 
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
-app.config.from_pyfile('flask.cfg')
 app.config['modules'] = [
     {'name': 'Research',       'function': 'research_bp.index'},
     {'name': 'Vault',          'function': 'vault_bp.index'},
