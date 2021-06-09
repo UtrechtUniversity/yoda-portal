@@ -3,7 +3,6 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-import base64
 import json
 import sys
 from traceback import print_exc
@@ -114,15 +113,15 @@ def callback():
         'code': code,
         'redirect_uri': app.config.get('OIDC_CALLBACK_URI')
     }
-    
+
     token_uri = app.config.get('OIDC_TOKEN_URI')
 
-    # Content-type is application/x-www-form-urlencoded by default when data is a dict 
+    # Content-type is application/x-www-form-urlencoded by default when data is a dict
     response = requests.post(
-        token_uri, 
-        data, 
+        token_uri,
+        data,
         auth=(
-            app.config.get('OIDC_CLIENT_ID'), 
+            app.config.get('OIDC_CLIENT_ID'),
             app.config.get('OIDC_CLIENT_SECRET')
         )
     )
@@ -190,6 +189,7 @@ def callback():
 
 def irods_login(username, password):
     password = escape_irods_pam_password(password)
+    print('Wat\n{}\n{}'.format(username, password), file=sys.stderr)
 
     irods = iRODSSession(
         host=app.config.get('IRODS_ICAT_HOSTNAME'),
@@ -200,8 +200,9 @@ def irods_login(username, password):
         configure=True,
         **app.config.get('IRODS_SESSION_OPTIONS')
     )
+    print('HALLO IK BEN HIER', file=sys.stderr)
     _ = irods.server_version
-
+    print('HALLO IK BEN ER', file=sys.stderr)
     session.clear()
     session['user_id'] = username
     session['password'] = password
