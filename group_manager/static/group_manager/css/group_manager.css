@@ -1,0 +1,123 @@
+@charset "UTF-8";
+/**
+ * \file
+ * \brief     Yoda Group Manager frontend styling.
+ * \author    Chris Smeele
+ * \copyright Copyright (c) 2015-2020, Utrecht university. All rights reserved
+ * \license   GPLv3, see LICENSE
+ */
+
+.card-header .input-group-sm {
+	margin: -7px; /* Search box */
+}
+.card-footer .input-group-sm {
+	margin: -6px; /* Search box */
+}
+
+.select2-highlighted .grey {
+	color: #ddd;
+}
+
+.selectify-data-classification {
+	width: 100%;
+}
+
+.card > .list-group .list-group {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.card > .list-group .list-group .list-group .list-group-item {
+	padding-left: 40px;
+}
+
+.list-group a.list-group-item {
+	cursor: pointer;
+}
+
+.card > .list-group .list-group-item.category,
+.card > .list-group .list-group-item.subcategory {
+	padding-left: 0;
+	padding-right: 0;
+	border: none;
+}
+
+.card > .list-group .list-group-item.subcategory > .list-group > .list-group-item:last-child {
+	border-bottom: 1px solid #ddd;
+}
+
+.card > .list-group .list-group-item.subcategory:last-child > .list-group > .list-group-item:last-child {
+	border-bottom: none;
+}
+
+.card > .list-group .list-group-item.category > .name,
+.card > .list-group .list-group-item.subcategory > .name {
+	padding-left:  15px;
+	padding-right: 15px;
+	padding-bottom: 10px;
+}
+
+.card > .list-group .list-group-item.category > .name {
+	font-weight: bold;
+	text-decoration: none;
+}
+.card > .list-group .list-group-item.subcategory > .name {
+	padding-left: 40px;
+	font-weight: medium;
+}
+
+#group-list {
+	overflow: auto;
+}
+
+#group-list a {
+	display: block;
+}
+
+#group-list .list-group,
+#group-list .list-group .list-group-item {
+	border-radius: 0;
+}
+
+#group-list + .card-footer {
+	border-top: 1px solid #ddd
+}
+
+#user-list .user .glyphicon {
+	padding-right: 8px;
+}
+
+#user-list .self:after {
+	content: ' (you)';
+}
+
+#user-list .list-group-item #f-user-create {
+	margin: -5px -5px;
+}
+
+.placeholder-text {
+	font-style: italic;
+	color: #aaa;
+}
+
+.item-user-create .user-create-text {
+	text-decoration: underline
+}
+
+.list-group-item.filtered {
+	display: none;
+}
+
+.list-group-item.blink-once {
+	-webkit-animation: blink-once 1s;
+	   -moz-animation: blink-once 1s;
+	        animation: blink-once 1s;
+}
+
+@-webkit-keyframes blink-once {
+	from { background-color: rgba(255,220,50,1.0); }
+	to   { background-color: rgba(255,220,50,0.0); }
+}
+@keyframes blink-once {
+	from { background-color: rgba(255,220,50,1.0); }
+	to   { background-color: rgba(255,220,50,0.0); }
+}

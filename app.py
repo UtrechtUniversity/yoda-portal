@@ -10,7 +10,7 @@ from flask_wtf.csrf import CSRFProtect
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
 from general.general import general_bp
-from group_manager.group_manager import group_bp
+from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
 from research.research import research_bp
 from stats.stats import stats_bp
@@ -31,7 +31,7 @@ app.config['modules'] = [
     {'name': 'Research',       'function': 'research_bp.index'},
     {'name': 'Vault',          'function': 'vault_bp.index'},
     {'name': 'Statistics',     'function': 'stats_bp.index'},
-    {'name': 'Group Manager',  'function': 'group_bp.index'}
+    {'name': 'Group Manager',  'function': 'group_manager_bp.index'}
 ]
 if app.config.get('INTAKE_ENABLED'):
     app.config['modules'].append(
@@ -42,8 +42,12 @@ if app.config.get('DATAREQUEST_ENABLED'):
         {'name': 'Datarequest', 'function': 'datarequest_bp.index'}
     )
 
+# Default nr of items in browser list
+app.config['browser-items-per-page'] = 10
+# Default nr of items in search list
+app.config['search-items-per-page'] = 10
 
-# Start Flask-Session for storing sessions server-side
+# Start Flask-Session
 Session(app)
 
 

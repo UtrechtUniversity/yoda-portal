@@ -1,0 +1,123 @@
+<div class="well" style="padding: 10px;background:#F0E68C;">
+    <h4>Dataset</h4>
+    <table class="row-border hover table table-striped tbl-fullwidth table-outside-borders">
+        <tr>
+            <td>
+                <strong>Path</strong>
+            </td>
+            <td>
+               {# <?php echo htmlentities($datasetPath); ?> #} {{ datasetPath }}
+            </td>
+        </tr>
+        {# if($scannedByWhen AND is_array($scannedByWhen) AND count($scannedByWhen)==2) #}
+            <tr>
+                <td>
+                    <strong>Scanned by</strong>
+                </td>
+                <td>
+                    {# <?php echo htmlentities($scannedByWhen[0]) . ' (' . date('Y-m-d H:i:s', intval($scannedByWhen[1])) . ')'; ?> #}
+                    {{ scannedByWhen.0 }} {{ scannedByWhen.1 }}
+                </td>
+            </tr>
+    </table>
+
+    {% if datasetErrors or datasetWarnings %}
+        <h4>Errors and warnings</h4>
+        <table class="row-border hover table table-striped tbl-fullwidth table-outside-borders ">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th><strong>Description</strong></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in datasetErrors %}
+                <tr>
+                    <td style="width:5px;"><i class="glyphicon glyphicon-remove-sign"></i></td>
+                    <td>
+                        {{ item }}
+                    </td>
+                </tr>
+            {% endfor %}
+            {% for item in datasetWarnings %}
+                <tr>
+                    <td style="width:5px;"><i class="glyphicon glyphicon-info-sign"></i></td>
+                    <td>
+                        {{ item }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <h4>Comments</h4>
+    <table class="row-border hover table table-striped tbl-fullwidth table-outside-borders" data-dataset-id="{{ datasetID }}">
+        <thead>
+            <tr>
+                <th><strong>User</strong></th>
+                <th><strong>Date</strong></th>
+                <th><strong>Comment</strong></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in datasetComments %}
+        <tr>
+            <td style="width:50px;">
+                {{ item['name'] }}
+            </td>
+            <td style="width:135px;">
+                {{ item.time }}
+            </td>
+            <td style="margin-right:5px;max-width: 400px;">
+                {{ item.comment }}
+            </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td style="padding-top:10px;" colspan="3">
+                <form action="" method="post" >
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" name="comments" placeholder="Enter your comment here..." style="width:960px;">
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary btn-sm btn-add-comment" type="button">Add comment</button>
+                        </span>
+                    </div>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <br>
+
+    <h4>File information</h4>
+    <table id="tree{{ tbl_id }}" class="row-border hover table table-striped tbl-fullwidth table-outside-borders ">
+        <thead>
+        <tr>
+            <th style="width:500px;"><strong>Name</strong></th>
+            <th><strong>Errors and warnings</strong></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for node_id in  path_nodes_ordered %}
+            {% if not (pathItems[node_id].parent_id=='' and node_id=='') %}
+                    <tr data-tt-id="{{ node_id }}" data-tt-parent-id="{{ pathItems[node_id].parent_id }}"
+                        style="vertical-align: top;">
+                        <td valign="top">{{ pathItems[node_id].name }}</td>
+                        <td valign="top">
+                            {% if pathItems[node_id].errors %}
+                                <strong>Error(s)</strong><br>
+                                {{ pathItems[node_id].errors|join('<br>') }}
+                            {% endif %}
+                            {% if pathItems[node_id].warnings %}
+                                <strong>Warning(s)</strong><br>
+                                {{ pathItems[node_id].warnings|join('<br>') }}
+                            {% endif %}
+                        </td>
+                    </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
