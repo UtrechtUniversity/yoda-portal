@@ -3,18 +3,18 @@
 {% block title %}{{ super() }} &dash; Deposit{% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('research_bp.static', filename='lib/sweetalert/sweetalert.min.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='lib/sweetalert/sweetalert.min.js') }}"></script>
 <script>
     var formLoaded = false;
 </script>
-<!--Leaflet form for geolocation - not needed probably: -->
-<script src="{{ url_for('research_bp.static', filename='js/metadata-form.js') }}" async></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/metadata-form.js') }}" async></script>
 {% endblock %}
 
 {% block style %}
-<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
-<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/metadata/form.css') }}">
-<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/metadata/leaflet.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/metadata/form.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/metadata/leaflet.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -26,7 +26,7 @@
                     Metadata form - {{ path | trim | safe }}
                 </h5>
                 <div class="input-group-sm has-feedback pull-right">
-                    <a class="btn btn-secondary" href="/deposit/metadata/">Close</a>
+                    <a class="btn btn-secondary" href="/deposit/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
                 </div>
             </div>
             <div class="card-body">
@@ -55,13 +55,13 @@
                     Metadata form - {{ path | trim | safe }}
                 </h5>
                 <div class="input-group-sm has-feedback pull-right close-button hide">
-                    <a class="btn btn-secondary" href="/deposit/metadata/">Close</a>
+                    <a class="btn btn-secondary" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
                 </div>
             </div>
             <div class="card-body">
                 <div id="transformation-text"></div>
                 <div id="transformation-buttons" class="hide">
-                    <a class="transformation-reject btn btn-danger pull-right" href="/deposit/metadata/">Postpone transformation</a>
+                    <a class="transformation-reject btn btn-danger pull-right" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Postpone transformation</a>
                     <button class="transformation-accept btn btn-success pull-right">Accept transformation</button>
                 </div>
             </div>
@@ -77,7 +77,7 @@
                     Metadata form - {{ path | trim | replace(" ", "&nbsp;") | safe }}
                 </h5>
                 <div class="input-group-sm has-feedback pull-right close-button">
-                    <a class="btn btn-light btn-sm" href="/deposit/metadata/">Close</a>
+                    <a class="btn btn-light btn-sm" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
                 </div>
             </div>
             <div class="card-body">

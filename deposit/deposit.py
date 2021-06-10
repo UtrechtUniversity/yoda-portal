@@ -4,8 +4,7 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
 import os
-from flask import Blueprint, render_template, redirect, url_for, g, flash, jsonify, make_response, request, session
-from werkzeug.utils import secure_filename
+from flask import Blueprint, render_template, g, jsonify, make_response, request
 
 deposit_bp = Blueprint('deposit_bp', __name__,
                        template_folder='templates',
@@ -24,6 +23,7 @@ Deposit flow:
 @deposit_bp.route('/', methods=['GET'])
 def index():
     return render_template('deposit/deposit.html')
+
 
 @deposit_bp.route('/prototype_upload')
 def prototype_upload():
@@ -161,19 +161,13 @@ def flow_upload_post():
     return response
 
 
-
-
 @deposit_bp.route('/metadata/form')
-@deposit_bp.route('/metadata', methods=['GET'])
-def metadata():
-    path = request.args.get('path')
-    return render_template('deposit/metadata.html', path=path)
-
-
-@deposit_bp.route('/metadata', methods=['POST'])
-def metadata_upload():
+def metadata_form():
     """ Step2: Add metadata to your upload """
-    return redirect(url_for('deposit_bp.submit'))
+    path = request.args.get('path')
+    return render_template('deposit/metadata-form.html', path=path)
+    # return render_template('research/metadata-form.html', path=path)
+    # return redirect(url_for('deposit_bp.submit'))
 
 
 @deposit_bp.route('/submit', methods=['GET'])
@@ -185,9 +179,5 @@ def submit():
 @deposit_bp.route('/submit', methods=['POST'])
 def submit_upload():
     """ Step 3: Submit upload """
+    # todo upload with POST here or with metadata form
     return render_template('deposit/thankyou.html')
-
-
-
-
-
