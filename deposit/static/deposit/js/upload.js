@@ -62,11 +62,13 @@ $(function() {
         var $self = $('.flow-file-'+file.uniqueIdentifier);
         // Reflect that the file upload has completed
         $self.find('.flow-file-progress').text('(completed)');
-        $self.find('.flow-file-pause, .flow-file-resume', '.flow-file-cancel').remove();
+        $self.find('.flow-file-pause, .flow-file-resume, .flow-file-cancel').remove();
     });
     r.on('fileError', function(file, message){
         // Reflect that the file upload has resulted in error
-        $('.flow-file-'+file.uniqueIdentifier+' .flow-file-progress').html('(file could not be uploaded: '+message+')');
+        var $self = $('.flow-file-'+file.uniqueIdentifier);
+        $self.find('.flow-file-progress').html('(file could not be uploaded: '+message+')');
+        $self.find('.flow-file-cancel').remove();
     });
     r.on('fileProgress', function(file){
         // Handle progress for both the file and the overall upload
