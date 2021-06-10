@@ -32,3 +32,6 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# Node modules
+/research/metadata-form/node_modules/
+/deposit/metadata-form/node_modules/
