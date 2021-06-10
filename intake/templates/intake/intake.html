@@ -2,14 +2,15 @@
 
 {% block title %}{{ super() }} &dash; Intake{% endblock title %}
 
-{% block scripts %}
+{% block style %}
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/jquery.dataTables.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/datatables.bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/intake.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/treetable/jquery.treetable.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/treetable/jquery.treetable.theme.default.css') }}">
-    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
+{% endblock %}
 
+{% block scripts %}
     <script src="{{ url_for('intake_bp.static', filename='scripts/jquery.dataTables.min.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/dataTables.bootstrap.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/dataTables.bootstrapPagination-3.js') }}"></script>
@@ -28,7 +29,7 @@
     <script src="{{ url_for('intake_bp.static', filename='scripts/controllers/intake.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/datatables/plugin_sort_on_image.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/treetable/jquery.treetable.js') }}"></script>
-    
+
 {% endblock scripts %}
 
 {% block content %}
@@ -122,7 +123,7 @@
                     <br/>
                     <table class="table table-striped hover" id="select-study">
                         {% for study in studies %}
-                            <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}"> 
+                            <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}">
                                 <td>
                                     <i class="fa fa-graduation-cap" aria-hidden="true"></i>
                                 </td>
@@ -269,7 +270,7 @@
                             <td style="text-align: right;">
                                 {{ (data.datasetErrors + data.objectErrors) if (data.datasetErrors + data.objectErrors)>0 else '-' }}
                                     /
-                                {{ (data.datasetWarnings + data.objectWarnings) if (data.datasetWarnings + data.objectWarnings)>0 else '-' }} 
+                                {{ (data.datasetWarnings + data.objectWarnings) if (data.datasetWarnings + data.objectWarnings)>0 else '-' }}
                             </td>
                             <td style="text-align: right;">
                                 {{ data.datasetComments if  data.datasetComments else '-' }}
