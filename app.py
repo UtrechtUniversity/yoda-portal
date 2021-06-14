@@ -7,6 +7,8 @@ from flask import Flask, g, redirect, request, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 
+from deposit.deposit import deposit_bp
+
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
 from general.general import general_bp
@@ -16,7 +18,6 @@ from research.research import research_bp
 from stats.stats import stats_bp
 from user.user import user_bp
 from vault.vault import vault_bp
-from deposit.deposit import deposit_bp
 
 app = Flask(__name__)
 app.config.from_pyfile('flask.cfg')
