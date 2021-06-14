@@ -3,11 +3,11 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+from deposit.deposit import deposit_bp
+
 from flask import Flask, g, redirect, request, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
-
-from deposit.deposit import deposit_bp
 
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
