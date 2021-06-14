@@ -2,6 +2,12 @@
 
 {% block title %}{{ super() }} &dash; Deposit{% endblock %}
 
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/metadata/form.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/metadata/leaflet.css') }}">
+{% endblock %}
+
 {% block scripts %}
 <script src="{{ url_for('deposit_bp.static', filename='lib/sweetalert/sweetalert.min.js') }}"></script>
 <script>
@@ -10,23 +16,16 @@
 <script src="{{ url_for('deposit_bp.static', filename='js/metadata-form.js') }}" async></script>
 {% endblock %}
 
-{% block style %}
-<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
-<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
-<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/metadata/form.css') }}">
-<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/metadata/leaflet.css') }}">
-{% endblock %}
-
 {% block content %}
 <div id="form-errors" class="row hide">
     <div class="col-md-12">
         <div class="card">
             <div class="card-header clearfix">
                 <h5 class="card-title pull-left">
-                    Metadata form - {{ path | trim | safe }}
+                    Deposit Metadata form has errors
                 </h5>
                 <div class="input-group-sm has-feedback pull-right">
-                    <a class="btn btn-secondary" href="/deposit/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
+                    <a class="btn btn-secondary" href="/deposit/metadata/form">Close</a>
                 </div>
             </div>
             <div class="card-body">
@@ -34,9 +33,7 @@
                     It is not possible to load this form as the yoda-metadata.json file is not
                     in accordance with the form definition.
                 </p>
-                <p>
-                    Please check the following in your JSON file:
-                </p>
+                <p>Please check the following in your JSON file:</p>
                 <ul class="error-fields"></ul>
                 <p>
                     When using the 'Delete all metadata' button beware that you will lose all data!
@@ -52,16 +49,16 @@
         <div class="card">
             <div class="card-header clearfix">
                 <h5 class="card-title pull-left">
-                    Metadata form - {{ path | trim | safe }}
+                    Metadata form: transform
                 </h5>
                 <div class="input-group-sm has-feedback pull-right close-button hide">
-                    <a class="btn btn-secondary" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
+                    <a class="btn btn-secondary" href="/deposit/metadata/form">Close</a>
                 </div>
             </div>
             <div class="card-body">
                 <div id="transformation-text"></div>
                 <div id="transformation-buttons" class="hide">
-                    <a class="transformation-reject btn btn-danger pull-right" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Postpone transformation</a>
+                    <a class="transformation-reject btn btn-danger pull-right" href="/deposit/metadata/form">Postpone transformation</a>
                     <button class="transformation-accept btn btn-success pull-right">Accept transformation</button>
                 </div>
             </div>
@@ -74,10 +71,10 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title pull-left">
-                    Metadata form - {{ path | trim | replace(" ", "&nbsp;") | safe }}
+                    Deposit Metadata form
                 </h5>
                 <div class="input-group-sm has-feedback pull-right close-button">
-                    <a class="btn btn-light btn-sm" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
+                    <a class="btn btn-light btn-sm" href="/deposit/metadata/form">Close</a>
                 </div>
             </div>
             <div class="card-body">
