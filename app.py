@@ -5,13 +5,11 @@ __license__   = 'GPLv3, see LICENSE'
 
 from flask import Flask, g, redirect, request, url_for
 from flask_session import Session
-
-from deposit.deposit import deposit_bp
-
 from flask_wtf.csrf import CSRFProtect
 
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
+from deposit.deposit import deposit_bp
 from general.general import general_bp
 from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
