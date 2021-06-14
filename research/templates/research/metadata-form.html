@@ -2,19 +2,18 @@
 
 {% block title %}{{ super() }} &dash; Research{% endblock %}
 
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
+<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/metadata/form.css') }}">
+<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/metadata/leaflet.css') }}">
+{% endblock %}
+
 {% block scripts %}
 <script src="{{ url_for('research_bp.static', filename='lib/sweetalert/sweetalert.min.js') }}"></script>
 <script>
     var formLoaded = false;
 </script>
 <script src="{{ url_for('research_bp.static', filename='js/metadata-form.js') }}" async></script>
-{% endblock %}
-
-{% block style %}
-<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
-<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
-<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/metadata/form.css') }}">
-<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/metadata/leaflet.css') }}">
 {% endblock %}
 
 {% block content %}
