@@ -15,21 +15,15 @@ deposit_bp = Blueprint('deposit_bp', __name__,
 
 """
 Deposit flow:
-1. Upload data:     /deposit/
-2. Add metadata:    /deposit/metadata/
-3. Submit:          /deposit/submit/
+1. Upload data:     /deposit
+2. Add metadata:    /deposit/metadata/form
+3. Submit:          /deposit/submit
 """
 
 
 @deposit_bp.route('/', methods=['GET'])
 def index():
     return render_template('deposit/deposit.html')
-
-
-@deposit_bp.route('/prototype_upload')
-def prototype_upload():
-    """ alternative for above """
-    return render_template('deposit/upload.html')
 
 
 def get_chunk_name(uploaded_filename, chunk_number):
