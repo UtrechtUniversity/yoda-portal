@@ -7,16 +7,17 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('deposit_bp.static', filename='js/deposit.js') }}"></script>
 {% endblock %}
 
 {% block content %}
 
-{% if g.user %}
     <h1 style="margin:40px 0;">Submit Deposit</h1>
-{% else %}
-    <p>You have no access to the deposit submit page - please log in.</p>
-{% endif %}
-
+    <p>Submit your deposit here to location: <em>(path)</em></p>
+    <form method="post">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="accept_terms" name="accept_terms">
+          <label class="form-check-label" for="accept_terms">I accept the terms and conditions</label>
+        </div>
+    </form>
 
 {% endblock %}
