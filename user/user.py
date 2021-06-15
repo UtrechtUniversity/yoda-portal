@@ -192,7 +192,6 @@ def callback():
 
 def irods_login(username, password):
     password = escape_irods_pam_password(password)
-    print('Wat\n{}\n{}'.format(username, password), file=sys.stderr)
 
     irods = iRODSSession(
         host=app.config.get('IRODS_ICAT_HOSTNAME'),
@@ -203,9 +202,7 @@ def irods_login(username, password):
         configure=True,
         **app.config.get('IRODS_SESSION_OPTIONS')
     )
-    print('HALLO IK BEN HIER', file=sys.stderr)
     _ = irods.server_version
-    print('HALLO IK BEN ER', file=sys.stderr)
     session.clear()
     session['user_id'] = username
     session['password'] = password
