@@ -3,9 +3,7 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
-import os
-
-from flask import Blueprint, g, jsonify, make_response, render_template, request
+from flask import Blueprint, render_template, request
 
 deposit_bp = Blueprint('deposit_bp', __name__,
                        template_folder='templates',
@@ -19,7 +17,7 @@ Deposit flow:
 2. Add metadata:    /deposit/metadata/form?path=/research-initial
 3. Submit:          /deposit/submit
 
-Flow upload: 
+Flow upload:
 Uses the flow upload in research module
 """
 
