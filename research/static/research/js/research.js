@@ -119,16 +119,6 @@ $(function() {
         handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
-    /*
-    $('.btn-group button.upload').click(function(){
-        $("#upload").trigger("click");
-    });
-
-    $("#upload").change(function() {
-        handleUpload($(this).attr('data-path'), this.files);
-    });
-     */
-
     // Flow.js upload handler
     var r = new Flow({
         target: '/research/upload',
@@ -145,7 +135,7 @@ $(function() {
     r.assignDrop($('.upload-drop')[0]);
     r.assignBrowse($('.upload')[0]);
 
-    // Handle files add event
+    // Flow.js handle events
     r.on('filesAdded', function(files){
         if (files.length) {
             $('#files').html("");
@@ -153,7 +143,6 @@ $(function() {
                 logUpload(file.uniqueIdentifier, file);
             });
         }
-
         $('#uploads').modal('show');
     });
     r.on('filesSubmitted', function() {
@@ -176,11 +165,6 @@ $(function() {
         var percent = Math.floor(r.progress()*100);
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', percent + '%');
     });
-    /*
-    r.on('catchAll', function() {
-        console.log.apply(console, arguments);
-    });
-     */
 
     $("body").on("click", "a.view-video", function() {
         let path = $(this).attr('data-path');
@@ -1080,7 +1064,7 @@ async function rejectFolder(folder)
 
 function logUpload(id, file) {
     let log = `<div class="row" id="${id}">
-                  <div class="col-md-6" style="word-wrap: break-word;">${htmlEncode(file.name)}</div>
+                  <div class="col-md-6" style="word-wrap: break-word;">${htmlEncode(file.relativePath)}</div>
                   <div class="col-md-3"><div class="progress"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>
                   <div class="col-md-3 msg"><i class="fa fa-spinner fa-spin fa-fw"></i></div>
                </div>`;
