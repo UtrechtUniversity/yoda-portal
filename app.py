@@ -18,8 +18,14 @@ from user.user import user_bp
 from vault.vault import vault_bp
 
 app = Flask(__name__)
-app.config.from_pyfile('flask.cfg')
-app.config['JSON_SORT_KEYS'] = False  # Check if this is still needed with Python v3.7?
+
+# Load configurations
+with app.app_context():
+    app.config.from_pyfile('flask.cfg')
+
+
+# Setup values for the navigation bar used in
+# general/templates/general/base.html
 app.config['modules'] = [
     {'name': 'Research',       'function': 'research_bp.index'},
     {'name': 'Vault',          'function': 'vault_bp.index'},
@@ -43,18 +49,20 @@ app.config['search-items-per-page'] = 10
 # Start Flask-Session
 Session(app)
 
+
 # Register blueprints
-app.register_blueprint(general_bp)
-app.register_blueprint(group_manager_bp, url_prefix='/group_manager')
-app.register_blueprint(research_bp, url_prefix='/research')
-app.register_blueprint(stats_bp, url_prefix='/stats')
-app.register_blueprint(user_bp, url_prefix='/user')
-app.register_blueprint(vault_bp, url_prefix='/vault')
-app.register_blueprint(api_bp, url_prefix='/api/')
-if app.config.get('INTAKE_ENABLED'):
-    app.register_blueprint(intake_bp, url_prefix='/intake/')
-if app.config.get('DATAREQUEST_ENABLED'):
-    app.register_blueprint(datarequest_bp, url_prefix='/datarequest/')
+with app.app_context():
+    app.register_blueprint(general_bp)
+    app.register_blueprint(group_manager_bp, url_prefix='/group')
+    app.register_blueprint(research_bp, url_prefix='/research')
+    app.register_blueprint(stats_bp, url_prefix='/statistics')
+    app.register_blueprint(user_bp, url_prefix='/user')
+    app.register_blueprint(vault_bp, url_prefix='/vault')
+    app.register_blueprint(api_bp, url_prefix='/api/')
+    if app.config.get('INTAKE_ENABLED'):
+        app.register_blueprint(intake_bp, url_prefix='/intake/')
+    if app.config.get('DATAREQUEST_ENABLED'):
+        app.register_blueprint(datarequest_bp, url_prefix='/datarequest/')
 
 # XXX CSRF needs to be disabled for API testing.
 csrf = CSRFProtect(app)
@@ -65,6 +73,7 @@ def protect_pages():
     """Restricted pages access protection."""
     if not request.endpoint or request.endpoint in ['general_bp.index',
                                                     'user_bp.login',
+                                                    'user_bp.callback',
                                                     'api_bp.call',
                                                     'static']:
         return
