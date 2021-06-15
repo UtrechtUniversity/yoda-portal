@@ -131,7 +131,10 @@ $(function() {
 
     // Flow.js upload handler
     var r = new Flow({
-        target: '/research/upload'
+        target: '/research/upload',
+        chunkSize: 10 * 1024 * 1024,
+        simultaneousUploads: 5,
+        query: {'csrf_token': Yoda.csrf.tokenValue, filepath : ''}
     });
     // Flow.js isn't supported, fall back on a different method
     if (!r.support) {
@@ -153,7 +156,9 @@ $(function() {
 
         $('#uploads').modal('show');
     });
-    r.on('filesSubmitted', function(file) {
+    r.on('filesSubmitted', function() {
+        let path = $('.upload').attr('data-path');
+        r.opts.query.filepath = path;
         r.upload();
     });
     r.on('complete', function(){
