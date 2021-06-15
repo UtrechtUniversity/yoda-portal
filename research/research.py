@@ -155,6 +155,7 @@ def upload_post():
 
     relative_path = os.path.dirname(flow_relative_path)
     filepath = request.form.get('filepath', type=str)
+    filepath = filepath.lstrip("/")
 
     if (not flow_identifier or not flow_filename or not flow_chunk_number
        or not flow_total_chunks or not flow_chunk_size or not filepath):
