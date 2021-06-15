@@ -162,7 +162,7 @@ $(function() {
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', '0%');
     });
     r.on('fileProgress', function(file){
-        var percent = Math.floor(r.progress()*100);
+        var percent = Math.floor(file.progress()*100);
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', percent + '%');
     });
 
