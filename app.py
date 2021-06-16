@@ -53,9 +53,9 @@ Session(app)
 # Register blueprints
 with app.app_context():
     app.register_blueprint(general_bp)
-    app.register_blueprint(group_manager_bp, url_prefix='/group')
+    app.register_blueprint(group_manager_bp, url_prefix='/group_manager')
     app.register_blueprint(research_bp, url_prefix='/research')
-    app.register_blueprint(stats_bp, url_prefix='/statistics')
+    app.register_blueprint(stats_bp, url_prefix='/stats')
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(vault_bp, url_prefix='/vault')
     app.register_blueprint(api_bp, url_prefix='/api/')
