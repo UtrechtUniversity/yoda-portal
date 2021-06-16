@@ -119,12 +119,51 @@ $(function() {
         handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
-    $('.btn-group button.upload').click(function(){
-        $("#upload").trigger("click");
+    // Flow.js upload handler
+    var r = new Flow({
+        target: '/research/upload',
+        chunkSize: 10 * 1024 * 1024,
+        simultaneousUploads: 5,
+        query: {'csrf_token': Yoda.csrf.tokenValue, filepath : ''}
     });
+    // Flow.js isn't supported, fall back on a different method
+    if (!r.support) {
+        Yoda.set_message('error', 'No upload browser support.');
+    }
 
-    $("#upload").change(function() {
-        handleUpload($(this).attr('data-path'), this.files);
+    // Assign upload places for dropping/selecting files
+    r.assignDrop($('.upload-drop')[0]);
+    r.assignBrowse($('.upload')[0]);
+
+    // Flow.js handle events
+    r.on('filesAdded', function(files){
+        if (files.length) {
+            $('#files').html("");
+            $.each(files, function(key, file) {
+                logUpload(file.uniqueIdentifier, file);
+            });
+        }
+        $('#uploads').modal('show');
+    });
+    r.on('filesSubmitted', function() {
+        let path = $('.upload').attr('data-path');
+        r.opts.query.filepath = path;
+        r.upload();
+    });
+    r.on('complete', function(){
+        let path = $('.upload').attr('data-path');
+        browse(path);
+    });
+    r.on('fileSuccess', function(file,message){
+        $("#" + file.uniqueIdentifier + " .msg").html("OK");
+    });
+    r.on('fileError', function(file, message){
+        $("#" + file.uniqueIdentifier + " .msg").html("FAILED");
+        $("#" + file.uniqueIdentifier + " .progress-bar").css('width', '0%');
+    });
+    r.on('fileProgress', function(file){
+        var percent = Math.floor(file.progress()*100);
+        $("#" + file.uniqueIdentifier + " .progress-bar").css('width', percent + '%');
     });
 
     $("body").on("click", "a.view-video", function() {
@@ -742,7 +781,7 @@ function topInformation(dir, showAlert)
 
             $('.btn-group button.metadata-form').hide();
 
-            $('#upload').attr('data-path', "");
+            $('.upload').attr('data-path', "");
             $('.btn-group button.upload').prop("disabled", true);
             $('.btn-group button.folder-create').attr('data-path', "");
             $('.btn-group button.folder-create').prop("disabled", true);
@@ -810,7 +849,7 @@ function topInformation(dir, showAlert)
             // Check if folder is writable.
             if (hasWriteRights && (status == '' || status == 'SECURED')) {
                 // Enable uploads.
-                $('#upload').attr('data-path', dir);
+                $('.upload').attr('data-path', dir);
                 $('.btn-group button.upload').prop("disabled", false);
 
                 // Enable folder / file manipulations.
@@ -872,7 +911,7 @@ function topInformation(dir, showAlert)
             }
         });
     } else {
-        $('#upload').attr('data-path', "");
+        $('.upload').attr('data-path', "");
 
         // Folder/ file manipulation data
         $('.btn-group button.folder-create').attr('data-path', "");
@@ -1023,104 +1062,25 @@ async function rejectFolder(folder)
     topInformation(folder, false);
 }
 
-// File uploads.
-function handleUpload(path, files) {
-    // Check if path is specified and files are uploaded.
-    if (path == "" || files.length < 1)
-        return;
-
-    // Keep track of the number of uploads to generate unique element IDs.
-    handleUpload.nextFileId = handleUpload.nextFileId || 1;
-
-    let promises = [];
-    $('#files').html("");
-    $('#uploads').modal('show');
-
-    // Send files one by one.
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-
-        // Log file upload.
-        const id = "upload" + handleUpload.nextFileId++;
-        logUpload(id, file);
-
-        // Check file size.
-        if(file.size > 300*1024*1024) {
-            $("#" + id + " .msg").html("Exceeds file limit");
-            continue;
-        }
-
-        // Send file.
-        promises.push(sendFile(id, path, file));
-    }
-
-    // Reload file browser if all promises are resolved.
-    Promise.all(promises).then(function() {
-        browse(path);
-    });
-}
-
-function sendFile(id, path, file) {
-    // Return a new promise.
-    return new Promise(function(resolve, reject) {
-
-        const uri = "browse/upload";
-        const xhr = new XMLHttpRequest();
-        const fd = new FormData();
-
-        xhr.open("POST", uri, true);
-
-        xhr.onloadend = function (e) {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                let response = JSON.parse(xhr.response);
-                if (response.status == "OK") {
-                    $("#" + id + " .msg").html("OK");
-                    resolve(xhr.response);
-                } else {
-                    $("#" + id + " .msg").html(response.statusInfo);
-                    $("#" + id + " .progress-bar").css('width', '0%');
-                    resolve(xhr.response);
-                }
-            } else {
-                $("#" + id + " .msg").html("FAILED");
-                $("#" + id + " .progress-bar").css('width', '0%');
-                resolve(xhr.response);
-            }
-        }
-
-        xhr.upload.addEventListener('progress', function(e) {
-            var percent = parseInt((e.loaded / e.total) * 100);
-            $("#" + id + " .progress-bar").css('width', percent + '%');
-        });
-
-        fd.append(Yoda.csrf.tokenName, Yoda.csrf.tokenValue);
-        fd.append('filepath', path);
-        fd.append('file', file);
-
-        // Initiate a multipart/form-data upload.
-        xhr.send(fd);
-    });
-}
-
-
-
 function logUpload(id, file) {
     let log = `<div class="row" id="${id}">
-                  <div class="col-md-6" style="word-wrap: break-word;">${htmlEncode(file.name)}</div>
+                  <div class="col-md-6" style="word-wrap: break-word;">${htmlEncode(file.relativePath)}</div>
                   <div class="col-md-3"><div class="progress"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>
                   <div class="col-md-3 msg"><i class="fa fa-spinner fa-spin fa-fw"></i></div>
                </div>`;
     $('#files').append(log);
 }
 
-function dropHandler(ev) {
-    // Prevent default behavior (Prevent file from being opened)
-    ev.preventDefault();
-
-    handleUpload($("#upload").attr('data-path'), ev.dataTransfer.files);
+function dragEnterHandler(ev)
+{
+    $(this).addClass('flow-dragover');
 }
 
-function dragOverHandler(ev) {
-  // Prevent default behavior (Prevent file from being opened)
-  ev.preventDefault();
+function dragEndHandler(ev)
+{
+    $(this).removeClass('flow-dragover');
+}
+
+function dropHandler(ev) {
+    $(this).removeClass('flow-dragover');
 }
