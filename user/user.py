@@ -142,7 +142,10 @@ def callback():
         )
         
         return response
-             
+
+    token_response = None   
+    userinfo_response = None
+      
     try:
         token_response = token_request()
         js           = token_response.json()
@@ -171,12 +174,12 @@ def callback():
 
         irods_login(email, access_token)
 
-    except (jwt.PyJWTError, json.decoder.JSONDecodeError, iRODSException) as error:
+    except (jwt.PyJWTError, json.decoder.JSONDecodeError, iRODSException, KeyError) as error:
         print_exc()
         
         if  isinstance(error, jwt.PyJWTError):
-            # Error occurred during steps for verification
-            print('JWKS URI: {}\nId Token: {}'.format(jwks_uri, str(id_token)))
+            # Error occurred during steps for verification, configurations used can be found in flask.cfg
+            print('Id Token:\n{}'.format(str(id_token)))
         elif isinstance(error, json.decoder.JSONDecodeError):
             # Either token response or userinfo response decoding failed
             print('token_response + headers:\n{}\n\n{}'.format(token_response.headers, token_response.text))
@@ -184,6 +187,12 @@ def callback():
                print('userinfo_response + headers:\n{}\n\n{}'.format(userinfo_response.headers, userinfo_response.text)) 
         elif isinstance(error, iRODSException):
             print('username: {}'.format(email))
+        elif isinstance(error, KeyError):
+            # Missing key in token or userinfo response. The only one of interest is the latest response
+            if userinfo_response is not None:
+                print('userinfo_response + headers:\n{}\n{}'.format(userinfo_response.headers, userinfo_response.text))
+            else:
+                print('token_response + headers:\n{}\n{}'.format(token_response.headers, token_response.text))
 
         flash(
             'An error occurred during the OpenID Connect protocol. ' 
