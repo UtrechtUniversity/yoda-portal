@@ -110,53 +110,51 @@ def settings():
 
 @user_bp.route('/callback')
 def callback():
-    code = request.args.get('code')
-    data = {
-        'grant_type': 'authorization_code',
-        'code': code,
-        'redirect_uri': app.config.get('OIDC_CALLBACK_URI')
-    }
+    def token_request():
+        code = request.args.get('code')
+        data = {
+            'grant_type': 'authorization_code',
+            'code': code,
+            'redirect_uri': app.config.get('OIDC_CALLBACK_URI')
+        }
 
-    token_uri = app.config.get('OIDC_TOKEN_URI')
+        token_uri = app.config.get('OIDC_TOKEN_URI')
 
-    # Content-type is application/x-www-form-urlencoded by default when data is a dict
-    response = requests.post(
-        token_uri,
-        data,
-        auth=(
-            app.config.get('OIDC_CLIENT_ID'),
-            app.config.get('OIDC_CLIENT_SECRET')
+        # Content-type is application/x-www-form-urlencoded by default when data is a dict
+        response = requests.post(
+            token_uri,
+            data,
+            auth=(
+                app.config.get('OIDC_CLIENT_ID'),
+                app.config.get('OIDC_CLIENT_SECRET')
+            )
         )
-    )
+        
+        return response
 
-    # Did the server respond nicely?
-    if response.status_code != 200:
-        flash(
-            'Failed to get token from identity server. '
-            'If the issue persists, please contact the system '
-            'administrator',
-            'error'
+    def userinfo_request(token):
+        userinfo_uri = app.config.get('OIDC_USERINFO_URI')
+        response = requests.get(
+            userinfo_uri,
+            headers = {
+                'Authorization': 'Bearer {}'.format(token)
+            }
         )
-        print(
-            'Error: {}:\n{}'.format(
-                response.status_code,
-                response.text
-            ),
-            file=sys.stderr
-        )
-        return redirect(url_for('user_bp.login'))
-
-    # Read the JWT id token
+        
+        return response
+             
     try:
-        js           = response.json()
+        token_response = token_request()
+        js           = token_response.json()
         access_token = js['access_token']
         id_token     = js['id_token']
+
         jwks_uri     = app.config.get('OIDC_JWKS_URI')
         jwks_client  = jwt.PyJWKClient(jwks_uri)
         signing_key  = jwks_client.get_signing_key_from_jwt(id_token)
         algorithms   = ['RS256']
 
-        # Does verification of the token as well
+        # Does verification of the token
         payload = jwt.decode(
             id_token,
             signing_key.key,
@@ -166,25 +164,33 @@ def callback():
             issuer=app.config.get('OIDC_JWT_ISSUER')
         )
 
-        field = app.config.get('OIDC_EMAIL_FIELD')
-        irods_login(payload[field], access_token)
-    except (jwt.PyJWTError, json.decoder.JSONDecodeError):
+        userinfo_response = userinfo_request(access_token)
+
+        email_identifier = app.config.get('OIDC_EMAIL_FIELD')
+        email = userinfo_response.json()[email_identifier].lower()
+
+        irods_login(email, access_token)
+
+    except (jwt.PyJWTError, json.decoder.JSONDecodeError, iRODSException) as error:
+        print_exc()
+        
+        if  isinstance(error, jwt.PyJWTError):
+            # Error occurred during steps for verification
+            print('JWKS URI: {}\nId Token: {}'.format(jwks_uri, str(id_token)))
+        elif isinstance(error, json.decoder.JSONDecodeError):
+            # Either token response or userinfo response decoding failed
+            print('token_response + headers:\n{}\n\n{}'.format(token_response.headers, token_response.text))
+            if userinfo_response is not None:
+               print('userinfo_response + headers:\n{}\n\n{}'.format(userinfo_response.headers, userinfo_response.text)) 
+        elif isinstance(error, iRODSException):
+            print('username: {}'.format(email))
+
         flash(
-            'An error occurred while reading the token response. '
+            'An error occurred during the OpenID Connect protocol. ' 
             'If the issue persists, please contact the system '
             'administrator',
             'error'
         )
-        print_exc()
-        return redirect(url_for('user_bp.login'))
-    except iRODSException:
-        flash(
-            'An error occurred while connecting to iRODs. '
-            'If the issue persists, please contact the system '
-            'administrator',
-            'error'
-        )
-        print_exc()
         return redirect(url_for('user_bp.login'))
 
     return redirect(url_for('general_bp.index'))
