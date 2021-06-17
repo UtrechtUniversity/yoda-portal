@@ -129,23 +129,23 @@ def callback():
                 app.config.get('OIDC_CLIENT_SECRET')
             )
         )
-        
+
         return response
 
     def userinfo_request(token):
         userinfo_uri = app.config.get('OIDC_USERINFO_URI')
         response = requests.get(
             userinfo_uri,
-            headers = {
+            headers={
                 'Authorization': 'Bearer {}'.format(token)
             }
         )
-        
+
         return response
 
-    token_response = None   
+    token_response = None
     userinfo_response = None
-      
+
     try:
         token_response = token_request()
         js           = token_response.json()
@@ -176,26 +176,30 @@ def callback():
 
     except (jwt.PyJWTError, json.decoder.JSONDecodeError, iRODSException, KeyError) as error:
         print_exc()
-        
-        if  isinstance(error, jwt.PyJWTError):
+
+        if isinstance(error, jwt.PyJWTError):
             # Error occurred during steps for verification, configurations used can be found in flask.cfg
-            print('Id Token:\n{}'.format(str(id_token)))
+            print('Id Token:\n{}'.format(str(id_token)), file=sys.stderr)
         elif isinstance(error, json.decoder.JSONDecodeError):
             # Either token response or userinfo response decoding failed
-            print('token_response + headers:\n{}\n\n{}'.format(token_response.headers, token_response.text))
+            print('token_response + headers:\n{}\n\n{}'.format(token_response.headers, token_response.text), file=sys.stderr)
             if userinfo_response is not None:
-               print('userinfo_response + headers:\n{}\n\n{}'.format(userinfo_response.headers, userinfo_response.text)) 
+                print(
+                    'userinfo_response + headers:\n{}\n\n{}'.format(userinfo_response.headers, userinfo_response.text),
+                    file=sys.stderr)
         elif isinstance(error, iRODSException):
-            print('username: {}'.format(email))
+            print('username: {}'.format(email), file=sys.stderr)
         elif isinstance(error, KeyError):
             # Missing key in token or userinfo response. The only one of interest is the latest response
             if userinfo_response is not None:
-                print('userinfo_response + headers:\n{}\n{}'.format(userinfo_response.headers, userinfo_response.text))
+                print(
+                    'userinfo_response + headers:\n{}\n{}'.format(userinfo_response.headers, userinfo_response.text),
+                    file=sys.stderr)
             else:
-                print('token_response + headers:\n{}\n{}'.format(token_response.headers, token_response.text))
+                print('token_response + headers:\n{}\n{}'.format(token_response.headers, token_response.text), file=sys.stderr)
 
         flash(
-            'An error occurred during the OpenID Connect protocol. ' 
+            'An error occurred during the OpenID Connect protocol. '
             'If the issue persists, please contact the system '
             'administrator',
             'error'
