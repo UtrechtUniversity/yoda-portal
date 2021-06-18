@@ -4,7 +4,12 @@ import Form from "@rjsf/bootstrap-4";
 import Select from 'react-select';
 import Geolocation from "./Geolocation";
 
-const path = $('#form').attr('data-path');
+// Set path
+//filepath ,path, currentFolder
+//const path = 'research-initial';
+var path = $('#form').attr('data-path');
+//console.info(path);
+//console.info(encodeURIComponent(path));
 
 let schema       = {};
 let uiSchema     = {};
@@ -191,11 +196,7 @@ class YodaButtons extends React.Component {
     }
 
     renderDeleteButton() {
-        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn pull-right">Delete all metadata </button>);
-    }
-
-    renderCloneButton() {
-        return (<button onClick={this.props.cloneMetadata} type="button" className="btn btn-primary clone-metadata-btn pull-right">Clone from parent folder</button>);
+        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger btn-small delete-all-metadata-btn pull-right">Delete all metadata </button>);
     }
 
     renderFormCompleteness() {
@@ -205,16 +206,10 @@ class YodaButtons extends React.Component {
     renderButtons() {
         let buttons = [];
 
-        if (formProperties.data.can_edit) {
-            buttons.push(this.renderSaveButton());
-            buttons.push(this.renderFormCompleteness());
+        buttons.push(this.renderSaveButton());
+        buttons.push(this.renderFormCompleteness());
+        buttons.push(this.renderDeleteButton());
 
-            // Delete and clone are mutually exclusive.
-            if (formProperties.data.metadata !== null)
-                buttons.push(this.renderDeleteButton());
-            else if (formProperties.data.can_clone)
-                buttons.push(this.renderCloneButton());
-        }
         return (<div>{buttons}</div>);
     }
 
@@ -233,6 +228,7 @@ class YodaButtons extends React.Component {
 
 
 class Container extends React.Component {
+
     constructor(props) {
         super(props);
         this.saveMetadata = this.saveMetadata.bind(this);
@@ -243,48 +239,16 @@ class Container extends React.Component {
         this.form.submitButton.click();
     }
 
-    cloneMetadata() {
-        swal({
-                title: "Are you sure?",
-                text: "Entered metadata will be overwritten by cloning.",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#ffcd00",
-                confirmButtonText: "Yes, clone metadata!",
-                closeOnConfirm: false,
-                animation: false
-            },
-            async isConfirm => {
-                if (isConfirm) {
-                    await Yoda.call('meta_clone_file',
-                        {target_coll: Yoda.basePath+path},
-                        {errorPrefix: 'Metadata could not be cloned'});
-                    window.location.reload();
-                }
-            });
-    }
-
     render() {
         return (
             <div>
-                <YodaButtons saveMetadata={this.saveMetadata}
-                             deleteMetadata={deleteMetadata}
-                             cloneMetadata={this.cloneMetadata} />
+                <YodaButtons saveMetadata={this.saveMetadata} deleteMetadata={deleteMetadata} />
                 <YodaForm ref={(form) => {this.form=form;}}/>
-                <YodaButtons saveMetadata={this.saveMetadata}
-                             deleteMetadata={deleteMetadata}
-                             cloneMetadata={this.cloneMetadata} />
+                <YodaButtons saveMetadata={this.saveMetadata} deleteMetadata={deleteMetadata} />
             </div>
         );
     }
 };
-
-/**
- * Returns to the browse view for the current collection.
- */
-function browse() {
-    window.location.href = '/research/browse?dir=' + encodeURIComponent(path);
-}
 
 function deleteMetadata() {
     swal({
@@ -304,7 +268,7 @@ function deleteMetadata() {
                     {errorPrefix: 'Metadata could not be deleted'});
 
                 Yoda.store_message('success', `Deleted metadata of folder <${path}>`);
-                browse();
+                window.location.reload(true);
             }
         });
 }
@@ -330,12 +294,8 @@ function loadForm() {
         if (formProperties.status === 'error_transformation_needed') {
             // Transformation is necessary. Show transformation prompt.
             $('#transformation-text').html(formProperties.data.transformation_html);
-            if (formProperties.data.can_edit) {
-                $('#transformation-buttons').removeClass('hide')
-                $('#transformation-text').html(formProperties.data.transformation_html);
-            } else {
-                $('#transformation .close-button').removeClass('hide')
-            }
+            $('#transformation-buttons').removeClass('hide')
+            $('#transformation-text').html(formProperties.data.transformation_html);
             $('.transformation-accept').on('click', async () => {
                 $('.transformation-accept').attr('disabled', true);
 
@@ -363,16 +323,12 @@ function loadForm() {
             $('#form-errors .error-fields').html(text);
             $('#form-errors').removeClass('hide');
 
-        } else if (formProperties.data.metadata === null && !formProperties.data.can_edit) {
+        } else if (formProperties.data.metadata === null) {
             // No metadata present and no write access. Do not show a form.
             $('#form').addClass('hide');
             $('#no-metadata').removeClass('hide');
 
         } else {
-            // Metadata present or user has write access, load the form.
-            if (!formProperties.data.can_edit)
-                uiSchema['ui:readonly'] = true;
-
             render(<Container/>, document.getElementById('form'));
 
             // Form may already be visible (with "loading" text).
@@ -414,7 +370,7 @@ async function submitData(data) {
             {errorPrefix: 'Metadata could not be saved'});
 
         Yoda.store_message('success', `Updated metadata of folder <${path}>`);
-        browse();
+        window.location.reload(true);
     } catch (e) {
         // Allow retry.
         $('.yodaButtons button').attr('disabled', false);

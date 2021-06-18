@@ -3,7 +3,9 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, flash, render_template
+
+import api
 
 deposit_bp = Blueprint('deposit_bp', __name__,
                        template_folder='templates',
@@ -13,12 +15,12 @@ deposit_bp = Blueprint('deposit_bp', __name__,
 
 """
 Deposit flow:
-1. Upload data:     /deposit
-2. Add metadata:    /deposit/metadata/form?path=/research-initial
-3. Submit:          /deposit/submit
+    Uses the flow upload in research module
 
-Flow upload:
-Uses the flow upload in research module
+    1. Upload data:     /deposit
+    2. Add metadata:    /deposit/metadata/form?path=/research-initial
+    3. Submit:          /deposit/submit
+
 """
 
 
@@ -27,10 +29,20 @@ def index():
     return render_template('deposit/deposit.html')
 
 
+@deposit_bp.route('/metadata')
 @deposit_bp.route('/metadata/form')
 def metadata_form():
-    """ Step2: Add metadata to your upload """
-    path = request.args.get('path')
+    """ Step2: Add metadata to your upload
+    path is folder location to upload to
+    """
+    try:
+        response = api.call('api_deposit_path')
+        path = response.get('deposit_path', 'default')
+    except Exception as e:
+        flash('Could not get path from api call, using default. {}'.format(e))
+        path = 'research-initial'
+
+    # path = request.args.get('path')
     return render_template('deposit/metadata-form.html', path=path)
 
 
@@ -43,5 +55,5 @@ def submit():
 @deposit_bp.route('/submit', methods=['POST'])
 def submit_upload():
     """ Step 3: Submit upload """
-    # todo upload with POST here or with metadata form
+    # todo upload here with agreeing terms and conditions
     return render_template('deposit/thankyou.html')

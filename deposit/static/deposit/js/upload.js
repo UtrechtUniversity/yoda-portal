@@ -1,10 +1,24 @@
+/* Flow upload functionality
+Uses basic list of uploading files
+Fancy UI with progress bars later from research module
+*/
+
 $(function() {
     console.log('ready');
+
+// Set path
+//    var path = '';
+//    Yoda.call('api_deposit_path').then((data) => {
+//        console.info(data);
+//        path = data.deposit_path;
+//    });
+    var path = 'research-initial';
+
     var r = new Flow({
-        target: '/research/flow_upload',       //todo change when functionality is made
+        target: '/research/upload',     // We use the code from research. Changed from research/flow_upload
         chunkSize: 10 * 1024 * 1024,
         simultaneousUploads: 5,
-        query: {'csrf_token': Yoda.csrf.tokenValue, 'filepath': 'research-initial'} //todo change
+        query: {'csrf_token': Yoda.csrf.tokenValue, 'filepath': path}
     });
     // Flow.js isn't supported, fall back on a different method
     if (!r.support) {
@@ -56,19 +70,17 @@ $(function() {
     });
     r.on('complete', function(){
         // Hide pause/resume when the upload has completed
-        $('.flow-file-pause, flow-file-resume, flow-file-cancel').hide();
+        $('.flow-progress .progress-resume-link, .flow-progress .progress-pause-link').hide();
     });
     r.on('fileSuccess', function(file,message){
         var $self = $('.flow-file-'+file.uniqueIdentifier);
         // Reflect that the file upload has completed
         $self.find('.flow-file-progress').text('(completed)');
-        $self.find('.flow-file-pause, .flow-file-resume, .flow-file-cancel').remove();
+        $self.find('.flow-file-pause, .flow-file-resume').remove();
     });
     r.on('fileError', function(file, message){
         // Reflect that the file upload has resulted in error
-        var $self = $('.flow-file-'+file.uniqueIdentifier);
-        $self.find('.flow-file-progress').html('(file could not be uploaded: '+message+')');
-        $self.find('.flow-file-cancel').remove();
+        $('.flow-file-'+file.uniqueIdentifier+' .flow-file-progress').html('(file could not be uploaded)');
     });
     r.on('fileProgress', function(file){
         // Handle progress for both the file and the overall upload
@@ -80,17 +92,12 @@ $(function() {
     });
     r.on('uploadStart', function(){
         // Show pause, hide resume
-        $('.flow-file-pause').show();
-        $('.flow-file-resume').hide();
+        $('.flow-progress .progress-resume-link').hide();
+        $('.flow-progress .progress-pause-link').show();
     });
     r.on('catchAll', function() {
         console.log.apply(console, arguments);
     });
-    /*
-    r.on('catchAll', function() {
-        console.log.apply(console, arguments);
-    });
-     */
 });
 
 function readablizeBytes(bytes) {
