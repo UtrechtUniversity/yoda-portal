@@ -4,12 +4,11 @@ import Form from "@rjsf/bootstrap-4";
 import Select from 'react-select';
 import Geolocation from "./Geolocation";
 
-// Set path
-//filepath ,path, currentFolder
-//const path = 'research-initial';
-var path = $('#form').attr('data-path');
-//console.info(path);
-//console.info(encodeURIComponent(path));
+//const path = "/research-initial";
+const path = $('#form').attr('data-path');
+console.info("Path: " + path);
+console.info("tokenName: " + Yoda.csrf.tokenName);
+console.info("tokenValue: " + Yoda.csrf.tokenValue);
 
 let schema       = {};
 let uiSchema     = {};
@@ -192,11 +191,11 @@ class YodaButtons extends React.Component {
     }
 
     renderSaveButton() {
-        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary pull-left">Save</button>);
+        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary pull-left">Save & submit</button>);
     }
 
     renderDeleteButton() {
-        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger btn-small delete-all-metadata-btn pull-right">Delete all metadata </button>);
+        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn pull-right">Delete all metadata </button>);
     }
 
     renderFormCompleteness() {
@@ -206,10 +205,12 @@ class YodaButtons extends React.Component {
     renderButtons() {
         let buttons = [];
 
-        buttons.push(this.renderSaveButton());
-        buttons.push(this.renderFormCompleteness());
-        buttons.push(this.renderDeleteButton());
-
+        if (formProperties.data.can_edit) {
+            buttons.push(this.renderSaveButton());
+            buttons.push(this.renderFormCompleteness());
+            if (formProperties.data.metadata !== null)
+                buttons.push(this.renderDeleteButton());
+        }
         return (<div>{buttons}</div>);
     }
 
@@ -228,7 +229,6 @@ class YodaButtons extends React.Component {
 
 
 class Container extends React.Component {
-
     constructor(props) {
         super(props);
         this.saveMetadata = this.saveMetadata.bind(this);
@@ -242,13 +242,16 @@ class Container extends React.Component {
     render() {
         return (
             <div>
-                <YodaButtons saveMetadata={this.saveMetadata} deleteMetadata={deleteMetadata} />
+                <YodaButtons saveMetadata={this.saveMetadata}
+                             deleteMetadata={deleteMetadata}  />
                 <YodaForm ref={(form) => {this.form=form;}}/>
-                <YodaButtons saveMetadata={this.saveMetadata} deleteMetadata={deleteMetadata} />
+                <YodaButtons saveMetadata={this.saveMetadata}
+                             deleteMetadata={deleteMetadata} />
             </div>
         );
     }
 };
+
 
 function deleteMetadata() {
     swal({
@@ -268,7 +271,7 @@ function deleteMetadata() {
                     {errorPrefix: 'Metadata could not be deleted'});
 
                 Yoda.store_message('success', `Deleted metadata of folder <${path}>`);
-                window.location.reload(true);
+                window.location.reload();
             }
         });
 }
@@ -284,8 +287,7 @@ function loadForm() {
             formProperties = data;
 
         if (formProperties.data !== null) {
-            // These ary only present when there is a form to show (i.e. no
-            // validation errors, and no transformation needed).
+            // These ary only present when there is a form to show (i.e. no validation errors)
             schema       = formProperties.data.schema;
             uiSchema     = formProperties.data.uischema;
             yodaFormData = formProperties.data.metadata === null ? undefined : formProperties.data.metadata;
@@ -294,8 +296,12 @@ function loadForm() {
         if (formProperties.status === 'error_transformation_needed') {
             // Transformation is necessary. Show transformation prompt.
             $('#transformation-text').html(formProperties.data.transformation_html);
-            $('#transformation-buttons').removeClass('hide')
-            $('#transformation-text').html(formProperties.data.transformation_html);
+            if (formProperties.data.can_edit) {
+                $('#transformation-buttons').removeClass('hide')
+                $('#transformation-text').html(formProperties.data.transformation_html);
+            } else {
+                $('#transformation .close-button').removeClass('hide')
+            }
             $('.transformation-accept').on('click', async () => {
                 $('.transformation-accept').attr('disabled', true);
 
@@ -323,12 +329,16 @@ function loadForm() {
             $('#form-errors .error-fields').html(text);
             $('#form-errors').removeClass('hide');
 
-        } else if (formProperties.data.metadata === null) {
+        } else if (formProperties.data.metadata === null && !formProperties.data.can_edit) {
             // No metadata present and no write access. Do not show a form.
             $('#form').addClass('hide');
             $('#no-metadata').removeClass('hide');
 
         } else {
+            // Readonly if you may not edit
+            if (!formProperties.data.can_edit)
+                uiSchema['ui:readonly'] = true;
+
             render(<Container/>, document.getElementById('form'));
 
             // Form may already be visible (with "loading" text).
@@ -370,7 +380,7 @@ async function submitData(data) {
             {errorPrefix: 'Metadata could not be saved'});
 
         Yoda.store_message('success', `Updated metadata of folder <${path}>`);
-        window.location.reload(true);
+        window.location.href = '/deposit/submit';
     } catch (e) {
         // Allow retry.
         $('.yodaButtons button').attr('disabled', false);

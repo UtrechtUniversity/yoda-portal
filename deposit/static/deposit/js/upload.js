@@ -8,6 +8,7 @@ $(function() {
 
     // Set path
     var path = $("#path").html();
+    console.info("Upload path: " + path);
 
 //    JS api call (alternative)
 //    Yoda.call('deposit_path').then((data) => {

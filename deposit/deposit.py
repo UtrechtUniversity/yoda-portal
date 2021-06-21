@@ -23,11 +23,16 @@ Deposit flow:
 
 """
 
+def get_deposit_path():
+    response = api.call('deposit_path')
+    path = "/" + response['data']['deposit_path']
+    return path.replace('//', '/')
 
 @deposit_bp.route('/', methods=['GET'])
 def index():
-    response = api.call('deposit_path')
-    path = response['data']['deposit_path']
+    # response = api.call('deposit_path')
+    # path = response['data']['deposit_path']
+    path = get_deposit_path()
     return render_template('deposit/deposit.html', path=path)
 
 
@@ -37,21 +42,15 @@ def metadata_form():
     """ Step2: Add metadata to your upload
     path is folder location to upload to
     """
-    try:
-        response = api.call('api_deposit_path')
-        path = response.get('deposit_path', 'default')
-    except Exception as e:
-        flash('Could not get path from api call, using default. {}'.format(e))
-        path = 'research-initial'
-
-    # path = request.args.get('path')
+    path = get_deposit_path()
     return render_template('deposit/metadata-form.html', path=path)
 
 
 @deposit_bp.route('/submit', methods=['GET'])
 def submit():
     """ Step 3: Submit upload """
-    return render_template('deposit/submit.html')
+    path = get_deposit_path()
+    return render_template('deposit/submit.html', path=path)
 
 
 @deposit_bp.route('/submit', methods=['POST'])
