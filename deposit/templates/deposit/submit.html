@@ -12,11 +12,15 @@
 {% block content %}
 
     <h1 style="margin:40px 0;">Submit Deposit</h1>
-    <p>Submit your deposit here to location: <em>(path)</em></p>
+    <p>Submit your deposit here to location: <em>{{path|safe}}</em></p>
     <form method="post">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="accept_terms" name="accept_terms">
+          <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms">
           <label class="form-check-label" for="accept_terms">I accept the terms and conditions</label>
+        </div>
+        <div id="buttons">
+            <a href="/deposit/metadata" class="btn btn-secondary" style="margin:15px 15px 15px 0">Back</a>
+            <button type="submit" class="btn btn-primary" style="margin:15px 15px 15px 0">Submit</button>
         </div>
     </form>
 
