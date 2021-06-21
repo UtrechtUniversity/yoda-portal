@@ -212,6 +212,9 @@ def callback():
 def irods_login(username, password):
     password = escape_irods_pam_password(password)
 
+    # Add a prefix to consume in the PAM stack
+    password = '++oidc_token++'+ password
+
     irods = iRODSSession(
         host=app.config.get('IRODS_ICAT_HOSTNAME'),
         port=app.config.get('IRODS_ICAT_PORT'),
