@@ -172,6 +172,9 @@ def callback():
         email_identifier = app.config.get('OIDC_EMAIL_FIELD')
         email = userinfo_response.json()[email_identifier].lower()
 
+        # Add a prefix to consume in the PAM stack
+        access_token = '++oidc_token++'+ access_token
+
         irods_login(email, access_token)
 
     except (jwt.PyJWTError, json.decoder.JSONDecodeError, iRODSException, KeyError) as error:
@@ -211,9 +214,6 @@ def callback():
 
 def irods_login(username, password):
     password = escape_irods_pam_password(password)
-
-    # Add a prefix to consume in the PAM stack
-    password = '++oidc_token++'+ password
 
     irods = iRODSSession(
         host=app.config.get('IRODS_ICAT_HOSTNAME'),
