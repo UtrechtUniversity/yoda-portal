@@ -6,13 +6,14 @@ Fancy UI with progress bars later from research module
 $(function() {
     console.log('ready');
 
-// Set path
-//    var path = '';
-//    Yoda.call('api_deposit_path').then((data) => {
-//        console.info(data);
-//        path = data.deposit_path;
+    // Set path
+    var path = $("#path").html();
+
+//    JS api call (alternative)
+//    Yoda.call('deposit_path').then((data) => {
+//        console.info("Path: " + data.deposit_path);
+//        path = String(data.deposit_path);
 //    });
-    var path = 'research-initial';
 
     var r = new Flow({
         target: '/research/upload',     // We use the code from research. Changed from research/flow_upload

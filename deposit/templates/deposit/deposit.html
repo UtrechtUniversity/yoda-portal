@@ -18,7 +18,7 @@
 <p>You can deposit your data with the following steps:</p>
 <ol>
     <li>Upload</li>
-    <li><a href="/deposit/metadata/form?path=/research-initial">Add metadata</a></li>
+    <li><a href="/deposit/metadata/form">Add metadata</a></li>
     <li>Submit</li>
 </ol>
 
@@ -34,5 +34,7 @@
 <p>
     <a href="/deposit/metadata/form?path=/research-initial">&gt;&gt; Add metadata</a>
 </p>
+
+<div id="path" style="display:none;">{{ path | safe }}</div>
 
 {% endblock %}

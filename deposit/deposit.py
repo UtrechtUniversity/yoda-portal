@@ -26,7 +26,9 @@ Deposit flow:
 
 @deposit_bp.route('/', methods=['GET'])
 def index():
-    return render_template('deposit/deposit.html')
+    response = api.call('deposit_path')
+    path = response['data']['deposit_path']
+    return render_template('deposit/deposit.html', path=path)
 
 
 @deposit_bp.route('/metadata')
