@@ -173,7 +173,7 @@ def callback():
         email = userinfo_response.json()[email_identifier].lower()
 
         # Add a prefix to consume in the PAM stack
-        access_token = '++oidc_token++'+ access_token
+        access_token = '++oidc_token++' + access_token
 
         irods_login(email, access_token)
 
