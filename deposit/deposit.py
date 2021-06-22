@@ -3,7 +3,7 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, flash, render_template
+from flask import Blueprint, render_template
 
 import api
 
@@ -23,10 +23,12 @@ Deposit flow:
 
 """
 
+
 def get_deposit_path():
     response = api.call('deposit_path')
     path = "/" + response['data']['deposit_path']
     return path.replace('//', '/')
+
 
 @deposit_bp.route('/', methods=['GET'])
 def index():
