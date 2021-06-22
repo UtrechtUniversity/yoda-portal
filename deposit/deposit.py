@@ -32,6 +32,7 @@ def get_deposit_path():
 
 @deposit_bp.route('/', methods=['GET'])
 def index():
+    """ Deposit files/folder to a folder path """
     # response = api.call('deposit_path')
     # path = response['data']['deposit_path']
     path = get_deposit_path()
@@ -41,9 +42,7 @@ def index():
 @deposit_bp.route('/metadata')
 @deposit_bp.route('/metadata/form')
 def metadata_form():
-    """ Step2: Add metadata to your upload
-    path is folder location to upload to
-    """
+    """ Step2: Add metadata to your upload """
     path = get_deposit_path()
     return render_template('deposit/metadata-form.html', path=path)
 
