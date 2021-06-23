@@ -172,6 +172,9 @@ def callback():
         email_identifier = app.config.get('OIDC_EMAIL_FIELD')
         email = userinfo_response.json()[email_identifier].lower()
 
+        # Add a prefix to consume in the PAM stack
+        access_token = '++oidc_token++' + access_token
+
         irods_login(email, access_token)
 
     except (jwt.PyJWTError, json.decoder.JSONDecodeError, iRODSException, KeyError) as error:
