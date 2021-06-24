@@ -38,7 +38,8 @@ function makeItemActive(currentItem)
 
 function getDetails(resource)
 {
-    var url = "statistics/resource_details?resource=" + encodeURIComponent(resource);
+    var url = 'resource_details?resource=' + encodeURIComponent(resource); 
+
     $.getJSON(url, function( data ) {
         if (data.status == 'success') {
             $('.resource-details').html(data.html);
@@ -152,7 +153,7 @@ function select2Tier()
     $('.tier-select').select2({
         ajax: {
             delay:    250,
-            url:      Yoda.baseUrl + 'statistics/get_tiers',
+            url:      'get_tiers',
             type:     'get',
             dataType: 'json',
             data: {},
