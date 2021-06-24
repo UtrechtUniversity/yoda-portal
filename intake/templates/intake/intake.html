@@ -2,15 +2,14 @@
 
 {% block title %}{{ super() }} &dash; Intake{% endblock title %}
 
-{% block style %}
+{% block scripts %}
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/jquery.dataTables.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/datatables.bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/intake.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/treetable/jquery.treetable.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/treetable/jquery.treetable.theme.default.css') }}">
-{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
 
-{% block scripts %}
     <script src="{{ url_for('intake_bp.static', filename='scripts/jquery.dataTables.min.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/dataTables.bootstrap.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/dataTables.bootstrapPagination-3.js') }}"></script>
@@ -29,7 +28,6 @@
     <script src="{{ url_for('intake_bp.static', filename='scripts/controllers/intake.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/datatables/plugin_sort_on_image.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/treetable/jquery.treetable.js') }}"></script>
-
 {% endblock scripts %}
 
 {% block content %}
@@ -115,7 +113,7 @@
     <div class="row" id="toprow">
         <div class="col-sm-12">
             <div class="btn-group">
-                <button class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" id="dropdown-select-study">
                     <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
@@ -123,7 +121,7 @@
                     <br/>
                     <table class="table table-striped hover" id="select-study">
                         {% for study in studies %}
-                            <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}">
+                            <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}" class="ta-{{ study }}"> 
                                 <td>
                                     <i class="fa fa-graduation-cap" aria-hidden="true"></i>
                                 </td>
@@ -203,7 +201,7 @@
                         <button class="btn btn-outline-secondary" id="btn-unlock"><span class="glyphicon glyphicon-check"></span> Unlock datasets</button>
                 </div>
                 <div class="btn-group">
-                    <a href="reports" class="btn btn-info"><span class="glyphicon glyphicon-signal"></span> Reports</a>
+                    <a href="reports" class="btn btn-info btn-goto-reports"><span class="glyphicon glyphicon-signal"></span> Reports</a>
                 </div>
             {% endif %}
 
@@ -270,7 +268,7 @@
                             <td style="text-align: right;">
                                 {{ (data.datasetErrors + data.objectErrors) if (data.datasetErrors + data.objectErrors)>0 else '-' }}
                                     /
-                                {{ (data.datasetWarnings + data.objectWarnings) if (data.datasetWarnings + data.objectWarnings)>0 else '-' }}
+                                {{ (data.datasetWarnings + data.objectWarnings) if (data.datasetWarnings + data.objectWarnings)>0 else '-' }} 
                             </td>
                             <td style="text-align: right;">
                                 {{ data.datasetComments if  data.datasetComments else '-' }}
