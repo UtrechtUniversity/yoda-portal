@@ -1,10 +1,4 @@
 $(function() {
-//    # ??? wat doet dit nu??
-//    get_studies();
-//   get_studies_dm();
-//    get_datasets('grp-intake-initial');
-//    get_unrecognized_files('grp-intake-initial')
-
     var tableUnrecognised = $('#datatable_unrecognised').DataTable({
         "language": {
             "sEmptyTable":     "No data found",

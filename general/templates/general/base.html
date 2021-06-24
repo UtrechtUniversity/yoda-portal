@@ -1,13 +1,13 @@
 <!doctype html>
-<html>
+<html lang="en">
     <head>
         {% block head %}
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+
             <title>{% block title %}{{ config.get('PORTAL_TITLE_TEXT') }}{% endblock %}</title>
 
             <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
 
             <link rel="stylesheet" href="{{ url_for('static', filename='lib/font-awesome-4.7.0/css/font-awesome.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
@@ -15,13 +15,11 @@
 
             <script src="{{ url_for('static', filename='lib/jquery-1.11.2/js/jquery.min.js') }}"></script>
             <script src="{{ url_for('static', filename='lib/bootstrap-4.4.1/js/bootstrap.bundle.min.js') }}"></script>
-            <script src="{{ url_for('static', filename='lib/toastr/toastr.min.js') }}"></script>
             <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
-            <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
             <script>
                 Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'};
                 {% if g.user %}
-                Yoda.basePath = '/tempZone/home';
+                Yoda.basePath = '/{{ g.irods.zone }}/home';
                 Yoda.user = {
                     username: '{{ g.user }}',
                 };
@@ -36,7 +34,7 @@
         <header class="brandbar container">
             <div class="navbar yoda-topnavbar">
                 <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">
-                    <img class="logo" src="{{ url_for('static', filename='img/logo-uu.svg') }}">
+                    <img class="logo" src="{{ url_for('static', filename='img/logo-uu.svg') }}" alt="logo">
                 </a>
                 <div class="auth-action pull-right">
                     {% if g.user %}
@@ -63,7 +61,7 @@
         <nav class="navbar navbar-inverse navbar-static-top navbar-expand-lg yoda-navbar">
             <div class="container">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"i aria-label="Toggle navigation">
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
@@ -83,8 +81,16 @@
         {% block container %}
         <div class="container page">
             <div id="messages">
-                {% for message in get_flashed_messages() %}
-                    <div class="flash">{{ message }}</div>
+                {% for category, message in get_flashed_messages(with_categories=true) %}
+                {% if category is sameas 'error' %}
+                {% set category = 'danger' %}
+                {% endif %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
                 {% endfor %}
             </div>
 

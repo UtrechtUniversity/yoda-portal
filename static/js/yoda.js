@@ -1,21 +1,36 @@
 /**
  * \file
  * \brief     Yoda Portal platform code.
- * \author    Chris Smeele
- * \copyright Copyright (c) 2015 - 2019, Utrecht university. All rights reserved
+ * \copyright Copyright (c) 2015-2021, Utrecht university. All rights reserved
  * \license   GPLv3, see LICENSE
  */
-
 "use strict";
 
 /// Namespace for JS functions shared across Yoda modules.
 let Yoda = {};
 
-Yoda.message = function(type, msg) {
-    // Saves a message to be shown on the next page-load.
+Yoda.store_message = function(type, msg) {
+    type = (type === 'error') ? 'danger' : type;
+
+    // Stores a message to be shown on the next page-load.
     Yoda.storage.session.set('messages',
                              Yoda.storage.session.get('messages', [])
                              .concat({ type: type, message: msg }));
+};
+
+Yoda.set_message = function(type, msg) {
+    type = (type === 'error') ? 'danger' : type;
+
+    // Insert message if a #messages container is present.
+    let $messages = $('#messages');
+    if ($messages.length) {
+        $messages.append(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">`
+                         + `${Yoda.escapeEntities(msg)}`
+                         + '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+                         + '<span aria-hidden="true">&times;</span>'
+                         + '</button>'
+                         + '</div>');
+    }
 };
 
 Yoda.load = function() {
@@ -26,9 +41,11 @@ Yoda.load = function() {
         Yoda.storage.session.remove('messages');
 
         messages.forEach(item =>
-            $messages.append(`<div class="alert alert-${item.type}">`
-                             + '<button class="close" data-dismiss="alert"><span>&times;</span></button>'
-                             + `<p>${Yoda.escapeEntities(item.message)}</p>`
+            $messages.append(`<div class="alert alert-${item.type} alert-dismissible fade show" role="alert">`
+                             + `${Yoda.escapeEntities(item.message)}`
+                             + '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+                             + '<span aria-hidden="true">&times;</span>'
+                             + '</button>'
                              + '</div>'));
     }
 };
@@ -68,8 +85,8 @@ Yoda.call = async function(path, data={}, options={}) {
             return errorResult('Your request could not be completed due to a network connection issue.'
                                +' Please try again in a few minutes.');
         }
-        if (!((r.status >= 200 && r.status < 300) || r.status == 500)) {
-            // API responses should either produce 200 or 500.
+        if (!((r.status >= 200 && r.status < 300) || r.status == 400 || r.status == 500)) {
+            // API responses should either produce 200, 400 or 500.
             // Any other status code indicates an internal error without (human-readable) information.
             console.error(`API Error: HTTP status ${r.status}`);
             return errorResult();
@@ -118,9 +135,9 @@ Yoda.call = async function(path, data={}, options={}) {
         console.error(`API: ${path} failed: `, x);
         if (!quiet) {
             if (Yoda.version === 'development' && 'debug_info' in x)
-                setMessage('error', `${errorPrefix}${x.status_info} //// debug information: ${path}: ${x.debug_info}`);
+                Yoda.set_message('error', `${errorPrefix}${x.status_info} //// debug information: ${path}: ${x.debug_info}`);
             else
-                setMessage('error', errorPrefix+x.status_info);
+                Yoda.set_message('error', errorPrefix+x.status_info);
         }
         if (rawResult)
              return x;
@@ -161,7 +178,7 @@ Yoda.storage = {
 /// Escapes quotes in attribute selectors.
 Yoda.escapeQuotes = str => str.replace(/\\/g, '\\\\').replace(/("|')/g, '\\$1');
 
- /// Escape characters that may have a special meaning in HTML by converting them to HTML entities.
+/// Escape characters that may have a special meaning in HTML by converting them to HTML entities.
 Yoda.escapeEntities = str => $('<div>').text(str).html();
 
 $(Yoda.load);
