@@ -28,9 +28,9 @@ with app.app_context():
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
 app.config['modules'] = [
+    {'name': 'Deposit',        'function': 'deposit_bp.index'},
     {'name': 'Research',       'function': 'research_bp.index'},
     {'name': 'Vault',          'function': 'vault_bp.index'},
-    {'name': 'Deposit',        'function': 'deposit_bp.index'},
     {'name': 'Statistics',     'function': 'stats_bp.index'},
     {'name': 'Group Manager',  'function': 'group_manager_bp.index'},
 ]
