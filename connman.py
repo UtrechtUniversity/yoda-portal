@@ -11,6 +11,10 @@ TTL = 60 * 30
 
 class Session(object):
     def __init__(self, sid, irods):
+        """
+        :param sid: flask sessino id
+        :param irods: irods session
+        """
         self.sid   = sid
         self.irods = irods
         self.time  = time.time()
@@ -20,7 +24,7 @@ class Session(object):
         self.irods.cleanup()
         print('[gc/logout]: Dropped iRODS session of session {}'.format(self.sid))
 
-
+# We use custom session dict (no flask session) to prevent session pickling
 sessions = dict()
 lock = threading.Lock()
 
@@ -50,6 +54,11 @@ def get(sid):
 
 
 def add(sid, irods):
+    """
+    Add flask sid and irods session to our custom session dict
+    :param sid: flask session id
+    :param irods: irods session
+    """
     global sessions
     s = Session(sid, irods)
     sessions[sid] = s
