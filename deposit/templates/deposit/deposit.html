@@ -16,17 +16,22 @@
 {% with step=1 %}
     {% include 'deposit/workflow.html' %}
 {% endwith %}
-<h1>Deposit your data</h1>
 
-<div id="flow_upload">
-    <h1>Drag & Drop upload files</h1>
-    <div class="flow-drop" ondragenter="jQuery(this).addClass('flow-dragover');" ondragend="jQuery(this).removeClass('flow-dragover');" ondrop="jQuery(this).removeClass('flow-dragover');">
-        Drop files or folders here to upload or <a class="flow-browse-folder"><u>select folders</u></a> or <a class="flow-browse"><u>select files</u></a> from your computer
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title pull-left">Deposit your data</h5>
     </div>
-    <ul class="flow-list"></ul>
+    <div class="card-body">
+        <div id="flow_upload">
+            <h1>Drag & Drop upload files</h1>
+            <div class="flow-drop" ondragenter="jQuery(this).addClass('flow-dragover');" ondragend="jQuery(this).removeClass('flow-dragover');" ondrop="jQuery(this).removeClass('flow-dragover');">
+                Drop files or folders here to upload or <a class="flow-browse-folder"><u>select folders</u></a> or <a class="flow-browse"><u>select files</u></a> from your computer
+            </div>
+            <ul class="flow-list"></ul>
+        </div>
+        <a class="btn btn-primary pull-right" href="/deposit/metadata">Add metadata</a>
+    </div>
 </div>
-
-<p><a href="/deposit/metadata">&gt;&gt; Add metadata</a></p>
 
 <div id="path" style="display:none;">{{ path|safe }}</div>
 
