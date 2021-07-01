@@ -95,6 +95,13 @@ $(function() {
         $('.btn-confirm-file-rename').attr('data-collection', $(this).attr('data-collection'));
 
         $('#file-rename').modal('show');
+        // input text selection handling - select all text in front of last '.'
+        $('#file-rename-name').focus();
+        var endSelection = $(this).attr('data-name').lastIndexOf('.');
+        if (endSelection == -1) {
+            endSelection = $(this).attr('data-name').length
+        }
+        document.getElementById('file-rename-name').setSelectionRange(0, endSelection);
     });
 
     $('.btn-confirm-file-rename').click(function() {

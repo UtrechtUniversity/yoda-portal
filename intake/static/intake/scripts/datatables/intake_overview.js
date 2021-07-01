@@ -121,9 +121,9 @@ $(document).ready(function() {
         handleVaultButtonStatus();
     });
 
-
-    $('#btn-lock').prop('disabled', true);
-    $('#btn-unlock').prop('disabled', true);
+    // Initialize buttons
+    $('#btn-lock').prop('disabled', true).addClass('disabled');
+    $('#btn-unlock').prop('disabled', true).addClass('disabled');
 } );
 
 function handleVaultButtonStatus()
@@ -141,13 +141,13 @@ function handleVaultButtonStatus()
         //$('#btn-lock').prop('disabled', false);
 //        $('#btn-lock').prop('disabled', false).removeClass('btn-default').removeClass('disabled').addClass('btn-primary');
 //        $('#btn-unlock').prop('disabled', false).removeClass('btn-default').removeClass('disabled').addClass('btn-warning');
-        $('#btn-lock').prop('disabled', false).addClass('btn-info'); //.removeClass('btn-default').addClass('btn-primary');
-        $('#btn-unlock').prop('disabled', false).addClass('btn-warning'); //.removeClass('btn-default').addClass('btn-warning');
+        $('#btn-lock').prop('disabled', false).addClass('btn-info').removeClass('disabled'); //.removeClass('btn-default').addClass('btn-primary');
+        $('#btn-unlock').prop('disabled', false).addClass('btn-warning').removeClass('disabled'); //.removeClass('btn-default').addClass('btn-warning');
     }
     else{
         // $('#btn-lock').prop('disabled', true).removeClass('btn-primary').addClass('disabled').addClass('btn-default');
         // $('#btn-unlock').prop('disabled', true).removeClass('btn-warning').addClass('disabled').addClass('btn-default');
-        $('#btn-lock').prop('disabled', true).removeClass('btn-info'); //.removeClass('btn-primary').addClass('btn-default');
-        $('#btn-unlock').prop('disabled', true).removeClass('btn-warning');// .removeClass('btn-warning').addClass('btn-default');
+        $('#btn-lock').prop('disabled', true).removeClass('btn-info').addClass('disabled'); //.removeClass('btn-primary').addClass('btn-default');
+        $('#btn-unlock').prop('disabled', true).removeClass('btn-warning').addClass('disabled');// .removeClass('btn-warning').addClass('btn-default');
     }
 }

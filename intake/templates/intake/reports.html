@@ -2,11 +2,10 @@
 
 {% block title %}{{ super() }} &dash; Intake{% endblock title %}
 
-{% block style %}
-    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/intake.css') }}">
-{% endblock style %}
-
 {% block scripts %}
+    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/intake.css') }}">
+    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
+
     <script src="{{ url_for('intake_bp.static', filename='scripts/controllers/reports.js') }}"></script>
 {% endblock scripts %}
 
@@ -23,7 +22,7 @@
                     <br>
                     Please click <a href="{{ url_for('intake_bp.index') }}">here</a> to go to an area that is accessible for you.
                     <div class="btn-group">
-                        <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info"><span class="fa fa-chevron-right"></span> Intake</a>
+                        <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info btn-goto-intake"><span class="fa fa-chevron-right"></span> Intake</a>
                     </div>
                 </div>
             </div>
@@ -74,21 +73,21 @@
             </div>
         </div>
         <div class="btn-group">
-            <a class="btn  btn-outline-secondary" href="{{ url_for('intake_bp.export', studyID=study_id) }}" hP2="download?studyID={{ study_id | urlencode | replace("+", "%20") }}" target="_blank">
+            <a class="btn  btn-outline-secondary btn-export-data" href="{{ url_for('intake_bp.export', studyID=study_id) }}" target="_blank">
                 <span class="fa fa-download"></span> Export data</span>
             </a>
         </div>
         <div class="btn-group">
-            <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info"><span class="fa fa-chevron-right"></span> Intake</a>
+            <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info btn-goto-intake"><span class="fa fa-chevron-right"></span> Intake</a>
         </div>
       </div>
     </div>
-
+	
     <div class="row">
         <div class="col-sm-6">
             <h1>Raw</h1>
             {% set exists = [] %}
-            <table width="100%" class="table-striped">
+            <table width="100%" class="table-striped dataset-type-counts-raw">
                 <thead>
                 <tr>
                     <td><strong>Type</strong></td>
@@ -103,7 +102,7 @@
                         {% for version in datasetTypeCounts[type][wave] %}
                             {% if version=='raw' %}
                                 {% if exists.append(1) %}{% endif %}
-                                <tr>
+                                <tr class="dataset-type-counts-raw">
                                     <td>{{ type }}</td>
                                     <td>{{ wave }}</td>
                                     <td>{{ datasetTypeCounts[type][wave][version] }}</td>
@@ -138,7 +137,7 @@
                         {% for version in datasetTypeCounts[type][wave] %}
                             {% if version!='raw' %}
                                 {% if exists.append(1) %}{% endif %}
-                                <tr>
+                                <tr class="dataset-type-counts-processed">
                                     <td>{{ type }}</td>
                                     <td>{{ version }}</td>
                                     <td>{{ wave }}</td>
@@ -164,7 +163,7 @@
                 {% for version in aggregatedInfo %}
                     {% if version == 'raw' %}
                         {% for descr in aggregatedInfo[version] %}
-                            <tr>
+                            <tr class="dataset-aggregated-version-raw">
                                 <td style="width:250px;">{{ title_translate[descr] }}</td>
                                 <td align="right">{{ aggregatedInfo[version][descr] }}</td>
                             </tr>
@@ -181,7 +180,7 @@
                 {% for version in aggregatedInfo %}
                     {% if version == 'notRaw' %}
                         {% for descr in aggregatedInfo[version] %}
-                            <tr>
+                            <tr class="dataset-aggregated-version-processed">
                                 <td style="width:250px;">{{ title_translate[descr] }}</td>
                                 <td align="right">{{ aggregatedInfo[version][descr] }}</td>
                             </tr>
@@ -198,7 +197,7 @@
                 {% for version in aggregatedInfo %}
                     {% if version == 'total' %}
                         {% for descr in aggregatedInfo[version] %}
-                            <tr>
+                            <tr class="dataset-aggregated-version-total">
                                 <td style="width:250px;">{{ title_translate[descr] }}</td>
                                 <td align="right">{{ aggregatedInfo[version][descr] }}</td>
                             </tr>

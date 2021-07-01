@@ -37,24 +37,40 @@ def _call(fn):
 
 
 def call(fn, data=None):
+    def bytesbuf_to_str(s):
+        s = s.buf[:s.buflen]
+        i = s.find(b'\x00')
+        return s if i < 0 else s[:i]
+
+    def escape_quotes(s):
+        return s.replace('\\', '\\\\').replace('"', '\\"')
+
+    def break_strings(N, m):
+        return (N - 1) // m + 1
+
+    def nrep_string_expr(s, m=64):
+        return ' ++\n'.join('"{}"'.format(escape_quotes(s[i * m:i * m + m])) for i in range(break_strings(len(s), m) + 1))
+
     if data is None:
         data = {}
 
-    sanitized_params = json.dumps(data) \
-        .replace('\\', '\\\\') \
-        .replace('"', '\\"')
+    params = json.dumps(data)
+    arg_str_expr = nrep_string_expr(params)
+
+    # Set parameters as variable instead of parameter input to circumvent iRODS string limits.
+    rule_body = '''a {{ *x={}
+                        api_{}(*x)
+                     }}
+                '''.format(arg_str_expr, fn)
 
     x = rule.Rule(
         g.irods,
-        body='a {{ api_{}(*x); }}'.format(fn),
-        params={'*x': '"{}"'.format(sanitized_params)},
+        body=rule_body,
+        params={},
         output='ruleExecOut')
 
     x = x.execute()
-    x = x._values['MsParam_PI'][0]._values['inOutStruct']._values['stdoutBuf']
-    x = x.buf[:x.buflen]
-    if b'\x00' in x:
-        x = x[:x.find(b'\x00')]
+    x = bytesbuf_to_str(x._values['MsParam_PI'][0]._values['inOutStruct']._values['stdoutBuf'])
 
     result = x.decode()
 
