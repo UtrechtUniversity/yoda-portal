@@ -10,6 +10,7 @@ TTL = 60 * 30
 
 
 class Session(object):
+    """Session object storing the iRODS session object."""
     def __init__(self, sid, irods):
         self.sid   = sid
         self.irods = irods
@@ -26,6 +27,7 @@ lock = threading.Lock()
 
 
 def gc():
+    """Session garbage collection."""
     while True:
         with lock:
             t = time.time()
@@ -40,6 +42,7 @@ gc.start()
 
 
 def get(sid):
+    """Retrieve iRODS session object from session."""
     if sid in sessions:
         s = sessions[sid]
         s.lock.acquire()
@@ -50,6 +53,7 @@ def get(sid):
 
 
 def add(sid, irods):
+    """Add irods session object to session."""
     global sessions
     s = Session(sid, irods)
     sessions[sid] = s
@@ -59,6 +63,7 @@ def add(sid, irods):
 
 
 def release(sid):
+    """Release a session."""
     global sessions
     if sid in sessions:
         s = sessions[sid]
@@ -67,6 +72,7 @@ def release(sid):
 
 
 def clean(sid):
+    """Clean a session."""
     global sessions
     if sid in sessions:
         del sessions[sid]
