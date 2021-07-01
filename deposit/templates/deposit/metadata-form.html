@@ -17,6 +17,9 @@
 {% endblock %}
 
 {% block content %}
+{% with step=2 %}
+    {% include 'workflow.html' %}
+{% endwith %}
 <div id="form-errors" class="row hide">
     <div class="col-md-12">
         <div class="card">

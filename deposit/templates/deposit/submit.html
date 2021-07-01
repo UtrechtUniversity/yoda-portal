@@ -10,7 +10,9 @@
 {% endblock %}
 
 {% block content %}
-
+    {% with step=3 %}
+        {% include 'workflow.html' %}
+    {% endwith %}
     <h1 style="margin:40px 0;">Submit Deposit</h1>
     <p>Submit your deposit here to location: <em>{{path|safe}}</em></p>
     <form method="post">
@@ -23,5 +25,4 @@
             <button type="submit" class="btn btn-primary" style="margin:15px 15px 15px 0">Submit</button>
         </div>
     </form>
-
 {% endblock %}
