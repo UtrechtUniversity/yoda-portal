@@ -1,10 +1,4 @@
 $(function() {
-//    # ??? wat doet dit nu??
-//    get_studies();
-//   get_studies_dm();
-//    get_datasets('grp-intake-initial');
-//    get_unrecognized_files('grp-intake-initial')
-
     var tableUnrecognised = $('#datatable_unrecognised').DataTable({
         "language": {
             "sEmptyTable":     "No data found",
@@ -47,7 +41,7 @@ $(function() {
     $('#btn-start-scan').click(function(){
         var study_id = 'grp-intake-' + $('#studyID').val();
 
-        $(this).prop('disabled', true);
+        $(this).prop('disabled', true).addClass('disabled');
         inProgressStart('Scanning in progress...');
         Yoda.call('intake_scan_for_datasets',
                   {coll: Yoda.basePath + '/' + study_id}).then((data) => {
@@ -63,60 +57,51 @@ $(function() {
 
     // datamanager only
     $('#btn-lock').click(function(){
-        var url = Yoda.baseUrl + ['intake','lockDatasets'].join('/'),
-            datasets=[],
-            csrf_key = $('input[name="csrf_yoda"]').val();
-
-        // if(datasets.length==0){
-        //     return alert('Please select at least one dataset.');
-        // }
-
-        intake_path = Yoda.basePath + '/' + 'grp-intake-' + $('#studyID').val();
+        var datasets = [],
+            intake_path = Yoda.basePath + '/' + 'grp-intake-' + $('#studyID').val();
         inProgressStart('Locking in progress...');
 
         $('.cbDataSet').each(function(){
             if($(this).prop('checked')){
-                // datasets.push($(this).parent().parent().data('dataset-id'));
-                dataset_id = $(this).parent().parent().data('dataset-id');
-                Yoda.call('intake_lock_dataset', {"path": intake_path, "dataset_id": dataset_id}).then((data) => {
-                    console.log(data);
-                    if (data.proc_status!='OK') {
-                        reload_page_with_alert('2');
-                    }
-                })
+                datasets.push($(this).parent().parent().data('dataset-id'));
             }
         });
-        reload_page_with_alert('1');
-        return;
+        handleLockingAndAlerts(intake_path, datasets.toString());
     });
 
     // datamanager only
     $('#btn-unlock').click(function(){
-        var url = Yoda.baseUrl + ['intake','unlockDatasets'].join('/'),
-            datasets=[],
-            csrf_key = $('input[name="csrf_yoda"]').val();
-
-        // if(datasets.length==0){
-        //     return alert('Please select at least one dataset.');
-        // }
-
-        intake_path = Yoda.basePath + '/' + 'grp-intake-' + $('#studyID').val();
-        inProgressStart('Unlocking in progress...');
+        var datasets = [],
+            intake_path = Yoda.basePath + '/' + 'grp-intake-' + $('#studyID').val();
+        inProgressStart('Locking in progress...');
 
         $('.cbDataSet').each(function(){
             if($(this).prop('checked')){
-                dataset_id = $(this).parent().parent().data('dataset-id');
-                Yoda.call('intake_unlock_dataset', {"path": intake_path, "dataset_id": dataset_id}).then((data) => {
-                    console.log(data);
-                    if (data.proc_status!='OK') {
-                        reload_page_with_alert('4');
-                    }
-                })
+                datasets.push($(this).parent().parent().data('dataset-id'));
             }
         });
-        reload_page_with_alert('3');
-        return;
+        handleUnlockingAndAlerts(intake_path, datasets.toString());
     });
+
+    async function handleLockingAndAlerts(intake_path, dataset_ids)
+    {
+        result = await Yoda.call('intake_lock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
+        if (result.proc_status!='OK') {
+            reload_page_with_alert('2');
+            return;
+        }
+        reload_page_with_alert('1');
+    }
+
+    async function handleUnlockingAndAlerts(intake_path, dataset_ids)
+    {
+        result = await Yoda.call('intake_unlock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
+        if (result.proc_status!='OK') {
+            reload_page_with_alert('4');
+            return;
+        }
+        reload_page_with_alert('3');
+    }
 
     function addCommentToDataset(studyId, table, datasetId, comment)
     {

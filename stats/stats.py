@@ -5,7 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 from datetime import datetime
 
-from flask import Blueprint, make_response, render_template
+from flask import Blueprint, jsonify, make_response, render_template, request
 
 import api
 
@@ -17,11 +17,29 @@ stats_bp = Blueprint('stats_bp', __name__,
 
 @stats_bp.route('/')
 def index():
+    resource_tiers_response = api.call('resource_resource_and_tier_data', data={})
     group_response = api.call('resource_list_groups', data={})
     category_response = api.call('resource_category_stats', data={})
     return render_template('stats/stats.html',
+                           resources=resource_tiers_response['data'],
                            groups=group_response['data'],
                            categories=category_response['data'])
+
+
+@stats_bp.route('get_tiers', methods=['GET'])
+def get_tiers():
+    result = api.call('resource_get_tiers', data={})
+    return jsonify(result['data'])
+
+
+@stats_bp.route('resource_details', methods=['GET'])
+def get_resource_details():
+    resource = request.args.get('resource')
+    result = api.call('resource_tier', {'res_name': resource})
+    html = render_template('stats/resource_tier_mgmt.html',
+                           name=resource,
+                           tier=result['data'])
+    return {'status': 'success', 'html': html}
 
 
 @stats_bp.route('/export')
