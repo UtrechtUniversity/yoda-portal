@@ -16,13 +16,7 @@
 {% with step=1 %}
     {% include 'deposit/workflow.html' %}
 {% endwith %}
-<h1 style="margin: 40px 0;">Deposit your data</h1>
-<p>You can deposit your data with the following steps:</p>
-<ol>
-    <li>Upload</li>
-    <li><a href="/deposit/metadata">Add metadata</a></li>
-    <li>Submit</li>
-</ol>
+<h1>Deposit your data</h1>
 
 <div id="flow_upload">
     <h1>Drag & Drop upload files</h1>
@@ -32,7 +26,6 @@
     <ul class="flow-list"></ul>
 </div>
 
-<h1 style="margin-top:40px;">Metadata</h1>
 <p><a href="/deposit/metadata">&gt;&gt; Add metadata</a></p>
 
 <div id="path" style="display:none;">{{ path|safe }}</div>
