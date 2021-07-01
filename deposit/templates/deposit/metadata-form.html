@@ -17,11 +17,14 @@
 {% endblock %}
 
 {% block content %}
+{% with step=2 %}
+    {% include 'deposit/workflow.html' %}
+{% endwith %}
 <div id="form-errors" class="row hide">
     <div class="col-md-12">
         <div class="card">
             <div class="card-header clearfix">
-                <h5 class="card-title pull-left">Deposit Metadata form has errors</h5>
+                <h5 class="card-title pull-left">Metadata form has errors</h5>
                 <div class="input-group-sm has-feedback pull-right"><a class="btn btn-secondary" href="/deposit/metadata">Close</a></div>
             </div>
             <div class="card-body">
@@ -41,7 +44,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title pull-left">Deposit Metadata for: {{path|safe}}</h5>
+                <h5 class="card-title pull-left">Metadata for your deposit</h5>
 <!--                <div class="input-group-sm has-feedback pull-right close-button"><a class="btn btn-light btn-sm" href="/deposit/submit">Next page</a></div>-->
             </div>
             <div class="card-body">

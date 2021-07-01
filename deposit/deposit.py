@@ -12,15 +12,13 @@ deposit_bp = Blueprint('deposit_bp', __name__,
                        static_folder='static/deposit',
                        static_url_path='/deposit')
 
-
 """
 Deposit flow:
     Uses the flow upload in research module
 
     1. Upload data:     /deposit
-    2. Add metadata:    /deposit/metadata/form?path=/research-initial
+    2. Add metadata:    /deposit/metadata/
     3. Submit:          /deposit/submit
-
 """
 
 
@@ -32,30 +30,28 @@ def get_deposit_path():
 
 @deposit_bp.route('/', methods=['GET'])
 def index():
-    """ Deposit files/folder to a folder path """
-    # response = api.call('deposit_path')
-    # path = response['data']['deposit_path']
+    """ Step 1: Deposit files and folders """
     path = get_deposit_path()
     return render_template('deposit/deposit.html', path=path)
 
 
-@deposit_bp.route('/metadata/')
-@deposit_bp.route('/metadata/form/')
+@deposit_bp.route('/metadata')
+@deposit_bp.route('/metadata/form')
 def metadata_form():
-    """ Step2: Add metadata to your upload """
+    """Step 2: Add metadata to your upload"""
     path = get_deposit_path()
     return render_template('deposit/metadata-form.html', path=path)
 
 
-@deposit_bp.route('/submit/', methods=['GET'])
+@deposit_bp.route('/submit', methods=['GET'])
 def submit():
-    """ Step 3: Submit upload """
+    """Step 3: Submit upload"""
     path = get_deposit_path()
     return render_template('deposit/submit.html', path=path)
 
 
-@deposit_bp.route('/submit/', methods=['POST'])
+@deposit_bp.route('/submit', methods=['POST'])
 def submit_upload():
-    """ Step 3: Submit upload """
+    """Step 3: Submit upload """
     # todo upload here with agreeing terms and conditions
     return render_template('deposit/thankyou.html')
