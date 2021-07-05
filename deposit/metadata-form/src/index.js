@@ -7,6 +7,8 @@ import Geolocation from "./Geolocation";
 //const path = "/research-initial";
 const path = $('#form').attr('data-path');
 console.info("Path: " + path);
+console.info("tokenName: " + Yoda.csrf.tokenName);
+console.info("tokenValue: " + Yoda.csrf.tokenValue);
 
 let schema       = {};
 let uiSchema     = {};
@@ -184,17 +186,16 @@ class YodaForm extends React.Component {
 }
 
 class YodaButtons extends React.Component {
-
     constructor(props) {
         super(props);
     }
 
     renderSaveButton() {
-        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary pull-left mr-1">Save</button>);
+        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary pull-left">Save & submit</button>);
     }
 
     renderDeleteButton() {
-        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn pull-right">Delete all metadata</button>);
+        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn pull-right">Delete all metadata </button>);
     }
 
     renderFormCompleteness() {
@@ -228,14 +229,9 @@ class YodaButtons extends React.Component {
 
 
 class Container extends React.Component {
-
     constructor(props) {
         super(props);
         this.saveMetadata = this.saveMetadata.bind(this);
-    }
-
-    gotoDepositPage() {
-        window.location.href="/deposit/";
     }
 
     saveMetadata() {
@@ -246,7 +242,6 @@ class Container extends React.Component {
     render() {
         return (
             <div>
-                <button onClick={this.gotoDepositPage} type="button" className="btn btn-secondary pull-left">Back</button>
                 <YodaButtons saveMetadata={this.saveMetadata}
                              deleteMetadata={deleteMetadata}  />
                 <YodaForm ref={(form) => {this.form=form;}}/>
@@ -385,7 +380,7 @@ async function submitData(data) {
             {errorPrefix: 'Metadata could not be saved'});
 
         Yoda.store_message('success', `Updated metadata of folder <${path}>`);
-        window.location.href = '/deposit/submit/';
+        window.location.href = '/deposit/submit';
     } catch (e) {
         // Allow retry.
         $('.yodaButtons button').attr('disabled', false);
