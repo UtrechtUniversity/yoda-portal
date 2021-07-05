@@ -16,9 +16,9 @@ deposit_bp = Blueprint('deposit_bp', __name__,
 Deposit flow:
     Uses the flow upload in research module
 
-    1. Upload data:     /deposit
+    1. Upload data:     /deposit/
     2. Add metadata:    /deposit/metadata/
-    3. Submit:          /deposit/submit
+    3. Submit:          /deposit/submit/
 """
 
 
@@ -35,7 +35,7 @@ def index():
     return render_template('deposit/deposit.html', path=path)
 
 
-@deposit_bp.route('/metadata')
+@deposit_bp.route('/metadata/')
 @deposit_bp.route('/metadata/form')
 def metadata_form():
     """Step 2: Add metadata to your upload"""
@@ -43,14 +43,14 @@ def metadata_form():
     return render_template('deposit/metadata-form.html', path=path)
 
 
-@deposit_bp.route('/submit', methods=['GET'])
+@deposit_bp.route('/submit/', methods=['GET'])
 def submit():
     """Step 3: Submit upload"""
     path = get_deposit_path()
     return render_template('deposit/submit.html', path=path)
 
 
-@deposit_bp.route('/submit', methods=['POST'])
+@deposit_bp.route('/submit/', methods=['POST'])
 def submit_upload():
     """Step 3: Submit upload """
     # todo upload here with agreeing terms and conditions
