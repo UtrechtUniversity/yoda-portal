@@ -4,11 +4,7 @@ import Form from "@rjsf/bootstrap-4";
 import Select from 'react-select';
 import Geolocation from "./Geolocation";
 
-//const path = "/research-initial";
 const path = $('#form').attr('data-path');
-console.info("Path: " + path);
-console.info("tokenName: " + Yoda.csrf.tokenName);
-console.info("tokenValue: " + Yoda.csrf.tokenValue);
 
 let schema       = {};
 let uiSchema     = {};
@@ -17,6 +13,7 @@ let yodaFormData = {};
 let formProperties;
 
 let saving = false;
+let back   = false;
 
 let form = document.getElementById('form');
 
@@ -190,12 +187,16 @@ class YodaButtons extends React.Component {
         super(props);
     }
 
-    renderSaveButton() {
-        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary pull-left">Save & submit</button>);
+    renderBackButton() {
+        return (<button onClick={this.props.backButton} type="submit" className="btn btn-secondary pull-left">Back</button>);
+    }
+
+    renderSubmitButton() {
+        return (<button onClick={this.props.submitButton} type="submit" className="btn btn-primary pull-right">Submit</button>);
     }
 
     renderDeleteButton() {
-        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn pull-right">Delete all metadata </button>);
+        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn ml-3">Delete all metadata </button>);
     }
 
     renderFormCompleteness() {
@@ -206,7 +207,8 @@ class YodaButtons extends React.Component {
         let buttons = [];
 
         if (formProperties.data.can_edit) {
-            buttons.push(this.renderSaveButton());
+            buttons.push(this.renderBackButton());
+            buttons.push(this.renderSubmitButton());
             buttons.push(this.renderFormCompleteness());
             if (formProperties.data.metadata !== null)
                 buttons.push(this.renderDeleteButton());
@@ -227,14 +229,21 @@ class YodaButtons extends React.Component {
     }
 }
 
-
 class Container extends React.Component {
     constructor(props) {
         super(props);
-        this.saveMetadata = this.saveMetadata.bind(this);
+        this.backButton = this.backButton.bind(this);
+        this.submitButton = this.submitButton.bind(this);
     }
 
-    saveMetadata() {
+    backButton() {
+        back = true;
+        saving = true;
+        this.form.submitButton.click();
+    }
+
+    submitButton() {
+        back = false;
         saving = true;
         this.form.submitButton.click();
     }
@@ -242,10 +251,12 @@ class Container extends React.Component {
     render() {
         return (
             <div>
-                <YodaButtons saveMetadata={this.saveMetadata}
+                <YodaButtons backButton={this.backButton}
+                             submitButton={this.submitButton}
                              deleteMetadata={deleteMetadata}  />
                 <YodaForm ref={(form) => {this.form=form;}}/>
-                <YodaButtons saveMetadata={this.saveMetadata}
+                <YodaButtons backButton={this.backButton}
+                             submitButton={this.submitButton}
                              deleteMetadata={deleteMetadata} />
             </div>
         );
@@ -379,8 +390,12 @@ async function submitData(data) {
             {coll: Yoda.basePath+path, metadata: data},
             {errorPrefix: 'Metadata could not be saved'});
 
-        Yoda.store_message('success', `Updated metadata of folder <${path}>`);
-        window.location.href = '/deposit/submit';
+            //Yoda.store_message('success', `Updated metadata of folder <${path}>`);
+            if (back) {
+                window.location.href = '/deposit';
+            } else {
+                window.location.href = '/deposit/submit';
+            }
     } catch (e) {
         // Allow retry.
         $('.yodaButtons button').attr('disabled', false);
