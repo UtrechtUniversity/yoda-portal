@@ -1,20 +1,26 @@
-<div class="card-group" style="margin-bottom:10px;">
+<div class="card-group mb-2">
   <div class="card {% if step == 1 %}bg-primary{% endif %}">
-    <a href="/deposit/" class="card-body" style="display:block;">
+    <div class="card-body">
       <h5 class="card-title">1. Deposit data</h5>
-      <p class="card-subtitle">Easily add files and folders to submit as a datapackage.</p>
-    </a>
+      <p class="card-subtitle">
+          <a href="/deposit" class="stretched-link">Easily add files and folders to submit as a datapackage.</a>
+      </p>
+    </div>
   </div>
   <div class="card {% if step == 2 %}bg-primary{% endif %}">
-    <a href="/deposit/metadata/" class="card-body" style="display:block;">
+    <div class="card-body">
       <h5 class="card-title">2. Add metadata</h5>
-      <p class="card-subtitle">Add metadata about your deposit.</p>
-    </a>
+      <p class="card-subtitle">
+          <a href="/deposit/metadata" class="stretched-link">Add metadata to your data package</a>
+      </p>
+    </div>
   </div>
   <div class="card {% if step == 3 %}bg-primary{% endif %}">
-    <a href="/deposit/submit/" class="card-body" style="display:block;">
+    <div class="card-body">
       <h5 class="card-title">3. Submit</h5>
-      <p class="card-text">Submit your deposit.</p>
-    </a>
+      <p class="card-subtitle">
+          <a href="/deposit/submit" class="stretched-link">Submit your data package</a>
+      </p>
+    </div>
   </div>
 </div>
