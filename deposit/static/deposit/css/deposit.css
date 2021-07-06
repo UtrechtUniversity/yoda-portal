@@ -115,6 +115,6 @@ table.dataTable > tbody > tr > td i {
 .fa-exclamation-circle,
 .fa-book,
 .fa-info-circle {
-    color: #333;
+    color: #331a8c;
+    font-size: 25px;
 }
-
