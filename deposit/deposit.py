@@ -3,7 +3,7 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, session
 
 import api
 
@@ -17,7 +17,7 @@ Deposit flow:
     Uses the flow upload in research module
 
     1. Upload data:     /deposit
-    2. Add metadata:    /deposit/metadata/
+    2. Add metadata:    /deposit/metadata
     3. Submit:          /deposit/submit
 """
 
@@ -28,11 +28,23 @@ def get_deposit_path():
     return path.replace('//', '/')
 
 
-@deposit_bp.route('/', methods=['GET'])
+@deposit_bp.route('/')
+@deposit_bp.route('/browse')
 def index():
     """ Step 1: Deposit files and folders """
-    path = get_deposit_path()
-    return render_template('deposit/deposit.html', path=path)
+    # return render_template('deposit/deposit.html', path=path)
+
+    items = 10
+    # dir = '/research-initial'
+    # dir = request.args.get('dir')
+    dir = get_deposit_path()
+
+    return render_template('deposit/deposit.html',
+                           activeModule='deposit',
+                           searchHtml='',
+                           items=items,
+                           dir=dir)
+
 
 
 @deposit_bp.route('/metadata')
