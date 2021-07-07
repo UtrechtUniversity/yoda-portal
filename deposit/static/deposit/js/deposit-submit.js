@@ -21,7 +21,12 @@ async function getStatus()
 {
     try {
         let status = await Yoda.call('deposit_status', {})
-        console.log(status)
+        if (status.data) {
+            $('#data_check').removeClass('fa-times text-danger').addClass('fa-check text-success');
+        }
+        if (status.metadata) {
+            $('#metadata_check').removeClass('fa-times text-danger').addClass('fa-check text-success');
+        }
     } catch (e) {
         console.log(e);
     }
