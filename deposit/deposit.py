@@ -3,7 +3,7 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, render_template
 
 import api
 
@@ -44,7 +44,6 @@ def index():
                            searchHtml='',
                            items=items,
                            dir=dir)
-
 
 
 @deposit_bp.route('/metadata')

@@ -18,6 +18,8 @@ $(function() {
 async function submitToVault()
 {
     try {
+        let status = await Yoda.call('deposit_status', {})
+        console.log(status);
         let status = await Yoda.call('deposit_submit', {})
         console.log(status);
     } catch (e) {
