@@ -143,6 +143,9 @@ def callback():
 
         return response
 
+    class UserinfoSubMismatchError(Exception):
+        pass
+
     token_response = None
     userinfo_response = None
 
@@ -168,16 +171,20 @@ def callback():
         )
 
         userinfo_response = userinfo_request(access_token)
+        userinfo_payload = userinfo_response.json()
 
+        if payload['sub'] != userinfo_payload['sub']:
+            raise UserinfoSubMismatchError
+ 
         email_identifier = app.config.get('OIDC_EMAIL_FIELD')
-        email = userinfo_response.json()[email_identifier].lower()
+        email = userinfo_payload[email_identifier].lower()
 
         # Add a prefix to consume in the PAM stack
-        access_token = '++oidc_token++' + access_token
+        access_token = '++oidc_token++' + payload['sub'] + 'end_sub' + access_token
 
         irods_login(email, access_token)
 
-    except (jwt.PyJWTError, json.decoder.JSONDecodeError, iRODSException, KeyError) as error:
+    except (jwt.PyJWTError, json.decoder.JSONDecodeError, iRODSException, KeyError, UserinfoSubMismatchError) as error:
         print_exc()
 
         if isinstance(error, jwt.PyJWTError):
@@ -200,6 +207,11 @@ def callback():
                     file=sys.stderr)
             else:
                 print('token_response + headers:\n{}\n{}'.format(token_response.headers, token_response.text), file=sys.stderr)
+        elif isinstance(error, UserinfoSubMismatchError):
+            # Possible Token substitution attack
+            print(
+                'Possible token substitution attack: {} is not {}'.format(payload['sub'], userinfo_response['sub']),
+                file=sys.stderr)
 
         flash(
             'An error occurred during the OpenID Connect protocol. '
