@@ -10,18 +10,26 @@ $(document).ajaxSend(function(e, request, settings) {
 });
 
 $(function() {
+    getStatus();
+
     $("body").on("click", "button#submit", function() {
         submitToVault();
     });
 });
 
-async function submitToVault()
+async function getStatus()
 {
     try {
         let status = await Yoda.call('deposit_status', {})
-        console.log(status);
-        let status = await Yoda.call('deposit_submit', {})
-        console.log(status);
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+async function submitToVault()
+{
+    try {
+        await Yoda.call('deposit_status', {})
     } catch (e) {
         console.log(e);
     }
