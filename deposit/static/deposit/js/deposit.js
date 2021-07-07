@@ -207,10 +207,6 @@ $(function() {
         unlockFolder($(this).attr('data-folder'));
     });
 
-    $("body").on("click", "a.action-submit", function() {
-        submitToVault($(this).attr('data-folder'));
-    });
-
     $("body").on("click", "a.action-check-for-unpreservable-files", function() {
         // Check for unpreservable file formats.
         // If present, show extensions to user.
@@ -307,6 +303,10 @@ $(function() {
 
     $("body").on("click", "a.action-go-to-vault", function() {
         window.location.href = '/vault/?dir=' + encodeURIComponent('/'+$(this).attr('vault-path'));
+    });
+
+    $("body").on("click", "button#submit", function() {
+        submitToVault();
     });
 });
 
@@ -1002,27 +1002,13 @@ function showMetadataForm(path)
     window.location.href = 'metadata/form?path=' + encodeURIComponent(path);
 }
 
-async function submitToVault(folder)
+async function submitToVault()
 {
-    if (typeof folder != 'undefined') {
-        // Set spinner & disable button
-        let btnText = $('#statusBadge').html();
-        $('#statusBadge').html('Submit <i class="fa fa-spinner fa-spin fa-fw"></i>');
-        $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-        try {
-            let status = await Yoda.call('folder_submit', {'coll': Yoda.basePath + folder})
-            if (status === 'SUBMITTED') {
-                $('#statusBadge').html('Submitted');
-            } else if (status === 'ACCEPTED') {
-                $('#statusBadge').html('Accepted');
-            } else {
-                $('#statusBadge').html(btnText);
-            }
-        } catch (e) {
-            $('#statusBadge').html(btnText);
-        }
-        topInformation(folder, false);
+    try {
+        let status = await Yoda.call('deposit_submit', {})
+        console.log(status);
+    } catch (e) {
+        console.log(e);
     }
 }
 

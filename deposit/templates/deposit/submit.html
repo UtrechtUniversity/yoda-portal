@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('deposit_bp.static', filename='js/deposit.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -26,7 +27,7 @@
                 </div>
                 <br />
                 <a href="/deposit/metadata" class="btn btn-secondary">Back</a>
-                <button type="submit" class="btn btn-primary pull-right">Submit</button>
+                <button id="submit" type="submit" class="btn btn-primary pull-right">Submit</button>
             </form>
         </div>
     </div>
