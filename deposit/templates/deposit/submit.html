@@ -20,15 +20,13 @@
             <h5 class="card-title pull-left">Submit your data package</h5>
         </div>
         <div class="card-body">
-            <form method="post">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms">
-                  <label class="form-check-label" for="accept_terms">I accept the terms and conditions</label>
-                </div>
-                <br />
-                <a href="/deposit/metadata" class="btn btn-secondary">Back</a>
-                <button id="submit" type="submit" class="btn btn-primary pull-right">Submit</button>
-            </form>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms">
+              <label class="form-check-label" for="accept_terms">I accept the terms and conditions</label>
+            </div>
+            <br />
+            <a href="/deposit/metadata" class="btn btn-secondary">Back</a>
+            <button id="submit" type="submit" class="btn btn-primary pull-right">Submit</button>
         </div>
     </div>
 {% endblock %}
