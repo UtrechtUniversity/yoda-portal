@@ -21,6 +21,7 @@ async function getStatus()
 {
     try {
         let status = await Yoda.call('deposit_status', {})
+        console.log(status)
     } catch (e) {
         console.log(e);
     }
