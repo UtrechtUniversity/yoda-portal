@@ -148,7 +148,7 @@ def callback():
 
     token_response = None
     userinfo_response = None
-    exception_occurred = True # To identify exception in finally-clause
+    exception_occurred = True  # To identify exception in finally-clause
 
     try:
         token_response = token_request()
@@ -176,7 +176,7 @@ def callback():
 
         if payload['sub'] != userinfo_payload['sub']:
             raise UserinfoSubMismatchError
- 
+
         email_identifier = app.config.get('OIDC_EMAIL_FIELD')
         email = userinfo_payload[email_identifier].lower()
 
@@ -187,30 +187,63 @@ def callback():
         exception_occurred = False
 
     except jwt.PyJWTError:
-        # Error occurred during steps for verification, configurations used can be found in flask.cfg
-        print('Id Token:\n{}'.format(str(id_token)), file=sys.stderr)
+        # Error occurred during steps for verification,
+        # configurations used can be found in flask.cfg
+        print(
+            'Id Token:\n{}'
+            .format(str(id_token)),
+            file=sys.stderr)
+
     except json.decoder.JSONDecodeError:
         # Either token response or userinfo response decoding failed
-        print('token_response + headers:\n{}\n\n{}'.format(token_response.headers, token_response.text), file=sys.stderr)
+        print(
+            'token_response + headers:\n{}\n\n{}'
+            .format(
+                token_response.headers,
+                token_response.text),
+            file=sys.stderr)
+
         if userinfo_response is not None:
             print(
-                'userinfo_response + headers:\n{}\n\n{}'.format(userinfo_response.headers, userinfo_response.text),
+                'userinfo_response + headers:\n{}\n\n{}'
+                .format(
+                    userinfo_response.headers,
+                    userinfo_response.text),
                 file=sys.stderr)
+
     except iRODSException:
-        print('username: {}'.format(email), file=sys.stderr)
+        print(
+            'username: {}'
+            .format(email),
+            file=sys.stderr)
+
     except KeyError:
-        # Missing key in token or userinfo response. The only one of interest is the latest response
+        # Missing key in token or userinfo response.
+        # The only one of interest is the latest response
         if userinfo_response is not None:
             print(
-                'userinfo_response + headers:\n{}\n{}'.format(userinfo_response.headers, userinfo_response.text),
+                'userinfo_response + headers:\n{}\n{}'
+                .format(
+                    userinfo_response.headers,
+                    userinfo_response.text),
                 file=sys.stderr)
         else:
-            print('token_response + headers:\n{}\n{}'.format(token_response.headers, token_response.text), file=sys.stderr)
+            print(
+                'token_response + headers:\n{}\n{}'
+                .format(
+                    token_response.headers,
+                    token_response.text),
+                file=sys.stderr)
+
     except UserinfoSubMismatchError:
         # Possible Token substitution attack
         print(
-            'Possible token substitution attack: {} is not {}'.format(payload['sub'], userinfo_response['sub']),
+            'Possible token substitution attack: {} is not {}'
+            .format(
+                payload['sub'],
+                userinfo_response['sub']),
             file=sys.stderr)
+
     finally:
         if exception_occurred:
             print_exc()
