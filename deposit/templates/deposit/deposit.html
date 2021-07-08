@@ -23,13 +23,12 @@
 {% include 'deposit/workflow.html' %}
 {% endwith %}
 
-<div class="card">
+<div class="card page_deposit">
     <div class="card-header">
         <h5 class="card-title pull-left" style="margin:4px 0;">Deposit upload</h5>
     </div>
     <div class="card-body">
 
-        <!-- datatable -->
         <div class="row d-block">
 
             <nav aria-label="breadcrumb flex-column">
@@ -58,6 +57,7 @@
                 </div>
             </div>
 
+            <!-- datatable -->
             <div class="col-md-12">
                 <div class="row d-block">
                     <table id="file-browser" class="table yoda-table table-striped upload-drop" ondrop="dropHandler(event);" ondragenter="dragEnterHandler(event);" ondragend="dragEndHandler(event);">
