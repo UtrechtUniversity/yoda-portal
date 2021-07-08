@@ -141,6 +141,34 @@ $(function() {
             $('#files').html("");
             $.each(files, function(key, file) {
                 logUpload(file.uniqueIdentifier, file);
+
+                let $self = $('#'+file.uniqueIdentifier);
+                // Pause btn
+                $self.find('.upload-pause').on('click', function () {
+                    file.pause();
+                    $self.find('.upload-pause').hide();
+                    $self.find('.upload-resume').show();
+                    $self.find('.msg').text('Paused');
+                });
+                // Resume btn
+                $self.find('.upload-resume').on('click', function () {
+                    file.resume();
+                    $self.find('.upload-pause').show();
+                    $self.find('.upload-resume').hide();
+                    $self.find('.msg').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+                });
+                // Cancel btn
+                $self.find('.upload-cancel').on('click', function () {
+                    file.cancel();
+                    $self.remove();
+                });
+                // Retry btn
+                $self.find('.upload-retry').on('click', function () {
+                    file.retry();
+                    $self.find('.upload-pause').show();
+                    $self.find('.upload-retry').hide();
+                    $self.find('.msg').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+                });
             });
         }
         $('#uploads').modal('show');
@@ -155,11 +183,17 @@ $(function() {
         browse(path);
     });
     r.on('fileSuccess', function(file,message){
-        $("#" + file.uniqueIdentifier + " .msg").html("OK");
+        $("#" + file.uniqueIdentifier + " .msg").html("Succesfully");
+        let $self = $('#'+file.uniqueIdentifier);
+        $self.find('.upload-bttns').hide();
+
     });
     r.on('fileError', function(file, message){
-        $("#" + file.uniqueIdentifier + " .msg").html("FAILED");
+        $("#" + file.uniqueIdentifier + " .msg").html("Failed");
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', '0%');
+        let $self = $('#'+file.uniqueIdentifier);
+        $self.find('.upload-pause').hide();
+        $self.find('.upload-retry').show();
     });
     r.on('fileProgress', function(file){
         var percent = Math.floor(file.progress()*100);
@@ -1063,8 +1097,24 @@ async function rejectFolder(folder)
 }
 
 function logUpload(id, file) {
-    let log = `<div class="row" id="${id}">
-                  <div class="col-md-6" style="word-wrap: break-word;">${htmlEncode(file.relativePath)}</div>
+    let log = `<div class="row upload-row" id="${id}">
+                  <div class="col-md-6">
+                    <div class="upload-filename">${htmlEncode(file.relativePath)}</div>
+                    <div class="upload-btns btn-group btn-group-sm" role="group" aria-label="Basic example">
+                      <button type="button" class="btn btn-secondary upload-cancel mr-1">
+                        Cancel
+                      </button>
+                      <button type="button" class="btn btn-secondary upload-resume hide mr-1">
+                        Resume
+                      </button>
+                      <button type="button" class="btn btn-secondary upload-pause">
+                        Pause
+                      </button>
+                      <button type="button" class="btn btn-secondary upload-retry hide">
+                        Retry
+                      </button>                      
+                    </div>
+                  </div>
                   <div class="col-md-3"><div class="progress"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>
                   <div class="col-md-3 msg"><i class="fa fa-spinner fa-spin fa-fw"></i></div>
                </div>`;
