@@ -15,6 +15,12 @@ $(function() {
     $("body").on("click", "button#submit", function() {
         submitToVault();
     });
+
+    $("#submit").change(function() {
+        if($(this).checked && getStatus()) {
+            $(this)..prop('disabled', false);
+        }
+    });
 });
 
 async function getStatus()
@@ -27,9 +33,16 @@ async function getStatus()
         if (status.metadata) {
             $('#metadata_check').removeClass('fa-times text-danger').addClass('fa-check text-success');
         }
+        if (status.data && status.metadata) {
+            return true;
+        } else {
+            return false;
+        }
     } catch (e) {
         console.log(e);
+        return false;
     }
+    return false;
 }
 
 async function submitToVault()
