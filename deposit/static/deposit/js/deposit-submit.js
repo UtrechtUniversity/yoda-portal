@@ -16,9 +16,9 @@ $(function() {
         submitToVault();
     });
 
-    $("#submit").change(function() {
+    $("#accept_terms").change(function() {
         if($(this).checked && getStatus()) {
-            $(this).prop('disabled', false);
+            $("#submit").prop('disabled', false);
         }
     });
 });
