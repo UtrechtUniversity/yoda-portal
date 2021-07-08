@@ -18,7 +18,7 @@ $(function() {
 
     $("#submit").change(function() {
         if($(this).checked && getStatus()) {
-            $(this)..prop('disabled', false);
+            $(this).prop('disabled', false);
         }
     });
 });
