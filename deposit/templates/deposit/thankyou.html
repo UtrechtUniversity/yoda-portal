@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Deposit &dash; Thank you{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/deposit.css') }}">
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title pull-left">Thankyou</h5>
+        </div>
+        <div class="card-body">
+            <p>Thank you for your deposit.</p>
+            <p>The files are currently moved to the <a href="/vault/browse?dir={{path|safe}}">vault</a>.</p>
+            <p>You will receive a notification message when the upload is finished.</p>
+        </div>
+    </div>
+{% endblock %}

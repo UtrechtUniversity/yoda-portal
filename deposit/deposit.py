@@ -3,7 +3,7 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, render_template
 
 import api
 
@@ -13,16 +13,20 @@ deposit_bp = Blueprint('deposit_bp', __name__,
                        static_url_path='/deposit')
 
 """
-Deposit flow:
-    Uses the flow upload in research module
+    Deposit data flow
 
-    1. Upload data:     /deposit
-    2. Add metadata:    /deposit/metadata
-    3. Submit:          /deposit/submit
+    1. Upload data:     /deposit/
+    2. Add metadata:    /deposit/metadata/
+    3. Submit:          /deposit/submit/
+    4. Thankyou page
+    
+    Uses the flow upload and download/view from research module
+
 """
 
 
 def get_deposit_path():
+    """ Returns folder to deposit files. default: '/research-initial' """
     response = api.call('deposit_path')
     path = "/" + response['data']['deposit_path']
     return path.replace('//', '/')
@@ -32,37 +36,34 @@ def get_deposit_path():
 @deposit_bp.route('/browse')
 def index():
     """ Step 1: Deposit files and folders """
-    # return render_template('deposit/deposit.html', path=path)
 
-    items = 10
-    # dir = '/research-initial'
-    # dir = request.args.get('dir')
-    dir = get_deposit_path()
+    items = 25
+    # path = request.args.get('dir')
+    path = get_deposit_path()
 
     return render_template('deposit/deposit.html',
                            activeModule='deposit',
                            searchHtml='',
                            items=items,
-                           dir=dir)
+                           dir=path)
 
 
-
-@deposit_bp.route('/metadata')
+@deposit_bp.route('/metadata/', methods=['GET'])
 def metadata_form():
     """Step 2: Add metadata to your upload"""
     path = get_deposit_path()
     return render_template('deposit/metadata-form.html', path=path)
 
 
-@deposit_bp.route('/submit', methods=['GET'])
+@deposit_bp.route('/submit/', methods=['GET'])
 def submit():
     """Step 3: Submit upload"""
     path = get_deposit_path()
     return render_template('deposit/submit.html', path=path)
 
 
-@deposit_bp.route('/submit', methods=['POST'])
-def submit_upload():
-    """Step 3: Submit upload """
-    # todo upload here with agreeing terms and conditions
-    return render_template('deposit/thankyou.html')
+@deposit_bp.route('/thankyou/', methods=['GET'])
+def thankyou():
+    """Step 4: Thank you page """
+    path = get_deposit_path()
+    return render_template('deposit/thankyou.html', path=path)

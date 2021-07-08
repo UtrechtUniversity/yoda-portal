@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+
     {% with step=3 %}
         {% include 'deposit/workflow.html' %}
     {% endwith %}
@@ -24,6 +25,7 @@
                   <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms">
                   <label class="form-check-label" for="accept_terms">I accept the terms and conditions</label>
                 </div>
+                <p>If you want to cancel the deposit click <a href="xx">here</a>. This will delete all files and folders uploaded.</p>
                 <br />
                 <a href="/deposit/metadata" class="btn btn-secondary">Back</a>
                 <button type="submit" class="btn btn-primary pull-right">Submit</button>

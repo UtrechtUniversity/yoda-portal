@@ -20,15 +20,13 @@ $(function() {
 
     // Canonicalize path somewhat, for convenience.
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
+
+    console.info("dir: " + dir);
     console.info("currentfolder: " + currentFolder);
 
     if ($('#file-browser').length) {
         startBrowsing(browsePageItems);
     }
-
-    $('.btn-group button.metadata-form').click(function(){
-        showMetadataForm($(this).attr('data-path'));
-    });
 
     ////////////////////////////////////////////////
     // File and folder management from context menu
@@ -45,7 +43,7 @@ $(function() {
         $('#folder-create').modal('show');
     });
 
-    // handle addition of new folder to
+    // FOLDER create
     $('.btn-confirm-folder-create').click(function() {
         // er kan een dubbele naam zijn? error handling afwikkelen!
        handleFolderAdd($('#path-folder-create').val(), $(this).attr('data-path'));
@@ -129,7 +127,7 @@ $(function() {
 
     // Flow.js upload handler
     var r = new Flow({
-        target: '/research/upload',
+        target: '/research/upload',    //TODO
         chunkSize: 10 * 1024 * 1024,
         simultaneousUploads: 5,
         query: {'csrf_token': Yoda.csrf.tokenValue, filepath : ''}
@@ -199,103 +197,12 @@ $(function() {
         $("#viewer").html("");
     });
 
-    $("body").on("click", "a.action-lock", function() {
-        lockFolder($(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "a.action-unlock", function() {
-        unlockFolder($(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "a.action-submit", function() {
-        submitToVault($(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "a.action-check-for-unpreservable-files", function() {
-        // Check for unpreservable file formats.
-        // If present, show extensions to user.
-        let folder = $(this).attr('data-folder');
-        $("#file-formats-list").val('');
-
-        $('#showUnpreservableFiles .help').hide();
-        $('#showUnpreservableFiles .preservable').hide();
-        $('#showUnpreservableFiles .advice').hide();
-        $('#showUnpreservableFiles .unpreservable').hide();
-        $('#showUnpreservableFiles .checking').hide();
-
-        if (preservableFormatsLists === null) {
-            // Retrieve preservable file format lists.
-            Yoda.call('vault_preservable_formats_lists').then((data) => {
-                preservableFormatsLists = data;
-
-                $('#file-formats-list').html("<option value='' disabled selected>Select a file format list</option>");
-                for (let list in data) {
-                    if (data.hasOwnProperty(list)) {
-                        $("#file-formats-list").append(new Option(data[list]['name'], list));
-                    }
-                }
-                $('#showUnpreservableFiles').modal('show');
-            });
-        } else {
-            $('#showUnpreservableFiles').modal('show');
-        }
-    });
-
-    $("#file-formats-list").change(function() {
-        let folder = $('a.action-check-for-unpreservable-files').attr('data-folder');
-        let list   = $('#file-formats-list option:selected').val();
-        if (!(list in preservableFormatsLists))
-            return;
-
-        $('#showUnpreservableFiles .checking').show();
-        $('#showUnpreservableFiles .unpreservable').hide();
-        $('#showUnpreservableFiles .preservable').hide();
-        $('#showUnpreservableFiles .advice').hide();
-        $('#showUnpreservableFiles .help'  ).hide();
-
-        $('#showUnpreservableFiles .help'  ).text(preservableFormatsLists[list]["help"]);
-        $('#showUnpreservableFiles .advice').text(preservableFormatsLists[list]["advice"]);
-
-        // Retrieve unpreservable files in folder.
-        Yoda.call('vault_unpreservable_files',
-                  {coll: Yoda.basePath + folder, list_name: list}).then((data) => {
-            $('#showUnpreservableFiles .checking').hide();
-            $('#showUnpreservableFiles .help').show();
-            if (data.length > 0) {
-                $('#showUnpreservableFiles .list-unpreservable-formats').html('');
-                for (let ext of data)
-                    $('#showUnpreservableFiles .list-unpreservable-formats').append(`<li>${htmlEncode(ext)}</li>`);
-                $('#showUnpreservableFiles .advice').show();
-                $('#showUnpreservableFiles .unpreservable').show();
-            } else {
-                $('#showUnpreservableFiles .preservable').show();
-            }
-            $('#showUnpreservableFiles').modal('show');
-        });
-    });
-
-    $("body").on("click", "a.action-unsubmit", function() {
-        unsubmitToVault($(this).attr('data-folder'));
-    });
-
     $("body").on("click", "a.action-accept", function() {
         acceptFolder($(this).attr('data-folder'));
     });
 
     $("body").on("click", "a.action-reject", function() {
         rejectFolder($(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "i.lock-icon", function() {
-        toggleLocksList($(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "i.actionlog-icon", function() {
-        toggleActionLogList($(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "i.system-metadata-icon", function() {
-        toggleSystemMetadata($(this).attr('data-folder'));
     });
 
     $("body").on("click", ".browse", function(e) {
@@ -305,13 +212,11 @@ $(function() {
         e.preventDefault();
     });
 
-    $("body").on("click", "a.action-go-to-vault", function() {
-        window.location.href = '/vault/?dir=' + encodeURIComponent('/'+$(this).attr('vault-path'));
-    });
 });
 
 
 async function handleFolderAdd(new_folder, collection) {
+
     if (!new_folder.length) {
         fileMgmtDialogAlert('folder-create', 'Please add a folder name');
         return;
@@ -336,6 +241,7 @@ async function handleFolderAdd(new_folder, collection) {
 
 
 async function handleFolderRename(new_folder_name, collection, org_folder_name) {
+
     if (!new_folder_name.length) {
         fileMgmtDialogAlert('folder-rename', 'Please add a new folder name');
         return;
@@ -361,6 +267,7 @@ async function handleFolderRename(new_folder_name, collection, org_folder_name) 
 
 
 async function handleFolderDelete(collection, folder_name) {
+
     let result = await Yoda.call('research_folder_delete',
         {
             coll: Yoda.basePath +  collection,
@@ -380,6 +287,7 @@ async function handleFolderDelete(collection, folder_name) {
 }
 
 async function handleFileRename(new_file_name, collection, org_file_name) {
+
     if (!new_file_name.length) {
         fileMgmtDialogAlert('file-rename', 'Please add a new file name');
         return;
@@ -460,8 +368,7 @@ function makeBreadcrumb(dir)
     let pathParts = dir.split('/').filter(x => x.length);
 
     // [[Crumb text, Path]] - e.g. [...['x', '/research-a/x']]
-    //  let crumbs = [['Home', ''],
-    let crumbs = [[''],
+    let crumbs = [['Home', ''],
                   ...Array.from(pathParts.entries())
                           .map(([i,x]) => [x, '/'+pathParts.slice(0, i+1).join('/')])];
 
@@ -652,7 +559,7 @@ function startBrowsing(items)
         "bInfo": false,
         "bLengthChange": true,
         "language": {
-            "emptyTable": "No accessible files/folders present",
+            "emptyTable": "Drag and drop files and folders here",
             "lengthMenu": "_MENU_"
         },
         "dom": '<"top">frt<"bottom"lp><"clear">',
@@ -731,37 +638,6 @@ function toggleActionLogList(folder)
     }
 }
 
-function toggleSystemMetadata(folder)
-{
-    let systemMetadata = $('.system-metadata');
-    let systemMetadataItems = $('.system-metadata-items');
-
-    let isVisible = systemMetadata.is(":visible");
-
-    // Toggle system metadata.
-    if (isVisible) {
-        systemMetadata.hide();
-    } else {
-        // Retrieve system metadata of folder.
-        Yoda.call('research_system_metadata', {coll: Yoda.basePath + folder}).then((data) => {
-            systemMetadata.hide();
-            var html = '';
-            if (data) {
-                $.each(data, function(index, value) {
-                    html += '<a class="list-group-item list-group-item-action"><strong>' +
-                        htmlEncode(index) +
-                        '</strong>: ' +
-                        htmlEncode(value) +
-                        '</a>';
-                });
-            } else {
-                html += '<a class="list-group-item list-group-item-action">No system metadata present</a>';
-            }
-            systemMetadataItems.html(html);
-            systemMetadata.show();
-        });
-    }
-}
 
 window.addEventListener('popstate', function(e) {
     // Catch forward/backward navigation and reload the view.
@@ -805,6 +681,7 @@ function topInformation(dir, showAlert)
             $('.top-information').hide();
             $('.top-info-buttons').hide();
 
+            // TODO delete?
             // Set folder status badge and actions.
             if (typeof status != 'undefined') {
                 if (status == '') {
@@ -873,16 +750,6 @@ function topInformation(dir, showAlert)
                 $('a.file-rename').prop("disabled", false);
             }
 
-            // Lock icon
-            $('.lock').hide();
-            var lockIcon = '';
-            if (lockCount != '0' && typeof lockCount != 'undefined') {
-                lockIcon = `<i class="fa fa-exclamation-circle lock-icon" data-folder="${htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`;
-            }
-
-            // Provenance action log
-            $('.actionlog').hide();
-            let actionLogIcon = ` <i class="fa fa-book actionlog-icon" style="cursor:pointer" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
 
             // System metadata.
             $('.system-metadata').hide();
@@ -913,7 +780,7 @@ function topInformation(dir, showAlert)
             $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
 
             var icon = '<i class="fa fa-folder-open-o" aria-hidden="true"></i>';
-            $('.top-information h2').html(`<span class="icon">${icon}</span> ${folderName}${lockIcon}${systemMetadataIcon}${actionLogIcon}${statusBadge}`);
+            $('.top-information h2').html(`<span class="icon">${icon}</span> ${folderName} ${statusBadge}`);
 
             // Show top information and buttons.
             if (typeof status != 'undefined') {

@@ -196,7 +196,7 @@ class YodaButtons extends React.Component {
     }
 
     renderDeleteButton() {
-        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn ml-3">Delete all metadata </button>);
+        return (<button onClick={deleteMetadata} type="button" className="btn btn-secondary delete-all-metadata-btn ml-3">Delete all metadata </button>);
     }
 
     renderFormCompleteness() {

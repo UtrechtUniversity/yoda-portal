@@ -15,6 +15,11 @@
     float:left;
 }
 
+nav.breadcrumb {
+    margin: -20px 0px 0px -6px;
+    background-color: #fefefe;
+}
+
 .top-information {
     display: none;
 }
@@ -72,12 +77,13 @@ Needs save on metadata form too (react)
     margin: 4px 0;
 }
 
-.dataTables_empty {
-    padding: 30px 0 20px 0;
-}
 
 
 /* Data table */
+
+#file-browser .dataTables_empty {
+    padding: 40px 0 !important;
+}
 
 #file-browser tr > :nth-child(1) {
     min-width: 40%;

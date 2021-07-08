@@ -4,20 +4,17 @@
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/datatables/css/datatables.min.css') }}">
-<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/upload.css') }}">
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/deposit.css') }}">
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('deposit_bp.static', filename='lib/datatables/js/datatables.min.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
-<!--<script src="{{ url_for('deposit_bp.static', filename='js/upload.js') }}"></script>-->
 <script src="{{ url_for('deposit_bp.static', filename='js/deposit.js') }}"></script>
 <script>
     var browsePageItems = {{ items }};
     var browseStartDir = dir = path  = {{ dir|tojson|safe }};
     var view = 'browse';
-
 </script>
 {% endblock %}
 
@@ -32,7 +29,6 @@
     </div>
     <div class="card-body">
 
-
         <!-- datatable -->
         <div class="row d-block">
 
@@ -41,8 +37,6 @@
                     <li class="breadcrumb-item">Home</li>
                 </ol>
             </nav>
-
-            <p style="font-weight:italic; margin:10px 4px;">Drag and drop files and folders.</p>
 
             <div class="top-information">
                 <div class="row">
@@ -61,19 +55,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="card lock">
-                    <div class="card-header">Locks</div>
-                    <div class="list-group lock-items"></div>
-                </div>
-                <div class="card system-metadata">
-                    <div class="card-header">System metadata</div>
-                    <div class="list-group system-metadata-items"></div>
-                </div>
-                <div class="card actionlog">
-                    <div class="card-header">Provenance information</div>
-                    <div class="list-group actionlog-items"></div>
                 </div>
             </div>
 
@@ -99,37 +80,6 @@
 
 
 <!-- Modals -->
-
-<div class="modal" tabindex="-1" role="dialog" id="showUnpreservableFiles">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <h3 class="modal-title">File formats compliance with policy</h3>
-                <div class="form-group">
-                    <label for="file-formats-list">Select preservable file format list:</label>
-                    <select class="form-control" id="file-formats-list">
-                        <option value="" disabled selected>Select a file format list</option>
-                    </select>
-                </div>
-                <p class="help"></p><br/>
-                <p class="advice"></p>
-                <p class="checking">Checking files <i class="fa fa-spinner fa-spin fa-fw"></i></p>
-                <p class="preservable">
-                    This folder does not contain files that are likely to become unusable in the future.
-                </p>
-                <div class="unpreservable">
-                    <p>The following unpreservable file extensions were found in your dataset:</p>
-                    <ul class="list-unpreservable-formats"></ul>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal" tabindex="-1" role="dialog" id="folder-create">
     <div class="modal-dialog">
         <div class="modal-content">
