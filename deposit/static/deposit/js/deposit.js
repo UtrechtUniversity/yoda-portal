@@ -869,6 +869,7 @@ function showMetadataForm(path)
     window.location.href = 'metadata/form?path=' + encodeURIComponent(path);
 }
 
+/*
 async function submitToVault(folder)
 {
     if (typeof folder != 'undefined') {
@@ -892,8 +893,21 @@ async function submitToVault(folder)
         topInformation(folder, false);
     }
 }
+*/
 
-async function unsubmitToVault(folder) {
+async function submitToVault()
+{
+    try {
+        let status = await Yoda.call('deposit_submit', {})
+        console.log(status);
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+
+async function unsubmitToVault(folder)
+{
     if (typeof folder != 'undefined') {
         var btnText = $('#statusBadge').html();
         $('#statusBadge').html('Unsubmit <i class="fa fa-spinner fa-spin fa-fw"></i>');

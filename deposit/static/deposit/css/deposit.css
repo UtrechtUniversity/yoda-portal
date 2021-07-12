@@ -15,8 +15,8 @@
     float:left;
 }
 
-nav.breadcrumb {
-    margin: -20px 0px 0px -6px;
+nav .breadcrumb {
+    margin: -20px 0px 0px -4px;
     background-color: #fefefe;
 }
 
