@@ -9,6 +9,7 @@ from flask_wtf.csrf import CSRFProtect
 
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
+from deposit.deposit import deposit_bp
 from general.general import general_bp
 from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
@@ -27,10 +28,11 @@ with app.app_context():
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
 app.config['modules'] = [
+    {'name': 'Deposit',        'function': 'deposit_bp.index'},
     {'name': 'Research',       'function': 'research_bp.index'},
     {'name': 'Vault',          'function': 'vault_bp.index'},
     {'name': 'Statistics',     'function': 'stats_bp.index'},
-    {'name': 'Group Manager',  'function': 'group_manager_bp.index'}
+    {'name': 'Group Manager',  'function': 'group_manager_bp.index'},
 ]
 if app.config.get('INTAKE_ENABLED'):
     app.config['modules'].append(
@@ -49,7 +51,6 @@ app.config['search-items-per-page'] = 10
 # Start Flask-Session
 Session(app)
 
-
 # Register blueprints
 with app.app_context():
     app.register_blueprint(general_bp)
@@ -58,6 +59,7 @@ with app.app_context():
     app.register_blueprint(stats_bp, url_prefix='/stats')
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(vault_bp, url_prefix='/vault')
+    app.register_blueprint(deposit_bp, url_prefix='/deposit')
     app.register_blueprint(api_bp, url_prefix='/api/')
     if app.config.get('INTAKE_ENABLED'):
         app.register_blueprint(intake_bp, url_prefix='/intake/')

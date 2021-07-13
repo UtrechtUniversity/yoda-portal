@@ -10,8 +10,12 @@ TTL = 60 * 30
 
 
 class Session(object):
-    """Session object storing the iRODS session object."""
     def __init__(self, sid, irods):
+        """Session object storing the iRODS session object.
+
+        :param sid:   Flask session identifier
+        :param irods: iRODS session
+        """
         self.sid   = sid
         self.irods = irods
         self.time  = time.time()
@@ -22,7 +26,7 @@ class Session(object):
         print('[gc/logout]: Dropped iRODS session of session {}'.format(self.sid))
 
 
-sessions = dict()
+sessions = dict()  # Custom session dict instead of Flask session (cannot pickle iRODS session)
 lock = threading.Lock()
 
 
@@ -53,7 +57,12 @@ def get(sid):
 
 
 def add(sid, irods):
-    """Add irods session object to session."""
+    """
+    Add flask sid and irods session to our custom session dict
+
+    :param sid:   Flask session identifier
+    :param irods: iRODS session
+    """
     global sessions
     s = Session(sid, irods)
     sessions[sid] = s
@@ -63,7 +72,10 @@ def add(sid, irods):
 
 
 def release(sid):
-    """Release a session."""
+    """Release a session.
+
+    :param sid:   Flask session identifier
+    """
     global sessions
     if sid in sessions:
         s = sessions[sid]
@@ -72,7 +84,10 @@ def release(sid):
 
 
 def clean(sid):
-    """Clean a session."""
+    """Clean a session.
+
+    :param sid:   Flask session identifier
+    """
     global sessions
     if sid in sessions:
         del sessions[sid]

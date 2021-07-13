@@ -20,7 +20,7 @@ $(function() {
         /// Group name prefixes that can be shown in the group manager.
         /// NB: To make group prefixes selectable in the group add dialog, the
         /// view phtml must be edited.
-        GROUP_PREFIXES_RE:          /^(grp-|priv-|intake-|vault-|research-|datamanager-|datarequests-)/,
+        GROUP_PREFIXES_RE:          /^(grp-|priv-|intake-|vault-|research-|deposit-|datamanager-|datarequests-)/,
 
         /// A subset of GROUP_PREFIXES_RE that cannot be selected for group creation, and that cannot be deleted.
         GROUP_PREFIXES_RESERVED_RE: /^(priv-|vault-)/,

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Deposit{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/deposit.css') }}">
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('deposit_bp.static', filename='js/deposit-submit.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+    {% with step=3 %}
+        {% include 'deposit/workflow.html' %}
+    {% endwith %}
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title pull-left">Submit your data package</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check">
+              <p>Data uploaded <i id="data_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
+              <p>Metadata complete <i id="metadata_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
+              <br />
+              <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms">
+              <label class="form-check-label" for="accept_terms">I accept the terms and conditions</label>
+            </div>
+            <br />
+            <a href="/deposit/metadata" class="btn btn-secondary">Back</a>
+            <button id="submit" type="submit" class="btn btn-primary pull-right" disabled>Submit</button>
+        </div>
+    </div>
+{% endblock %}
