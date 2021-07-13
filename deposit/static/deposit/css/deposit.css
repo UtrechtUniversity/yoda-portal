@@ -19,11 +19,6 @@ nav .breadcrumb {
     background-color: transparent;
 }
 
-.top-info-buttons {
-    padding-top: 20px;
-    text-align: right;
-}
-
 .action-list li {
     cursor: pointer;
 }
