@@ -8,7 +8,6 @@ $(document).ajaxSend(function(e, request, settings) {
               + '=' + encodeURIComponent(Yoda.csrf.tokenValue);
     }
 });
-console.info(Yoda.csrf.tokenName + ": " + Yoda.csrf.tokenValue);
 
 let preservableFormatsLists = null;
 let currentFolder;
@@ -172,39 +171,6 @@ $(function() {
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', percent + '%');
     });
 
-    $("body").on("click", "a.view-video", function() {
-        let path = $(this).attr('data-path');
-        let viewerHtml = `<video width="570" controls autoplay><source src="/research/browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></video>`;
-        $('#viewer').html(viewerHtml);
-        $('#viewMedia').modal('show');
-    });
-
-    $("body").on("click", "a.view-audio", function() {
-        let path = $(this).attr('data-path');
-        let viewerHtml = `<audio width="570" controls autoplay><source src="/research/browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></audio>`;
-        $('#viewer').html(viewerHtml);
-        $('#viewMedia').modal('show');
-    });
-
-    $("body").on("click", "a.view-image", function() {
-        let path = $(this).attr('data-path');
-        let viewerHtml = `<img width="570" src="/research/browse/download?filepath=${htmlEncode(encodeURIComponent(path))}" />`;
-        $('#viewer').html(viewerHtml);
-        $('#viewMedia').modal('show');
-    });
-
-    $("#viewMedia.modal").on("hidden.bs.modal", function() {
-        $("#viewer").html("");
-    });
-
-    $("body").on("click", "a.action-accept", function() {
-        acceptFolder($(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "a.action-reject", function() {
-        rejectFolder($(this).attr('data-folder'));
-    });
-
     $("body").on("click", ".browse", function(e) {
         browse($(this).attr('data-path'), true);
         // Dismiss stale messages.
@@ -330,7 +296,6 @@ async function handleFileDelete(collection, file_name) {
     }
 }
 
-
 function fileMgmtDialogAlert(dlgName, alert) {
     //Alerts regarding folder/file management
     //Inside the modals
@@ -342,7 +307,6 @@ function fileMgmtDialogAlert(dlgName, alert) {
         $('#alert-panel-' + dlgName).hide();
     }
 }
-
 
 function changeBrowserUrl(path)
 {
@@ -360,8 +324,10 @@ function browse(dir = '', changeHistory = false)
     makeBreadcrumb(dir);
     if (changeHistory)
         changeBrowserUrl(dir);
-    topInformation(dir, true); //only here topInformation should show its alertMessage
+
     buildFileBrowser(dir);
+    $('.upload').attr('data-path', dir);
+    $('.btn-group button.folder-create').attr('data-path', dir);    
 }
 
 function makeBreadcrumb(dir)
@@ -526,20 +492,6 @@ const tableRenderer = {
         }
         else {
             // Render context menu for files.
-            const viewExts = {
-                image: ['jpg', 'jpeg', 'gif', 'png'],
-                audio: ['mp3', 'ogg', 'wav'],
-                video: ['mp4', 'ogg', 'webm']
-            };
-            let ext = row.name.replace(/.*\./, '').toLowerCase();
-
-            actions.append(`<a class="dropdown-item" href="/research/browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file">Download</a>`);
-
-            // Generate dropdown "view" actions for different media types.
-            for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-                actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`);
-            }
-
             actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this file">Rename</a>`);
             actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
         }
@@ -593,269 +545,6 @@ window.addEventListener('popstate', function(e) {
 
     browse('dir' in query ? query.dir : '');
 });
-
-function topInformation(dir, showAlert)
-{
-    if (typeof dir != 'undefined') {
-        Yoda.call('research_collection_details',
-                  {path: Yoda.basePath + dir}).then((data) => {
-            let statusText = "";
-            var basename = data.basename;
-            var status = data.status;
-            var userType = data.member_type;
-            var hasWriteRights = true;
-            var isDatamanager = data.is_datamanager;
-            var lockCount = data.lock_count;
-            var vaultPath = data.vault_path;
-            var actions = [];
-
-            $('.btn-group button.metadata-form').hide();
-
-            $('.upload').attr('data-path', "");
-            $('.btn-group button.upload').prop("disabled", true);
-            $('.btn-group button.folder-create').attr('data-path', "");
-            $('.btn-group button.folder-create').prop("disabled", true);
-
-            $('a.folder-delete').prop("disabled", true);
-            $('a.folder-rename').prop("disabled", true);
-            $('a.file-delete').prop("disabled", true);
-            $('a.file-rename').prop("disabled", true);
-
-            $('.top-information').hide();
-            $('.top-info-buttons').hide();
-
-            // TODO delete?
-            // Set folder status badge and actions.
-            if (typeof status != 'undefined') {
-                if (status == '') {
-                    statusText = "";
-                    actions['lock'] = 'Lock';
-                    actions['submit'] = 'Submit';
-                } else if (status == 'LOCKED') {
-                    statusText = "Locked";
-                    actions['unlock'] = 'Unlock';
-                    actions['submit'] = 'Submit';
-                } else if (status == 'SUBMITTED') {
-                    statusText = "Submitted";
-                    actions['unsubmit'] = 'Unsubmit';
-                } else if (status == 'ACCEPTED') {
-                    statusText = "Accepted";
-                } else if (status == 'SECURED') {
-                    statusText = "Secured";
-                    actions['lock'] = 'Lock';
-                    actions['submit'] = 'Submit';
-                } else if (status == 'REJECTED') {
-                    statusText = "Rejected";
-                    actions['lock'] = 'Lock';
-                    actions['submit'] = 'Submit';
-                }
-
-                $('.btn-group button.folder-status').attr('data-datamanager', isDatamanager);
-            }
-
-            if (userType == 'reader') {
-                var actions = [];
-                hasWriteRights = false;
-            }
-
-            if (isDatamanager) {
-                // Check rights as datamanager.
-                if (userType != 'manager' && userType != 'normal') {
-                    var actions = [];
-                    hasWriteRights = false;
-                }
-
-                if (typeof status != 'undefined') {
-                    if (status == 'SUBMITTED') {
-                        actions['accept'] = 'Accept';
-                        actions['reject'] = 'Reject';
-                    }
-                }
-            }
-
-            // Check if folder is writable.
-            if (hasWriteRights && (status == '' || status == 'SECURED')) {
-                // Enable uploads.
-                $('.upload').attr('data-path', dir);
-                $('.btn-group button.upload').prop("disabled", false);
-
-                // Enable folder / file manipulations.
-                $('.btn-group button.folder-create').attr('data-path', dir);
-                $('.btn-group button.folder-create').prop("disabled", false);
-
-                $('a.folder-delete').prop("disabled", false);
-                $('a.folder-rename').prop("disabled", false);
-                $('a.file-delete').prop("disabled", false);
-                $('a.file-rename').prop("disabled", false);
-            }
-
-
-            // System metadata.
-            $('.system-metadata').hide();
-            let systemMetadataIcon = ` <i class="fa fa-info-circle system-metadata-icon" style="cursor:pointer" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
-
-            $('.btn-group button.folder-status').attr('data-write', hasWriteRights);
-
-            // Add unpreservable files check to actions.
-            actions['check-for-unpreservable-files'] = 'Check for compliance with policy';
-
-            // Handle actions
-            handleActionsList(actions, dir);
-
-            // Set vault paths.
-            if (typeof vaultPath != 'undefined' ) {
-                $('a.action-go-to-vault').attr('vault-path', vaultPath);
-            }
-
-            let folderName = htmlEncode(basename).replace(/ /g, "&nbsp;");
-            let statusBadge = '<span id="statusBadge" class="ml-2 badge badge-pill badge-primary">' + statusText + '</span>';
-
-            // Reset action dropdown.
-            $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
-
-            var icon = '<i class="fa fa-folder-open-o" aria-hidden="true"></i>';
-            $('.top-information h2').html(`<span class="icon">${icon}</span> ${folderName} ${statusBadge}`);
-
-            // Show top information and buttons.
-            if (typeof status != 'undefined') {
-                $('.top-information').show();
-                $('.top-info-buttons').show();
-            }
-        });
-    } else {
-        $('.upload').attr('data-path', "");
-
-        // Folder/ file manipulation data
-        $('.btn-group button.folder-create').attr('data-path', "");
-
-        $('.top-information').hide();
-    }
-}
-
-function handleActionsList(actions, folder)
-{
-    var html = '';
-    var vaultHtml = '';
-    var possibleActions = ['lock', 'unlock',
-                           'submit', 'unsubmit',
-                           'accept', 'reject'];
-
-    var possibleVaultActions = ['check-for-unpreservable-files',
-                                'go-to-vault'];
-
-    $.each(possibleActions, function( index, value ) {
-        if (actions.hasOwnProperty(value)) {
-            html += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>';
-        }
-    });
-
-    $.each(possibleVaultActions, function( index, value ) {
-        if (actions.hasOwnProperty(value)) {
-            vaultHtml += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>';
-        }
-    });
-
-    if (html != '' && vaultHtml != '') {
-        html += '<div class="dropdown-divider"></div>' + vaultHtml;
-    } else if (vaultHtml != '') {
-        html += vaultHtml;
-    }
-
-    $('.action-list').html(html);
-}
-
-
-
-
-function showMetadataForm(path)
-{
-    window.location.href = 'metadata/form?path=' + encodeURIComponent(path);
-}
-
-/*
-async function submitToVault(folder)
-{
-    if (typeof folder != 'undefined') {
-        // Set spinner & disable button
-        let btnText = $('#statusBadge').html();
-        $('#statusBadge').html('Submit <i class="fa fa-spinner fa-spin fa-fw"></i>');
-        $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-        try {
-            let status = await Yoda.call('folder_submit', {'coll': Yoda.basePath + folder})
-            if (status === 'SUBMITTED') {
-                $('#statusBadge').html('Submitted');
-            } else if (status === 'ACCEPTED') {
-                $('#statusBadge').html('Accepted');
-            } else {
-                $('#statusBadge').html(btnText);
-            }
-        } catch (e) {
-            $('#statusBadge').html(btnText);
-        }
-        topInformation(folder, false);
-    }
-}
-*/
-
-async function submitToVault()
-{
-    try {
-        let status = await Yoda.call('deposit_submit', {})
-        console.log(status);
-    } catch (e) {
-        console.log(e);
-    }
-}
-
-
-async function unsubmitToVault(folder)
-{
-    if (typeof folder != 'undefined') {
-        var btnText = $('#statusBadge').html();
-        $('#statusBadge').html('Unsubmit <i class="fa fa-spinner fa-spin fa-fw"></i>');
-        $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-        try {
-            let status = await Yoda.call('folder_unsubmit', {'coll': Yoda.basePath + folder})
-            $('#statusBadge').html('');
-        } catch(e) {
-            $('#statusBadge').html(btnText);
-        }
-        topInformation(folder, false);
-    }
-}
-
-async function acceptFolder(folder)
-{
-    var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Accept <i class="fa fa-spinner fa-spin fa-fw"></i>');
-    $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-    try {
-        await Yoda.call('folder_accept', {'coll': Yoda.basePath + folder})
-        $('#statusBadge').html('Accepted');
-    } catch (e) {
-        $('#statusBadge').html(btnText);
-    }
-    topInformation(folder, false);
-}
-
-async function rejectFolder(folder)
-{
-    var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Reject <i class="fa fa-spinner fa-spin fa-fw"></i>');
-    $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-    try {
-        await Yoda.call('folder_reject', {'coll': Yoda.basePath + folder})
-        $('#statusBadge').html('Rejected');
-    } catch (e) {
-        $('#statusBadge').html(btnText);
-        Yoda.set_message('error', data.statusInfo);
-    }
-    topInformation(folder, false);
-}
 
 function logUpload(id, file) {
     let log = `<div class="row" id="${id}">

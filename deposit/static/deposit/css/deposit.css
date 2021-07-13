@@ -16,12 +16,7 @@
 }
 
 nav .breadcrumb {
-    margin: -20px 0px 0px -4px;
-    background-color: #fefefe;
-}
-
-.top-information {
-    display: none;
+    background-color: transparent;
 }
 
 .top-info-buttons {
@@ -38,18 +33,6 @@ nav .breadcrumb {
 }
 .panel-footer  .input-group-sm {
     margin: -6px; /* btn in panel footer */
-}
-
-.top-information h1 .icon .fa-stack {
-    font-size:22px;
-}
-
-.top-information h1 .icon .fa-stack .fa-shield.fa-stack-1x {
-    margin-top: 2px;
-}
-
-.top-information h1 #statusBadge {
-    margin-left: 20px;
 }
 
 #messages {
