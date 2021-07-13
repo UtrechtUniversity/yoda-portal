@@ -61,7 +61,8 @@ async function getStatus()
 async function submitToVault()
 {
     try {
-        await Yoda.call('deposit_status', {})
+        let status = await Yoda.call('deposit_submit', {})
+        console.log(status);
     } catch (e) {
         console.log(e);
     }
