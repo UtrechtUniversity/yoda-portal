@@ -148,7 +148,7 @@ $(function() {
                     file.pause();
                     $self.find('.upload-pause').hide();
                     $self.find('.upload-resume').show();
-                    $self.find('.msg').text('Paused');
+                    $self.find('.msg').text('Upload paused');
                 });
                 // Resume btn
                 $self.find('.upload-resume').on('click', function () {
@@ -183,13 +183,13 @@ $(function() {
         browse(path);
     });
     r.on('fileSuccess', function(file,message){
-        $("#" + file.uniqueIdentifier + " .msg").html("Succesfully");
+        $("#" + file.uniqueIdentifier + " .msg").html("Upload completed");
         let $self = $('#'+file.uniqueIdentifier);
         $self.find('.upload-bttns').hide();
 
     });
     r.on('fileError', function(file, message){
-        $("#" + file.uniqueIdentifier + " .msg").html("Failed");
+        $("#" + file.uniqueIdentifier + " .msg").html("Upload failed");
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', '0%');
         let $self = $('#'+file.uniqueIdentifier);
         $self.find('.upload-pause').hide();
@@ -1115,7 +1115,7 @@ function logUpload(id, file) {
                       </button>                      
                     </div>
                   </div>
-                  <div class="col-md-3"><div class="progress"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>
+                  <div class="col-md-3"><div class="progress mt-1"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>
                   <div class="col-md-3 msg"><i class="fa fa-spinner fa-spin fa-fw"></i></div>
                </div>`;
     $('#files').append(log);
