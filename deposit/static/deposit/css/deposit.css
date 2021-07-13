@@ -17,6 +17,7 @@
 
 nav .breadcrumb {
     background-color: transparent;
+    margin-bottom: 0;
 }
 
 .action-list li {
@@ -38,6 +39,20 @@ nav .breadcrumb {
 .dropdown-toggle, .view-image, .view-audio, .view-video {
     cursor: pointer;
 }
+
+/* Upload */
+.upload-row {
+    margin-bottom: 5px;
+}
+.upload-filename {
+    word-wrap: break-word;
+    display: inline-block;
+ }
+
+.hide {
+    display:none;
+}
+
 
 /* cards clickable
 Needs save on metadata form too (react)
