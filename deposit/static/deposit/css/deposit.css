@@ -49,9 +49,16 @@ nav .breadcrumb {
     display: inline-block;
  }
 
+.upload-pause,
+.upload-resume,
+.upload-retry {
+    display: none;
+}
+
 .hide {
     display:none;
 }
+
 
 
 /* cards clickable

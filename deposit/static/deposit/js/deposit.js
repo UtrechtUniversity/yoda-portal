@@ -148,6 +148,8 @@ $(function() {
                 logUpload(file.uniqueIdentifier, file);
 
                 let $self = $('#'+file.uniqueIdentifier);
+                $self.find('.upload-pause').delay(1000).show(0);
+                $self.find('.upload-cancel').delay(1000).show(0);
 
                 // Pause btn
                 $self.find('.upload-pause').on('click', function () {
@@ -581,7 +583,7 @@ function logUpload(id, file) {
                     <div class="upload-filename">${htmlEncode(file.relativePath)}</div>
                     <div class="upload-btns btn-group btn-group-sm" role="group" aria-label="Basic example">
                       <button type="button" class="btn btn-secondary upload-pause mr-1">Pause</button>
-                      <button type="button" class="btn btn-secondary upload-resume hide mr-1">Resume</button>
+                      <button type="button" class="btn btn-secondary upload-resume mr-1">Resume</button>
                       <button type="button" class="btn btn-secondary upload-cancel mr-1">Cancel</button>
                     </div>
                   </div>
