@@ -331,8 +331,9 @@ async function handleFileDelete(collection, file_name) {
 }
 
 
-// Alerts regarding folder/file management
 function fileMgmtDialogAlert(dlgName, alert) {
+    //Alerts regarding folder/file management
+    //Inside the modals
     if (alert.length) {
         $('#alert-panel-' + dlgName + ' span').html(alert);
         $('#alert-panel-' + dlgName).show()
@@ -580,64 +581,6 @@ function startBrowsing(items)
     browse(currentFolder);
 }
 
-function toggleLocksList(folder)
-{
-    var isVisible = $('.lock').is(":visible");
-
-    // toggle locks list
-    if (isVisible) {
-        $('.lock').hide();
-    } else {
-        // Get locks
-        Yoda.call('folder_get_locks', {'coll':  Yoda.basePath + folder}).then((data) => {
-            $('.lock').hide();
-
-            var html = '';
-            $.each(data, function (index, value) {
-                html += '<a class="list-group-item list-group-item-action"><span class="browse" data-path="' + htmlEncode(value) + '">' + htmlEncode(value) + '</span></a>';
-            });
-            $('.lock-items').html(html);
-            $('.lock').show();
-        });
-    }
-}
-
-function toggleActionLogList(folder)
-{
-    /* ActionLog = Provenance information */
-
-    let actionList = $('.actionlog');
-    let actionListItems = $('.actionlog-items');
-
-    let isVisible = actionList.is(":visible");
-
-    // toggle locks list
-    if (isVisible) {
-        actionList.hide();
-    } else {
-        // Get provenance information
-        Yoda.call('provenance_log', {coll: Yoda.basePath + folder}).then((data) => {
-            actionList.hide();
-            var html = '';
-            if (data.length) {
-                $.each(data, function (index, value) {
-                    html += '<a class="list-group-item list-group-item-action">'
-                         + htmlEncode(value[2])
-                         + ' - <strong>'
-                         + htmlEncode(value[1])
-                         + '</strong> - '
-                         + htmlEncode(value[0])
-                         + '</a>';
-                });
-            } else {
-                html += '<a class="list-group-item list-group-item-action">No provenance information present</a>';
-            }
-            actionListItems.html(html)
-            actionList.show();
-        });
-    }
-}
-
 
 window.addEventListener('popstate', function(e) {
     // Catch forward/backward navigation and reload the view.
@@ -707,10 +650,6 @@ function topInformation(dir, showAlert)
                     actions['submit'] = 'Submit';
                 }
 
-                // Show metadata button.
-                $('.btn-group button.metadata-form').attr('data-path', dir);
-                $('.btn-group button.metadata-form').show();
-
                 $('.btn-group button.folder-status').attr('data-datamanager', isDatamanager);
             }
 
@@ -759,11 +698,6 @@ function topInformation(dir, showAlert)
 
             // Add unpreservable files check to actions.
             actions['check-for-unpreservable-files'] = 'Check for compliance with policy';
-
-            // Add go to vault to actions.
-            if (typeof vaultPath != 'undefined' ) {
-                actions['go-to-vault'] = 'Go to vault';
-            }
 
             // Handle actions
             handleActionsList(actions, dir);
@@ -830,39 +764,8 @@ function handleActionsList(actions, folder)
     $('.action-list').html(html);
 }
 
-async function lockFolder(folder)
-{
-    // Get current button text
-    var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Lock <i class="fa fa-spinner fa-spin fa-fw"></i>');
-    $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
-    // Change folder status call
 
-    try {
-        await Yoda.call('folder_lock', {'coll': Yoda.basePath + folder})
-        $('#statusBadge').text('Locked');
-    } catch (e) {
-        $('#statusBadge').html(btnText);
-    }
-    topInformation(folder, false);
-}
-
-async function unlockFolder(folder)
-{
-    // Get current button text
-    let btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Unlock <i class="fa fa-spinner fa-spin fa-fw"></i>');
-    $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-    try {
-        await Yoda.call('folder_unlock', {'coll': Yoda.basePath + folder});
-        $('#statusBadge').text('');
-    } catch (e) {
-        $('#statusBadge').html(btnText);
-    }
-    topInformation(folder, false);
-}
 
 function showMetadataForm(path)
 {

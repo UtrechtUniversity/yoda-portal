@@ -19,7 +19,7 @@ deposit_bp = Blueprint('deposit_bp', __name__,
     2. Add metadata:    /deposit/metadata/
     3. Submit:          /deposit/submit/
     4. Thankyou page
-    
+
     Uses the flow upload and download/view from research module
 
 """
