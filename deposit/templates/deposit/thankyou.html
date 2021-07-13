@@ -13,12 +13,11 @@
 
     <div class="card page_deposit_thankyou">
         <div class="card-header">
-            <h5 class="card-title pull-left">Thankyou</h5>
+            <h5 class="card-title pull-left">Thank you!</h5>
         </div>
         <div class="card-body">
-            <p>Thank you for your deposit.</p>
-            <p>If successfull, the files are automatically moved to the <a href="/vault/browse?dir={{path|safe}}" style="text-decoration:underline; font-weight:bold;">vault</a>.</p>
-            <p>You will receive a notification message when the upload is finished.</p>
+            <p>Thank you for your deposit!</p>
+            <p>We are preparing your data package! You will receive a <a href="{{ url_for('user_bp.notifications') }}">notification</a> message when your datapackage is ready!</p>
         </div>
     </div>
 {% endblock %}
