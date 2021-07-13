@@ -102,11 +102,6 @@ def download():
         abort(404)
 
 
-@research_bp.route('/prototype_upload')
-def prototype_upload():
-    return render_template('research/upload.html')
-
-
 def get_chunk_name(uploaded_filename, chunk_number):
     return uploaded_filename + "_part_%03d" % chunk_number
 
