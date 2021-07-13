@@ -140,3 +140,13 @@ table.dataTable > tbody > tr > td i {
 .yoda-table tr.odd {
     background-color: transparent !important;
 }
+
+/* Upload */
+.upload-row {
+    margin-bottom: 5px;
+}
+
+.upload-filename {
+    word-wrap: break-word;
+    display: inline-block;
+}
