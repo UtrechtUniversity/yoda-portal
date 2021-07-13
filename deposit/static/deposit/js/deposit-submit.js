@@ -61,8 +61,10 @@ async function getStatus()
 async function submitToVault()
 {
     try {
-        let status = await Yoda.call('deposit_submit', {})
-        console.log(status);
+        let result = await Yoda.call('deposit_submit', {})
+        if (result.status == "ok") {
+            window.location.href = '/deposit/thankyou';
+        }
     } catch (e) {
         console.log(e);
     }
