@@ -139,6 +139,7 @@ $(function() {
     // Assign upload places for dropping/selecting files
     r.assignDrop($('.upload-drop')[0]);
     r.assignBrowse($('.upload')[0]);
+    r.assignBrowse($('.upload-folder')[0], true);
 
     // Flow.js handle events
     r.on('filesAdded', function(files){
@@ -148,8 +149,8 @@ $(function() {
                 logUpload(file.uniqueIdentifier, file);
 
                 let $self = $('#'+file.uniqueIdentifier);
-                $self.find('.upload-pause').delay(1000).show(0);
-                $self.find('.upload-cancel').delay(1000).show(0);
+//                $self.find('.upload-pause').delay(2000).show(0);
+//                $self.find('.upload-cancel').delay(2000).show(0);
 
                 // Pause btn
                 $self.find('.upload-pause').on('click', function () {
@@ -357,7 +358,8 @@ function browse(dir = '', changeHistory = false)
 
     buildFileBrowser(dir);
     $('.upload').attr('data-path', dir);
-    $('.btn-group button.folder-create').attr('data-path', dir);    
+    $('.upload-folder').attr('data-path', dir);
+    $('.btn-group button.folder-create').attr('data-path', dir);
 }
 
 function makeBreadcrumb(dir)
