@@ -75,6 +75,7 @@ def protect_pages():
     """Restricted pages access protection."""
     if not request.endpoint or request.endpoint in ['general_bp.index',
                                                     'user_bp.login',
+                                                    'user_bp.gate',
                                                     'user_bp.callback',
                                                     'api_bp.call',
                                                     'static']:
