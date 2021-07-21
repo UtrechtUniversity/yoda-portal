@@ -24,39 +24,80 @@ user_bp = Blueprint('user_bp', __name__,
                     static_url_path='/static')
 
 
+@user_bp.route('/gate', methods=['GET', 'POST'])
+def gate():
+    if request.method == 'POST':
+        username = request.form['username']
+
+        if username is None:
+            flash(
+                'Missing username',
+                'error')
+            return render_template('user/gate.html')
+
+        session['login_username'] = username
+
+        # If the username matches the domain set for OIDC
+        if should_redirect_to_oidc(username):
+            return redirect(oidc_authorize_url(username))
+        # Else (i.e. it is an external user, local user, or OIDC is disabled)
+        else:
+            return redirect(url_for('user_bp.login'))
+
+    return render_template('user/gate.html')
+
+
 @user_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+
         username = request.form['username']
         password = request.form['password']
 
         if username is None:
-            error = 'Missing username'
-        else:
-            try:
-                irods_login(username, password)
+            flash(
+                'Username missing',
+                'error')
+            return render_template('user/login.html')
 
-            except PAM_AUTH_PASSWORD_FAILED:
+        session['login_username'] = username
+        g.login_username = username
+
+        # Check if someone isn't trying to sneak past OIDC login 
+        if should_redirect_to_oidc(username):
+            return redirect(oidc_authorize_url(username))
+ 
+        if password is None:
+            flash(
+                'Password missing',
+                'error')
+            return render_template('user/login.html')
+
+        try:
+            irods_login(username, password)
+        except PAM_AUTH_PASSWORD_FAILED:
                 flash(
                     'Username/password was incorrect',
                     'error'
                 )
-                return redirect(url_for('user_bp.login'))
-            except iRODSException as e:
-                flash(
-                    'An error occurred while connecting to iRODs. '
-                    'If the issue persists, please contact the '
-                    'system administrator',
-                    'error'
-                )
-                print_exc()
-                return redirect(url_for('user_bp.login'))
+                return render_template('user/login.html')
+        except iRODSException as e:
+            flash(
+                'An error occurred while connecting to iRODs. '
+                'If the issue persists, please contact the '
+                'system administrator',
+                'error')
+            print_exc()
+            return render_template('user/login.html')
 
         redirect_target = request.args.get('redirect_target')
         if redirect_target is None:
             redirect_target = url_for('general_bp.index')
 
         return redirect(redirect_target)
+
+    if session.get('login_username') is None:
+        return redirect(url_for('user_bp.gate'))
 
     return render_template('user/login.html')
 
@@ -189,6 +230,7 @@ def callback():
     except jwt.PyJWTError:
         # Error occurred during steps for verification,
         # configurations used can be found in flask.cfg
+        print_exc()
         print(
             'Id Token:\n{}'
             .format(str(id_token)),
@@ -196,6 +238,7 @@ def callback():
 
     except json.decoder.JSONDecodeError:
         # Either token response or userinfo response decoding failed
+        print_exc()
         print(
             'token_response + headers:\n{}\n\n{}'
             .format(
@@ -212,6 +255,7 @@ def callback():
                 file=sys.stderr)
 
     except iRODSException:
+        print_exc()
         print(
             'username: {}'
             .format(email),
@@ -220,6 +264,7 @@ def callback():
     except KeyError:
         # Missing key in token or userinfo response.
         # The only one of interest is the latest response
+        print_exc()
         if userinfo_response is not None:
             print(
                 'userinfo_response + headers:\n{}\n{}'
@@ -237,6 +282,7 @@ def callback():
 
     except UserinfoSubMismatchError:
         # Possible Token substitution attack
+        print_exc()
         print(
             'Possible token substitution attack: {} is not {}'
             .format(
@@ -246,8 +292,6 @@ def callback():
 
     finally:
         if exception_occurred:
-            print_exc()
-
             flash(
                 'An error occurred during the OpenID Connect protocol. '
                 'If the issue persists, please contact the system '
@@ -258,6 +302,23 @@ def callback():
             return redirect(url_for('user_bp.login'))
 
     return redirect(url_for('general_bp.index'))
+
+
+def should_redirect_to_oidc(username):
+    domain = app.config.get('OIDC_DOMAIN')
+    if app.config.get('OIDC_ENABLED') and username.endswith(domain):
+        return True
+    else:
+        return False
+
+
+def oidc_authorize_url(username):
+    authorize_url = app.config.get('OIDC_AUTH_URI')
+
+    if username:
+        authorize_url += '&login_hint=' + username
+
+    return authorize_url
 
 
 def irods_login(username, password):
@@ -294,6 +355,10 @@ def escape_irods_pam_password(password):
 def prepare_user():
     user_id = session.get('user_id', None)
     irods = connman.get(session.sid)
+    login_username = session.get('login_username')
+
+    if login_username:
+        g.login_username = login_username
 
     if user_id is None:
         g.user = None
