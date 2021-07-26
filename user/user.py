@@ -63,10 +63,10 @@ def login():
         session['login_username'] = username
         g.login_username = username
 
-        # Check if someone isn't trying to sneak past OIDC login 
+        # Check if someone isn't trying to sneak past OIDC login
         if should_redirect_to_oidc(username):
             return redirect(oidc_authorize_url(username))
- 
+
         if password is None:
             flash(
                 'Password missing',
@@ -76,11 +76,11 @@ def login():
         try:
             irods_login(username, password)
         except PAM_AUTH_PASSWORD_FAILED:
-                flash(
-                    'Username/password was incorrect',
-                    'error'
-                )
-                return render_template('user/login.html')
+            flash(
+                'Username/password was incorrect',
+                'error'
+            )
+            return render_template('user/login.html')
         except iRODSException as e:
             flash(
                 'An error occurred while connecting to iRODs. '
