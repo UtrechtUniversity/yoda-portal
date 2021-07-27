@@ -42,7 +42,11 @@ def gate():
             return redirect(oidc_authorize_url(username))
         # Else (i.e. it is an external user, local user, or OIDC is disabled)
         else:
-            return redirect(url_for('user_bp.login'))
+            redirect_target = request.args.get('redirect_target')
+            if redirect_target is None:
+                return redirect(url_for('user_bp.login'))
+            else:
+                return redirect(url_for('user_bp.login', redirect_target=redirect_target))
 
     return render_template('user/gate.html')
 

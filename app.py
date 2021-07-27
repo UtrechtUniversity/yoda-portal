@@ -83,7 +83,7 @@ def protect_pages():
     elif g.get('user', None) is not None:
         return
     else:
-        return redirect(url_for('user_bp.login', redirect_target=request.full_path))
+        return redirect(url_for('user_bp.gate', redirect_target=request.full_path))
 
 
 @app.after_request
