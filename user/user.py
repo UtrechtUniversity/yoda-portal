@@ -37,16 +37,16 @@ def gate():
 
         session['login_username'] = username
 
+        redirect_target = request.args.get('redirect_target')
+        if redirect_target is not None:
+            session['redirect_target'] = redirect_target
+
         # If the username matches the domain set for OIDC
         if should_redirect_to_oidc(username):
             return redirect(oidc_authorize_url(username))
         # Else (i.e. it is an external user, local user, or OIDC is disabled)
         else:
-            redirect_target = request.args.get('redirect_target')
-            if redirect_target is None:
-                return redirect(url_for('user_bp.login'))
-            else:
-                return redirect(url_for('user_bp.login', redirect_target=redirect_target))
+            return redirect(url_for('user_bp.login'))
 
     return render_template('user/gate.html')
 
@@ -94,11 +94,11 @@ def login():
             print_exc()
             return render_template('user/login.html')
 
-        redirect_target = request.args.get('redirect_target')
-        if redirect_target is None:
-            redirect_target = url_for('general_bp.index')
-
-        return redirect(redirect_target)
+        target = session.get('redirect_target')
+        if target is not None:
+            return redirect(target)
+        else:
+            return redirect(url_for('general_bp.index'))
 
     if session.get('login_username') is None:
         return redirect(url_for('user_bp.gate'))
@@ -305,7 +305,11 @@ def callback():
 
             return redirect(url_for('user_bp.login'))
 
-    return redirect(url_for('general_bp.index'))
+    target = session.get('redirect_target')
+    if target is not None:
+        return redirect(target)
+    else:
+        return redirect(url_for('general_bp.index'))
 
 
 def should_redirect_to_oidc(username):
@@ -338,7 +342,7 @@ def irods_login(username, password):
         **app.config.get('IRODS_SESSION_OPTIONS')
     )
     _ = irods.server_version
-    session.clear()
+
     session['user_id'] = username
     session['password'] = password
     connman.add(session.sid, irods)
