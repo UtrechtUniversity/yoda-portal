@@ -94,11 +94,7 @@ def login():
             print_exc()
             return render_template('user/login.html')
 
-        target = session.get('redirect_target')
-        if target is not None:
-            return redirect(target)
-        else:
-            return redirect(url_for('general_bp.index'))
+        return redirect(original_destination())
 
     if session.get('login_username') is None:
         return redirect(url_for('user_bp.gate'))
@@ -305,11 +301,7 @@ def callback():
 
             return redirect(url_for('user_bp.login'))
 
-    target = session.get('redirect_target')
-    if target is not None:
-        return redirect(target)
-    else:
-        return redirect(url_for('general_bp.index'))
+    return redirect(original_destination())
 
 
 def should_redirect_to_oidc(username):
@@ -357,6 +349,15 @@ def escape_irods_pam_password(password):
     })
 
     return password.translate(translation)
+
+
+def original_destination():
+    target = session.get('redirect_target')
+    if target is not None:
+        session['redirect_target'] = None
+        return target
+    else:
+        return url_for('general_bp.index')
 
 
 @user_bp.before_app_request
