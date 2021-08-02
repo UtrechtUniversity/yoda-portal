@@ -129,7 +129,7 @@ $(function() {
     // Flow.js upload handler
     var r = new Flow({
         target: '/research/upload',
-        chunkSize: 10 * 1024 * 1024,
+        chunkSize: 25 * 1024 * 1024,
         simultaneousUploads: 1,
         testChunks: false,
         query: {'csrf_token': Yoda.csrf.tokenValue, filepath : ''}
