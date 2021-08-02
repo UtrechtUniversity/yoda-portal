@@ -131,7 +131,6 @@ $(function() {
         target: '/research/upload',
         chunkSize: 25 * 1024 * 1024,
         simultaneousUploads: 1,
-        testChunks: false,
         query: {'csrf_token': Yoda.csrf.tokenValue, filepath : ''}
     });
     // Flow.js isn't supported, fall back on a different method

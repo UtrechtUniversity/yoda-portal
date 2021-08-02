@@ -103,21 +103,17 @@ def download():
         abort(404)
 
 
-def get_chunk_name(uploaded_filename, chunk_number):
-    return uploaded_filename + "_part_%03d" % chunk_number
-
-
 @research_bp.route('/upload', methods=['GET'])
 def upload_get():
     flow_identifier = request.args.get('flowIdentifier', type=str)
     flow_filename = secure_filename(request.args.get('flowFilename', type=str))
     flow_chunk_number = request.args.get('flowChunkNumber', type=int)
-    flow_total_chunks = request.form.get('flowTotalChunks', type=int)
-    flow_chunk_size = request.form.get('flowChunkSize', type=int)
-    flow_relative_path = request.form.get('flowRelativePath', type=str)
+    flow_total_chunks = request.args.get('flowTotalChunks', type=int)
+    flow_chunk_size = request.args.get('flowChunkSize', type=int)
+    flow_relative_path = request.args.get('flowRelativePath', type=str)
 
     relative_path = os.path.dirname(flow_relative_path)
-    filepath = request.form.get('filepath', type=str)
+    filepath = request.args.get('filepath', type=str)
     filepath = filepath.lstrip("/")
 
     if (not flow_identifier or not flow_filename or not flow_chunk_number
@@ -144,7 +140,7 @@ def upload_get():
     try:
         obj = session.data_objects.get(file_path)
 
-        if obj.replicas[0].size >= int(flow_chunk_size * (flow_chunk_number - 1)):
+        if obj.replicas[0].size > int(flow_chunk_size * (flow_chunk_number - 1)):
             # Chunk already exists.
             response = make_response(jsonify({"message": "Chunk found"}), 200)
             response.headers["Content-Type"] = "application/json"
