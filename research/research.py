@@ -7,6 +7,7 @@ import io
 import os
 
 from flask import abort, Blueprint, g, jsonify, make_response, render_template, request, Response, session, stream_with_context
+from irods.message import iRODSMessage
 from werkzeug.utils import secure_filename
 
 research_bp = Blueprint('research_bp', __name__,
@@ -172,61 +173,33 @@ def upload_post():
     # Get the chunk data.
     chunk_data = request.files['file']
 
-    if flow_total_chunks == 1:
-        file_path = os.path.join(base_dir, flow_filename)
+    file_path = os.path.join(base_dir, flow_filename)
+    if flow_chunk_number == 1:
+        encode_unicode_content = iRODSMessage.encode_unicode(chunk_data.stream.read())
 
         try:
-            obj = session.data_objects.create(file_path)
-            with obj.open('w+') as f:
-                f.write(chunk_data.stream.read())
-            f.close()
+            with session.data_objects.open(file_path, 'w') as obj_desc:
+                obj_desc.write(encode_unicode_content)
+
+            obj_desc.close()
         except Exception:
             response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
             response.headers["Content-Type"] = "application/json"
             return response
     else:
-        # Ensure temp chunk collection exists.
-        temp_dir = os.path.join(base_dir, flow_identifier)
-        if not session.collections.exists(temp_dir):
-            session.collections.create(temp_dir)
+        encode_unicode_content = iRODSMessage.encode_unicode(chunk_data.stream.read())
 
-        # Save the chunk data.
-        chunk_path = os.path.join(temp_dir, get_chunk_name(flow_filename, flow_chunk_number))
         try:
-            obj = session.data_objects.create(chunk_path)
+            with session.data_objects.open(file_path, 'a') as obj_desc:
+                # Go to the end of the file
+                obj_desc.seek(0, 2)
+                obj_desc.write(encode_unicode_content)
 
-            with obj.open('w+') as f:
-                f.write(chunk_data.stream.read())
-            f.close()
+            obj_desc.close()
         except Exception:
             response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
             response.headers["Content-Type"] = "application/json"
             return response
-
-        # Check if the upload is complete.
-        chunk_paths = [os.path.join(temp_dir, get_chunk_name(flow_filename, x)) for x in range(1, flow_total_chunks + 1)]
-        upload_complete = all([session.data_objects.exists(p) for p in chunk_paths])
-
-        # Combine all the chunks to create the final file.
-        if upload_complete:
-            file_path = os.path.join(base_dir, flow_filename)
-
-            obj = session.data_objects.create(file_path, force=True)
-
-            with obj.open('w+') as f:
-                chunk_number = 0
-                for chunk in chunk_paths:
-                    # read file
-                    obj2 = session.data_objects.get(chunk)
-                    with obj2.open('r') as f2:
-                        f.seek(chunk_number * flow_chunk_size)
-                        f.write(f2.read())
-                    f2.close()
-                    chunk_number += 1
-
-                coll = session.collections.get(temp_dir)
-                coll.remove(recurse=True, force=True)
-            f.close()
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
     response.headers["Content-Type"] = "application/json"
