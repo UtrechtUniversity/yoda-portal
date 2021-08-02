@@ -18,7 +18,36 @@ from stats.stats import stats_bp
 from user.user import user_bp
 from vault.vault import vault_bp
 
+
+from jinja2 import BaseLoader, TemplateNotFound
+from flask import current_app
+
+from os import path
+
+
+class BlueprintLoader(BaseLoader):
+    def get_source(self, environment, template):
+        # First check user defined area
+        user_templates_area = '/var/www/yoda/user-templates/'
+        user_template_path = path.join(user_templates_area, template)
+        if path.exists(user_template_path):
+            source = ''
+            with open(user_template_path) as f:
+                source = f.read()
+            return source, user_template_path, lambda: mtime == getmtime(user_template_path)
+
+        for loader in (current_app.blueprints[request.blueprint].jinja_loader, current_app.blueprints['general_bp'].jinja_loader, current_app.jinja_loader):
+            try:
+                if loader:
+                    return loader.get_source(environment, template)
+            except TemplateNotFound:
+                pass
+        raise TemplateNotFound(template)
+
+
 app = Flask(__name__)
+app.jinja_env.loader = BlueprintLoader()
+
 
 # Load configurations
 with app.app_context():
