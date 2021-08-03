@@ -130,6 +130,7 @@ $(function() {
     var r = new Flow({
         target: '/research/upload',
         chunkSize: 25 * 1024 * 1024,
+        forceChunkSize: True,
         simultaneousUploads: 1,
         query: {'csrf_token': Yoda.csrf.tokenValue, filepath : ''}
     });
