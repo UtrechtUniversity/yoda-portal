@@ -103,6 +103,19 @@ def download():
         abort(404)
 
 
+def build_object_path(path, relative_path, filename):
+    relative_path = os.path.dirname(relative_path)
+    path = path.lstrip("/")
+
+    # Build relative path.
+    if relative_path:
+        base_dir = os.path.join("/" + g.irods.zone, 'home', path, relative_path)
+    else:
+        base_dir = os.path.join("/" + g.irods.zone, 'home', path)
+
+    return os.path.join(base_dir, filename)
+
+
 @research_bp.route('/upload', methods=['GET'])
 def upload_get():
     flow_identifier = request.args.get('flowIdentifier', type=str)
@@ -112,33 +125,24 @@ def upload_get():
     flow_chunk_size = request.args.get('flowChunkSize', type=int)
     flow_relative_path = request.args.get('flowRelativePath', type=str)
 
-    relative_path = os.path.dirname(flow_relative_path)
     filepath = request.args.get('filepath', type=str)
-    filepath = filepath.lstrip("/")
 
     if (not flow_identifier or not flow_filename or not flow_chunk_number
-       or not flow_chunk_size or not filepath):
+       or not flow_total_chunks or not flow_chunk_size or not filepath):
         # Parameters are missing or invalid.
         response = make_response(jsonify({"message": "Parameter missing or invalid"}), 500)
         response.headers["Content-Type"] = "application/json"
         return response
 
     session = g.irods
-
-    # Build relative path.
-    if relative_path:
-        base_dir = os.path.join("/" + g.irods.zone, 'home', filepath, relative_path)
-    else:
-        base_dir = os.path.join("/" + g.irods.zone, 'home', filepath)
+    object_path = build_object_path(filepath, flow_relative_path, flow_filename)
 
     # Partial file name for chunked uploads.
     if flow_total_chunks > 1:
-        file_path = "{}.part".format(os.path.join(base_dir, flow_filename))
-    else:
-        file_path = os.path.join(base_dir, flow_filename)
+        object_path = "{}.part".format(object_path)
 
     try:
-        obj = session.data_objects.get(file_path)
+        obj = session.data_objects.get(object_path)
 
         if obj.replicas[0].size > int(flow_chunk_size * (flow_chunk_number - 1)):
             # Chunk already exists.
@@ -146,10 +150,7 @@ def upload_get():
             response.headers["Content-Type"] = "application/json"
             return response
         else:
-            # Chunk does not exists and needs to be uploaded.
-            response = make_response(jsonify({"message": "Chunk not found"}), 204)
-            response.headers["Content-Type"] = "application/json"
-            return response
+            raise Exception
     except Exception:
         # Chunk does not exists and needs to be uploaded.
         response = make_response(jsonify({"message": "Chunk not found"}), 204)
@@ -166,9 +167,7 @@ def upload_post():
     flow_chunk_size = request.form.get('flowChunkSize', type=int)
     flow_relative_path = request.form.get('flowRelativePath', type=str)
 
-    relative_path = os.path.dirname(flow_relative_path)
     filepath = request.form.get('filepath', type=str)
-    filepath = filepath.lstrip("/")
 
     if (not flow_identifier or not flow_filename or not flow_chunk_number
        or not flow_total_chunks or not flow_chunk_size or not filepath):
@@ -178,54 +177,37 @@ def upload_post():
         return response
 
     session = g.irods
-
-    # Ensure relative path collection exists.
-    if relative_path:
-        base_dir = os.path.join("/" + g.irods.zone, 'home', filepath, relative_path)
-        if not session.collections.exists(base_dir):
-            session.collections.create(base_dir)
-    else:
-        base_dir = os.path.join("/" + g.irods.zone, 'home', filepath)
-
-    # Get the chunk data.
-    chunk_data = request.files['file']
+    object_path = build_object_path(filepath, flow_relative_path, flow_filename)
 
     # Partial file name for chunked uploads.
     if flow_total_chunks > 1:
-        file_path = "{}.part".format(os.path.join(base_dir, flow_filename))
-    else:
-        file_path = os.path.join(base_dir, flow_filename)
+        object_path = "{}.part".format(object_path)
 
-    if flow_chunk_number == 1:
-        encode_unicode_content = iRODSMessage.encode_unicode(chunk_data.stream.read())
+    # Get the chunk data.
+    chunk_data = request.files['file']
+    encode_unicode_content = iRODSMessage.encode_unicode(chunk_data.stream.read())
 
-        try:
-            with session.data_objects.open(file_path, 'w') as obj_desc:
+    try:
+        if flow_chunk_number == 1:
+            with session.data_objects.open(object_path, 'w') as obj_desc:
                 obj_desc.write(encode_unicode_content)
 
             obj_desc.close()
-        except Exception:
-            response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
-            response.headers["Content-Type"] = "application/json"
-            return response
-    else:
-        encode_unicode_content = iRODSMessage.encode_unicode(chunk_data.stream.read())
-
-        try:
-            with session.data_objects.open(file_path, 'a') as obj_desc:
+        else:
+            with session.data_objects.open(object_path, 'a') as obj_desc:
                 obj_desc.seek(int(flow_chunk_size * (flow_chunk_number - 1)))
                 obj_desc.write(encode_unicode_content)
 
             obj_desc.close()
-        except Exception:
-            response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
-            response.headers["Content-Type"] = "application/json"
-            return response
+    except Exception:
+        response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
+        response.headers["Content-Type"] = "application/json"
+        return response
 
     # Rename partial file name when complete for chunked uploads.
     if flow_chunk_number == flow_total_chunks:
-        final_file_path = os.path.join(base_dir, flow_filename)
-        session.data_objects.move(file_path, final_file_path)
+        final_object_path = build_object_path(filepath, flow_relative_path, flow_filename)
+        session.data_objects.move(object_path, final_object_path)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
     response.headers["Content-Type"] = "application/json"
