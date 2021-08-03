@@ -205,7 +205,7 @@ def upload_post():
         return response
 
     # Rename partial file name when complete for chunked uploads.
-    if flow_chunk_number == flow_total_chunks:
+    if flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
         final_object_path = build_object_path(filepath, flow_relative_path, flow_filename)
         session.data_objects.move(object_path, final_object_path)
 
