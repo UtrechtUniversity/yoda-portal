@@ -183,12 +183,12 @@ $(function() {
         $('#uploads').modal('show');
     });
     r.on('filesSubmitted', function() {
-        let path = $('.upload').attr('data-path');
+        let path = $('a.upload').attr('data-path');
         r.opts.query.filepath = path;
         r.upload();
     });
     r.on('complete', function(){
-        let path = $('.upload').attr('data-path');
+        let path = $('a.upload').attr('data-path');
         browse(path);
     });
     r.on('fileSuccess', function(file,message){
@@ -824,8 +824,8 @@ function topInformation(dir, showAlert)
 
             $('.btn-group button.metadata-form').hide();
 
-            $('.btn-group .upload').attr('data-path', "");
-            $('.btn-group .upload').prop("disabled", true);
+            $('.btn-group a.upload').attr('data-path', "");
+            $('.btn-group a.upload').prop("disabled", true);
             $('.btn-group button.folder-create').attr('data-path', "");
             $('.btn-group button.folder-create').prop("disabled", true);
 
@@ -892,8 +892,8 @@ function topInformation(dir, showAlert)
             // Check if folder is writable.
             if (hasWriteRights && (status == '' || status == 'SECURED')) {
                 // Enable uploads.
-                $('.btn-group .upload').attr('data-path', dir);
-                $('.btn-group .upload').prop("disabled", false);
+                $('.btn-group a.upload').attr('data-path', dir);
+                $('.btn-group a.upload').prop("disabled", false);
 
                 // Enable folder / file manipulations.
                 $('.btn-group button.folder-create').attr('data-path', dir);
@@ -954,7 +954,7 @@ function topInformation(dir, showAlert)
             }
         });
     } else {
-        $('.btn-group .upload').attr('data-path', "");
+        $('.btn-group a.upload').attr('data-path', "");
 
         // Folder/ file manipulation data
         $('.btn-group button.folder-create').attr('data-path', "");
