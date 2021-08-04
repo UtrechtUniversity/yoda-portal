@@ -118,7 +118,8 @@ nav .breadcrumb {
 }
 
 #file-browser > tbody > tr > td,
-#file-browser .dropdown a {
+#file-browser .dropdown a,
+#files div {
     font-size: 0.9rem;
 }
 

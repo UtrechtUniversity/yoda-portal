@@ -187,7 +187,7 @@ $(function() {
         browse(path);
     });
     r.on('fileSuccess', function(file,message){
-        $("#" + file.uniqueIdentifier + " .msg").html("Upload complete");
+        $("#" + file.uniqueIdentifier + " .msg").html("<span class='text-success'>Upload complete</span>");
         let $self = $('#'+file.uniqueIdentifier);
         $self.find('.upload-btns').hide();
 
@@ -543,7 +543,7 @@ function startBrowsing(items)
     $('#file-browser').DataTable({
         "bFilter": false,
         "bInfo": false,
-        "bLengthChange": true,
+        "bLengthChange": false,
         "language": {
             "emptyTable": "Drag and drop files and folders here",
             "lengthMenu": "_MENU_"
