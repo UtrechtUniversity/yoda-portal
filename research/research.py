@@ -110,6 +110,10 @@ def build_object_path(path, relative_path, filename):
     # Build relative path.
     if relative_path:
         base_dir = os.path.join("/" + g.irods.zone, 'home', path, relative_path)
+        # Ensure upload collection exists.
+        session = g.irods
+        if not session.collections.exists(base_dir):
+            session.collections.create(base_dir)
     else:
         base_dir = os.path.join("/" + g.irods.zone, 'home', path)
 
