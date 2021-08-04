@@ -129,8 +129,9 @@ $(function() {
     // Flow.js upload handler
     var r = new Flow({
         target: '/research/upload',
-        chunkSize: 10 * 1024 * 1024,
-        simultaneousUploads: 5,
+        chunkSize: 25 * 1024 * 1024,
+        forceChunkSize: true,
+        simultaneousUploads: 1,
         query: {'csrf_token': Yoda.csrf.tokenValue, filepath : ''}
     });
     // Flow.js isn't supported, fall back on a different method
@@ -1119,7 +1120,7 @@ function logUpload(id, file) {
                       </button>
                       <button type="button" class="btn btn-secondary upload-retry hide">
                         Retry
-                      </button>                      
+                      </button>
                     </div>
                   </div>
                   <div class="col-md-3"><div class="progress mt-1"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>
