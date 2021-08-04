@@ -117,7 +117,7 @@ def forgot_password():
 @user_bp.route('/notifications')
 def notifications():
     sort_order = request.args.get('sort_order', 'desc')
-    response = api.call('notifications_load', data={'sort_order': sort_order}
+    response = api.call('notifications_load', data={'sort_order': sort_order})
     session['notifications'] = len(response['data'])
     return render_template('user/notifications.html', notifications=response['data'])
 
