@@ -77,6 +77,9 @@ nav .breadcrumb {
     margin: 4px 0;
 }
 
+.page_deposit_thankyou a {
+    text-decoration: underline;
+}
 
 /* Data table */
 
