@@ -65,10 +65,8 @@ nav .breadcrumb {
     display: inline-block;
  }
 
-.upload-pause,
-.upload-resume,
-.upload-retry {
-    display: none;
+.upload-btns {
+    margin-left: 10px;
 }
 
 .hide {
