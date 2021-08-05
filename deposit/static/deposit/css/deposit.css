@@ -1,13 +1,13 @@
 
 /* ** File browser size **
-Make the file browser wider to allow longer filenames.
-If container-fluid is used (for a full-width file browser), use the right padding on laptop screens */
+ Make the file browser wider to allow longer filenames.
+*/
 @media (min-width: 1400px){
     .container, .container-sm, .container-md, .container-lg, .container-xl {
         max-width: 1390px;
     }
 }
-
+/* If container-fluid is used (for a full-width file browser), use the right padding on laptop screens */
 @media (min-width: 769px) {
     .container-fluid .page {
         padding: 0 100px;

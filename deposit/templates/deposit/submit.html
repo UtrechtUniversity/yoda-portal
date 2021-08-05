@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit{% endblock %}
+{% block title %}{{ super() }} &dash; Deposit &dash; Submit{% endblock %}
 
 {% block style %}
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/stepper/bs-stepper.custom.css') }}">
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/deposit.css') }}">
 {% endblock %}
 

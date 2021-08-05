@@ -1,20 +1,24 @@
-<div class="card-group mb-2">
-  <div class="card {% if step == 1 %}bg-primary{% endif %}">
-    <div class="card-body">
-      <h5 class="card-title">1. Deposit data</h5>
-      <p class="card-subtitle">Easily add files and folders to submit as a datapackage.</p>
+<div class="bs-stepper">
+  <div class="bs-stepper-header" role="tablist">
+    <div class="step {% if step == 1 %}active{%endif%}">
+      <span class="step-trigger">
+        <span class="bs-stepper-circle">1</span>
+        <span class="bs-stepper-label">Deposit</span>
+      </span>
     </div>
-  </div>
-  <div class="card {% if step == 2 %}bg-primary{% endif %}">
-    <div class="card-body">
-      <h5 class="card-title">2. Add metadata</h5>
-      <p class="card-subtitle">Add metadata to your data package</p>
+    <div class="line"></div>
+    <div class="step {% if step == 2 %}active{%endif%}">
+      <span class="step-trigger">
+        <span class="bs-stepper-circle">2</span>
+        <span class="bs-stepper-label">Metadata</span>
+      </span>
     </div>
-  </div>
-  <div class="card {% if step == 3 %}bg-primary{% endif %}">
-    <div class="card-body">
-      <h5 class="card-title">3. Submit</h5>
-      <p class="card-subtitle">Submit your data package</p>
+    <div class="line"></div>
+    <div class="step {% if step == 3 %}active{%endif%}">
+      <span class="step-trigger">
+        <span class="bs-stepper-circle">3</span>
+        <span class="bs-stepper-label">Submit</span>
+      </span>
     </div>
   </div>
 </div>
