@@ -6,6 +6,10 @@ __license__   = 'GPLv3, see LICENSE'
 from flask import Flask, g, redirect, request, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
+import os
+import sqlite3
+import sys
+import pathlib
 
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
@@ -23,7 +27,6 @@ app = Flask(__name__)
 # Load configurations
 with app.app_context():
     app.config.from_pyfile('flask.cfg')
-
 
 # Setup values for the navigation bar used in
 # general/templates/general/base.html

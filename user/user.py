@@ -145,9 +145,21 @@ def settings():
     response = api.call('settings_load', data={})
     settings = response['data']
 
+    # Load tokens.
+    response = api.call('load_tokens')
+    tokens = response['data']
+    settings['tokens'] = tokens
+
     return render_template('user/settings.html', **settings)
 
 
+@user_bp.route('/create-token', methods=['GET', 'POST'])
+def token_generation():
+    #token = api.call('api_create_token', data={})
+    #print('Dit is het token: {}'.format(token), file=sys.stderr) 
+    return render_template('user/token_generation.html')
+
+    
 @user_bp.route('/callback')
 def callback():
     def token_request():

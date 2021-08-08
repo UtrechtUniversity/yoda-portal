@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Create a new token{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('user_bp.static', filename='js/token.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="panel-title">Create a new token</div>
+    </div>
+    <div class="card-body">
+        <form method="post" class="form-horizontal">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group row">
+                <label id="label-input" class="col-sm-3 col-form-label" for="f-token-label">Token label</label>
+                <input 
+                    name="token-label" 
+                    id="f-token-label" 
+                    class="form-control col-sm-6" 
+                    type="text" 
+                    placeholder="Enter a label to identify the new token by" 
+                    autofocus 
+                    required />
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label" for="f-token">Token</label>
+                <input  
+                    id="f-token"
+                    class="form-control col-sm-6"
+                    type="text"
+                    disabled/>
+            </div>
+            <a class="btn btn-primary gen-token">Generate token</a>
+        </form>
+    </div>
+</div>
+{% endblock content %}

@@ -38,4 +38,25 @@
         </form>
     </div>
 </div>
+
+<div class="card">
+    <div class="card-header">
+        Access tokens
+    </div>
+    <div class="card-body">
+		<a href="{{ url_for('user_bp.token_generation') }}" class="btn btn-primary mb-4">Create new token</a>
+        <div class="list-group">
+            {% for t in tokens %}
+            <div class="list-group-item d-inline-flex">
+                <label class="col-sm-6">{{ t.label }}</label>
+                <span class="col-sm-2">{{ t.gen_time }}</span>
+                <span class="col-sm-2">{{ t.exp_time }}</span>
+                <input class="btn btn-danger col-sm-2 delete-token" type="button" value="Delete"/>  
+            </div>
+            {% endfor %}
+        </div>
+        </form>
+    </div>
+</div>
+
 {% endblock content %}
