@@ -5,14 +5,14 @@ __license__   = 'GPLv3, see LICENSE'
 
 from datetime import datetime
 
-from flask import Blueprint, jsonify, make_response, render_template, request
+from flask import Blueprint, jsonify, make_response, render_template, request, send_from_directory
 
 import api
 
 stats_bp = Blueprint('stats_bp', __name__,
                      template_folder='templates',
                      static_folder='static/stats',
-                     static_url_path='/static')
+                     static_url_path='/assets')
 
 
 @stats_bp.route('/')
