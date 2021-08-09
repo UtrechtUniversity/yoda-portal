@@ -4,10 +4,10 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
+from traceback import print_exc
 
 from flask import Blueprint, g, jsonify, request
 from irods import rule
-from traceback import print_exc
 
 from errors import UnauthorizedAPIAccessError
 
