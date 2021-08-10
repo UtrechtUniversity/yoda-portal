@@ -52,20 +52,18 @@
                             </div>
                         </div>
                     {% else %}
-                        <a class="btn btn-primary" href="{{ url_for('user_bp.login') }}">Sign in</a>
+                        <a class="btn btn-primary" href="{{ url_for('user_bp.gate') }}">Sign in</a>
                     {% endif %}
                 </div>
             </div>
         </header>
 
-        <nav class="navbar navbar-inverse navbar-static-top navbar-expand-lg yoda-navbar">
+        <nav class="navbar navbar-dark navbar-static-top navbar-expand-lg yoda-navbar">
             <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
-                </div>
+                <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
                 <div id="navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
                         {% for module in config.get('modules') %}
