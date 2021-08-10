@@ -43,7 +43,7 @@ class BlueprintLoader(BaseLoader):
             return source, user_template_path, False
 
         for loader in (current_app.blueprints[request.blueprint].jinja_loader,
-                                              current_app.blueprints['general_bp'].jinja_loader,
+                       current_app.blueprints['general_bp'].jinja_loader,
                        current_app.jinja_loader):
             try:
                 if loader:
@@ -104,24 +104,23 @@ with app.app_context():
 # XXX CSRF needs to be disabled for API testing.
 csrf = CSRFProtect(app)
 
+"""
+Protect pages:
+Static files handling first - recognisable through '/assets/'
+Override requested static file if present in user_static_area
+If not present fall back to the standard supplied static file
 
+This only works when the blueprint is created with static_url_path='/assets'
+The structure becomes
+/assets/ - for the root of the application
+/module/assets/ - for the modules of the application
+
+the corresponding file structure for static files is:
+/static
+/module/static/module/
+"""
 @app.before_request
 def protect_pages():
-    """
-    Static files handling first - recognisable through '/assets/'
-    Override requested static file if present in user_static_area
-    If not present fall back to the standard supplied static file
-
-    This only works when the blueprint is created with static_url_path='/assets'
-    The structure becomes
-    /assets/ - for the root of the application
-    /module/assets/ - for the modules of the application
-
-    the corresponding file structure for static files is:
-    /static
-    /module/static/module/
-    """
-
     if '/assets/' in request.full_path:
         base = path.basename(request.path[1:])
         dir = path.dirname(request.path[1:])
