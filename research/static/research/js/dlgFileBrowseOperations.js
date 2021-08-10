@@ -2,27 +2,18 @@ var folderSelectBrowser = null;
 var dlgCurrentFolder = '';
 
 $( document ).ready(function() {
-    /*
-    $("body").on("click", "a.action-copy-vault-package-to-research", function() {
-
-        dlgCurrentFolder = ''; // always initiatize when reopening the box
-        dlgShowFolderSelectDialog($(this).attr('data-folder'));
-    });
-
-    $('#btn-copy-package').on('click', function(){
-        copyVaultPackageToDynamic(urlEncodedOrigin, urlEncodedPath);
-    })
-     */
-
     $("body").on("click", "a.file-copy, a.file-move", function() {
         // Determine action
         if($(this).hasClass("file-move")) {
             $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'move');
-            $('#dlg-file-browse-operations span.action').text('Move');
+            $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move');
+            $('#dlg-file-browse-operations .card-title span.action').text('move');
         } else {
             $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'copy');
-            $('#dlg-file-browse-operations span.action').text('Copy');
+            $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy');
+            $('#dlg-file-browse-operations .card-title span.action').text('copy');
         }
+
         // Set filename in modal & button attribute
         $('#dlg-file-browse-operations span.action-file').text($(this).attr('data-name'));
         $('#dlg-file-browse-operations .dlg-action-button').attr('data-name', $(this).attr('data-name'));
