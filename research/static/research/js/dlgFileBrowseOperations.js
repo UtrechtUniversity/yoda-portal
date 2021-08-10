@@ -50,8 +50,8 @@ $( document ).ready(function() {
     });
 
     $('.dlg-action-button').on('click', function(){
-        let filepath = $(this).attr('data-collection') + $(this).attr('data-name');
-        let newFilepath = dlgCurrentFolder + $(this).attr('data-name');
+        let filepath = $(this).attr('data-collection') + "/" + $(this).attr('data-name');
+        let newFilepath = dlgCurrentFolder + "/" + $(this).attr('data-name');
 
         if($(this).attr("data-action") == 'move') {
             moveFile(filepath, newFilepath);
@@ -62,7 +62,7 @@ $( document ).ready(function() {
 
 });
 
-async function copyFile(filepath, NewFilepath)
+async function copyFile(filepath, newFilepath)
 {
     dlgSelectAlertHide();
 
@@ -70,7 +70,7 @@ async function copyFile(filepath, NewFilepath)
         let result = await Yoda.call('research_file_copy',
             {
                 'filepath': Yoda.basePath + filepath,
-                'new_filepath': Yoda.basePath + NewFilepath
+                'new_filepath': Yoda.basePath + newFilepath
             },
             {'quiet': true}
         );
@@ -88,7 +88,7 @@ async function copyFile(filepath, NewFilepath)
     }
 }
 
-async function moveFile(filepath, NewFilepath)
+async function moveFile(filepath, newFilepath)
 {
     dlgSelectAlertHide();
 
@@ -96,7 +96,7 @@ async function moveFile(filepath, NewFilepath)
         let result = await Yoda.call('research_file_move',
             {
                 'filepath': Yoda.basePath + filepath,
-                'new_filepath': Yoda.basePath + NewFilepath
+                'new_filepath': Yoda.basePath + newFilepath
             },
             {'quiet': true}
         );
