@@ -18,10 +18,10 @@ $( document ).ready(function() {
         // Determine action
         if($(this).hasClass("file-move")) {
             $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'move');
-            $('#dlg-file-browse-operations span.action').text('move');
+            $('#dlg-file-browse-operations span.action').text('Move');
         } else {
             $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'copy');
-            $('#dlg-file-browse-operations span.action').text('copy');
+            $('#dlg-file-browse-operations span.action').text('Copy');
         }
         // Set filename in modal & button attribute
         $('#dlg-file-browse-operations span.action-file').text($(this).attr('data-name'));
