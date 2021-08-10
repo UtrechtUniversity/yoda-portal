@@ -579,10 +579,10 @@ window.addEventListener('popstate', function(e) {
 
 function logUpload(id, file) {
 
-   let log = `<div class="row upload-row" id="${id}">
+   let log = `<div class="row upload-row mb-1" id="${id}">
                   <div class="col-md-6">
                     <div class="upload-filename">${htmlEncode(file.relativePath)}</div>
-                    <div class="upload-btns btn-group btn-group-sm" role="group" aria-label="Basic example">
+                    <div class="upload-btns btn-group btn-group-sm ml-3" role="group" aria-label="Basic example">
                       <button type="button" class="btn btn-secondary upload-pause mr-1">Pause</button>
                       <button type="button" class="btn btn-secondary upload-resume mr-1 hide">Resume</button>
                       <button type="button" class="btn btn-secondary upload-cancel mr-1">Cancel</button>

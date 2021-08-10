@@ -14,37 +14,16 @@
     }
 }
 
-.tab-content {
-    margin-top:10px;
-}
-
 .browse, .browse-search, .browse-select {
     cursor: pointer;
 }
 
-.panel-heading h3 {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 75%;
-    float:left;
-}
-
 nav .breadcrumb {
     background-color: transparent;
-    margin-bottom: 0;
-    padding-left: 10px;
 }
 
 .action-list li {
     cursor: pointer;
-}
-
-.panel-heading .input-group-sm {
-    margin: -7px; /* btn in panel heading */
-}
-.panel-footer  .input-group-sm {
-    margin: -6px; /* btn in panel footer */
 }
 
 #messages {
@@ -57,17 +36,10 @@ nav .breadcrumb {
 }
 
 /* Upload */
-.upload-row {
-    margin-bottom: 5px;
-}
 .upload-filename {
     word-break: break-all;
     display: inline-block;
  }
-
-.upload-btns {
-    margin-left: 10px;
-}
 
 .hide {
     display:none;
@@ -100,13 +72,9 @@ nav .breadcrumb {
     max-width: 90px;
     text-align: right;
 }
-#file-browser .fa {
-    padding-left: 4px;
-    padding-right: 4px;
-}
+
 #file-browser_length, #search_length {
     float: left;
-    padding-top: 2px;
 }
 
 #file-browser > tbody > tr > td {
