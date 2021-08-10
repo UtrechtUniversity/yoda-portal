@@ -3,9 +3,12 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from flask import Flask, g, redirect, request, url_for, send_from_directory
+from os import path
+
+from flask import current_app, Flask, g, redirect, request, send_from_directory, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
+from jinja2 import BaseLoader, TemplateNotFound
 
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
@@ -18,11 +21,8 @@ from stats.stats import stats_bp
 from user.user import user_bp
 from vault.vault import vault_bp
 
-
-from jinja2 import BaseLoader, TemplateNotFound
-from flask import current_app
-
-from os import path
+# from jinja2 import BaseLoader, TemplateNotFound
+# from flask import current_app
 
 
 # User area where templates or static files are kept.
@@ -42,7 +42,8 @@ class BlueprintLoader(BaseLoader):
                 source = f.read()
             return source, user_template_path, False
 
-        for loader in (current_app.blueprints[request.blueprint].jinja_loader, current_app.blueprints['general_bp'].jinja_loader, 
+        for loader in (current_app.blueprints[request.blueprint].jinja_loader,
+                                              current_app.blueprints['general_bp'].jinja_loader,
                        current_app.jinja_loader):
             try:
                 if loader:
