@@ -5,7 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 from datetime import datetime
 
-from flask import Blueprint, jsonify, make_response, render_template, request, send_from_directory
+from flask import Blueprint, jsonify, make_response, render_template, request
 
 import api
 
