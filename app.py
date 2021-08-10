@@ -119,6 +119,8 @@ the corresponding file structure for static files is:
 /static
 /module/static/module/
 """
+
+
 @app.before_request
 def protect_pages():
     if '/assets/' in request.full_path:
