@@ -72,13 +72,12 @@ async function copyFile(filepath, newFilepath)
                 'filepath': Yoda.basePath + filepath,
                 'new_filepath': Yoda.basePath + newFilepath
             },
-            {'quiet': true}
+            {'quiet': true, 'rawResult': true}
         );
 
         if (result.status == 'ok') {
-            html = 'The file has been successfully copied.';
-            html += ' <a href="/research/?dir=' + dlgCurrentFolder + '">Go to new file</a>';
-            dlgSelectAlertShow(html);
+            Yoda.set_message('success', 'The file has been successfully copied.');
+            $('#dlg-file-browse-operations').modal('hide');
         }
         else { // non api error
             dlgSelectAlertShow(result.status_info);
@@ -98,13 +97,14 @@ async function moveFile(filepath, newFilepath)
                 'filepath': Yoda.basePath + filepath,
                 'new_filepath': Yoda.basePath + newFilepath
             },
-            {'quiet': true}
+            {'quiet': true, 'rawResult': true}
         );
 
         if (result.status == 'ok') {
-            html = 'The file has been successfully moved.';
-            html += ' <a href="/research/?dir=' + dlgCurrentFolder + '">Go to new file</a>';
-            dlgSelectAlertShow(html);
+            Yoda.set_message('success', 'The file has been successfully moved.');
+            $('#dlg-file-browse-operations').modal('hide');
+            let collection = $('#dlg-file-browse-operations .dlg-action-button').attr('data-collection');
+            browse(collection, true);
         }
         else { // non api error
             dlgSelectAlertShow(result.status_info);
@@ -181,7 +181,7 @@ let getFolderContents2 = (() => {
             let j = ++i;
 
             // + currentFolder
-            let result = await Yoda.call('browse_collections',
+            let result = await Yoda.call('browse_folder',
                 {'coll':       Yoda.basePath + dlgCurrentFolder,
                     'offset':     args.start,
                     'limit':      batchSize,
