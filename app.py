@@ -40,9 +40,10 @@ class BlueprintLoader(BaseLoader):
             source = ''
             with open(user_template_path) as f:
                 source = f.read()
-            return source, user_template_path, lambda: mtime == getmtime(user_template_path)
+            return source, user_template_path, False
 
-        for loader in (current_app.blueprints[request.blueprint].jinja_loader, current_app.blueprints['general_bp'].jinja_loader, current_app.jinja_loader):
+        for loader in (current_app.blueprints[request.blueprint].jinja_loader, current_app.blueprints['general_bp'].jinja_loader, 
+                       current_app.jinja_loader):
             try:
                 if loader:
                     return loader.get_source(environment, template)
@@ -109,12 +110,12 @@ def protect_pages():
     Static files handling first - recognisable through '/assets/'
     Override requested static file if present in user_static_area
     If not present fall back to the standard supplied static file
-    
+
     This only works when the blueprint is created with static_url_path='/assets'
     The structure becomes
     /assets/ - for the root of the application
     /module/assets/ - for the modules of the application
-    
+
     the corresponding file structure for static files is:
     /static
     /module/static/module/
