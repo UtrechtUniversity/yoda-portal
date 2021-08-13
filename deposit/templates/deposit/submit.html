@@ -13,26 +13,44 @@
 
 {% block content %}
 
-    {% with step=3 %}
-        {% include 'deposit/workflow.html' %}
-    {% endwith %}
+{% with step=3 %}
+{% include 'deposit/workflow.html' %}
+{% endwith %}
 
-    <div class="card">
-        <div class="card-header">
-            <h5 class="card-title pull-left">Submit your data package</h5>
-        </div>
-        <div class="card-body">
-            <div class="form-check">
-              <p>Data uploaded <i id="data_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
-              <p>Metadata complete <i id="metadata_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
-              <p style="margin:10px 20px;">
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title pull-left">Submit your data package</h5>
+    </div>
+    <div class="card-body">
+        <div class="form-check">
+            <p>Data uploaded <i id="data_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
+            <p>Metadata complete <i id="metadata_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
+            <p style="margin:10px 20px;">
                 <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms">
-                <label class="form-check-label" for="accept_terms" style="padding-left:3px;">I accept the terms and conditions</label>
-              </p>
-            </div>
-            <br />
-            <a href="/deposit/metadata" class="btn btn-secondary">Back</a>
-            <button id="submit" type="submit" class="btn btn-primary pull-right" disabled>Submit</button>
+                <label class="form-check-label" for="accept_terms" style="padding-left:3px;">I accept the</label>
+                <a href="" class="text-info" type="button" data-toggle="modal" data-target="#terms_conditions_modal" style="text-decoration:underline;">Terms and Conditions</a>
+            </p>
         </div>
     </div>
+    <div class="modal-footer">
+        <a href="/deposit/metadata" class="btn btn-secondary">Back</a>
+        <button id="submit" type="submit" class="btn btn-primary pull-right" disabled>Submit</button>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="terms_conditions_modal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Terms and conditions</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
