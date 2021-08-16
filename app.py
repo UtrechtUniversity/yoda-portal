@@ -28,7 +28,7 @@ from vault.vault import vault_bp
 class BlueprintLoader(BaseLoader):
     def get_source(self, environment, template):
         # First check user defined area
-        user_templates_area =  app.config.get('YODA_THEME_PATH') + '/' + app.config.get('YODA_THEME') + '/'
+        user_templates_area = app.config.get('YODA_THEME_PATH') + '/' + app.config.get('YODA_THEME') + '/'
         print(user_templates_area)
         user_template_path = path.join(user_templates_area, template)
         if path.exists(user_template_path):
