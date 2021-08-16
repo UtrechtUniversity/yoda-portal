@@ -909,7 +909,7 @@ function topInformation(dir, showAlert)
             $('.lock').hide();
             var lockIcon = '';
             if (lockCount != '0' && typeof lockCount != 'undefined') {
-                lockIcon = `<i class="fa fa-exclamation-circle lock-icon" data-folder="${htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`;
+                lockIcon = `<i class="fa fa-lock lock-icon" data-folder="${htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`;
             }
 
             // Provenance action log
