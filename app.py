@@ -25,16 +25,11 @@ from vault.vault import vault_bp
 # from flask import current_app
 
 
-# User area where templates or static files are kept.
-# These will override the supplied standard Yoda templates and static files
-user_templates_area = '/var/www/yoda/user-templates/'
-user_static_area = '/var/www/yoda/user-templates/'
-
-
 class BlueprintLoader(BaseLoader):
     def get_source(self, environment, template):
         # First check user defined area
-        # user_templates_area = '/var/www/yoda/user-templates/'
+        user_templates_area =  app.config.get('YODA_THEME_PATH') + '/' + app.config.get('YODA_THEME') + '/'
+        print(user_templates_area)
         user_template_path = path.join(user_templates_area, template)
         if path.exists(user_template_path):
             source = ''
@@ -55,6 +50,12 @@ class BlueprintLoader(BaseLoader):
 
 app = Flask(__name__, static_folder='assets')
 app.jinja_env.loader = BlueprintLoader()
+
+# Portal theme configuration
+# User area where templates or static files are kept.
+# These will override the supplied standard Yoda templates and static files
+# user_templates_area = app.config.get('YODA_THEME_PATH')
+# user_static_area = app.config.get('YODA_THEME_PATH')
 
 # Load configurations
 with app.app_context():
@@ -124,6 +125,8 @@ the corresponding file structure for static files is:
 @app.before_request
 def protect_pages():
     if '/assets/' in request.full_path:
+        user_static_area = app.config.get('YODA_THEME_PATH') + '/' + app.config.get('YODA_THEME') + '/'
+        print(user_static_area)
         base = path.basename(request.path[1:])
         dir = path.dirname(request.path[1:])
         parts = request.full_path.split('/')
