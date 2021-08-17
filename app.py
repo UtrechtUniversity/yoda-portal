@@ -98,10 +98,9 @@ csrf = CSRFProtect(app)
 
 
 @app.before_request
-def protect_pages():
+def static_loader():
     """
-    Protect pages:
-    Static files handling first - recognisable through '/assets/'
+    Static files handling - recognisable through '/assets/'
     Override requested static file if present in user_static_area
     If not present fall back to the standard supplied static file
 
@@ -113,6 +112,8 @@ def protect_pages():
     the corresponding file structure for static files is:
     /static
     /module/static/module/
+
+    :returns: Static file
     """
     if '/assets/' in request.full_path:
         user_static_area = app.config.get('YODA_THEME_PATH') + '/' + app.config.get('YODA_THEME') + '/'
@@ -141,6 +142,9 @@ def protect_pages():
                 static_dir = dir.replace(module + '/assets/', '/var/www/yoda/' + module + '/static/' + module + '/')
                 return send_from_directory(static_dir, base)
 
+
+@app.before_request
+def protect_pages():
     """Restricted pages access protection."""
     if not request.endpoint or request.endpoint in ['general_bp.index',
                                                     'user_bp.login',
