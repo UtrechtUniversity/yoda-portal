@@ -829,10 +829,10 @@ function topInformation(dir, showAlert)
             $('.btn-group button.folder-create').attr('data-path', "");
             $('.btn-group button.folder-create').prop("disabled", true);
 
-            $('a.folder-delete').prop("disabled", true);
-            $('a.folder-rename').prop("disabled", true);
-            $('a.file-delete').prop("disabled", true);
-            $('a.file-rename').prop("disabled", true);
+            $('a.folder-delete').addClass("disabled");
+            $('a.folder-rename').addClass("disabled");
+            $('a.file-delete').addClass("disabled");
+            $('a.file-rename').addClass("disabled");
 
             $('.top-information').hide();
             $('.top-info-buttons').hide();
@@ -899,10 +899,10 @@ function topInformation(dir, showAlert)
                 $('.btn-group button.folder-create').attr('data-path', dir);
                 $('.btn-group button.folder-create').prop("disabled", false);
 
-                $('a.folder-delete').prop("disabled", false);
-                $('a.folder-rename').prop("disabled", false);
-                $('a.file-delete').prop("disabled", false);
-                $('a.file-rename').prop("disabled", false);
+                $('a.folder-delete').removeClass("disabled");
+                $('a.folder-rename').removeClass("disabled");
+                $('a.file-delete').removeClass("disabled");
+                $('a.file-rename').removeClass("disabled");
             }
 
             // Lock icon
@@ -1003,7 +1003,6 @@ async function lockFolder(folder)
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     // Change folder status call
-
     try {
         await Yoda.call('folder_lock', {'coll': Yoda.basePath + folder})
         $('#statusBadge').text('Locked');
