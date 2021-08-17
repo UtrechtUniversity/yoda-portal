@@ -831,12 +831,12 @@ function topInformation(dir, showAlert)
             $('.btn-group button.folder-create').attr('data-path', "");
             $('.btn-group button.folder-create').prop("disabled", true);
 
-            $('a.folder-delete').prop("disabled", true);
-            $('a.folder-rename').prop("disabled", true);
-            $('a.file-delete').prop("disabled", true);
-            $('a.file-rename').prop("disabled", true);
-            $('a.file-copy').prop("disabled", true);
-            $('a.file-move').prop("disabled", true);
+            $('a.folder-delete').addClass("disabled");
+            $('a.folder-rename').addClass("disabled");
+            $('a.file-delete').addClass("disabled");
+            $('a.file-rename').addClass("disabled");
+            $('a.file-copy').addClass("disabled");
+            $('a.file-move').addClass("disabled");
 
             $('.top-information').hide();
             $('.top-info-buttons').hide();
@@ -903,19 +903,19 @@ function topInformation(dir, showAlert)
                 $('.btn-group button.folder-create').attr('data-path', dir);
                 $('.btn-group button.folder-create').prop("disabled", false);
 
-                $('a.folder-delete').prop("disabled", false);
-                $('a.folder-rename').prop("disabled", false);
-                $('a.file-delete').prop("disabled", false);
-                $('a.file-rename').prop("disabled", false);
-                $('a.file-copy').prop("disabled", false);
-                $('a.file-move').prop("disabled", false);
+                $('a.folder-delete').removeClass("disabled");
+                $('a.folder-rename').removeClass("disabled");
+                $('a.file-delete').removeClass("disabled");
+                $('a.file-rename').removeClass("disabled");
+                $('a.file-copy').removeClass("disabled");
+                $('a.file-move').removeClass("disabled");
             }
 
             // Lock icon
             $('.lock').hide();
             var lockIcon = '';
             if (lockCount != '0' && typeof lockCount != 'undefined') {
-                lockIcon = `<i class="fa fa-exclamation-circle lock-icon" data-folder="${htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`;
+                lockIcon = `<i class="fa fa-lock lock-icon" data-folder="${htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`;
             }
 
             // Provenance action log
@@ -1009,7 +1009,6 @@ async function lockFolder(folder)
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     // Change folder status call
-
     try {
         await Yoda.call('folder_lock', {'coll': Yoda.basePath + folder})
         $('#statusBadge').text('Locked');

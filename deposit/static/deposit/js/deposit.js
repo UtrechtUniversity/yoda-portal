@@ -150,8 +150,6 @@ $(function() {
                 logUpload(file.uniqueIdentifier, file);
 
                 let $self = $('#'+file.uniqueIdentifier);
-//                $self.find('.upload-pause').delay(2000).show(0);
-//                $self.find('.upload-cancel').delay(2000).show(0);
 
                 // Pause btn
                 $self.find('.upload-pause').on('click', function () {
@@ -187,7 +185,7 @@ $(function() {
         browse(path);
     });
     r.on('fileSuccess', function(file,message){
-        $("#" + file.uniqueIdentifier + " .msg").html("Upload complete");
+        $("#" + file.uniqueIdentifier + " .msg").html("<span class='text-success'>Upload complete</span>");
         let $self = $('#'+file.uniqueIdentifier);
         $self.find('.upload-btns').hide();
 
@@ -543,7 +541,7 @@ function startBrowsing(items)
     $('#file-browser').DataTable({
         "bFilter": false,
         "bInfo": false,
-        "bLengthChange": true,
+        "bLengthChange": false,
         "language": {
             "emptyTable": "Drag and drop files and folders here",
             "lengthMenu": "_MENU_"
@@ -581,12 +579,12 @@ window.addEventListener('popstate', function(e) {
 
 function logUpload(id, file) {
 
-   let log = `<div class="row upload-row" id="${id}">
+   let log = `<div class="row upload-row mb-1" id="${id}">
                   <div class="col-md-6">
                     <div class="upload-filename">${htmlEncode(file.relativePath)}</div>
-                    <div class="upload-btns btn-group btn-group-sm" role="group" aria-label="Basic example">
+                    <div class="upload-btns btn-group btn-group-sm ml-3" role="group" aria-label="Basic example">
                       <button type="button" class="btn btn-secondary upload-pause mr-1">Pause</button>
-                      <button type="button" class="btn btn-secondary upload-resume mr-1">Resume</button>
+                      <button type="button" class="btn btn-secondary upload-resume mr-1 hide">Resume</button>
                       <button type="button" class="btn btn-secondary upload-cancel mr-1">Cancel</button>
                     </div>
                   </div>
