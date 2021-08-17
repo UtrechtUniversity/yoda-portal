@@ -21,16 +21,13 @@ from stats.stats import stats_bp
 from user.user import user_bp
 from vault.vault import vault_bp
 
-# from jinja2 import BaseLoader, TemplateNotFound
-# from flask import current_app
-
 
 class BlueprintLoader(BaseLoader):
     def get_source(self, environment, template):
-        # First check user defined area
+        # First for template in user defined area.
         user_templates_area = app.config.get('YODA_THEME_PATH') + '/' + app.config.get('YODA_THEME') + '/'
-        print(user_templates_area)
         user_template_path = path.join(user_templates_area, template)
+
         if path.exists(user_template_path):
             source = ''
             with open(user_template_path) as f:
@@ -50,12 +47,6 @@ class BlueprintLoader(BaseLoader):
 
 app = Flask(__name__, static_folder='assets')
 app.jinja_env.loader = BlueprintLoader()
-
-# Portal theme configuration
-# User area where templates or static files are kept.
-# These will override the supplied standard Yoda templates and static files
-# user_templates_area = app.config.get('YODA_THEME_PATH')
-# user_static_area = app.config.get('YODA_THEME_PATH')
 
 # Load configurations
 with app.app_context():
@@ -105,31 +96,30 @@ with app.app_context():
 # XXX CSRF needs to be disabled for API testing.
 csrf = CSRFProtect(app)
 
-"""
-Protect pages:
-Static files handling first - recognisable through '/assets/'
-Override requested static file if present in user_static_area
-If not present fall back to the standard supplied static file
-
-This only works when the blueprint is created with static_url_path='/assets'
-The structure becomes
-/assets/ - for the root of the application
-/module/assets/ - for the modules of the application
-
-the corresponding file structure for static files is:
-/static
-/module/static/module/
-"""
-
 
 @app.before_request
 def protect_pages():
+    """
+    Protect pages:
+    Static files handling first - recognisable through '/assets/'
+    Override requested static file if present in user_static_area
+    If not present fall back to the standard supplied static file
+
+    This only works when the blueprint is created with static_url_path='/assets'
+    The structure becomes
+    /assets/ - for the root of the application
+    /module/assets/ - for the modules of the application
+
+    the corresponding file structure for static files is:
+    /static
+    /module/static/module/
+    """
     if '/assets/' in request.full_path:
         user_static_area = app.config.get('YODA_THEME_PATH') + '/' + app.config.get('YODA_THEME') + '/'
-        print(user_static_area)
         base = path.basename(request.path[1:])
         dir = path.dirname(request.path[1:])
         parts = request.full_path.split('/')
+
         if parts[1] == 'assets':
             static_dir = dir.replace('assets', user_static_area + 'static')
             user_static_filename = path.join(static_dir, base)
@@ -141,10 +131,8 @@ def protect_pages():
         else:
             # module specific handling
             module = parts[1]
-
             specific_file_location = dir.replace(module + '/assets/', '')
             module_static_area = module + '/static/' + module + '/'
-
             user_static_filename = path.join(user_static_area + module_static_area + specific_file_location, base)
 
             if path.exists(user_static_filename):
