@@ -2,10 +2,6 @@
 
 {% block title %}{{ super() }} &dash; Sign in{% endblock %}
 
-{% if config.get('OIDC_ENABLED') %}
-    {% set OIDC_AUTH_URI = config.get('OIDC_AUTH_BASE_URI') ~ '?response_type=code&client_id=' ~ config.get('OIDC_CLIENT_ID') ~ '&redirect_uri=' ~ config.get('OIDC_CALLBACK_URI') ~ '&scope=' ~ config.get('OIDC_SCOPES') ~ '&acr_values=' ~ config.get('OIDC_ACR_VALUES') %}
-{% endif %}
-
 {% block content %}
 <div class="row">
     <div class="offset-md-2 col-md-8">
@@ -18,12 +14,27 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label" for="f-login-username">Username</label>
-                        <input name="username" id="f-login-username" class="form-control col-sm-6" type="text" placeholder="j.a.smith@uu.nl" autofocus="" required />
+                        <input 
+                            name="username" 
+                            id="f-login-username" 
+                            class="form-control col-sm-6" 
+                            type="text" 
+                            placeholder="j.a.smith@uu.nl" 
+                            {% if g.login_username %} 
+                            value="{{ g.login_username }}"
+                            {% endif %} 
+                            required />
                         <span id="capitals" class="hidden error text-danger">Username should not contain capital letters.</span>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label" for="f-login-password">Password</label>
-                        <input name="password" id="f-login-password" class="form-control col-sm-6" type="password" required />
+                        <input 
+                            name="password" 
+                            id="f-login-password" 
+                            class="form-control col-sm-6" 
+                            type="password" 
+                            autofocus
+                            required />
                         <a class="col-sm-6 offset-sm-3 pl-0" href="{{ url_for('user_bp.forgot_password') }}" title="Forgot / change password?">Forgot / change password?</a>
                     </div>
                     <div class="form-group row">
@@ -31,7 +42,7 @@
                     </div>
                     {% if config.get('OIDC_ENABLED') %}
                     <div class="form-group row">
-                        <a class="btn btn-secondary col-sm-6 mt-2 offset-sm-3" href="{{ OIDC_AUTH_URI }}">{{ config.get('OIDC_SIGNIN_TEXT') }}</a>
+                       <a class="btn btn-secondary col-sm-6 mt-2 offset-sm-3" href="{{ config.get('OIDC_AUTH_URI') }}">{{ config.get('OIDC_SIGNIN_TEXT') }}</a>
                     </div>
                     {% endif %}
                 </form>

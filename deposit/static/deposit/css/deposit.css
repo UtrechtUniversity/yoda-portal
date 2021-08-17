@@ -1,34 +1,29 @@
 
-.tab-content {
-    margin-top:10px;
+/* ** File browser size **
+ Make the file browser wider to allow longer filenames.
+*/
+@media (min-width: 1400px){
+    .container, .container-sm, .container-md, .container-lg, .container-xl {
+        max-width: 1390px;
+    }
+}
+/* If container-fluid is used (for a full-width file browser), use the right padding on laptop screens */
+@media (min-width: 769px) {
+    .container-fluid .page {
+        padding: 0 100px;
+    }
 }
 
 .browse, .browse-search, .browse-select {
     cursor: pointer;
 }
 
-.panel-heading h3 {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 75%;
-    float:left;
-}
-
 nav .breadcrumb {
     background-color: transparent;
-    margin-bottom: 0;
 }
 
 .action-list li {
     cursor: pointer;
-}
-
-.panel-heading .input-group-sm {
-    margin: -7px; /* btn in panel heading */
-}
-.panel-footer  .input-group-sm {
-    margin: -6px; /* btn in panel footer */
 }
 
 #messages {
@@ -41,43 +36,22 @@ nav .breadcrumb {
 }
 
 /* Upload */
-.upload-row {
-    margin-bottom: 5px;
-}
 .upload-filename {
-    word-wrap: break-word;
+    word-break: break-all;
     display: inline-block;
  }
-
-.upload-pause,
-.upload-resume,
-.upload-retry {
-    display: none;
-}
 
 .hide {
     display:none;
 }
 
-
-
-/* cards clickable
-Needs save on metadata form too (react)
-.card > a,
-.card > a:hover,
-.card > a:active
- {
-    display: block;
-    text-decoration: none;
-    cursor: pointer;
-}
-*/
-
 .card-title {
     margin: 4px 0;
 }
 
-
+.page_deposit_thankyou a {
+    text-decoration: underline;
+}
 
 /* Data table */
 
@@ -86,27 +60,21 @@ Needs save on metadata form too (react)
 }
 
 #file-browser tr > :nth-child(1) {
-    min-width: 40%;
+    min-width: 60%;
+    word-break:break-all;
 }
-
 #file-browser tr > :nth-child(2) {
-    max-width: 30px;
     text-align: right;
 }
 #file-browser tr > :nth-child(3) {
-    max-width: 40px;
 }
 #file-browser tr > :nth-child(4) {
-    max-width: 10px;
+    max-width: 90px;
     text-align: right;
 }
-#file-browser .fa {
-    padding-left: 4px;
-    padding-right: 4px;
-}
+
 #file-browser_length, #search_length {
     float: left;
-    padding-top: 2px;
 }
 
 #file-browser > tbody > tr > td {
@@ -117,6 +85,13 @@ Needs save on metadata form too (react)
     font-size: 19px;
     vertical-align: bottom;
 }
+
+#file-browser > tbody > tr > td,
+#file-browser .dropdown a,
+#files div {
+    font-size: 0.9rem;
+}
+
 
 #file-browser th {
     background-color: #dcdcdc;

@@ -6,7 +6,8 @@
 img.header-logo-img {
     display: inline;
     width: 100%;
-    height: 500px;
+    height: auto;
+    min-height: 500px;
     clear: both;
 }
 

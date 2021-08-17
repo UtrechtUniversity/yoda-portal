@@ -129,8 +129,9 @@ $(function() {
     // Flow.js upload handler
     var r = new Flow({
         target: '/research/upload',
-        chunkSize: 10 * 1024 * 1024,
-        simultaneousUploads: 5,
+        chunkSize: 25 * 1024 * 1024,
+        forceChunkSize: true,
+        simultaneousUploads: 1,
         query: {'csrf_token': Yoda.csrf.tokenValue, filepath : ''}
     });
     // Flow.js isn't supported, fall back on a different method
@@ -140,7 +141,8 @@ $(function() {
 
     // Assign upload places for dropping/selecting files
     r.assignDrop($('.upload-drop')[0]);
-    r.assignBrowse($('.upload')[0]);
+    r.assignBrowse($('.upload-file')[0]);
+    r.assignBrowse($('.upload-folder')[0], true);
 
     // Flow.js handle events
     r.on('filesAdded', function(files){
@@ -181,12 +183,12 @@ $(function() {
         $('#uploads').modal('show');
     });
     r.on('filesSubmitted', function() {
-        let path = $('.upload').attr('data-path');
+        let path = $('button.upload').attr('data-path');
         r.opts.query.filepath = path;
         r.upload();
     });
     r.on('complete', function(){
-        let path = $('.upload').attr('data-path');
+        let path = $('button.upload').attr('data-path');
         browse(path);
     });
     r.on('fileSuccess', function(file,message){
@@ -822,7 +824,7 @@ function topInformation(dir, showAlert)
 
             $('.btn-group button.metadata-form').hide();
 
-            $('.upload').attr('data-path', "");
+            $('.btn-group button.upload').attr('data-path', "");
             $('.btn-group button.upload').prop("disabled", true);
             $('.btn-group button.folder-create').attr('data-path', "");
             $('.btn-group button.folder-create').prop("disabled", true);
@@ -890,7 +892,7 @@ function topInformation(dir, showAlert)
             // Check if folder is writable.
             if (hasWriteRights && (status == '' || status == 'SECURED')) {
                 // Enable uploads.
-                $('.upload').attr('data-path', dir);
+                $('.btn-group button.upload').attr('data-path', dir);
                 $('.btn-group button.upload').prop("disabled", false);
 
                 // Enable folder / file manipulations.
@@ -952,7 +954,7 @@ function topInformation(dir, showAlert)
             }
         });
     } else {
-        $('.upload').attr('data-path', "");
+        $('.btn-group button.upload').attr('data-path', "");
 
         // Folder/ file manipulation data
         $('.btn-group button.folder-create').attr('data-path', "");
@@ -1119,7 +1121,7 @@ function logUpload(id, file) {
                       </button>
                       <button type="button" class="btn btn-secondary upload-retry hide">
                         Retry
-                      </button>                      
+                      </button>
                     </div>
                   </div>
                   <div class="col-md-3"><div class="progress mt-1"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>

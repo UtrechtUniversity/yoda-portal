@@ -19,6 +19,12 @@ $(function() {
     $("#accept_terms").change(function() {
         submitStatus();
     });
+
+    // Load the terms and conditions:
+    Yoda.call('vault_get_publication_terms', {}).then((data) => {
+        $('#terms_conditions_modal .modal-body').html(data);
+    });
+
 });
 
 async function submitStatus()
