@@ -47,7 +47,7 @@ class ThemeTemplateLoader(BaseLoader):
     @cached_property
     def theme_path(self):
         """The absolute path to the theme's directory."""
-        return path.join(app.config.get( 'YODA_THEME_PATH'), app.config.get('YODA_THEME'))
+        return path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
 
 
 app = Flask(__name__, static_folder='assets')
