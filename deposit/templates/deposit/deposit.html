@@ -12,6 +12,7 @@
 <script src="{{ url_for('deposit_bp.static', filename='lib/datatables/js/datatables.min.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='js/deposit.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
 <script>
     var browsePageItems = {{ items }};
     var browseStartDir = dir = path  = {{ dir|tojson|safe }};
@@ -39,7 +40,7 @@
                         </ol>
                     </nav>
                 </div>
-                <div class="col-md-6 mt-2">
+                <div class="col-md-6 mt-2" id="top-upload-buttons">
                     <div class="btn-toolbar pull-right" role="toolbar">
                         <div class="btn-group mr-2" role="group">
                             <button type="button" class="btn btn-outline-secondary folder-create" data-path="" title="Create a new folder"><i class="fa fa-folder px-2" aria-hidden="true"></i> Create Folder</button>
@@ -179,6 +180,49 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button class='btn btn-primary btn-confirm-file-delete' data-collection="" data-name="">Delete file</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="dlg-file-browse-operations">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="card-body">
+
+                <div class="alert alert-warning hide" id="dlg-select-alert-panel">
+                    <span></span>
+                </div>
+
+                <div class="card">
+                    <div class="card-header clearfix">
+                        <h5 class="card-title pull-left">Select folder to <span class="action"></span> <span class="action-file"></span></h5>
+                    </div>
+
+                    <input type="hidden" id="restoration-objectid" value="">
+
+                    <div class="card">
+                        <div class="card-body">
+                            <ol class="breadcrumb dlg-breadcrumb">
+                                <li class="active">Home</li>
+                            </ol>
+
+                            <table id="folder-select-browser" class="table yoda-table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Modified date</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary dlg-action-button" data-action="" data-name="" data-collection=""><span class="action"></span></button>
             </div>
         </div>
     </div>
