@@ -5,11 +5,10 @@ __license__   = 'GPLv3, see LICENSE'
 
 from os import path
 
-from flask import current_app, Flask, g, redirect, request, send_from_directory, url_for
+from flask import Flask, g, redirect, request, send_from_directory, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
-from jinja2 import BaseLoader, TemplateNotFound
-from werkzeug.utils import cached_property
+from jinja2 import ChoiceLoader, FileSystemLoader
 
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
@@ -23,39 +22,19 @@ from user.user import user_bp
 from vault.vault import vault_bp
 
 
-class ThemeTemplateLoader(BaseLoader):
-    def get_source(self, environment, template):
-        # First for template in user defined area.
-        user_template_path = path.join(self.theme_path, template)
-
-        if path.exists(user_template_path):
-            source = ''
-            with open(user_template_path) as f:
-                source = f.read()
-            return source, user_template_path, False
-
-        for loader in (current_app.blueprints[request.blueprint].jinja_loader,
-                       current_app.blueprints['general_bp'].jinja_loader,
-                       current_app.jinja_loader):
-            try:
-                if loader:
-                    return loader.get_source(environment, template)
-            except TemplateNotFound:
-                pass
-        raise TemplateNotFound(template)
-
-    @cached_property
-    def theme_path(self):
-        """The absolute path to the theme's directory."""
-        return path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
-
-
 app = Flask(__name__, static_folder='assets')
-app.jinja_env.loader = ThemeTemplateLoader()
 
 # Load configurations
 with app.app_context():
     app.config.from_pyfile('flask.cfg')
+
+# Add theme loader.
+theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
+theme_loader = ChoiceLoader([
+    FileSystemLoader(theme_path),
+    app.jinja_loader,
+])
+app.jinja_loader = theme_loader
 
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
