@@ -117,8 +117,7 @@ def static_loader():
     """
     if '/assets/' in request.full_path:
         user_static_area = app.config.get('YODA_THEME_PATH') + '/' + app.config.get('YODA_THEME') + '/'
-        base = path.basename(request.path[1:])
-        dir = path.dirname(request.path[1:])
+        dir, base = path.split(request.path)
         parts = request.full_path.split('/')
 
         if parts[1] == 'assets':
