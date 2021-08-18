@@ -31,7 +31,7 @@ nav .breadcrumb {
     margin-right: -15px;
 }
 
-.dropdown-toggle, .view-image, .view-audio, .view-video {
+.dropdown-toggle {
     cursor: pointer;
 }
 
@@ -91,7 +91,6 @@ nav .breadcrumb {
 #files div {
     font-size: 0.9rem;
 }
-
 
 #file-browser th {
     background-color: #dcdcdc;
