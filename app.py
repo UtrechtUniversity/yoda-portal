@@ -100,30 +100,29 @@ def static_loader():
     :returns: Static file
     """
     if '/assets/' in request.full_path:
-        user_static_area = app.config.get('YODA_THEME_PATH') + '/' + app.config.get('YODA_THEME') + '/'
-        dir, base = path.split(request.path)
+        user_static_area = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
+        asset_dir, asset_name = path.split(request.path)
         parts = request.full_path.split('/')
 
         if parts[1] == 'assets':
-            static_dir = dir.replace('assets', user_static_area + 'static')
-            user_static_filename = path.join(static_dir, base)
-            if path.exists(user_static_filename):
-                return send_from_directory(static_dir, base)
-            else:
-                static_dir = dir.replace('assets', '/var/www/yoda/static')
-                return send_from_directory(static_dir, base)
+            # Main assets
+            static_dir = asset_dir.replace('/assets', user_static_area + '/static')
+            user_static_filename = path.join(static_dir, asset_name)
+            if not path.exists(user_static_filename):
+                static_dir = asset_dir.replace('/assets', '/var/www/yoda/static')
         else:
-            # module specific handling
+            # Module specific assets
             module = parts[1]
-            specific_file_location = dir.replace(module + '/assets/', '')
-            module_static_area = module + '/static/' + module + '/'
-            user_static_filename = path.join(user_static_area + module_static_area + specific_file_location, base)
+            specific_file_location = asset_dir.replace(module + '/assets/', '')
+            module_static_area = path.join(module, 'static', module)
+            user_static_filename = path.join(user_static_area, module_static_area, specific_file_location, asset_name)
 
             if path.exists(user_static_filename):
-                return send_from_directory(user_static_area + module_static_area + specific_file_location, base)
+                static_dir = path.join(user_static_area, module_static_area, specific_file_location)
             else:
-                static_dir = dir.replace(module + '/assets/', '/var/www/yoda/' + module + '/static/' + module + '/')
-                return send_from_directory(static_dir, base)
+                static_dir = asset_dir.replace('/' + module + '/assets', '/var/www/yoda/' + module_static_area)
+
+        return send_from_directory(static_dir, asset_name)
 
 
 @app.before_request
