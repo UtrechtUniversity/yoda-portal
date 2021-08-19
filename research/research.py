@@ -13,7 +13,7 @@ from werkzeug.utils import secure_filename
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
                         static_folder='static/research',
-                        static_url_path='/static')
+                        static_url_path='/assets')
 
 
 @research_bp.route('/')

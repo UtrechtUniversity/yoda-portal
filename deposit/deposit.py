@@ -10,7 +10,7 @@ import api
 deposit_bp = Blueprint('deposit_bp', __name__,
                        template_folder='templates',
                        static_folder='static/deposit',
-                       static_url_path='/deposit')
+                       static_url_path='/assets')
 
 """
     Deposit data flow
