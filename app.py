@@ -3,9 +3,12 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from flask import Flask, g, redirect, request, url_for
+from os import path
+
+from flask import Flask, g, redirect, request, send_from_directory, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
+from jinja2 import ChoiceLoader, FileSystemLoader
 
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
@@ -18,12 +21,20 @@ from stats.stats import stats_bp
 from user.user import user_bp
 from vault.vault import vault_bp
 
-app = Flask(__name__)
+
+app = Flask(__name__, static_folder='assets')
 
 # Load configurations
 with app.app_context():
     app.config.from_pyfile('flask.cfg')
 
+# Add theme loader.
+theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
+theme_loader = ChoiceLoader([
+    FileSystemLoader(theme_path),
+    app.jinja_loader,
+])
+app.jinja_loader = theme_loader
 
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
@@ -68,6 +79,50 @@ with app.app_context():
 
 # XXX CSRF needs to be disabled for API testing.
 csrf = CSRFProtect(app)
+
+
+@app.before_request
+def static_loader():
+    """
+    Static files handling - recognisable through '/assets/'
+    Override requested static file if present in user_static_area
+    If not present fall back to the standard supplied static file
+
+    This only works when the blueprint is created with static_url_path='/assets'
+    The structure becomes
+    /assets/ - for the root of the application
+    /module/assets/ - for the modules of the application
+
+    the corresponding file structure for static files is:
+    /static
+    /module/static/module/
+
+    :returns: Static file
+    """
+    if '/assets/' in request.full_path:
+        user_static_area = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
+        asset_dir, asset_name = path.split(request.path)
+        parts = request.full_path.split('/')
+
+        if parts[1] == 'assets':
+            # Main assets
+            static_dir = asset_dir.replace('/assets', user_static_area + '/static')
+            user_static_filename = path.join(static_dir, asset_name)
+            if not path.exists(user_static_filename):
+                static_dir = asset_dir.replace('/assets', '/var/www/yoda/static')
+        else:
+            # Module specific assets
+            module = parts[1]
+            specific_file_location = asset_dir.replace(module + '/assets/', '')
+            module_static_area = path.join(module, 'static', module)
+            user_static_filename = path.join(user_static_area, module_static_area, specific_file_location, asset_name)
+
+            if path.exists(user_static_filename):
+                static_dir = path.join(user_static_area, module_static_area, specific_file_location)
+            else:
+                static_dir = asset_dir.replace('/' + module + '/assets', '/var/www/yoda/' + module_static_area)
+
+        return send_from_directory(static_dir, asset_name)
 
 
 @app.before_request

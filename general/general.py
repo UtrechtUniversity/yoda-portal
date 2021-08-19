@@ -9,7 +9,7 @@ from flask_wtf.csrf import CSRFError
 general_bp = Blueprint('general_bp', __name__,
                        template_folder='templates/general',
                        static_folder='static/general',
-                       static_url_path='/static')
+                       static_url_path='/assets')
 
 
 @general_bp.route('/')

@@ -12,7 +12,7 @@ import api
 vault_bp = Blueprint('vault_bp', __name__,
                      template_folder='templates',
                      static_folder='static/vault',
-                     static_url_path='/static')
+                     static_url_path='/assets')
 
 
 @vault_bp.route('/')
