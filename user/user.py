@@ -375,8 +375,10 @@ def prepare_user():
         g.irods = irods
 
         # Check for notifications.
-        response = api.call('notifications_load', data={})
-        g.notifications = len(response['data'])
+        endpoints = ["static", "call"]
+        if not request.endpoint.endswith(tuple(endpoints)):
+            response = api.call('notifications_load', data={})
+            g.notifications = len(response['data'])
     else:
         redirect('user_bp.login')
 
