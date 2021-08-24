@@ -51,6 +51,9 @@
                         <div class="btn-group mr-2" role="group">
                             <button type="button" class="btn btn-outline-secondary upload-folder" data-path="" title="Upload folders"><i class="fa fa-upload" aria-hidden="true"></i> Upload folders</button>
                         </div>
+                        <div class="btn-group mr-2" role="group">
+                            <button type="button" class="btn btn-outline-secondary deposit-clear" data-path="" title="Clear deposit"><i class="fa fa-trash" aria-hidden="true"></i> Clear deposit</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -72,7 +75,7 @@
             </div>
         </div>
         <div class="row pull-right">
-            <a class="btn btn-primary pull-right mt-3" href="/deposit/metadata/">Add metadata</a>
+            <a class="btn btn-primary mt-3 mr-1" href="/deposit/metadata/">Add metadata</a>
         </div>
     </div>
 </div>
@@ -180,6 +183,26 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button class='btn btn-primary btn-confirm-file-delete' data-collection="" data-name="">Delete file</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="deposit-clear">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Clear deposit</h5>
+                <div class="alert alert-warning" id="alert-panel-deposit-clear">
+                    <span></span>
+                </div>
+                <div>
+                    <p>Clear the full deposit and start over?</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button class='btn btn-danger btn-confirm-deposit-clear'>Clear deposit</button>
             </div>
         </div>
     </div>
