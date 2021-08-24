@@ -20,6 +20,8 @@
 <div class="card">
     <div class="card-header">
         <h5 class="card-title pull-left">Submit your data package</h5>
+        <button type="button" class="btn btn-outline-secondary deposit-clear pull-right" title="Clear deposit"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp; Clear deposit</button>
+
     </div>
     <div class="card-body">
         <div class="form-check">
@@ -48,6 +50,24 @@
                 </button>
             </div>
             <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="deposit-clear">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Clear deposit</h5>
+                <div class="alert alert-warning" id="alert-panel-deposit-clear">
+                    <span></span>
+                </div>
+                <p class="mt-2">Clear the full deposit and start over?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button class='btn btn-danger btn-confirm-deposit-clear'>Clear deposit</button>
             </div>
         </div>
     </div>
