@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit{% endblock %}
+{% block title %}{{ super() }} &dash; Deposit xx{% endblock %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/metadata/form.css') }}">
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/metadata/leaflet.css') }}">
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/stepper/bs-stepper.custom.css') }}">
-{% endblock %}
 <style>
 @media (min-width: 1400px){
     .container, .container-sm, .container-md, .container-lg, .container-xl {
-        max-width: 1390px;
+        max-width: 1390px !important;
     }
 }
 </style>
+{% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('deposit_bp.static', filename='lib/sweetalert/sweetalert.min.js') }}"></script>
@@ -53,8 +53,8 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title pull-left">Metadata for your deposit</h5>
-<!--                <div class="input-group-sm has-feedback pull-right close-button"><a class="btn btn-light btn-sm" href="/deposit/submit">Next page</a></div>-->
+                <h5 class="card-title pull-left" style="margin:7px 0;">Metadata for your deposit</h5>
+<!--                <button type="button" class="btn btn-outline-secondary deposit-clear pull-right" title="Clear deposit"><i class="fa fa-trash" aria-hidden="true"></i> Clear deposit</button>-->
             </div>
             <div class="card-body">
                 <div id="no-metadata" class="hide">

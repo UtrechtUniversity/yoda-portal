@@ -17,6 +17,7 @@
     var browsePageItems = {{ items }};
     var browseStartDir = dir = path  = {{ dir|tojson|safe }};
     var view = 'browse';
+
 </script>
 {% endblock %}
 
@@ -196,9 +197,7 @@
                 <div class="alert alert-warning" id="alert-panel-deposit-clear">
                     <span></span>
                 </div>
-                <div>
-                    <p>Clear the full deposit and start over?</p>
-                </div>
+                <p class="mt-2">Clear the full deposit and start over?</p>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
