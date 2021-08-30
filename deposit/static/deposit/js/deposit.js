@@ -15,7 +15,6 @@ let currentFolder;
 $(function() {
 
     currentFolder = dir;
-    console.info("dir: " + dir);
 
     // Canonicalize path somewhat, for convenience.
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
