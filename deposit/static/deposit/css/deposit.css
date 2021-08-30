@@ -104,3 +104,7 @@ nav .breadcrumb {
 #file-browser tr.odd {
     background-color: transparent !important;
 }
+
+a.dropdown-item:hover, a.dropdown-item:focus {
+    cursor: pointer;
+}
