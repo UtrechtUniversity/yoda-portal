@@ -17,6 +17,7 @@
     var browsePageItems = {{ items }};
     var browseStartDir = dir = path  = {{ dir|tojson|safe }};
     var view = 'browse';
+
 </script>
 {% endblock %}
 
@@ -51,6 +52,9 @@
                         <div class="btn-group mr-2" role="group">
                             <button type="button" class="btn btn-outline-secondary upload-folder" data-path="" title="Upload folders"><i class="fa fa-upload" aria-hidden="true"></i> Upload folders</button>
                         </div>
+                        <div class="btn-group mr-2" role="group">
+                            <button type="button" class="btn btn-outline-secondary deposit-clear" data-path="" title="Clear deposit"><i class="fa fa-trash" aria-hidden="true"></i> Clear deposit</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -72,10 +76,31 @@
             </div>
         </div>
         <div class="row pull-right">
-            <a class="btn btn-primary pull-right mt-3" href="/deposit/metadata/">Add metadata</a>
+            <a class="btn btn-primary mt-3 mr-1" href="/deposit/metadata/">Add metadata</a>
         </div>
     </div>
 </div>
+
+<div class="card upload-large-files mt-3">
+    <div class="card-header">
+        <h5 class="card-title pull-left" style="margin:4px 0;">Upload information</h5>
+    </div>
+    <div class="card-body">
+        <p>For frequent large uploads (bigger than 1GB) we recommend using one of the following:</p>
+        <ul>
+            <li>
+                <a class="card-link text-primary" href="https://www.uu.nl/en/research/yoda/guide-to-yoda/i-am-using-yoda/using-icommands-for-large-datasets" title="Using iCommands for large datasets">iCommands</a><br>
+                Requires familiarity with using the commandline.
+            </li>
+            <li>
+                <a class="card-link text-primary" href="https://www.uu.nl/en/research/yoda/guide-to-yoda/i-want-to-start-using-yoda/connecting-to-the-yoda-network-disk-on-windows" title="Yoda drive">Yoda Drive / WebDAV</a><br>
+                Useful for large files and when you need to be able to connect to multiple Yoda environments simultaneously. For MacOS and Linux, see the links in the menu on the left.
+            </li>
+        </ul>
+    </div>
+</div>
+
+
 
 <!-- Modals -->
 <div class="modal" tabindex="-1" role="dialog" id="folder-create">
@@ -185,22 +210,36 @@
     </div>
 </div>
 
+<div class="modal" tabindex="-1" role="dialog" id="deposit-clear">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Clear deposit</h5>
+                <div class="alert alert-warning" id="alert-panel-deposit-clear">
+                    <span></span>
+                </div>
+                <p class="mt-2">Clear the full deposit and start over?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button class='btn btn-danger btn-confirm-deposit-clear'>Clear deposit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal" id="dlg-file-browse-operations">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="card-body">
-
                 <div class="alert alert-warning hide" id="dlg-select-alert-panel">
                     <span></span>
                 </div>
-
                 <div class="card">
                     <div class="card-header clearfix">
                         <h5 class="card-title pull-left">Select folder to <span class="action"></span> <span class="action-file"></span></h5>
                     </div>
-
                     <input type="hidden" id="restoration-objectid" value="">
-
                     <div class="card">
                         <div class="card-body">
                             <ol class="breadcrumb dlg-breadcrumb">
@@ -219,7 +258,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button class="btn btn-primary dlg-action-button" data-action="" data-name="" data-collection=""><span class="action"></span></button>

@@ -121,6 +121,16 @@ $(function() {
         handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
+    // Deposit clear button
+    $("body").on("click", "button.deposit-clear", function() {
+        fileMgmtDialogAlert('deposit-clear', ''); // Destroy earlier alerts
+        $('#deposit-clear').modal('show');
+    });
+    $('.btn-confirm-deposit-clear').click(function() {
+        handleDepositClear();
+    });
+
+
     // Flow.js upload handler
     var r = new Flow({
         target: '/research/upload',
@@ -320,6 +330,26 @@ async function handleFileDelete(collection, file_name) {
     }
     else {
         fileMgmtDialogAlert('file-delete', result.status_info);
+    }
+}
+
+async function handleDepositClear()
+{
+    /* User clicks clear deposit and then confirm,
+     Then all data and metadata from the deposit-space is removed,
+     And the depositor is shown an empty deposit workflow.
+    */
+
+    let result = await Yoda.call('deposit_clear', {}, {'quiet': true, 'rawResult': true});
+
+    if (!result){
+        fileMgmtDialogAlert('deposit-clear', "API call not successfull");
+    } else if (result.status == 'ok') {
+        Yoda.set_message('success', 'Successfully cleared the deposit space');
+        $('#deposit-clear').modal('hide');
+        browse('');
+    } else {
+        fileMgmtDialogAlert('deposit-clear', result.status_info);
     }
 }
 
