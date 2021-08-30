@@ -1,0 +1,22 @@
+// colors
+$primary: #007ecc;
+$grey: #e1e1e1;
+
+// Bootstrap 4 theme colors
+$theme-colors: (
+  "primary": $primary
+);
+
+// Navbar
+$navbar-bg: $grey;
+$navbar-text: #primary;
+$navbar-hover: #000;
+$navbar-active: #000;
+
+// Bootstrap card
+$card-cap-bg: $grey;
+$card-cap-color: $primary;
+$card-border-color: $grey;
+
+// Bootstrap bage
+$badge-font-size: .50em;

@@ -21,7 +21,7 @@ import connman
 user_bp = Blueprint('user_bp', __name__,
                     template_folder='templates',
                     static_folder='static/user',
-                    static_url_path='/static')
+                    static_url_path='/assets')
 
 
 @user_bp.route('/gate', methods=['GET', 'POST'])
@@ -375,8 +375,10 @@ def prepare_user():
         g.irods = irods
 
         # Check for notifications.
-        response = api.call('notifications_load', data={})
-        g.notifications = len(response['data'])
+        endpoints = ["static", "call"]
+        if not request.endpoint.endswith(tuple(endpoints)):
+            response = api.call('notifications_load', data={})
+            g.notifications = len(response['data'])
     else:
         redirect('user_bp.login')
 

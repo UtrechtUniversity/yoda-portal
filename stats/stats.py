@@ -12,7 +12,7 @@ import api
 stats_bp = Blueprint('stats_bp', __name__,
                      template_folder='templates',
                      static_folder='static/stats',
-                     static_url_path='/static')
+                     static_url_path='/assets')
 
 
 @stats_bp.route('/')
