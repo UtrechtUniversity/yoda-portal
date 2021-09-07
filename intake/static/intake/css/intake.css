@@ -1,3 +1,6 @@
+.container, .container-sm, .container-md, .container-lg, .container-xl {
+    max-width: 1390px;
+}
 #select-study,#select-study-folder tbody tr {
     cursor:pointer;
 }
