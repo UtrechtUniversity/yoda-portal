@@ -8,25 +8,17 @@
 {% endblock %}
 
 {% block container %}
-<div class="page">
-    <div id="messages">
-        {% for category, message in get_flashed_messages(with_categories=true) %}
-        {% if category is sameas 'error' %}
-        {% set category = 'danger' %}
-        {% endif %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        {% endfor %}
-    </div>
 
-    <div class="header-logo">
-        <img src="{{ url_for('static', filename='img/frontpage_banner.jpg') }}"
-             alt="Yoda is a share-collaborate environment for research data"
-             title="Yoda is a share-collaborate environment for research data" class="header-logo-img">
+    <div class="page">
+        <div id="messages">
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+                {% if category is sameas 'error' %} {% set category = 'danger' %} {% endif %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+            {% endfor %}
+        </div>
 
         {% if g.user %}
             {% include 'index_authenticated.html' %}
@@ -35,5 +27,5 @@
         {% endif %}
 
     </div>
-</div>
+
 {% endblock %}
