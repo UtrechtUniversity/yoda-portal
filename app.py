@@ -45,6 +45,8 @@ app.config['modules'] = [
     {'name': 'Statistics',     'function': 'stats_bp.index'},
     {'name': 'Group Manager',  'function': 'group_manager_bp.index'},
 ]
+app.config['modules_list'] = [module['name'] for module in app.config['modules']]
+
 if app.config.get('INTAKE_ENABLED'):
     app.config['modules'].append(
         {'name': 'Intake', 'function': 'intake_bp.index'}
