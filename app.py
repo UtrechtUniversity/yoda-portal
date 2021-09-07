@@ -45,6 +45,8 @@ app.config['modules'] = [
     {'name': 'Statistics',     'function': 'stats_bp.index'},
     {'name': 'Group Manager',  'function': 'group_manager_bp.index'},
 ]
+app.config['modules_list'] = [module['name'] for module in app.config['modules']]
+
 if app.config.get('INTAKE_ENABLED'):
     app.config['modules'].append(
         {'name': 'Intake', 'function': 'intake_bp.index'}
@@ -53,10 +55,6 @@ if app.config.get('DATAREQUEST_ENABLED'):
     app.config['modules'].append(
         {'name': 'Datarequest', 'function': 'datarequest_bp.index'}
     )
-
-app.config['modules_list'] = []
-for module in app.config.get('modules'):
-    app.config['modules_list'].append(module.get('name'))
 
 # Default nr of items in browser list
 app.config['browser-items-per-page'] = 10
