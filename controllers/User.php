@@ -92,7 +92,10 @@ class User extends MY_Controller {
 
         $loginFailed = false;
         if (isset($username) && isset($password) && $username !== false && $password !== false) {
-            if ($this->rodsuser->login($username, $password)) {
+            if (strlen($username) > 64) {
+                $loginFailed = true;
+                $error = "Login failed. Please check your username and password.";
+            } else if ($this->rodsuser->login($username, $password)) {
 
                 $this->session->set_userdata('username', $username);
                 $this->session->set_userdata('password', $password);
