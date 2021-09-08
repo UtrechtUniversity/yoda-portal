@@ -73,7 +73,7 @@ class User extends MY_Controller {
         error_log("Error during verification/authentication. Id token verified: {$verified_string}, username: {$username}");
         if($verified != 1) {
             error_log("Id token: {$jsonresult['id_token']}");
-	} 
+	}
         $this->session->keep_flashdata('redirect_after_login');
         $this->session->set_flashdata('error', 'Failed to login to Yoda. Please contact a data manager about your account.');
         redirect('user/login');
@@ -114,9 +114,10 @@ class User extends MY_Controller {
         $this->session->keep_flashdata('redirect_after_login');
 
         // Check whether we were redirected from a failed callback
-        $error = $this->session->flashdata('error');
-        if( isset( $error ) ) {
+        $callback_error = $this->session->flashdata('error');
+        if (isset($callback_error) && $callback_error !== '') {
             $loginFailed = true;
+            $error = $callback_error;
         }
 
         $viewParams = array(
