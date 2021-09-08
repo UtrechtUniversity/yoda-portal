@@ -7,31 +7,16 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
 {% endblock %}
 
-{% block container %}
-<div class="page">
-    <div id="messages">
+{% block content %}
 
-                {% for category, message in get_flashed_messages(with_categories=true) %}
-                    {% if category is sameas 'error' %} {% set category = 'danger' %} {% endif %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    </div>
-                {% endfor %}
-
+    <div class="header-logo-text-background">
+        <div class="header-logo-text-content">
+        <h1>Welcome to Yoda for ITS!</h1>
+            <p>Yoda is a share-collaborate environment for research data.</p>
+        </div>
+        <div>
+            <a class="btn btn-primary" href="https://www.uu.nl/yoda" target="_blank">Help</a>
+        </div>
     </div>
 
-    <div class="header-logo">
-
-             <div class="header-logo-text-background">
-                 <div class="header-logo-text-content">
-                     <h1>Welcome to Yoda for ITS!</h1>
-                     <p>Yoda is a share-collaborate environment for research data.</p>
-                 </div>
-                 <div>
-                     <a class="btn btn-primary" href="https://www.uu.nl/yoda" target="_blank">Help</a>
-                 </div>
-             </div>
-    </div>
-</div>
 {% endblock %}

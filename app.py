@@ -54,6 +54,8 @@ if app.config.get('DATAREQUEST_ENABLED'):
         {'name': 'Datarequest', 'function': 'datarequest_bp.index'}
     )
 
+app.config['modules_list'] = [module['name'] for module in app.config['modules']]
+
 # Default nr of items in browser list
 app.config['browser-items-per-page'] = 10
 # Default nr of items in search list

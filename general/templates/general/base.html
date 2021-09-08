@@ -78,20 +78,22 @@
             </div>
         </nav>
 
-        {% block container %}
-        <div class="container page">
-            <div id="messages">
-                {% for category, message in get_flashed_messages(with_categories=true) %}
-                    {% if category is sameas 'error' %} {% set category = 'danger' %} {% endif %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    </div>
-                {% endfor %}
+        {% block page %}
+        <div class="page">
+            <div class="container">
+                <div id="messages">
+                    {% for category, message in get_flashed_messages(with_categories=true) %}
+                        {% if category is sameas 'error' %} {% set category = 'danger' %} {% endif %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% block content %}{% endblock %}
             </div>
-            {% block content %}{% endblock %}
         </div>
-        {% endblock container %}
+        {% endblock page %}
 
         {% block footer %}
         <footer class="footer">
