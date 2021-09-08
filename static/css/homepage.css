@@ -1,3 +1,11 @@
+.page {
+    background: url('/assets/img/frontpage_banner.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height:600px;
+}
+
 .header-logo {
     width: 100%;
     position: relative;
@@ -5,7 +13,7 @@
 
 .header-logo-text-background {
     position: absolute;
-    top: 18%;
+    top: 20%;
     background-color: rgba(0, 0, 0, .5);
     right: 5%;
     padding: 15px 30px;
@@ -14,14 +22,6 @@
 .header-logo-text-content {
     color: #fff;
     overflow: hidden;
-}
-
-.page {
-    background: url('/assets/img/frontpage_banner.jpg');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    min-height:600px;
 }
 
 #deposit-tile,
