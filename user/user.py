@@ -30,9 +30,11 @@ def gate():
         username = request.form['username']
 
         if username is None:
-            flash(
-                'Missing username',
-                'error')
+            flash('Missing username', 'error')
+            return render_template('user/gate.html')
+
+        if len(username) > 64:
+            flash('Invalid username', 'error')
             return render_template('user/gate.html')
 
         session['login_username'] = username
@@ -59,9 +61,11 @@ def login():
         password = request.form['password']
 
         if username is None:
-            flash(
-                'Username missing',
-                'error')
+            flash('Missing username', 'error')
+            return render_template('user/login.html')
+
+        if len(username) > 64:
+            flash('Invalid username', 'error')
             return render_template('user/login.html')
 
         session['login_username'] = username

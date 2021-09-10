@@ -346,7 +346,7 @@ async function handleDepositClear()
     } else if (result.status == 'ok') {
         Yoda.set_message('success', 'Successfully cleared the deposit space');
         $('#deposit-clear').modal('hide');
-        browse('');
+        window.location.reload(true);
     } else {
         fileMgmtDialogAlert('deposit-clear', result.status_info);
     }

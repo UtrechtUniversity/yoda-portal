@@ -14,25 +14,26 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label" for="f-login-username">Username</label>
-                        <input 
-                            name="username" 
-                            id="f-login-username" 
-                            class="form-control col-sm-6" 
-                            type="text" 
-                            placeholder="j.a.smith@uu.nl" 
-                            {% if g.login_username %} 
+                        <input
+                            name="username"
+                            id="f-login-username"
+                            class="form-control col-sm-6"
+                            type="text"
+                            placeholder="j.a.smith@uu.nl"
+                            {% if g.login_username %}
                             value="{{ g.login_username }}"
-                            {% endif %} 
+                            {% endif %}
+                            maxlength="64"
                             required />
                         <span id="capitals" class="hidden error text-danger">Username should not contain capital letters.</span>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label" for="f-login-password">Password</label>
-                        <input 
-                            name="password" 
-                            id="f-login-password" 
-                            class="form-control col-sm-6" 
-                            type="password" 
+                        <input
+                            name="password"
+                            id="f-login-password"
+                            class="form-control col-sm-6"
+                            type="password"
                             autofocus
                             required />
                         <a class="col-sm-6 offset-sm-3 pl-0" href="{{ url_for('user_bp.forgot_password') }}" title="Forgot / change password?">Forgot / change password?</a>
