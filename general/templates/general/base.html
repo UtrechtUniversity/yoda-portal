@@ -44,7 +44,7 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="{{ url_for('user_bp.notifications') }}">
-                                    Notifications {% if g.notifications %}<span class="badge badge-primary">{{ g.notifications }}</span>{% endif %}
+                                    Notifications {% if g.notifications %}<span class="badge bg-primary">{{ g.notifications }}</span>{% endif %}
                                 </a>
                                 <a class="dropdown-item" href="{{ url_for('user_bp.settings') }}">Settings</a>
                                 <div class="dropdown-divider"></div>

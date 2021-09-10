@@ -12,23 +12,25 @@
             <div class="card-body">
                 <form method="post" class="form-horizontal">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="form-group row">
+                    <div class="row mb-3">
                         <label class="col-sm-3 col-form-label" for="f-login-username">Username</label>
-                        <input 
-                            name="username" 
-                            id="f-login-username" 
-                            class="form-control col-sm-6" 
-                            type="text" 
-                            placeholder="j.a.smith@uu.nl" 
-                            autofocus 
-                            {%if g.login_username is defined %}
-                            value="{{ g.login_username }}" 
-                            onfocus="this.setSelectionRange(this.value.length,this.value.length);"
-                            {% endif %}
-                            required />
-                        <span id="capitals" class="hidden error text-danger">Username should not contain capital letters.</span>
+                        <div class="col-sm-6">
+                            <input
+                                name="username"
+                                id="f-login-username"
+                                class="form-control"
+                                type="text"
+                                placeholder="j.a.smith@uu.nl"
+                                autofocus
+                                {%if g.login_username is defined %}
+                                value="{{ g.login_username }}"
+                                onfocus="this.setSelectionRange(this.value.length,this.value.length);"
+                                {% endif %}
+                                required />
+                            <span id="capitals" class="hidden error text-danger">Username should not contain capital letters.</span>
+                        </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="ps-2 pe-2">
                         <input id="f-login-submit" class="btn btn-primary col-sm-6 offset-sm-3" type="submit" value="Next" />
                     </div>
                 </form>

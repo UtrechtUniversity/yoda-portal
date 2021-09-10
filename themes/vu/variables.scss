@@ -2,16 +2,13 @@
 $primary: #007ecc;
 $grey: #e1e1e1;
 
-// Bootstrap 4 theme colors
-$theme-colors: (
-  "primary": $primary
-);
-
-// Navbar
+// Yoda Navbar
 $navbar-bg: $grey;
-$navbar-text: #primary;
-$navbar-hover: #000;
-$navbar-active: #000;
+$navbar-dark-color: $primary;
+$navbar-dark-brand-color: $primary;
+$navbar-dark-brand-hover-color: $primary;
+$navbar-dark-hover-color: #000;
+$navbar-dark-active-color: #000;
 
 // Bootstrap card
 $card-cap-bg: $grey;
