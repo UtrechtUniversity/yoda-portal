@@ -149,12 +149,14 @@ def settings():
     response = api.call('settings_load', data={})
     settings = response['data']
 
+    return render_template('user/settings.html', **settings)
+
+
+@user_bp.route('/data_access', methods=['GET', 'POST'])
+def data_access_password():
     # Load tokens.
     response = api.call('load_tokens')
-    tokens = response['data']
-    settings['tokens'] = tokens
-
-    return render_template('user/settings.html', **settings)
+    return render_template('user/data_access.html', tokens=response['data'])
 
 
 @user_bp.route('/create-token', methods=['GET', 'POST'])
