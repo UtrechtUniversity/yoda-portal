@@ -13,7 +13,7 @@ import api
 intake_bp = Blueprint('intake_bp', __name__,
                       template_folder='templates',
                       static_folder='static/intake',
-                      static_url_path='/intake')
+                      static_url_path='/assets')
 
 
 @intake_bp.route('/', methods=['GET'])

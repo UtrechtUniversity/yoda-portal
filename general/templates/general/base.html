@@ -34,7 +34,7 @@
         <header class="brandbar container">
             <div class="navbar yoda-topnavbar">
                 <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">
-                    <img class="logo" src="{{ url_for('static', filename='img/logo-uu.svg') }}" alt="logo">
+                    <img class="logo" src="{{ url_for('static', filename='img/logo.svg') }}" alt="logo">
                 </a>
                 <div class="auth-action pull-right">
                     {% if g.user %}
@@ -61,6 +61,7 @@
         <nav class="navbar navbar-dark navbar-static-top navbar-expand-lg yoda-navbar">
             <div class="container">
                 <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
+                {% if g.user %}
                 <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -73,6 +74,7 @@
                         {% endfor %}
                     </ul>
                 </div>
+                {% endif %}
             </div>
         </nav>
 

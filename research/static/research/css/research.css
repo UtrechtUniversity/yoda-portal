@@ -83,7 +83,6 @@ ol.breadcrumb li.active {
 }
 
 .lock-icon {
-    font-size: 30px;
     margin-left: 10px;
     cursor: pointer;
 }
@@ -112,6 +111,10 @@ ol.breadcrumb li.active {
 #file-browser .fa {
     padding-left: 4px;
     padding-right: 4px;
+}
+
+a.dropdown-item:hover, a.dropdown-item:focus {
+    cursor: pointer;
 }
 
 .dropdown-toggle, .view-image, .view-audio, .view-video {

@@ -10,7 +10,7 @@ import api
 group_manager_bp = Blueprint('group_manager_bp', __name__,
                              template_folder='templates',
                              static_folder='static/group_manager',
-                             static_url_path='/static')
+                             static_url_path='/assets')
 
 
 @group_manager_bp.route('')

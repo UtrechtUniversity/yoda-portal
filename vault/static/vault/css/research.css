@@ -114,6 +114,10 @@ ol.breadcrumb li.active {
     padding-right: 4px;
 }
 
+a.dropdown-item:hover, a.dropdown-item:focus {
+    cursor: pointer;
+}
+
 .dropdown-toggle, .view-image, .view-audio, .view-video {
     cursor: pointer;
 }

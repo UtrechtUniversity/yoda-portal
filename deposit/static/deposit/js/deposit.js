@@ -14,14 +14,10 @@ let currentFolder;
 
 $(function() {
 
-    //currentFolder = '';
     currentFolder = dir;
 
     // Canonicalize path somewhat, for convenience.
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
-
-    console.info("dir: " + dir);
-    console.info("currentfolder: " + currentFolder);
 
     if ($('#file-browser').length) {
         startBrowsing(browsePageItems);
@@ -123,6 +119,16 @@ $(function() {
     $('.btn-confirm-file-delete').click(function() {
         handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
+
+    // Deposit clear button
+    $("body").on("click", "button.deposit-clear", function() {
+        fileMgmtDialogAlert('deposit-clear', ''); // Destroy earlier alerts
+        $('#deposit-clear').modal('show');
+    });
+    $('.btn-confirm-deposit-clear').click(function() {
+        handleDepositClear();
+    });
+
 
     // Flow.js upload handler
     var r = new Flow({
@@ -326,6 +332,26 @@ async function handleFileDelete(collection, file_name) {
     }
 }
 
+async function handleDepositClear()
+{
+    /* User clicks clear deposit and then confirm,
+     Then all data and metadata from the deposit-space is removed,
+     And the depositor is shown an empty deposit workflow.
+    */
+
+    let result = await Yoda.call('deposit_clear', {}, {'quiet': true, 'rawResult': true});
+
+    if (!result){
+        fileMgmtDialogAlert('deposit-clear', "API call not successfull");
+    } else if (result.status == 'ok') {
+        Yoda.set_message('success', 'Successfully cleared the deposit space');
+        $('#deposit-clear').modal('hide');
+        window.location.reload(true);
+    } else {
+        fileMgmtDialogAlert('deposit-clear', result.status_info);
+    }
+}
+
 function fileMgmtDialogAlert(dlgName, alert) {
     //Alerts regarding folder/file management
     //Inside the modals
@@ -356,10 +382,11 @@ function browse(dir = '', changeHistory = false)
         changeBrowserUrl(dir);
 
     buildFileBrowser(dir);
-    $('.upload').attr('data-path', dir);
-    $('.upload-folder').attr('data-path', dir);
-    $('.btn-group button.folder-create').attr('data-path', dir);
+    $('button.upload').attr('data-path', dir);
+    $('button.upload-folder').attr('data-path', dir);
+    $('button.folder-create').attr('data-path', dir);
 }
+
 
 function makeBreadcrumb(dir)
 {
@@ -514,17 +541,22 @@ const tableRenderer = {
         let actions = $('<div class="dropdown-menu">');
 
         if (row.type === 'coll') {
+
             // no context menu for toplevel group-collections - these cannot be altered or deleted
             if (currentFolder.length==0) {
                 return '';
             }
+
+            // Context menu folder
             actions.append(`<a href="#" class="dropdown-item folder-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this folder">Rename</a>`);
-            actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
+            actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this folder">Delete</a>`);
         }
         else {
-            // Render context menu for files.
+            // Context menu for files
             actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this file">Rename</a>`);
             actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
+            actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Copy this file">Copy</a>`);
+            actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this file">Move</a>`);
         }
         let dropdown = $(`<div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

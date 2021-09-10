@@ -21,7 +21,7 @@ import connman
 user_bp = Blueprint('user_bp', __name__,
                     template_folder='templates',
                     static_folder='static/user',
-                    static_url_path='/static')
+                    static_url_path='/assets')
 
 
 @user_bp.route('/gate', methods=['GET', 'POST'])
@@ -30,9 +30,11 @@ def gate():
         username = request.form['username']
 
         if username is None:
-            flash(
-                'Missing username',
-                'error')
+            flash('Missing username', 'error')
+            return render_template('user/gate.html')
+
+        if len(username) > 64:
+            flash('Invalid username', 'error')
             return render_template('user/gate.html')
 
         session['login_username'] = username
@@ -59,9 +61,11 @@ def login():
         password = request.form['password']
 
         if username is None:
-            flash(
-                'Username missing',
-                'error')
+            flash('Missing username', 'error')
+            return render_template('user/login.html')
+
+        if len(username) > 64:
+            flash('Invalid username', 'error')
             return render_template('user/login.html')
 
         session['login_username'] = username
@@ -385,8 +389,10 @@ def prepare_user():
         g.irods = irods
 
         # Check for notifications.
-        response = api.call('notifications_load', data={})
-        g.notifications = len(response['data'])
+        endpoints = ["static", "call"]
+        if not request.endpoint.endswith(tuple(endpoints)):
+            response = api.call('notifications_load', data={})
+            g.notifications = len(response['data'])
     else:
         redirect('user_bp.login')
 

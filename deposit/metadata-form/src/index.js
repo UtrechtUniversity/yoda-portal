@@ -392,9 +392,9 @@ async function submitData(data) {
 
             //Yoda.store_message('success', `Updated metadata of folder <${path}>`);
             if (back) {
-                window.location.href = '/deposit';
+                window.location.href = '/deposit/';
             } else {
-                window.location.href = '/deposit/submit';
+                window.location.href = '/deposit/submit/';
             }
     } catch (e) {
         // Allow retry.

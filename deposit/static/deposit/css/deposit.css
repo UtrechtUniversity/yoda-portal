@@ -31,7 +31,7 @@ nav .breadcrumb {
     margin-right: -15px;
 }
 
-.dropdown-toggle, .view-image, .view-audio, .view-video {
+.dropdown-toggle {
     cursor: pointer;
 }
 
@@ -92,7 +92,6 @@ nav .breadcrumb {
     font-size: 0.9rem;
 }
 
-
 #file-browser th {
     background-color: #dcdcdc;
     border-color: #ddd;
@@ -104,4 +103,8 @@ nav .breadcrumb {
 
 #file-browser tr.odd {
     background-color: transparent !important;
+}
+
+a.dropdown-item:hover, a.dropdown-item:focus {
+    cursor: pointer;
 }
