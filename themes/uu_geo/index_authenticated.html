@@ -1,0 +1,24 @@
+<div id="deposit_research_tiles" class="row" style="margin-top:300px;">
+    <div class="col-lg-6 mt-1">
+        {% if 'Deposit' in config.modules_list %}
+        <div id="deposit-tile">
+            <div class="header-logo-text-content">
+                <h1>Deposit</h1>
+                <p>Research data in the archive</p>
+            </div>
+            <a class="btn btn-primary" href="/deposit/">Deposit</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-lg-6 mt-1">
+        {% if 'Research' in config.modules_list %}
+        <div id="search-tile">
+            <div class="header-logo-text-content">
+                <h1>Find and retrieve</h1>
+                <p>Research data from the archive</p>
+            </div>
+            <a class="btn btn-primary" href="/research/">Find & retrieve</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
