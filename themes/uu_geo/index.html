@@ -5,86 +5,14 @@
 {% block style %}
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
-
-<style>
-    .page {
-        background: url('/assets/img/frontpage_banner.jpg');
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        min-height:600px;
-    }
-    .header-logo-text-background {
-        top: 15%;
-    }
-
-    #deposit-tile,
-    #search-tile {
-        padding: 15px 30px;
-        background-color: rgba(0, 0, 0, .5);
-        min-height: 200px;
-    }
-</style>
-
 {% endblock %}
 
-{% block container %}
-<div class="page">
-    <div id="messages">
-        {% for category, message in get_flashed_messages(with_categories=true) %}
-            {% if category is sameas 'error' %} {% set category = 'danger' %} {% endif %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        {% endfor %}
-    </div>
+{% block content %}
 
-    <div class="header-logo-text-background">
-        <div class="header-logo-text-content">
-            <h1>Welcome to Yoda!</h1>
-            <p>Yoda is a share-collaborate environment for research data.</p>
-            <p>This is a Yoda <strong>development</strong> instance. You can follow the latest developments of Yoda
-                on <a href="https://github.com/UtrechtUniversity/yoda" style="color:white; text-decoration: underline">Github</a>
-            </p>
-        </div>
-        <div>
-            <a class="btn btn-primary" href="https://www.uu.nl/en/research/yoda" target="_blank">Introduction</a>
-            <a class="btn btn-primary" href="https://utrechtuniversity.github.io/yoda-docs/" target="_blank">Documentation</a>
-            <a class="btn btn-primary" href="https://github.com/UtrechtUniversity/yoda" target="_blank">Github</a>
-        </div>
-    </div>
+    {% if g.user %}
+        {% include 'index_authenticated.html' %}
+    {% else %}
+        {% include 'index_not_authenticated.html' %}
+    {% endif %}
 
-    <div class="row" style="margin-top:500px;">
-        <div class="col-lg-6 mt-1">
-        {% if 'Deposit' in config.modules_list %}
-            <div id="deposit-tile">
-                <div class="header-logo-text-content">
-                    <h1>Deposit</h1>
-                    <p>Research data in the archive</p>
-                </div>
-                <div class="pull-right">
-                    <a class="btn btn-primary" href="/deposit/">Deposit</a>
-                </div>
-            </div>
-        {% endif %}
-        </div>
-        <div class="col-lg-6 mt-1">
-            {% if 'Research' in config.modules_list %}
-            <div id="search-tile">
-                <div class="header-logo-text-content">
-                    <h1>Find and retrieve</h1>
-                    <p>Research data from the archive</p>
-                </div>
-                <div>
-                    <a class="btn btn-primary" href="/research/">Find & retrieve</a>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
-</div>
 {% endblock %}
