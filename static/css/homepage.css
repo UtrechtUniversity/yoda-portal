@@ -2,18 +2,13 @@
     background: url('/assets/img/frontpage_banner.jpg');
     background-position: center;
     background-repeat: no-repeat;
-    background-size: cover;
-    min-height: 400px;
-}
-
-.header-logo {
-    width: 100%;
-    position: relative;
+    background-size: 100%;
+    min-height: 600px;
 }
 
 .header-logo-text-background {
     position: absolute;
-    top: 20%;
+    top: 200px;
     background-color: rgba(0, 0, 0, .5);
     right: 5%;
     padding: 15px 30px;
