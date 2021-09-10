@@ -153,7 +153,7 @@ def settings():
 
 
 @user_bp.route('/data_access', methods=['GET', 'POST'])
-def data_access_password():
+def data_access():
     # Load tokens.
     response = api.call('load_tokens')
     return render_template('user/data_access.html', tokens=response['data'])
