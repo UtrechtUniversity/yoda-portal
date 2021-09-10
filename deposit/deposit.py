@@ -48,21 +48,21 @@ def index():
                            dir=path)
 
 
-@deposit_bp.route('/metadata/', methods=['GET'])
+@deposit_bp.route('/metadata/')
 def metadata_form():
     """Step 2: Add metadata to your upload"""
     path = get_deposit_path()
     return render_template('deposit/metadata-form.html', path=path)
 
 
-@deposit_bp.route('/submit/', methods=['GET'])
+@deposit_bp.route('/submit/')
 def submit():
     """Step 3: Submit upload"""
     path = get_deposit_path()
     return render_template('deposit/submit.html', path=path)
 
 
-@deposit_bp.route('/thankyou/', methods=['GET'])
+@deposit_bp.route('/thankyou/')
 def thankyou():
     """Step 4: Thank you page """
     path = get_deposit_path()
