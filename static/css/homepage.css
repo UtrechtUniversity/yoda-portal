@@ -1,6 +1,6 @@
 .page {
     background: url('/assets/img/frontpage_banner.jpg');
-    background-position: center;
+    background-position: center top;
     background-repeat: no-repeat;
     background-size: 100%;
     min-height: 600px;
