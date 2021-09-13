@@ -34,13 +34,13 @@
 			<div class="list-group" id="group-list">
                 {% for category, subcategories in group_hierarchy.items() %}
                 <div class="list-group-item category" id="category-{{ loop.index }}" data-name="{{ category }}">
-                    <a class="name collapsed" data-toggle="collapse" data-parent="#category-{{ loop.index }}" href="#category-{{ loop.index }}-ul">
+                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-{{ loop.index }}" href="#category-{{ loop.index }}-ul">
                         <i class="fa fa-caret-right triangle" aria-hidden="true"></i> {{ category }}
                     </a>
                     <div class="list-group collapse category-ul" id="category-{{ loop.index }}-ul">
                     {% for subcategory, groups in subcategories.items() %}
                     <div class="list-group-item subcategory" data-name="{{ subcategory }}">
-                        <a class="name collapsed" data-toggle="collapse" data-parent="#subcategory-{{ loop.index }}" href="#subcategory-{{ loop.index }}-ul">
+                        <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-{{ loop.index }}" href="#subcategory-{{ loop.index }}-ul">
                                 <i class="fa fa-caret-right triangle" aria-hidden="true"></i> {{ subcategory }}
                         </a>
                         <div class="list-group collapse subcategory-ul" id="subcategory-{{ loop.index }}-ul">
@@ -58,10 +58,10 @@
 			</div>
 			<div class="card-footer">
 				<div class="input-group-sm pull-left">
-					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.group_delete') }}" data-toggle="modal" data-target="#modal-group-delete">Remove group</a>
+					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.group_delete') }}" data-bs-toggle="modal" data-target="#modal-group-delete">Remove group</a>
 				</div>
 				<div class="input-group-sm pull-right">
-					<a class="btn btn-sm btn-primary create-button disabled" data-toggle="modal" data-target="#modal-group-create">Add group</a>
+					<a class="btn btn-sm btn-primary create-button disabled" data-bs-toggle="modal" data-target="#modal-group-create">Add group</a>
 				</div>
 			</div>
 		</div>
@@ -155,7 +155,7 @@
 					Change role:
                     <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Promote the selected user">&uarr;<i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
                     <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Demote the selected user">&darr;<i class="fa fa-eye" aria-hidden="true"></i></a>
-					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-toggle="modal" data-target="#modal-user-delete" title="Remove the selected user from this group">Remove user</a>
+					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-target="#modal-user-delete" title="Remove the selected user from this group">Remove user</a>
 				</div>
 			</div>
 		</div>
@@ -190,7 +190,7 @@
 							<div class="input-group">
 
 								<div class="input-group-btn" id="f-group-create-prefix-div" title="Choose a group type">
-									<button type="button" id="f-group-create-prefix-button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="text">research-&nbsp;</span><span class="caret"></span></button>
+									<button type="button" id="f-group-create-prefix-button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="text">research-&nbsp;</span><span class="caret"></span></button>
 									<ul class="dropdown-menu">
 										<li id="f-group-create-prefix-grp"><a href="#" data-value="grp-">grp-&nbsp;</a></li>
 										<li id="f-group-create-prefix-datamanager"><a href="#" data-value="datamanager-">datamanager-&nbsp;</a></li>
