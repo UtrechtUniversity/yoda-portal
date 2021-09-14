@@ -38,7 +38,7 @@ function makeItemActive(currentItem)
 
 function getDetails(resource)
 {
-    var url = 'resource_details?resource=' + encodeURIComponent(resource); 
+    var url = 'resource_details?resource=' + encodeURIComponent(resource);
 
     $.getJSON(url, function( data ) {
         if (data.status == 'success') {
@@ -192,9 +192,9 @@ async function editTier(resource, val) {
     );
 
     if (result.status == 'ok') {
-        $('#messages').html('<div class="alert alert-success"><button class="close" data-dismiss="alert"><span>×</span></button><p>Updated  ' + resource + ' properties.</p></div>');
+        Yoda.set_message('success', 'Updated  ' + resource + ' properties.');
     } else {
-        $('#messages').html('<div class="alert alert-danger"><button class="close" data-dismiss="alert"><span>×</span></button><p>Could not update ' + resource + ' properties  due to an internal error.</p></div>');
+        Yoda.set_message('error', 'Could not update ' + resource + ' properties  due to an internal error.');
     }
 
     $('.list-group-item.active .resource-tier').attr('title', htmlDecode(val));
