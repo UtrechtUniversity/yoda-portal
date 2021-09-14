@@ -13,7 +13,7 @@ group_manager_bp = Blueprint('group_manager_bp', __name__,
                              static_url_path='/assets')
 
 
-@group_manager_bp.route('')
+@group_manager_bp.route('/')
 def index():
     response = api.call('group_data', data={})
 
