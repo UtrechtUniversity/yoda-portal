@@ -26,8 +26,7 @@
         {% for row in dataErroneousFiles %}
         <tr data-filename="{{ row.name }}"
             data-path="{{ row.path }}"
-            data-error="{{ row.error }}"
-            >
+            data-error="{{ row.error }}">
             <td style="max-width:200px;"><div class="ellipseDivText">{{ row.name }}</div></td>
             <td>{{ row.date }}</td>
             <td>{{ row.pseudocode }}</td>

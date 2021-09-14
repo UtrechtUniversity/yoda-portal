@@ -51,7 +51,7 @@ div.datasetstatus_scanned{
     cursor:pointer;
 }
 
-.modal-body span.glyphicon-info-sign {
+.modal-body .fa-info {
     font-size: 6.2em;
     color: #DCDCDC;
     padding-top: 13px;
