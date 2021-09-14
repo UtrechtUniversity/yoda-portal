@@ -49,7 +49,7 @@ def index():
 
 
 @deposit_bp.route('/metadata/', methods=['GET'])
-def metadata_form():
+def form():
     """Step 2: Add metadata to your upload"""
     path = get_deposit_path()
     return render_template('deposit/metadata-form.html', path=path)
