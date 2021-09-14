@@ -48,9 +48,15 @@ nav .breadcrumb {
 .card-title {
     margin: 4px 0;
 }
+.upload-large-files .card-title {
+    margin:20px 0 0 20px;
+}
 
 .page_deposit_thankyou a {
     text-decoration: underline;
+}
+.accept_terms_line {
+    margin: 10px 20px;
 }
 
 /* Data table */
