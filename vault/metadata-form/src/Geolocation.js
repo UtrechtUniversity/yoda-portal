@@ -265,10 +265,10 @@ class Geolocation extends React.Component {
 
                     <div className='row'>
                         <div className='col-sm-12 mt-1'>
-                            <label>North:</label> <input type='text' className='geoInputCoords geoLat0 mr-1' boxid={this.geoBoxID} disabled={this.props.readonly}></input>
-                            <label>West:</label> <input type='text' className='geoInputCoords geoLng0 mr-1' boxid={this.geoBoxID} disabled={this.props.readonly}></input>
+                            <label>North:</label> <input type='text' className='geoInputCoords geoLat0 me-1' boxid={this.geoBoxID} disabled={this.props.readonly}></input>
+                            <label>West:</label> <input type='text' className='geoInputCoords geoLng0 me-1' boxid={this.geoBoxID} disabled={this.props.readonly}></input>
                             <label>South:</label> <input type='text' className='geoInputCoords geoLat1' boxid={this.geoBoxID} disabled={this.props.readonly}></input>
-                            <label>East:</label> <input type='text' className='geoInputCoords geoLng1 mr-1' boxid={this.geoBoxID} disabled={this.props.readonly}></input>
+                            <label>East:</label> <input type='text' className='geoInputCoords geoLng1 me-1' boxid={this.geoBoxID} disabled={this.props.readonly}></input>
                             <button className='btn btn-outline-secondary pull-right' onClick={(e) => {this.closeModal(e); }}>Close</button>
                         </div>
                     </div>

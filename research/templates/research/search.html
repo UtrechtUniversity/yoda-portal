@@ -13,11 +13,11 @@
     <div class="input-group mb-3">
         <div class="input-group-prepend search-panel">
             {% if searchType == 'revision' %}
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span id="search_concept" data-type="{{ searchType }}">Search revision by name</span>
             </button>
             {% else %}
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span id="search_concept" data-type="{{ searchType }}">Search by {{ searchType }}</span>
             </button>
             {% endif %}
