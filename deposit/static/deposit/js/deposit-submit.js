@@ -100,8 +100,7 @@ async function handleDepositClear()
         $("#alert-panel-deposit-clear").text("API call not successfull");
     } else if (result.status == 'ok') {
         Yoda.set_message('success', 'Successfully cleared the deposit space');
-        $('#deposit-clear').modal('hide');
-        window.location.reload(true);
+        window.location.href = '/deposit/';
     } else {
         $("#alert-panel-deposit-clear").text(result.status_info);
     }

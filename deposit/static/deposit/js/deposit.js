@@ -559,7 +559,7 @@ const tableRenderer = {
             actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this file">Move</a>`);
         }
         let dropdown = $(`<div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
                             </button>`);
         dropdown.append(actions);
@@ -614,10 +614,10 @@ function logUpload(id, file) {
    let log = `<div class="row upload-row mb-1" id="${id}">
                   <div class="col-md-6">
                     <div class="upload-filename">${htmlEncode(file.relativePath)}</div>
-                    <div class="upload-btns btn-group btn-group-sm ml-3" role="group" aria-label="Basic example">
-                      <button type="button" class="btn btn-secondary upload-pause mr-1">Pause</button>
-                      <button type="button" class="btn btn-secondary upload-resume mr-1 hide">Resume</button>
-                      <button type="button" class="btn btn-secondary upload-cancel mr-1">Cancel</button>
+                    <div class="upload-btns btn-group btn-group-sm ms-3" role="group" aria-label="Basic example">
+                      <button type="button" class="btn btn-secondary upload-pause me-1">Pause</button>
+                      <button type="button" class="btn btn-secondary upload-resume me-1 hide">Resume</button>
+                      <button type="button" class="btn btn-secondary upload-cancel me-1">Cancel</button>
                     </div>
                   </div>
                   <div class="col-md-3"><div class="progress"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>

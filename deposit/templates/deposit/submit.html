@@ -21,7 +21,6 @@
     <div class="card-header">
         <h5 class="card-title pull-left">Submit your data package</h5>
         <button type="button" class="btn btn-outline-secondary deposit-clear pull-right" title="Clear deposit"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp; Clear deposit</button>
-
     </div>
     <div class="card-body">
         <div class="form-check">
@@ -30,7 +29,7 @@
             <p style="margin:10px 20px;">
                 <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms">
                 <label class="form-check-label" for="accept_terms" style="padding-left:3px;">I accept the</label>
-                <a href="" class="text-info" type="button" data-bs-toggle="modal" data-target="#terms_conditions_modal" style="text-decoration:underline;">Terms and Conditions</a>
+                <a href="" data-bs-toggle="modal" data-bs-target="#terms_conditions_modal" style="">Terms and Conditions</a>
             </p>
         </div>
     </div>
@@ -45,9 +44,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Terms and conditions</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
             </div>
@@ -66,7 +63,7 @@
                 <p class="mt-2">Clear the full deposit and start over?</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button class='btn btn-danger btn-confirm-deposit-clear'>Clear deposit</button>
             </div>
         </div>
