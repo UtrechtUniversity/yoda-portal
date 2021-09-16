@@ -2,9 +2,9 @@
 /* ** File browser size **
  Make the file browser wider to allow longer filenames.
 */
-@media (min-width: 1400px){
+@media (min-width: 1500px){
     .container, .container-sm, .container-md, .container-lg, .container-xl {
-        max-width: 1390px;
+        max-width: 1490px;
     }
 }
 /* If container-fluid is used (for a full-width file browser), use the right padding on laptop screens */

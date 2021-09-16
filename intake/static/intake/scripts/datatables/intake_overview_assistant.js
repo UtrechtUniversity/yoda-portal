@@ -51,12 +51,12 @@ $(document).ready(function() {
 
              api.column(0).data().each( function ( group, i ) {
                  if ( last !== group ) {
-                     groupname = '<div class="datasetstatus_scanned"  style="float:left;"></div><span style="float:left;margin-left:5px;margin-top:8px;">Scanned datasets</span>';
+                     groupname = '<div class="datasetstatus_scanned pull-left"></div><span class="pull-left ml-2 mt-3">Scanned datasets</span>';
                      if(group=='LOCKED'){
-                         groupname= '<div class="datasetstatus_locked"  style="float:left;"></div><span style="float:left;margin-left:5px;margin-top:8px;">Submitted for transportation to vault - can be undone</span>';
+                         groupname= '<div class="datasetstatus_locked pull-left"></div><span class="pull-left ml-2 mt-3">Submitted for transportation to vault - can be undone</span>';
                      }
                      if(group=='FROZEN'){
-                         groupname='<div class="datasetstatus_frozen"  style="float:left;"></div><span style="float:left;margin-left:5px;margin-top:8px;">Frozen for transportation to vault - cannot be undone</span>';
+                         groupname='<div class="datasetstatus_frozen pull-left"></div><span class="pull-left ml-2 mt-3">Frozen for transportation to vault - cannot be undone</span>';
                      }
                      //$(rows).eq( i ).before(
                      //    '<tr class="group"><td colspan="11">' + '&nbsp;<strong>' + groupname + '</strong></td></tr>'

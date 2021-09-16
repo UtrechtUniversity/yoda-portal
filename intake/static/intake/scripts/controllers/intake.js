@@ -219,7 +219,7 @@ $(function() {
     }
 
     if (msg.length) {
-        $('#messages').html('<div class="alert alert-' + alertType + '"><button class="close" data-dismiss="alert"><span>×</span></button><p>' + msg + '</p></div>');
+        $('#messages').html('<div class="alert alert-' + alertType + '">' + msg + '</div>');
     }
 
     console.log($("#studyID").val())

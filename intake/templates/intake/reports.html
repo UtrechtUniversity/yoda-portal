@@ -4,8 +4,6 @@
 
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/intake.css') }}">
-    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
-
     <script src="{{ url_for('intake_bp.static', filename='scripts/controllers/reports.js') }}"></script>
 {% endblock scripts %}
 
@@ -13,17 +11,13 @@
 {% if access_denied %}
         <div class="row">
           <div class="col-sm-12">
-            <div class="alert alert-danger">
-                <button type="button" class="close" data-hide="alert">&times;</button>
-                <div class="info_text">
-		    This area or study is not accessible for you.
-                    <br>
-                    <br>
-                    <br>
+            <div class="alert alert-danger alert-dismissible fade show">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="info_text mb-3">
+		            This area or study is not accessible for you.
                     Please click <a href="{{ url_for('intake_bp.index') }}">here</a> to go to an area that is accessible for you.
-                    <div class="btn-group">
-                        <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info btn-goto-intake"><span class="fa fa-chevron-right"></span> Intake</a>
-                    </div>
+                    <br>
+                    <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info btn-goto-intake mt-2"><i class="fa fa-chevron-right"></i> Intake</a>
                 </div>
             </div>
            </div>
@@ -31,140 +25,120 @@
 
 {% else %}
 
-    <div class="row page-header">
-        <div class="col-sm-12">
-            <h1>
-                <span class="fa fa-folder-open"></span>
-                {{ title }}
-            </h1>
-        </div>
+    <div class="page-header">
+        <h1>
+            <i class="fa fa-folder-open"></i>
+            {{ title }}
+        </h1>
     </div>
 
-    <div class="row" id="toprow">
-     <div class="col-sm-12">
-        <div class="btn-group">
-            <button class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">
-                <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
-            </button>
+    <div id="toprow" class="mt-4">
 
-            <div class="dropdown-menu" style="width:300px;padding:5px;">
-                Please select a study for your Yoda Intake Area:
-                <br/>
-                <br/>
-                <table class="table table-striped hover" id="select-study">
-                    {% for study in studies %}
-                        <tr data-study-url="{{ url_for('intake_bp.reports', studyID=study) }}">
-                            <td >
-                                <span class="fa fa-graduation-cap"></span>
-                            </td>
-                            <td>
-                                    <span>
-                                        {{ study }}
-                                    </span>
-                            </td>
-                            <td style="width:10px;">
-                                {% if study==study_id %}
-                                    <span class="fa fa-check"></span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
+        <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
+        </button>
+
+        <div class="dropdown-menu">
+            Please select a study for your Yoda Intake Area:
+            <table class="table table-hover table-striped mt-3" id="select-study">
+                {% for study in studies %}
+                    <tr data-study-url="{{ url_for('intake_bp.reports', studyID=study) }}">
+                        <td><i class="fa fa-graduation-cap"></i></td>
+                        <td>{{ study }}</td>
+                        <td class="w10px">
+                            {% if study==study_id %}
+                                <i class="fa fa-check"></i>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
-        <div class="btn-group">
-            <a class="btn  btn-outline-secondary btn-export-data" href="{{ url_for('intake_bp.export', studyID=study_id) }}" target="_blank">
-                <span class="fa fa-download"></span> Export data</span>
-            </a>
-        </div>
-        <div class="btn-group">
-            <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info btn-goto-intake"><span class="fa fa-chevron-right"></span> Intake</a>
-        </div>
-      </div>
+
+        <a class="btn btn-outline-secondary btn-export-data mr-2" href="{{ url_for('intake_bp.export', studyID=study_id) }}" target="_blank"><i class="fa fa-download"></i> Export data</a>
+        <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info btn-goto-intake mr-2"><i class="fa fa-chevron-right"></i> Intake</a>
     </div>
-	
-    <div class="row">
-        <div class="col-sm-6">
-            <h1>Raw</h1>
-            {% set exists = [] %}
-            <table width="100%" class="table-striped dataset-type-counts-raw">
-                <thead>
-                <tr>
-                    <td><strong>Type</strong></td>
-                    <td><strong>Wave</strong></td>
-                    <td><strong>Count</strong></td>
-                </tr>
-                </thead>
-              <tbody>
-                {% set counter = 0 %}
-                {% for type in datasetTypeCounts %}
-                    {% for wave in datasetTypeCounts[type] %}
-                        {% for version in datasetTypeCounts[type][wave] %}
-                            {% if version=='raw' %}
-                                {% if exists.append(1) %}{% endif %}
-                                <tr class="dataset-type-counts-raw">
-                                    <td>{{ type }}</td>
-                                    <td>{{ wave }}</td>
-                                    <td>{{ datasetTypeCounts[type][wave][version] }}</td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
+
+    <div id="counts_raw" class="mt-4">
+        <h1>Raw</h1>
+        {% set exists = [] %}
+        <table width="100%" class="table-striped dataset-type-counts-raw">
+            <thead>
+            <tr>
+                <td><strong>Type</strong></td>
+                <td><strong>Version</strong></td>
+                <td><strong>Wave</strong></td>
+                <td><strong>Count</strong></td>
+            </tr>
+            </thead>
+          <tbody>
+            {% set counter = 0 %}
+            {% for type in datasetTypeCounts %}
+                {% for wave in datasetTypeCounts[type] %}
+                    {% for version in datasetTypeCounts[type][wave] %}
+                        {% if version=='raw' %}
+                            {% if exists.append(1) %}{% endif %}
+                            <tr class="dataset-type-counts-raw">
+                                <td>{{ type }}</td>
+                                <td>{{ version }}</td>
+                                <td>{{ wave }}</td>
+                                <td>{{ datasetTypeCounts[type][wave][version] }}</td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {% if not exists %}
+            <i>No data found.</i>
+        {% endif %}
 
-                </tbody>
-            </table>
-            {% if not exists %}
-                <i>No data found.</i>
-            {% endif %}
-
-        </div>
-        <div class="col-sm-6">
-            <h1>Processed</h1>
-            {% set exists = [] %}
-            <table width="100%" class="table-striped">
-                <thead>
-                <tr>
-                    <td><strong>Type</strong></td>
-                    <td><strong>Version</strong></td>
-                    <td><strong>Wave</strong></td>
-                    <td><strong>Count</strong></td>
-                </tr>
-                </thead>
-                <tbody>
-                {% for type in datasetTypeCounts %}
-                    {% for wave in datasetTypeCounts[type] %}
-                        {% for version in datasetTypeCounts[type][wave] %}
-                            {% if version!='raw' %}
-                                {% if exists.append(1) %}{% endif %}
-                                <tr class="dataset-type-counts-processed">
-                                    <td>{{ type }}</td>
-                                    <td>{{ version }}</td>
-                                    <td>{{ wave }}</td>
-                                    <td>{{ datasetTypeCounts[type][wave][version] }}</td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
+    <div id="counts_processed" class="mt-4 mb-5">
+        <h1>Processed</h1>
+        {% set exists = [] %}
+        <table width="100%" class="table-striped">
+            <thead>
+            <tr>
+                <td><strong>Type</strong></td>
+                <td><strong>Version</strong></td>
+                <td><strong>Wave</strong></td>
+                <td><strong>Count</strong></td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for type in datasetTypeCounts %}
+                {% for wave in datasetTypeCounts[type] %}
+                    {% for version in datasetTypeCounts[type][wave] %}
+                        {% if version!='raw' %}
+                            {% if exists.append(1) %}{% endif %}
+                            <tr class="dataset-type-counts-processed">
+                                <td>{{ type }}</td>
+                                <td>{{ version }}</td>
+                                <td>{{ wave }}</td>
+                                <td>{{ datasetTypeCounts[type][wave][version] }}</td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 {% endfor %}
-                </tbody>
-            </table>
-	    {% if not exists %}
-	        <i>No data found.</i>
-	    {% endif %}
-        </div>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% if not exists %}
+            <i>No data found.</i>
+        {% endif %}
     </div>
     <hr>
-    <div class="row">
-        <div class="col-xs-4">
-            <h1>Raw</h1>
+    <div id="aggregated_results" class="row">
+        <div class="col-sm-4">
+            <h3>Raw</h3>
             <table class="table-striped">
                 <tbody>
                 {% for version in aggregatedInfo %}
                     {% if version == 'raw' %}
                         {% for descr in aggregatedInfo[version] %}
                             <tr class="dataset-aggregated-version-raw">
-                                <td style="width:250px;">{{ title_translate[descr] }}</td>
+                                <td class="w250px">{{ title_translate[descr] }}</td>
                                 <td align="right">{{ aggregatedInfo[version][descr] }}</td>
                             </tr>
                         {% endfor %}
@@ -173,15 +147,15 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-xs-4">
-            <h1>Processed</h1>
+        <div class="col-sm-4">
+            <h3>Processed</h3>
             <table class="table-striped">
                 <tbody>
                 {% for version in aggregatedInfo %}
                     {% if version == 'notRaw' %}
                         {% for descr in aggregatedInfo[version] %}
                             <tr class="dataset-aggregated-version-processed">
-                                <td style="width:250px;">{{ title_translate[descr] }}</td>
+                                <td class="w250px">{{ title_translate[descr] }}</td>
                                 <td align="right">{{ aggregatedInfo[version][descr] }}</td>
                             </tr>
                         {% endfor %}
@@ -190,15 +164,15 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-xs-4">
-            <h1>Total</h1>
+        <div class="col-sm-4">
+            <h3>Total</h3>
             <table class="table-striped">
                 <tbody>
                 {% for version in aggregatedInfo %}
                     {% if version == 'total' %}
                         {% for descr in aggregatedInfo[version] %}
                             <tr class="dataset-aggregated-version-total">
-                                <td style="width:250px;">{{ title_translate[descr] }}</td>
+                                <td class="w250px">{{ title_translate[descr] }}</td>
                                 <td align="right">{{ aggregatedInfo[version][descr] }}</td>
                             </tr>
                         {% endfor %}
@@ -207,6 +181,7 @@
                 </tbody>
             </table>
         </div>
+    </div>
     </div>
 {% endif %}
 {% endblock content %}
