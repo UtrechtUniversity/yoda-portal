@@ -613,7 +613,7 @@ function logUpload(id, file) {
 
    let log = `<div class="row upload-row mb-1" id="${id}">
                   <div class="col-md-6">
-                    <div class="upload-filename">${htmlEncode(file.relativePath)}</div>
+                    <div class="upload-filename text-break">${htmlEncode(file.relativePath)}</div>
                     <div class="upload-btns btn-group btn-group-sm ms-3" role="group" aria-label="Basic example">
                       <button type="button" class="btn btn-secondary upload-pause me-1">Pause</button>
                       <button type="button" class="btn btn-secondary upload-resume me-1 hide">Resume</button>
