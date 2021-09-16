@@ -60,7 +60,7 @@
 
         <nav class="navbar navbar-dark navbar-static-top navbar-expand-lg yoda-navbar">
             <div class="container">
-                <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
+                <a class="navbar-brand {% if request.path == url_for('general_bp.index') %}active{% endif %}" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
                 {% if g.user %}
                 <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -69,7 +69,7 @@
                     <ul class="nav navbar-nav">
                         {% for module in config.get('modules') %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for( module.function ) }}">{{ module.name }}</a>
+                                <a class="nav-link {% if request.path == url_for(module.function) %}active{% endif %}" href="{{ url_for(module.function) }}">{{ module.name }}</a>
                             </li>
                         {% endfor %}
                     </ul>
