@@ -7,34 +7,16 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
 {% endblock %}
 
-{% block container %}
-<div class="page">
-    <div id="messages">
-        {% for category, message in get_flashed_messages(with_categories=true) %}
-        {% if category is sameas 'error' %}
-        {% set category = 'danger' %}
-        {% endif %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-    </div>
+{% block content %}
 
-    <div class="header-logo">
-        <img src="{{ url_for('static', filename='img/frontpage_banner.jpg') }}"
-             alt="Yoda is a share-collaborate environment for research data"
-             title="Yoda is a share-collaborate environment for research data" class="header-logo-img">
+    <div class="header-logo-text-background">
+         <div class="header-logo-text-content">
+             <h1>Welcome to Yoda!</h1>
+             <p>Yoda is a share-collaborate environment for research data.</p>
+         </div>
+         <div>
+             <a class="btn btn-primary" href="https://www.uu.nl/yoda" target="_blank">Help</a>
+         </div>
+     </div>
 
-             <div class="header-logo-text-background">
-                 <div class="header-logo-text-content">
-                     <h1>Welcome to Yoda!</h1>
-                     <p>Yoda is a share-collaborate environment for research data.</p>
-                 </div>
-                 <div>
-                     <a class="btn btn-primary" href="https://www.uu.nl/yoda" target="_blank">Help</a>
-                 </div>
-             </div>
-    </div>
-</div>
 {% endblock %}
