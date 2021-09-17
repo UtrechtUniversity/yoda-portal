@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Vault{% endblock %}
+{% block title %}{{ super() }} &dash; Vault{% endblock title %}
 
 {% block scripts %}
 <script>
     var formLoaded = false;
 </script>
 <script src="{{ url_for('vault_bp.static', filename='js/metadata-form.js') }}" async></script>
-{% endblock %}
+{% endblock scripts %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/metadata/form.css') }}">
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/metadata/leaflet.css') }}">
-{% endblock %}
+{% endblock style %}
 
 {% block content %}
 <div id="form-errors" class="row hide">
@@ -63,4 +63,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}

@@ -5,7 +5,7 @@
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
 
-            <title>{% block title %}{{ config.get('PORTAL_TITLE_TEXT') }}{% endblock %}</title>
+            <title>{% block title %}{{ config.get('PORTAL_TITLE_TEXT') }}{% endblock title %}</title>
 
             <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 
@@ -25,7 +25,7 @@
                 };
                 {% endif %}
             </script>
-            {% block scripts %}{% endblock %}
+            {% block scripts %}{% endblock scripts %}
         {% endblock head %}
     </head>
 
@@ -90,7 +90,7 @@
                         </div>
                     {% endfor %}
                 </div>
-                {% block content %}{% endblock %}
+                {% block content %}{% endblock content %}
             </div>
         </div>
         {% endblock container %}

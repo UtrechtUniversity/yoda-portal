@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Research{% endblock %}
+{% block title %}{{ super() }} &dash; Research{% endblock title %}
 
 {% block scripts %}
 <script src="{{ url_for('research_bp.static', filename='lib/datatables/js/datatables.min.js') }}"></script>
@@ -13,12 +13,12 @@
     var browseStartDir  = {{ dir|tojson|safe }};
     var view = 'browse';
 </script>
-{% endblock %}
+{% endblock scripts %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/research.css') }}">
 <link rel="stylesheet" href="{{ url_for('research_bp.static', filename='lib/datatables/css/datatables.min.css') }}">
-{% endblock %}
+{% endblock style %}
 
 {% block content %}
 <div class="modal" tabindex="-1" role="dialog" id="showUnpreservableFiles">
@@ -307,4 +307,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}
