@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Sign in{% endblock %}
+{% block title %}{{ super() }} &dash; Sign in{% endblock title %}
 
 {% block content %}
 <div class="row">
@@ -22,7 +22,7 @@
                                 type="text"
                                 placeholder="j.a.smith@uu.nl"
                                 autofocus
-                                {%if g.login_username is defined %}
+                                {% if g.login_username is defined %}
                                 value="{{ g.login_username }}"
                                 onfocus="this.setSelectionRange(this.value.length,this.value.length);"
                                 {% endif %}

@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit {% endblock %}
+{% block title %}{{ super() }} &dash; Deposit {% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/metadata/form.css') }}">
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/metadata/leaflet.css') }}">
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/stepper/bs-stepper.custom.css') }}">
-{% endblock %}
+{% endblock style %}
 
 {% block scripts %}
 <script src="{{ url_for('deposit_bp.static', filename='lib/sweetalert/sweetalert.min.js') }}"></script>
@@ -15,7 +15,7 @@
     var formLoaded = false;
 </script>
 <script src="{{ url_for('deposit_bp.static', filename='js/metadata-form.js') }}" async></script>
-{% endblock %}
+{% endblock scripts %}
 
 {% block content %}
 {% with step=2 %}
@@ -61,4 +61,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}

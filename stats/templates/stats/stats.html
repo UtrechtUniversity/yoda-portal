@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Statistics{% endblock %}
+{% block title %}{{ super() }} &dash; Statistics{% endblock title %}
 
 {% block style %}
     <link rel="stylesheet" href="{{ url_for('stats_bp.static', filename='lib/select2/css/select2.min.css') }}">
-{% endblock %}
+{% endblock style %}
 
 {% block scripts %}
     <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-2.7.3/chart.min.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='js/stats.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='lib/select2/js/select2.full.min.js') }}"></script>
-{% endblock %}
+{% endblock scripts %}
 
 {% block content %}
     <h1>Statistics</h1>
@@ -116,4 +116,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

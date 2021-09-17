@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Group Manager{% endblock %}
+{% block title %}{{ super() }} &dash; Group Manager{% endblock title %}
 
 {% block style %}
     <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='css/group_manager.css') }}">
     <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.css') }}">
     <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2/select2-bootstrap.min.css') }}">
-{% endblock %}
+{% endblock style %}
 
 {% block scripts %}
     <script src="{{ url_for('group_manager_bp.static', filename='js/group_manager.js') }}"></script>
@@ -16,7 +16,7 @@
         Yoda.groupManager.load({{ group_hierarchy | safe }}, '{{ user_type }}', '{{ user_zone }}');
     });
     </script>
-{% endblock %}
+{% endblock scripts %}
 
 {% block content %}
 <h1>Group Manager</h1>
@@ -277,4 +277,4 @@
 		</div>
 	</div>
 </div>
-{% endblock %}
+{% endblock content %}

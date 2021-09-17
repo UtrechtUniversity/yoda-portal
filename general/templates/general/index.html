@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Home{% endblock %}
+{% block title %}{{ super() }} &dash; Home{% endblock title %}
 
 {% block style %}
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
-{% endblock %}
+{% endblock style %}
 
 {% block content %}
 
@@ -15,4 +15,4 @@
         {% include 'index_not_authenticated.html' %}
     {% endif %}
 
-{% endblock %}
+{% endblock content %}
