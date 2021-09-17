@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/intake.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/treetable/jquery.treetable.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/treetable/jquery.treetable.theme.default.css') }}">
+    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
 {% endblock style %}
 
 {% block scripts %}
@@ -19,11 +20,13 @@
     {% else %}
         <script src="{{ url_for('intake_bp.static', filename='scripts/datatables/intake_overview_assistant.js') }}"></script>
     {% endif %}
+
     <script type="text/javascript">
         var view = 'intake';
         var alertNr = '{{ alertNr }}';
         var alertMsg = '{{alertMesg}}';
     </script>
+
     <script src="{{ url_for('intake_bp.static', filename='scripts/controllers/intake.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/datatables/plugin_sort_on_image.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/treetable/jquery.treetable.js') }}"></script>
@@ -32,25 +35,37 @@
 {% block content %}
 
 {% if alertNr == 100 %}
-    <div class="page-header mt-0">
-        <p>You have no access to the selected study. Please select another.</p>
-        <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-            <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
-        </button>
-        <div class="dropdown-menu w300px p-5">Please select a study:
-            <table class="table table-striped table-hover mt-2" id="select-study">
-            {% for study in studies %}
-            <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}">
-                <td><i class="fa fa-graduation-cap" aria-hidden="true"></i></td>
-                <td>{{ study }}</td>
-                <td class="w10px">
-                    {% if study==study_id %}
-                    <i class="fa fa-check"></i>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-            </table>
+    <div class="row page-header" style="margin-top:0px;">
+        <div class="col-sm-12">
+            <p>You have no access to the selected study. Please select another. </p>
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu" style="width:300px;padding:5px;">
+                    Please select a study:
+                    <br/>
+                    <table class="table table-striped hover" id="select-study">
+                        {% for study in studies %}
+                            <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}">
+                                <td>
+                                    <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+                                </td>
+                                <td>
+                                    <span>
+                                        {{ study }}
+                                    </span>
+                                </td>
+                                <td style="width:10px;">
+                                    {% if study==study_id %}
+                                        <span class="fa fa-check"></span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -63,40 +78,63 @@
                     <h3 class="no-offset"></h3>
                 </div>
                 <div class="modal-body">
-                    <span class="item"></span>
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    <div class="col-sm-10 pull-right">
+                        <span class="item"></span>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-ok"></span> OK
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="page-header mt-0">
-        <h1><i class="fa fa-folder-open" aria-hidden="true"></i>{{ title }}</h1>
-        <p>{{ full_path }}</p>
+    <div class="row page-header" style="margin-top:0px;">
+        <div class="col-sm-12">
+                <h1>
+                    <i class="fa fa-folder-open" aria-hidden="true"></i>
+                    {{ title }}
+                </h1>
+                <p>{{ full_path }}</p>
+        </div>
     </div>
-    <div class="progress_indicator hidden">
-        <h1 class="pull-right"></h1>
-        <img class="h1 pull-right h30px" src="{{ url_for('intake_bp.static', filename='images/ajax-loader.gif') }}">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="progress_indicator" style="display:none;">
+                <h1 class="pull-right">
+                    Scanning process in progress...
+                </h1>
+                <img class="h1 pull-right" src="{{ url_for('intake_bp.static', filename='images/ajax-loader.gif') }}" style="height:30px;">
+            </div>
+        </div>
     </div>
 
-    <div id="toprow">
-        <div>
+    <div class="row" id="toprow">
+        <div class="col-sm-12">
             <div class="btn-group">
-                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" id="dropdown-select-study">
+                <button class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" id="dropdown-select-study">
                     <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
                 </button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu" style="width:300px;padding:5px;">
                     Please select a study:
-                    <table class="table table-striped hover mt-2" id="select-study">
+                    <br/>
+                    <table class="table table-striped hover" id="select-study">
                         {% for study in studies %}
                             <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}" class="ta-{{ study }}">
-                                <td><i class="fa fa-graduation-cap" aria-hidden="true"></i></td>
-                                <td>{{ study }}</td>
-                                <td class="w10px">
+                                <td>
+                                    <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+                                </td>
+                                <td>
+                                    <span>
+                                        {{ study }}
+                                    </span>
+                                </td>
+                                <td style="width:10px;">
                                     {% if study==study_id %}
-                                        <i class="fa fa-check"></i>
+                                        <span class="fa fa-check"></span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -106,32 +144,44 @@
             </div>
             {% if selectableScanFolders %}
                 <div class="btn-group">
-                    <button class="btn  btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    <button class="btn  btn-outline-secondary dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-folder-open" aria-hidden="true"></i> Change folder <span class="caret"></span>
                     </button>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu" style="width:300px;padding:5px;">
                         Please select a folder:
-                        <table class="table table-striped hover mt-2" id="select-study-folder">
+                        <br/>
+                        <table class="table table-striped hover" id="select-study-folder">
                             <tr data-study-folder-url="{{ url_for('intake_bp.index', studyID=study) }}">
-                                <td class="w10px"><i class="fa fa-folder-open pull-left"></i></td>
-                                <td colspan="2"><strong>{{ study_id }}</strong></td>
-                                <td class="w10px">
+                                <td style="width:10px;">
+                                    <span class="glyphicon glyphicon-folder-open pull-left"></span>
+                                </td>
+                                <td colspan="2">
+                                    <strong>
+                                        {{ study_id }}
+                                    </strong>
+                                </td>
+                                <td style="width:10px;">
                                     {% if not study_folder %}
-                                        <i class="fa fa-check"></i>
+                                        <span class="glyphicon glyphicon-ok"></span>
                                     {% endif %}
                                 </td>
                             </tr>
                             {% for folder in selectableScanFolders %}
                                 {# <tr data-study-folder-url="?studyID={{ study_id | urlencode | replace("+", "%20") }}&studyFolder={{ folder.name | urlencode | replace("+", "%20") }}">  #}
                                 <tr data-study-folder-url="{{ url_for('intake_bp.index', studyID=study, studyFolder=folder.name) }}">
-                                    <td></td>
-                                    <td class="w10px">
-                                        <i class="fa fa-folder-open pull-left"></i>
+                                    <td>
                                     </td>
-                                    <td>{{ folder.name }}</td>
-                                    <td class="w10px">
+                                    <td style="width:10px;">
+                                        <span class="glyphicon glyphicon-folder-open pull-left"></span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            {{ folder.name }}
+                                        </span>
+                                    </td>
+                                    <td style="width:10px;">
                                         {% if folder==study_folder %}
-                                            <i class="fa fa-check"></i>
+                                            <span class="glyphicon glyphicon-ok"></span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -147,13 +197,13 @@
 
             {% if permissions.manager %}
                 <div class="btn-group">
-                    <button class="btn btn-outline-secondary" id="btn-lock"><i class="fa fa-lock"></i> Lock datasets</button>
+                    <button class="btn btn-outline-secondary" id="btn-lock"><span class="glyphicon glyphicon-check"></span> Lock datasets</button>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-outline-secondary" id="btn-unlock"><i class="fa fa-lock-open"></i> Unlock datasets</button>
+                        <button class="btn btn-outline-secondary" id="btn-unlock"><span class="glyphicon glyphicon-check"></span> Unlock datasets</button>
                 </div>
                 <div class="btn-group">
-                    <a href="reports" class="btn btn-info btn-goto-reports"><i class="fa fa-file-invoice"></i> Reports</a>
+                    <a href="reports" class="btn btn-info btn-goto-reports"><span class="glyphicon glyphicon-signal"></span> Reports</a>
                 </div>
             {% endif %}
 
@@ -169,7 +219,7 @@
             {% if not permissions.manager %}
                 {% include 'intake/table_files_unrecognised.html' %}
             {% endif %}
-            <table id="datatable" class="row-border hover table table-striped w-100">
+            <table id="datatable" class="row-border hover table table-striped" style="width:100%;">
                 <thead>
                     <tr>
                         {% if permissions.manager %}
@@ -178,21 +228,21 @@
                         <th align="center"><input type="checkbox" class="control-all-cbDataSets"></th>
                         <th></th>
                         <th>Status</th>
-                        <th class="w80px">Date</th>
+                        <th style="width:80px;">Date</th>
                         <th>Pseudocode</th>
                         <th>Experiment type</th>
                         <th>Wave</th>
                         <th>Version</th>
-                        <th class="text-end">Nr. of files</th>
-                        <th class="text-end">Nr. of errors/<br/>warnings</th>
-                        <th class="text-end">Nr. of <br/>comments</th>
+                        <th style="text-align: right;">Nr. of files</th>
+                        <th style="text-align: right;">Nr. of errors/<br/>warnings</th>
+                        <th style="text-align: right;">Nr. of <br/>comments</th>
                         <th>Created by</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for data in dataSets %}
                         <tr class="detailrow"
-                            data-fullpath="{{ data.path }}"
+                            data-fullpath="{{ data.path }}
                             data-target="{{ data.datasetStatus | upper }}"
                             data-row-id="{{ loop.index0 }}"
                             data-dataset-id="{{ data.dataset_id }}"
@@ -216,16 +266,18 @@
                             <td>{{ data.expType }}</td>
                             <td>{{ data.wave }}</td>
                             <td>{{ data.version }}</td>
-                            <td class="text-end">{{ data.objects }}</td>
-                            <td class="text-end">
+                            <td style="text-align: right;">{{ data.objects }}</td>
+                            <td style="text-align: right;">
                                 {{ (data.datasetErrors + data.objectErrors) if (data.datasetErrors + data.objectErrors)>0 else '-' }}
                                     /
                                 {{ (data.datasetWarnings + data.objectWarnings) if (data.datasetWarnings + data.objectWarnings)>0 else '-' }}
                             </td>
-                            <td class="text-end">
+                            <td style="text-align: right;">
                                 {{ data.datasetComments if  data.datasetComments else '-' }}
                             </td>
-                            <td>{{ data.datasetCreateName }}</td>
+                            <td>
+                                {{ data.datasetCreateName }}
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -241,11 +293,11 @@
         <div class="modal-dialog">
             <div class="modal-content" >
                 <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button class="close" data-dismiss="modal">&times;</button>
                     <h3></h3>
                 </div>
                 <div class="modal-body">
-                    <iframe class="select-generic-iframe" frameborder="0"></iframe>
+                    <iframe class="select-generic-iframe" style="height:350px; width:99%;"frameborder="0"></iframe>
                     <div class="select-generic-content"></div>
                 </div>
                 <div class="modal-footer">
