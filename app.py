@@ -89,7 +89,7 @@ with app.app_context():
     if app.config.get('DEPOSIT_ENABLED'):
         app.register_blueprint(deposit_bp, url_prefix='/deposit')
     if app.config.get('INTAKE_ENABLED'):
-        app.register_blueprint(intake_bp, url_prefix='/intake/')
+        app.register_blueprint(intake_bp, url_prefix='/intake')
     if app.config.get('DATAREQUEST_ENABLED'):
         app.register_blueprint(datarequest_bp, url_prefix='/datarequest/')
 
