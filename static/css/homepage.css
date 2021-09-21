@@ -1,18 +1,14 @@
-.header-logo {
-    width: 100%;
-    position: relative;
-}
-
-img.header-logo-img {
-    display: inline;
-    width: 100%;
-    height: auto;
-    clear: both;
+.page {
+    background: url('/assets/img/frontpage_banner.jpg');
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    min-height: 600px;
 }
 
 .header-logo-text-background {
     position: absolute;
-    top: 20%;
+    top: 200px;
     background-color: rgba(0, 0, 0, .5);
     right: 5%;
     padding: 15px 30px;
@@ -21,4 +17,11 @@ img.header-logo-img {
 .header-logo-text-content {
     color: #fff;
     overflow: hidden;
+}
+
+#deposit-tile,
+#search-tile {
+    padding: 15px 30px;
+    background-color: rgba(0, 0, 0, .5);
+    min-height: 200px;
 }

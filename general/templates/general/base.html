@@ -5,7 +5,7 @@
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
 
-            <title>{% block title %}{{ config.get('PORTAL_TITLE_TEXT') }}{% endblock %}</title>
+            <title>{% block title %}{{ config.get('PORTAL_TITLE_TEXT') }}{% endblock title %}</title>
 
             <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 
@@ -25,7 +25,7 @@
                 };
                 {% endif %}
             </script>
-            {% block scripts %}{% endblock %}
+            {% block scripts %}{% endblock scripts %}
         {% endblock head %}
     </head>
 
@@ -70,7 +70,7 @@
                     <ul class="nav navbar-nav">
                         {% for module in config.get('modules') %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for( module.function ) }}">{{ module.name }}</a>
+                                <a class="nav-link {% if request.path == url_for(module.function) %}active{% endif %}" href="{{ url_for(module.function) }}">{{ module.name }}</a>
                             </li>
                         {% endfor %}
                     </ul>
@@ -80,32 +80,29 @@
         </nav>
 
         {% block container %}
-        <div class="container page">
-            <div id="messages">
-                {% for category, message in get_flashed_messages(with_categories=true) %}
-                {% if category is sameas 'error' %}
-                {% set category = 'danger' %}
-                {% endif %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+        <div class="page">
+            <div class="container">
+                <div id="messages">
+                    {% for category, message in get_flashed_messages(with_categories=true) %}
+                        {% if category is sameas 'error' %} {% set category = 'danger' %} {% endif %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                {% block content %}{% endblock content %}
             </div>
-
-            {% block content %}{% endblock %}
         </div>
         {% endblock container %}
 
+        {% block footer %}
         <footer class="footer">
-            {% block footer %}
             <div class="container">
                 <p class="text-muted">Yoda {{ config.YODA_VERSION }}</p>
                 <!-- {{ config.YODA_COMMIT }} -->
             </div>
-            {% endblock footer %}
         </footer>
+        {% endblock footer %}
     </body>
 </html>

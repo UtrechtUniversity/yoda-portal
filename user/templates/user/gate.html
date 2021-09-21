@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Sign in{% endblock %}
+{% block title %}{{ super() }} &dash; Sign in{% endblock title %}
 
 {% block content %}
 <div class="row">
@@ -14,15 +14,15 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="form-group row">
                         <label class="col-sm-3 col-form-label" for="f-login-username">Username</label>
-                        <input 
-                            name="username" 
-                            id="f-login-username" 
-                            class="form-control col-sm-6" 
-                            type="text" 
-                            placeholder="j.a.smith@uu.nl" 
-                            autofocus 
-                            {%if g.login_username is defined %}
-                            value="{{ g.login_username }}" 
+                        <input
+                            name="username"
+                            id="f-login-username"
+                            class="form-control col-sm-6"
+                            type="text"
+                            placeholder="j.a.smith@uu.nl"
+                            autofocus
+                            {% if g.login_username is defined %}
+                            value="{{ g.login_username }}"
                             onfocus="this.setSelectionRange(this.value.length,this.value.length);"
                             {% endif %}
                             required />

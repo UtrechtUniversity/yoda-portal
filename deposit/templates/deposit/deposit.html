@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit{% endblock %}
+{% block title %}{{ super() }} &dash; Deposit{% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/datatables/css/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/stepper/bs-stepper.custom.css') }}">
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/deposit.css') }}">
-{% endblock %}
+{% endblock style %}
 
 {% block scripts %}
 <script src="{{ url_for('deposit_bp.static', filename='lib/datatables/js/datatables.min.js') }}"></script>
@@ -19,7 +19,7 @@
     var view = 'browse';
 
 </script>
-{% endblock %}
+{% endblock scripts %}
 
 {% block content %}
 {% with step=1 %}
@@ -28,7 +28,7 @@
 
 <div class="card page_deposit">
     <div class="card-header">
-        <h5 class="card-title pull-left" style="margin:4px 0;">Deposit upload</h5>
+        <h5 class="card-title pull-left">Deposit upload</h5>
     </div>
     <div class="card-body">
 
@@ -82,8 +82,10 @@
 </div>
 
 <div class="card upload-large-files mt-4">
-    <h5 class="card-title" style="margin:20px 0 0 20px;">Upload information</h5>
-    <div class="alert alert-light">
+    <div class="card-header">
+        <h5 class="card-title">Upload information</h5>
+    </div>
+    <div class="card-body">
         <p>For frequent large uploads (bigger than 1GB) we recommend using one of the following:</p>
         <ul>
             <li>
@@ -284,4 +286,4 @@
     </div>
 </div>
 
-{% endblock %}
+{% endblock content %}

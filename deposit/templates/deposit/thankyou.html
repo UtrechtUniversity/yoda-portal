@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit &dash; Thank you{% endblock %}
+{% block title %}{{ super() }} &dash; Deposit &dash; Thank you{% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/deposit.css') }}">
-{% endblock %}
+{% endblock style %}
 
 {% block scripts %}
-{% endblock %}
+{% endblock scripts %}
 
 {% block content %}
 
@@ -21,4 +21,4 @@
             <p>You can see your <a href="{{ url_for('user_bp.notifications') }}">notifications</a> in the dropdown in the top right corner.</p>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

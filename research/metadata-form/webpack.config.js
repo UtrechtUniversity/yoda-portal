@@ -17,15 +17,15 @@ var config = {
                 include : APP_DIR,
                 use: {
                     loader: 'babel-loader',
-                    query: {
-                        presets: ['react', 'es2015'],
-                        plugins: ['transform-object-rest-spread']
-
+                    options: {
+                        presets: ['@babel/react'],
+                        plugins: ['@babel/plugin-proposal-object-rest-spread']
                     }
                 }
             }
         ]
-    }
+    },
+    mode: "production"
 };
 
 module.exports = config;
