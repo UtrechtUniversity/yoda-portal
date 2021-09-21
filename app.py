@@ -39,13 +39,19 @@ app.jinja_loader = theme_loader
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
 app.config['modules'] = [
-    {'name': 'Deposit',        'function': 'deposit_bp.index'},
-    {'name': 'Research',       'function': 'research_bp.index'},
     {'name': 'Vault',          'function': 'vault_bp.index'},
     {'name': 'Statistics',     'function': 'stats_bp.index'},
     {'name': 'Group Manager',  'function': 'group_manager_bp.index'},
 ]
 
+if app.config.get('RESEARCH_ENABLED'):
+    app.config['modules'].append(
+        {'name': 'Research', 'function': 'research_bp.index'}
+    )
+if app.config.get('DEPOSIT_ENABLED'):
+    app.config['modules'].append(
+        {'name': 'Deposit', 'function': 'deposit_bp.index'}
+    )
 if app.config.get('INTAKE_ENABLED'):
     app.config['modules'].append(
         {'name': 'Intake', 'function': 'intake_bp.index'}
@@ -73,8 +79,9 @@ with app.app_context():
     app.register_blueprint(stats_bp, url_prefix='/stats')
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(vault_bp, url_prefix='/vault')
-    app.register_blueprint(deposit_bp, url_prefix='/deposit')
     app.register_blueprint(api_bp, url_prefix='/api/')
+    if app.config.get('DEPOSIT_ENABLED'):
+        app.register_blueprint(deposit_bp, url_prefix='/deposit')
     if app.config.get('INTAKE_ENABLED'):
         app.register_blueprint(intake_bp, url_prefix='/intake/')
     if app.config.get('DATAREQUEST_ENABLED'):
