@@ -3,7 +3,22 @@
 }
 
 .yoda-array-field legend {
+    float: none !important;
     padding: 0.2em 0.5em;
     font-size: 100%;
     width: revert;
+}
+
+label {
+    margin-bottom: 0.5rem;
+}
+
+.form-text {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.775em !important;
+}
+
+.d-flex, .col {
+    padding: 0 15px;
 }
