@@ -16,16 +16,16 @@
     <div class="card-body">
         <form method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <fieldset>
-                <div class="input-group mb-3 custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="mail_notifications" name="mail_notifications" {% if mail_notifications != 'OFF' %}checked{% else %}{% endif %}>
-                    <label class="custom-control-label" for="mail_notifications">Receive mail notifications</label>
+            <fieldset class="col-md-3">
+                <div class="input-group mb-3 form-check form-switch">
+                    <input type="checkbox" class="form-check-input" id="mail_notifications" name="mail_notifications" {% if mail_notifications != 'OFF' %}checked{% else %}{% endif %}>
+                    <label class="form-check-label" for="mail_notifications">Receive mail notifications</label>
                 </div>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                       <label class="input-group-text" for="mail_notifications_type">Type</label>
                     </div>
-                    <select class="custom-select col-md-2" id="mail_notifications_type" name="mail_notifications_type" {% if mail_notifications == 'OFF' %}disabled{% else %}{% endif %}>
+                    <select class="form-select" id="mail_notifications_type" name="mail_notifications_type" {% if mail_notifications == 'OFF' %}disabled{% else %}{% endif %}>
                         <option value="IMMEDIATE" {% if mail_notifications == 'IMMEDIATE' %}selected{% else %}{% endif %}>Immediate</option>
                         <option value="DAILY" {% if mail_notifications == 'DAILY' or mail_notifications == 'OFF' %}selected{% else %}{% endif %}>Daily</option>
                         <option value="WEEKLY" {% if mail_notifications == 'WEEKLY' %}selected{% else %}{% endif %}>Weekly</option>

@@ -231,7 +231,8 @@ def export():
 
 
 #     public function index($studyID=null)
-@intake_bp.route('reports', methods=['GET'])
+@intake_bp.route('reports')
+@intake_bp.route('/reports/')
 def reports():
     access_denied = True
     study_id = request.args.get('studyID')
