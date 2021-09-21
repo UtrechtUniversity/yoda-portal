@@ -2,8 +2,23 @@
     display: none;
 }
 
-.yoda-array-field legend {
+#metadata-form .yoda-array-field legend {
+    float: none !important;
     padding: 0.2em 0.5em;
     font-size: 100%;
     width: revert;
+}
+
+#metadata-form label {
+    margin-bottom: 0.5rem;
+}
+
+#metadata-form .form-text {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.775em !important;
+}
+
+#metadata-form .d-flex, #metadata-form  .col {
+    padding: 0 15px;
 }

@@ -672,7 +672,7 @@ const tableRenderer = {
             actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this file">Move</a>`);
         }
         let dropdown = $(`<div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
                             </button>`);
         dropdown.append(actions);
@@ -945,7 +945,7 @@ function topInformation(dir, showAlert)
             }
 
             let folderName = htmlEncode(basename).replace(/ /g, "&nbsp;");
-            let statusBadge = '<span id="statusBadge" class="ml-2 badge badge-pill badge-primary">' + statusText + '</span>';
+            let statusBadge = '<span id="statusBadge" class="ms-2 badge rounded-pill bg-primary">' + statusText + '</span>';
 
             // Reset action dropdown.
             $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
@@ -1115,10 +1115,10 @@ function logUpload(id, file) {
                   <div class="col-md-6">
                     <div class="upload-filename">${htmlEncode(file.relativePath)}</div>
                     <div class="upload-btns btn-group btn-group-sm" role="group" aria-label="Basic example">
-                      <button type="button" class="btn btn-secondary upload-cancel mr-1">
+                      <button type="button" class="btn btn-secondary upload-cancel me-1">
                         Cancel
                       </button>
-                      <button type="button" class="btn btn-secondary upload-resume hide mr-1">
+                      <button type="button" class="btn btn-secondary upload-resume hide me-1">
                         Resume
                       </button>
                       <button type="button" class="btn btn-secondary upload-pause">

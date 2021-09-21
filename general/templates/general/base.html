@@ -14,7 +14,7 @@
             {% block style %}{% endblock style %}
 
             <script src="{{ url_for('static', filename='lib/jquery-1.11.2/js/jquery.min.js') }}"></script>
-            <script src="{{ url_for('static', filename='lib/bootstrap-4.4.1/js/bootstrap.bundle.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='lib/bootstrap-5.0.2/js/bootstrap.bundle.min.js') }}"></script>
             <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
             <script>
                 Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'};
@@ -39,12 +39,12 @@
                 <div class="auth-action pull-right">
                     {% if g.user %}
                         <div class="dropdown">
-                            <button type="button" class="btn btn-primary dropdown-toggle" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button type="button" class="btn btn-primary dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{ g.user }} {% if g.notifications %}<i class="fa fa-bell" aria-hidden="true"></i>{% endif %}
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="{{ url_for('user_bp.notifications') }}">
-                                    Notifications {% if g.notifications %}<span class="badge badge-primary">{{ g.notifications }}</span>{% endif %}
+                                    Notifications {% if g.notifications %}<span class="badge bg-primary">{{ g.notifications }}</span>{% endif %}
                                 </a>
                                 <a class="dropdown-item" href="{{ url_for('user_bp.settings') }}">Settings</a>
                                 <div class="dropdown-divider"></div>
@@ -62,7 +62,7 @@
             <div class="container">
                 <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
                 {% if g.user %}
-                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div id="navbar" class="collapse navbar-collapse">
@@ -90,18 +90,19 @@
                         </div>
                     {% endfor %}
                 </div>
+
                 {% block content %}{% endblock content %}
             </div>
         </div>
         {% endblock container %}
 
-        {% block footer %}
         <footer class="footer">
+            {% block footer %}
             <div class="container">
                 <p class="text-muted">Yoda {{ config.YODA_VERSION }}</p>
                 <!-- {{ config.YODA_COMMIT }} -->
             </div>
+            {% endblock footer %}
         </footer>
-        {% endblock footer %}
     </body>
 </html>
