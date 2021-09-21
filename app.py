@@ -38,11 +38,7 @@ app.jinja_loader = theme_loader
 
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
-app.config['modules'] = [
-    {'name': 'Vault',          'function': 'vault_bp.index'},
-    {'name': 'Statistics',     'function': 'stats_bp.index'},
-    {'name': 'Group Manager',  'function': 'group_manager_bp.index'},
-]
+app.config['modules'] = []
 
 if app.config.get('RESEARCH_ENABLED'):
     app.config['modules'].append(
@@ -60,6 +56,16 @@ if app.config.get('DATAREQUEST_ENABLED'):
     app.config['modules'].append(
         {'name': 'Datarequest', 'function': 'datarequest_bp.index'}
     )
+
+app.config['modules'].append(
+    {'name': 'Vault', 'function': 'vault_bp.index'},
+)
+app.config['modules'].append(
+    {'name': 'Statistics', 'function': 'stats_bp.index'},
+)
+app.config['modules'].append(
+    {'name': 'Group Manager', 'function': 'group_manager_bp.index'},
+)
 
 app.config['modules_list'] = [module['name'] for module in app.config['modules']]
 
