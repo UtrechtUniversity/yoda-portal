@@ -305,7 +305,7 @@ const tableRenderer2 = {
             actions.append(`<li><a class="view-${type}" data-path="${htmlEncode(dlgCurrentFolder+'/'+row.name)}">View</a>`);
 
         let dropdown = $(`<div class="dropdown">
-                                <span class="dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                   <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
                                 </span>`);
         dropdown.append(actions);
