@@ -13,15 +13,10 @@ deposit_bp = Blueprint('deposit_bp', __name__,
                        static_url_path='/assets')
 
 """
-    Deposit data flow
-
     1. Upload data:     /deposit/
     2. Add metadata:    /deposit/metadata/
     3. Submit:          /deposit/submit/
-    4. Thankyou page
-
-    Uses the flow upload and download/view from research module
-
+    4. Thankyou page    /deposit/thankyou/
 """
 
 
@@ -32,7 +27,7 @@ def get_deposit_path():
     return path.replace('//', '/')
 
 
-@deposit_bp.route('/')
+@deposit_bp.route('/', strict_slashes=False)
 @deposit_bp.route('/browse')
 def index():
     """ Step 1: Deposit files and folders """
@@ -48,21 +43,21 @@ def index():
                            dir=path)
 
 
-@deposit_bp.route('/metadata/')
+@deposit_bp.route('/metadata/', strict_slashes=False)
 def form():
     """Step 2: Add metadata to your upload"""
     path = get_deposit_path()
     return render_template('deposit/metadata-form.html', path=path)
 
 
-@deposit_bp.route('/submit/')
+@deposit_bp.route('/submit/', strict_slashes=False)
 def submit():
     """Step 3: Submit upload"""
     path = get_deposit_path()
     return render_template('deposit/submit.html', path=path)
 
 
-@deposit_bp.route('/thankyou/')
+@deposit_bp.route('/thankyou/', strict_slashes=False)
 def thankyou():
     """Step 4: Thank you page """
     path = get_deposit_path()
