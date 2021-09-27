@@ -152,16 +152,11 @@ def settings():
     return render_template('user/settings.html', **settings)
 
 
-@user_bp.route('/data_access', methods=['GET', 'POST'])
+@user_bp.route('/data_access')
 def data_access():
     # Load tokens.
     response = api.call('load_tokens')
     return render_template('user/data_access.html', tokens=response['data'])
-
-
-@user_bp.route('/create-token', methods=['GET', 'POST'])
-def token_generation():
-    return render_template('user/token_generation.html')
 
 
 @user_bp.route('/callback')

@@ -21,7 +21,9 @@
         Data Access Passwords
     </div>
     <div class="card-body">
-		<a href="{{ url_for('user_bp.token_generation') }}" class="btn btn-primary mb-4">Create new token</a>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dataAccessPassword">
+          Generate new data access password
+        </button>
         <div class="list-group">
             <div class="list-group-item d-inline-flex">
                 <label class="col-sm-6">Password Label</label>
@@ -38,5 +40,45 @@
             {% endfor %}
         </div>
     </div>
+</div>
+
+<!-- Generate data access password modal -->
+<div class="modal fade" id="dataAccessPassword" tabindex="-1" aria-labelledby="dataAccessPassword" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dataAccessPassword">Generate new data access password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form method="post" class="form-horizontal">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <div class="form-group row">
+                  <label id="label-input" class="col-sm-3 col-form-label" for="f-token-label">Password label</label>
+                  <input
+                      name="token-label"
+                      id="f-token-label"
+                      class="form-control col-sm-6"
+                      type="text"
+                      placeholder="Enter a label to identify the new password by"
+                      autofocus
+                      required />
+              </div>
+              <div class="form-group row">
+                  <label class="col-sm-3 col-form-label" for="f-token">Password</label>
+                  <input
+                      id="f-token"
+                      class="form-control col-sm-6"
+                      type="text"
+                      disabled/>
+              </div>
+              <a class="btn btn-primary gen-token">Generate data access password</a>
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock content %}
