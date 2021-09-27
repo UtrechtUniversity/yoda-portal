@@ -51,8 +51,8 @@
       <div class="modal-body">
           <form method="post" class="form-horizontal">
               <div class="form-group row">
-                  <label id="label-input" class="col-sm-3 col-form-label" for="f-token-label">Password label</label>
-                  <div class="col-sm-6">
+                  <label id="label-input" class="col-sm-3 col-form-label" for="f-token-label">Label</label>
+                  <div class="col-sm-9">
                       <input
                           name="token-label"
                           id="f-token-label"
@@ -65,7 +65,7 @@
               </div>
               <div class="form-group row">
                   <label class="col-sm-3 col-form-label" for="f-token">Password</label>
-                  <div class="col-sm-6">
+                  <div class="col-sm-9">
                       <input
                           id="f-token"
                           class="form-control"
@@ -73,7 +73,13 @@
                           disabled/>
                   </div>
               </div>
-              <a class="btn btn-primary gen-token">Generate data access password</a>
+              <div id="#passwordError" class="alert alert-danger mt-3 hidden" role="alert">
+                  An error occurred while creating the token, please try another label. If the issue persists, contact your administrator
+              </div>
+              <a class="btn btn-primary gen-token mt-3">Generate data access password</a>
+              <div id="#passwordOk" class="alert alert-success mt-3 hidden" role="alert">
+                  Please store the password somewhere safe, you will not be able to do so after you close this window!
+              </div>
           </form>
       </div>
       <div class="modal-footer">
