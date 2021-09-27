@@ -14,17 +14,13 @@ $(document).ready(function() {
             });
     });
 
-    $("body").on("click", "a.gen-token", function(){
+    $("body").on("click", "a.gen-token", function(e){
         let label = $("#f-token-label").val();
-        $('#messages').empty();
-
         Yoda.call("generate_token", {"label": label}, {"quiet": true}).then(
             (data) => {
                 $('#f-token').val(data);
-                Yoda.set_message(
-                    'success',
-                    `Token created! Please store the token somewhere safe,
-you will not be able to do so after you leave this page!`);
+                $('a.gen-token').hide();
+                // Please store the password somewhere safe, you will not be able to do so after you close this window!
             },
             (error) => {
                 Yoda.set_message(

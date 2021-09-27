@@ -26,15 +26,13 @@
         </button>
         <div class="list-group">
             <div class="list-group-item d-inline-flex">
-                <label class="col-sm-6">Password Label</label>
-                <span class="col-sm-2">Generation Time</span>
-                <span class="col-sm-2">Expiration Time</span>
+                <label class="col-sm-7">Password Label</label>
+                <span class="col-sm-3">Expiration Time</span>
             </div>
             {% for t in tokens %}
             <div class="list-group-item d-inline-flex">
-                <label class="col-sm-6">{{ t.label }}</label>
-                <span class="col-sm-2">{{ t.gen_time }}</span>
-                <span class="col-sm-2">{{ t.exp_time }}</span>
+                <label class="col-sm-7">{{ t.label }}</label>
+                <span class="col-sm-3">{{ t.exp_time }}</span>
                 <input class="btn btn-danger col-sm-2 delete-token" type="button" value="Delete"/>
             </div>
             {% endfor %}
@@ -52,25 +50,28 @@
       </div>
       <div class="modal-body">
           <form method="post" class="form-horizontal">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <div class="form-group row">
                   <label id="label-input" class="col-sm-3 col-form-label" for="f-token-label">Password label</label>
-                  <input
-                      name="token-label"
-                      id="f-token-label"
-                      class="form-control col-sm-6"
-                      type="text"
-                      placeholder="Enter a label to identify the new password by"
-                      autofocus
-                      required />
+                  <div class="col-sm-6">
+                      <input
+                          name="token-label"
+                          id="f-token-label"
+                          class="form-control"
+                          type="text"
+                          placeholder="Enter a label to identify the new password by"
+                          autofocus
+                          required />
+                  </div>
               </div>
               <div class="form-group row">
                   <label class="col-sm-3 col-form-label" for="f-token">Password</label>
-                  <input
-                      id="f-token"
-                      class="form-control col-sm-6"
-                      type="text"
-                      disabled/>
+                  <div class="col-sm-6">
+                      <input
+                          id="f-token"
+                          class="form-control"
+                          type="text"
+                          disabled/>
+                  </div>
               </div>
               <a class="btn btn-primary gen-token">Generate data access password</a>
           </form>
