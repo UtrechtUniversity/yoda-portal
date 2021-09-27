@@ -18,7 +18,7 @@ $(document).ready(function() {
         let label = $("#f-token-label").val();
         $('#messages').empty();
 
-        Yoda.call("generate_token", data={"label": label}, options={"quiet": true}).then(
+        Yoda.call("generate_token", {"label": label}, {"quiet": true}).then(
             (data) => {
                 $('#f-token').val(data);
                 Yoda.set_message(
