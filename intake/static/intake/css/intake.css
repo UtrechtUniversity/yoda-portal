@@ -1,8 +1,3 @@
-@media (min-width: 1500px){
-    .container, .container-sm, .container-md, .container-lg, .container-xl {
-        max-width: 1490px;
-    }
-}
 #dataset_detail_view {
     padding: 10px;
     background:#F0E68C;
@@ -86,5 +81,3 @@ div.datasetstatus_scanned{
 .w250px { width: 250px; }
 .w300px { width: 300px; }
 .w500px { width: 500px; }
-
-
