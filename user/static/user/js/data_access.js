@@ -14,17 +14,22 @@ $(document).ready(function() {
             });
     });
 
-    $("body").on("click", "a.gen-token", function(e){
+    $("body").on("click", "#generateButton", function(e){
         let label = $("#f-token-label").val();
-        $('a.gen-token').hide();
+
+        let button = document.getElementById('generateButton');
+        button.setAttribute("hidden", true);
+
         Yoda.call("generate_token", {"label": label}, {"quiet": true}).then(
             (data) => {
                 $('#f-token').val(data);
-                $('#passwordOk').show();
+                let p = document.getElementById('passwordOk');
+                p.removeAttribute("hidden");
             },
             (error) => {
-                $('a.gen-token').show();                
-                $('#passwordError').show();
+                let p = document.getElementById('passwordError');
+                p.removeAttribute("hidden");
+                button.removeAttribute("hidden");
             });
     });
 });

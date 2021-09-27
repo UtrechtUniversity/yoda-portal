@@ -41,8 +41,8 @@
 </div>
 
 <!-- Generate data access password modal -->
-<div class="modal fade" id="dataAccessPassword" tabindex="-1" aria-labelledby="dataAccessPassword" aria-hidden="true">
-  <div class="modal-dialog">
+<div class="modal fade" id="dataAccessPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="dataAccessPassword" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="dataAccessPassword">Generate new data access password</h5>
@@ -50,7 +50,7 @@
       </div>
       <div class="modal-body">
           <form method="post" class="form-horizontal">
-              <div class="form-group row">
+              <div class="form-group row mb-3">
                   <label id="label-input" class="col-sm-3 col-form-label" for="f-token-label">Label</label>
                   <div class="col-sm-9">
                       <input
@@ -73,11 +73,11 @@
                           disabled/>
                   </div>
               </div>
-              <div id="#passwordError" class="alert alert-danger mt-3 hidden" role="alert">
+              <div id="passwordError" class="alert alert-danger mt-3" role="alert" hidden>
                   An error occurred while creating the token, please try another label. If the issue persists, contact your administrator
               </div>
-              <a class="btn btn-primary gen-token mt-3">Generate data access password</a>
-              <div id="#passwordOk" class="alert alert-success mt-3 hidden" role="alert">
+              <a id="generateButton" class="btn btn-primary mt-3">Generate data access password</a>
+              <div id="passwordOk" class="alert alert-success mt-3" role="alert" hidden>
                   Please store the password somewhere safe, you will not be able to do so after you close this window!
               </div>
           </form>
