@@ -8,14 +8,26 @@
 
 {% block content %}
 <h1>Data Access Password</h1>
-
+<p>
+    In order to upload, download or view the content of files via iCommands or network disk (webDAV), you need a one-time data access password.
+    <br />
+    <br />
+    Below you can generate data access password.
+    The password is valid for 72 hours.
+    If the password has expired, you can simply repeat this procedure.
+</p>
 <div class="card">
     <div class="card-header">
-        Data Access Tokens
+        Data Access Passwords
     </div>
     <div class="card-body">
 		<a href="{{ url_for('user_bp.token_generation') }}" class="btn btn-primary mb-4">Create new token</a>
         <div class="list-group">
+            <div class="list-group-item d-inline-flex">
+                <label class="col-sm-6">Password Label</label>
+                <span class="col-sm-2">Generation Time</span>
+                <span class="col-sm-2">Expiration Time</span>
+            </div>
             {% for t in tokens %}
             <div class="list-group-item d-inline-flex">
                 <label class="col-sm-6">{{ t.label }}</label>

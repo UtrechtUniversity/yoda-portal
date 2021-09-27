@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Create a new token{% endblock %}
+{% block title %}{{ super() }} &dash; Create a new data access password{% endblock %}
 
 {% block scripts %}
     <script src="{{ url_for('user_bp.static', filename='js/token.js') }}"></script>
@@ -9,25 +9,25 @@
 {% block content %}
 <div class="card">
     <div class="card-header">
-        <div class="panel-title">Create a new token</div>
+        <div class="panel-title">Create a new data access password</div>
     </div>
     <div class="card-body">
         <form method="post" class="form-horizontal">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group row">
-                <label id="label-input" class="col-sm-3 col-form-label" for="f-token-label">Token label</label>
-                <input 
-                    name="token-label" 
-                    id="f-token-label" 
-                    class="form-control col-sm-6" 
-                    type="text" 
-                    placeholder="Enter a label to identify the new token by" 
-                    autofocus 
+                <label id="label-input" class="col-sm-3 col-form-label" for="f-token-label">Password label</label>
+                <input
+                    name="token-label"
+                    id="f-token-label"
+                    class="form-control col-sm-6"
+                    type="text"
+                    placeholder="Enter a label to identify the new password by"
+                    autofocus
                     required />
             </div>
             <div class="form-group row">
                 <label class="col-sm-3 col-form-label" for="f-token">Token</label>
-                <input  
+                <input
                     id="f-token"
                     class="form-control col-sm-6"
                     type="text"
