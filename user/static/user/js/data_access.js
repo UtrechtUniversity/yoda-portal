@@ -15,7 +15,7 @@ $(document).ready(function() {
     });
 
     $("body").on("click", "a.gen-token", function(){
-        label = $("#f-token-label").val();
+        let label = $("#f-token-label").val();
         $('#messages').empty();
 
         Yoda.call("generate_token", data={"label": label}, options={"quiet": true}).then(
