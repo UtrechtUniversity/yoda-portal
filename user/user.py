@@ -89,7 +89,7 @@ def login():
                 'error'
             )
             return render_template('user/login.html')
-        except iRODSException as e:
+        except iRODSException:
             flash(
                 'An error occurred while connecting to iRODs. '
                 'If the issue persists, please contact the '
