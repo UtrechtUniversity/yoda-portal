@@ -598,11 +598,11 @@ function topInformation(dir, showAlert) {
 
             // Provenance action log
             $('.actionlog').hide();
-            let actionLogIcon = ` <i class="fa fa-book actionlog-icon" style="cursor:pointer" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
+            let actionLogIcon = ` <i class="fa fa-book actionlog-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
 
             // System metadata.
             $('.system-metadata').hide();
-            let systemMetadataIcon = ` <i class="fa fa-info-circle system-metadata-icon" style="cursor:pointer" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
+            let systemMetadataIcon = ` <i class="fa fa-info-circle system-metadata-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
 
             $('.btn-group button.folder-status').attr('data-write', hasWriteRights);
 

@@ -75,8 +75,6 @@ def index():
 def download():
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
-    content = ''
-    size = 0
     session = g.irods
 
     READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE

@@ -125,12 +125,9 @@ def get_intake_study_permissions(study_id):
 
 @intake_bp.route('getDatasetDetailView', methods=['POST'])
 def get_dataset_detail_view():
-    study_id = request.form.get('studyID')
     path = request.form.get('path')
     tbl_id = request.form.get('tbl_id')
     dataset_id = request.form.get('datasetID')
-
-    intake_path = '/' + g.irods.zone + '/home/grp-' + study_id
 
     result = api.call('intake_dataset_get_details',
                       {"coll": path, "dataset_id": dataset_id})

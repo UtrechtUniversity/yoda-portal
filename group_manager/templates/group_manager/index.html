@@ -141,7 +141,7 @@
 					</a>
 					<form action="{{ url_for('group_manager_bp.user_create') }}" method="POST" class="form-inline" id="f-user-create" hidden>
 						<input name="group_name" id="f-user-create-group" type="hidden" />
-						<div class="input-group" style="width: 100%;">
+						<div class="input-group">
 							<input name="user_name" id="f-user-create-name" class="form-control form-control-sm selectify-user-name" type="hidden" required placeholder="Enter a username" data-group="#f-user-create-group" />
 							<div class="input-group-btn">
 								<input id="f-user-create-submit" class="btn btn-primary btn-block btn-sm" type="submit" value="Add" />
