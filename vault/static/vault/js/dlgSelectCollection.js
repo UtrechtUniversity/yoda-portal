@@ -4,9 +4,6 @@ dlgCurrentFolder = '';
 
 $( document ).ready(function() {
     $("body").on("click",".dlg-browse", function(e) {
-
-        console.log('Clicked ROW');
-        console.log($(this).attr('data-path'));
         dlgBrowse($(this).attr('data-path'));
 
         // Dismiss stale messages.
