@@ -309,7 +309,7 @@ def callback():
                 'danger'
             )
 
-            return redirect(url_for('user_bp.login'))
+            return redirect(url_for('user_bp.gate'))
 
     return redirect(original_destination())
 
