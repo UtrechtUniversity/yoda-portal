@@ -30,11 +30,11 @@ def gate():
         username = request.form['username']
 
         if username is None:
-            flash('Missing username', 'error')
+            flash('Missing username', 'danger')
             return render_template('user/gate.html')
 
         if len(username) > 64:
-            flash('Invalid username', 'error')
+            flash('Invalid username', 'danger')
             return render_template('user/gate.html')
 
         session['login_username'] = username
@@ -61,11 +61,11 @@ def login():
         password = request.form['password']
 
         if username is None:
-            flash('Missing username', 'error')
+            flash('Missing username', 'danger')
             return render_template('user/login.html')
 
         if len(username) > 64:
-            flash('Invalid username', 'error')
+            flash('Invalid username', 'danger')
             return render_template('user/login.html')
 
         session['login_username'] = username
@@ -78,7 +78,7 @@ def login():
         if password is None:
             flash(
                 'Password missing',
-                'error')
+                'danger')
             return render_template('user/login.html')
 
         try:
@@ -86,7 +86,7 @@ def login():
         except PAM_AUTH_PASSWORD_FAILED:
             flash(
                 'Username/password was incorrect',
-                'error'
+                'danger'
             )
             return render_template('user/login.html')
         except iRODSException:
@@ -94,7 +94,7 @@ def login():
                 'An error occurred while connecting to iRODs. '
                 'If the issue persists, please contact the '
                 'system administrator',
-                'error')
+                'danger')
             print_exc()
             return render_template('user/login.html')
 
@@ -143,7 +143,7 @@ def settings():
         if response['status'] == 'ok':
             flash('Settings saved successfully', 'success')
         else:
-            flash('Saving settings failed!', 'error')
+            flash('Saving settings failed!', 'danger')
 
     # Load user settings.
     response = api.call('settings_load', data={})
@@ -299,7 +299,7 @@ def callback():
                 'An error occurred during the OpenID Connect protocol. '
                 'If the issue persists, please contact the system '
                 'administrator',
-                'error'
+                'danger'
             )
 
             return redirect(url_for('user_bp.login'))
