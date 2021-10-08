@@ -94,18 +94,12 @@ ol.breadcrumb li.active {
 }
 
 #file-browser tr > :nth-child(1) {
-    min-width: 40%;
+    padding-left: 10px;
 }
-
 #file-browser tr > :nth-child(2) {
-    max-width: 30px;
     text-align: right;
 }
-#file-browser tr > :nth-child(3) {
-    max-width: 40px;
-}
 #file-browser tr > :nth-child(4) {
-    max-width: 10px;
     text-align: right;
 }
 
@@ -144,3 +138,9 @@ table.dataTable > tbody > tr > td i {
 .yoda-table tr.odd {
     background-color: transparent !important;
 }
+
+.metadata-info {
+    padding: 10px 10px 0px 10px;
+}
+
+
