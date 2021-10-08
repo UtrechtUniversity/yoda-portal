@@ -630,7 +630,7 @@ function topInformation(dir, showAlert) {
             $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
 
             var icon = '<i class="fa fa-folder-open-o" aria-hidden="true"></i>';
-            $('.top-information h2').html(`<span class="icon">${icon}</span> ${folderName}${systemMetadataIcon}${actionLogIcon}${statusBadge}`);
+            $('.top-information h2').html(`<span class="icon">${icon}</span> <span class="folder-name">${folderName}</span>${systemMetadataIcon}${actionLogIcon}${statusBadge}`);
 
             // Show top information and buttons.
             if (typeof vaultStatus != 'undefined') {
@@ -792,6 +792,7 @@ function metadataInfo(){
         let metadata = result.data.metadata;
 
         $(".metadata-title").text(metadata.Title);
+        $(".top-information .folder-name").text(metadata.Title);
         $(".metadata-description").text(metadata.Description);
         $(".metadata-language").text(metadata.Language);
         $(".metadata-license").text(metadata.License);
