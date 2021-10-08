@@ -55,7 +55,7 @@ class User extends MY_Controller {
         $this->session->unset_userdata('username');
         $this->session->unset_userdata('password');
 
-        $username = $plainPayload[$email_field];
+        $username = strtolower($plainPayload[$email_field]);
         $password = $jsonresult['access_token'];
 
         if ($verified == 1 && $this->rodsuser->login($username, $password)) {
