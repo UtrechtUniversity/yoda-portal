@@ -20,6 +20,7 @@ $(function() {
     // Canonicalize path somewhat, for convenience.
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
 
+    metadataInfo();
 
     if ($('#file-browser').length) {
         startBrowsing(browsePageItems);
@@ -773,3 +774,55 @@ function vaultAccess(action, folder)
         topInformation(folder, false);
     }, "json");
 }
+
+function metadataInfo(){
+
+    Yoda.call('meta_form_load',
+        {coll: Yoda.basePath+currentFolder},
+        {rawResult: true})
+    .then((result) => {
+        console.log(result);
+
+        if (!result || jQuery.isEmptyObject(result.data))
+            return console.info('No result data from meta_form_load');
+        else
+            $('#metadata-info').show();
+
+        let status = result.status;
+        let metadata = result.data.metadata;
+
+        $(".metadata-title").text(metadata.Title);
+        $(".metadata-description").text(metadata.Description);
+        $(".metadata-language").text(metadata.Language);
+        $(".metadata-license").text(metadata.License);
+        $(".metadata-tags").text(metadata.Tag.toString());
+        $(".metadata-version").text(metadata.Version);
+        $(".metadata-data-classification").text(metadata.Data_Classification);
+        $(".metadata-license").text(metadata.License);
+
+        let creator = "";
+        for (let c in metadata.Creator){
+            creator += creator.concat(metadata.Creator[c].Name, ', ', metadata.Creator[c].Affiliation.toString());
+            if (metadata.Creator.length > 1)
+                creator += '; ';
+        }
+        $('.metadata-creator').text(creator);
+
+        let contributor = "";
+        for (let i in metadata.Contributor) {
+            contributor = contributor.concat(metadata.Contributor[i].Name, ', ', metadata.Contributor[i].Affiliation.toString());
+            if (metadata.Contributor.length > 1)
+                contributor += ';';
+        }
+        $('.metadata-contributor').text(contributor);
+
+        // Extra metadata
+        $(".metadata-data-access-restriction").text(metadata.Data_Access_Restriction);
+        $(".metadata-covered-geolocation-place").text(metadata.Covered_Geolocation_Place.toString());
+        $(".metadata-retention-period").text(metadata.Retention_Period);
+
+    });
+
+}
+
+

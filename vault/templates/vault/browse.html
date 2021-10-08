@@ -3,22 +3,22 @@
 {% block title %}{{ super() }} &dash; Vault{% endblock title %}
 
 {% block style %}
-    <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/vault.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/vault.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
 {% endblock style %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
-    <script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
-    <script src="{{ url_for('vault_bp.static', filename='js/search.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
+<script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
+<script src="{{ url_for('vault_bp.static', filename='js/search.js') }}"></script>
 
-    <script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
-    <script type="text/javascript">
+<script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
+<script type="text/javascript">
         var browsePageItems = {{ items }};
         var browseStartDir = {{ dir | tojson }};
         var browseDlgPageItems = {{ items }};
         var view = 'browse';
-    </script>
+</script>
 {% endblock scripts %}
 
 {% block content %}
@@ -81,7 +81,7 @@
                     </div>
                 </div>
                 <div class="row">
-                   <div class="col-sm-12">
+                    <div class="col-sm-12">
                         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button class='btn btn-primary ms-2 action-confirm-submit-for-publication'>Confirm agreement</button>
                     </div>
@@ -102,7 +102,7 @@
                         <option value="" disabled selected>Select a file format list</option>
                     </select>
                 </div>
-                <p class="help"></p><br />
+                <p class="help"></p><br/>
                 <p class="advice"></p>
                 <p class="checking">Checking files <i class="fa fa-spinner fa-spin fa-fw"></i></p>
                 <p class="preservable">
@@ -162,6 +162,45 @@
     </div>
 </div>
 
+<div id="metadata-info" class="alert alert-info hide">
+
+    <table class="table table-borderless metadata-table">
+        <tr>
+            <th colspan="2"><h2 class="metadata-title"></h2></th>
+        </tr>
+        <tr>
+            <th>Creator</th>
+            <td class="metadata-creator"></td>
+        </tr>
+        <tr>
+            <th>Contributor</th>
+            <td class="metadata-contributor"></td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td class="metadata-description"></td>
+        </tr>
+        <tr>
+            <th>Language</th>
+            <td class="metadata-language"></td>
+        </tr>
+        <tr>
+            <th>Tags</th>
+            <td class="metadata-tags"></td>
+        </tr>
+        <tr>
+            <th>License</th>
+            <td class="metadata-license"></td>
+        </tr>
+        <tr>
+            <th>Version</th>
+            <td class="metadata-version"></td>
+        </tr>
+
+    </table>
+
+</div>
+
 {% autoescape false %}
 {{ searchHtml }}
 {% endautoescape %}
@@ -174,7 +213,8 @@
     </nav>
 
     <div class="top-information">
-         <div class="row">
+
+        <div class="row">
             <div class="col-md-9">
                 <h2 class="pt-3"></h2>
             </div>
@@ -186,9 +226,7 @@
                         </div>
                         <div class="btn-group">
                             <div class="dropdown">
-                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="actionMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Actions
-                                </button>
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="actionMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button>
                                 <div class="dropdown-menu action-list" role="menu"></div>
                             </div>
                         </div>
@@ -211,12 +249,12 @@
         <div class="row d-block">
             <table id="file-browser" class="table yoda-table table-striped">
                 <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Size</th>
-                        <th>Modified date</th>
-                        <th></th>
-                    </tr>
+                <tr>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Modified date</th>
+                    <th></th>
+                </tr>
                 </thead>
             </table>
         </div>
