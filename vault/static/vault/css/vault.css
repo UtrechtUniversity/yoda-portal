@@ -1,4 +1,16 @@
 
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 400;
+  src: local("Merriweather"), local("Merriweather-Regular"), url(/static/font/Merriweather/Merriweather-Regular.woff) format("woff"); }
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 700;
+  src: local("Merriweather Bold"), local("Merriweather-Bold"), url(/static/font/open-sans/Merriweather-Bold.woff) format("woff"); }
+}
+
 .tab-content {
     margin-top:10px;
 }
@@ -141,6 +153,46 @@ table.dataTable > tbody > tr > td i {
 
 .metadata-info {
     padding: 10px 10px 0px 10px;
+}
+.metadata-info * {
+    font-family: 14/21px 'Open Sans', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    color: #212529;
+}
+.metadata-info .metadata-creator {
+    font: 21px/32px 'Open Sans', Arial;
+    margin: 15px 0 10px 0;
+}
+.metadata-info .metadata-title {
+    font: 32/38px 'Merriweather', 'Open Sans', Arial;
+    margin: 10px 0;
+    text-align:justify;
+}
+.metadata-info .dates-row {
+    margin: 10px 0;
+    font-style: italic;
+}
+.dates-row label {
+    margin-right: 5px;
+}
+.dates-row span {
+    font: 14/21px 'Merriweather', sans-serif;
+}
+
+.metadata-info .metadata-description {
+    font: 16px/24px 'Open Sans', sans-serif;
+    font-weight: 200;
+    margin: 10px 0;
+}
+
+.metadata-info tag {
+    background: #f2f2f2;
+    padding: 5px 10px;
+    margin: 7px 7px 0 0;
+    font: 16px/24px 'Open Sans', sans-serif;
+    color: #333333;
+    display: inline-block;
 }
 
 
