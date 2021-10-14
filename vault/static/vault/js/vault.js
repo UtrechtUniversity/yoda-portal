@@ -778,26 +778,29 @@ function vaultAccess(action, folder)
 function metadataInfo(){
     /* Loads metadata of the vault packages */
 
-    // Metadata info niet laden op overzichtspagina
-    //todo ook afvangen https://portal.yoda.test/vault/?dir=%2Fvault-default-1
-    let vault_overzicht = [
-        'https://portal.yoda.test/vault/',
-        'https://portal.yoda.test/vault/browse',
-    ];
-    for (let i in vault_overzicht){
-        if(window.location == vault_overzicht[i]){
-            console.info("Vault overzicht, toon geen vault metadata");
-            return;
-        }
-    }
+    console.info('vault pad:' + Yoda.basePath+currentFolder);
+
+    // TODO Metadata info niet laden op overzichtspagina's (/vault/ en /vault/browse)
+    // Goede: https://portal.yoda.test/vault/browse?dir=/vault-default-1/research-default-1[1634050841]
+    // Afvangen: https://portal.yoda.test/vault/?dir=%2Fvault-default-1
+//    let url = window.location.href;
+//    if(url.indexOf('/vault/' > 0 && url.indexOf('/vault/browse') > 0)){
+//        console.info("Vault overzicht; toon geen vault metadata");
+//        return;
+//    }
+
+// Test:
+//        Yoda.call('meta_form_load',
+//            {coll: Yoda.basePath+currentFolder},
+//            {rawResult: true})
+//        .then((result) => {
+//            console.info(result);
+//        });
+
+
    try {
 
-    //    Yoda.call('meta_form_load',
-    //        {coll: "vault/browse?dir=/research-default-0/"},
-    //        {rawResult: true})
-    //    .then((result) => {
-    //        console.log(result);
-    //    });
+        console.info("API call: " + Yoda.basePath+currentFolder);
 
         Yoda.call('meta_form_load',
             {coll: Yoda.basePath+currentFolder},
@@ -816,24 +819,20 @@ function metadataInfo(){
             console.info(metadata)
 
             $(".metadata-title").text(metadata.Title);
-            $(".top-information .folder-name").text(metadata.Title);
-            $(".metadata-license").text(metadata.License);
             $(".metadata-access").text(metadata.Data_Access_Restriction);
+            $(".metadata-data-classification").text(metadata.Data_Classification);
+            $(".metadata-license").text(metadata.License);
 
             if (metadata.Description){
-                $(".metadata-description").text(metadata.Description);
-                $readMoreJS.init({
-                   target: '.metadata-description',
-                   numOfWords: 50,               // Number of words to initially display (any number). Default: 50
-                   toggle: true,
-                   moreLink: 'read more ...',
-                   lessLink: 'read less'
-                });
-            }
-
-            if(metadata.Collected){
-                $(".metadata-start-date").text(metadata.Collected.Start_Date);
-                $(".metadata-end-date").text(metadata.Collected.End_Date);
+                let description = metadata.Description;
+                $(".metadata-description").text(truncate(description, 30));
+                $('.read-more-button').on('click', function(){
+                    $(".metadata-description").text(description);
+                    $('.read-more-button').hide();
+                    return false;
+                })
+//                $(".metadata-description-short").text(description.substring(0,300));
+//                $(".metadata-description-more").text(description.substring(300,description.length));
             }
 
             let creators = [];
@@ -847,24 +846,21 @@ function metadataInfo(){
             }
             $('.metadata-creator').text(creators.join(', '));
 
+             setTimeout(function(){
+                $(".folder-name").text(truncate(metadata.Description, 10));
+             }, 1000);
+
 //            Extra metadata
 //            $(".metadata-language").text(metadata.Language);
-//            $(".metadata-license").text(metadata.License);
 //            $(".metadata-tags").text(metadata.Tag.toString());
 //            $(".metadata-version").text(metadata.Version);
-//            $(".metadata-data-classification").text(metadata.Data_Classification);
-
-//            let contributor = "";
-//            for (let i in metadata.Contributor) {
-//                contributor = contributor.concat(metadata.Contributor[i].Name, ', ', metadata.Contributor[i].Affiliation.toString());
-//                if (metadata.Contributor.length > 1)
-//                    contributor += ';';
-//            }
-//            $('.metadata-contributor').text(contributor);
-
 //            $(".metadata-data-access-restriction").text(metadata.Data_Access_Restriction);
 //            $(".metadata-covered-geolocation-place").text(metadata.Covered_Geolocation_Place.toString());
 //            $(".metadata-retention-period").text(metadata.Retention_Period);
+//            if(metadata.Collected){
+//                $(".metadata-start-date").text(metadata.Collected.Start_Date);
+//                $(".metadata-end-date").text(metadata.Collected.End_Date);
+//            }
 
         });
     }
@@ -874,5 +870,9 @@ function metadataInfo(){
 
 }
 
+function truncate(str, nr_words) {
+    // Truncate string on n number of words
+    return str.split(" ").splice(0,nr_words).join(" ");
+}
 
 

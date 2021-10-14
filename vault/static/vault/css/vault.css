@@ -1,16 +1,4 @@
 
-@font-face {
-  font-family: 'Merriweather';
-  font-style: normal;
-  font-weight: 400;
-  src: local("Merriweather"), local("Merriweather-Regular"), url(/static/font/Merriweather/Merriweather-Regular.woff) format("woff"); }
-@font-face {
-  font-family: 'Merriweather';
-  font-style: normal;
-  font-weight: 700;
-  src: local("Merriweather Bold"), local("Merriweather-Bold"), url(/static/font/open-sans/Merriweather-Bold.woff) format("woff"); }
-}
-
 .tab-content {
     margin-top:10px;
 }
@@ -69,8 +57,19 @@ ol.breadcrumb li.active {
     margin-top: 2px;
 }
 
-.top-information h1 #statusBadge {
+#statusBadge {
     margin-left: 20px;
+}
+
+.lock-icon {
+    font-size: 30px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.system-metadata-icon:hover,
+.actionlog-icon:hover {
+    cursor: pointer;
 }
 
 .hide {
@@ -92,12 +91,6 @@ ol.breadcrumb li.active {
 #messages {
     margin-left: -15px;
     margin-right: -15px;
-}
-
-.lock-icon {
-    font-size: 30px;
-    margin-left: 10px;
-    cursor: pointer;
 }
 
 #file-browser_length, #search_length {
@@ -154,45 +147,29 @@ table.dataTable > tbody > tr > td i {
 .metadata-info {
     padding: 10px 10px 0px 10px;
 }
-.metadata-info * {
-    font-family: 14/21px 'Open Sans', sans-serif;
-    font-weight: 400;
-    font-style: normal;
-    color: #212529;
-}
 .metadata-info .metadata-creator {
     font: 21px/32px 'Open Sans', Arial;
     margin: 15px 0 10px 0;
 }
-.metadata-info .metadata-title {
-    font: 32/38px 'Merriweather', 'Open Sans', Arial;
-    margin: 10px 0;
-    text-align:justify;
+.metadata-title {
+    font: 26px/34px 'Open Sans', Arial;
+    margin: 0;
 }
-.metadata-info .dates-row {
+
+.metadata-info .subtitle-row {
     margin: 10px 0;
     font-style: italic;
 }
-.dates-row label {
-    margin-right: 5px;
-}
-.dates-row span {
-    font: 14/21px 'Merriweather', sans-serif;
+.metadata-info .subtitle-row label {
+    margin-right:5px;
 }
 
 .metadata-info .metadata-description {
-    font: 16px/24px 'Open Sans', sans-serif;
+    font: 16px/24px 'Open Sans', sans-serif !important;
     font-weight: 200;
     margin: 10px 0;
 }
 
-.metadata-info tag {
-    background: #f2f2f2;
-    padding: 5px 10px;
-    margin: 7px 7px 0 0;
-    font: 16px/24px 'Open Sans', sans-serif;
-    color: #333333;
-    display: inline-block;
+.read-more-button {
+    text-decoration:underline;
 }
-
-

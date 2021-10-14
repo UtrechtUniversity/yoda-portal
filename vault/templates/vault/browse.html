@@ -12,7 +12,6 @@
 <script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/search.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
-<script src="{{ url_for('static', filename='lib/read-more/readMoreJS.min.js') }}"></script>
 <script type="text/javascript">
         var browsePageItems = {{ items }};
         var browseStartDir = {{ dir | tojson }};
@@ -163,19 +162,6 @@
     </div>
 </div>
 
-<section class="metadata-info mb-4 hide">
-
-    <h2 class="row metadata-title"></h2>
-    <h4 class="row metadata-creator"></h4>
-    <div class="row dates-row">
-        <div class="col-md-4 text-start ps-0"><label>Accessibility: </label><span class="metadata-access"></span></div>
-        <div class="col-md-4 text-center"><label>Start date: </label><span class="metadata-start-date"></span></div>
-        <div class="col-md-4 text-end"><label>End date: </label><span class="metadata-end-date"></span></div>
-    </div>
-    <div class="metadata-description">
-    </div>
-</section>
-
 {% autoescape false %}
 {{ searchHtml }}
 {% endautoescape %}
@@ -187,11 +173,24 @@
         </ol>
     </nav>
 
+    <section class="metadata-info hide">
+        <h2 class="row metadata-title"></h2>
+        <h4 class="row metadata-creator"></h4>
+        <div class="row subtitle-row">
+            <div class="col-md-6 text-end"><label>Data classification: </label><span class="metadata-data-classification"></span></div>
+            <div class="col-md-6 text-start ps-0"><label>Accessibility: </label><span class="metadata-access"></span></div>
+        </div>
+        <div class="metadata-description">
+<!--            <div class="metadata-description-more collapse" id="collapse-readmore"></div>-->
+        </div>
+        <button class="btn read-more-button" role="button">Read more...</button>
+    </section>
+
     <div class="top-information">
 
         <div class="row">
             <div class="col-md-9">
-                <h2 class="pt-3"></h2>
+                <h2 class="pt-3 folder-row"></h2>
             </div>
             <div class="col-md-3">
                 <div class="top-info-buttons">
