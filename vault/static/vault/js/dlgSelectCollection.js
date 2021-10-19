@@ -186,7 +186,7 @@ let getFolderContents2 = (() => {
     let cacheSortOrder = null;  // Cached sort order.
     let i = 0;                  // Keep simultaneous requests from interfering.
 
-    console.log('IN getFOlderOCNtents2');
+    console.log('IN getFolderContents2');
 
     let get = async (args) => {
         // Check if we can use the cache.
