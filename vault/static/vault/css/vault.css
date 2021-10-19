@@ -52,10 +52,6 @@ ol.breadcrumb li.active {
     margin-top: 2px;
 }
 
-#statusBadge {
-    margin-left: 20px;
-}
-
 .lock-icon {
     font-size: 30px;
     margin-left: 10px;
@@ -138,8 +134,22 @@ table.dataTable > tbody > tr > td i {
 .yoda-table tr.odd {
     background-color: transparent !important;
 }
+.metadata-creator {
+    margin: 10px 0;
+}
 
+#statusBadge {
+    vertical-align:middle;
+}
+.metadata-info .subtitle-row {
+    margin: 10px 0;
+    font-style: italic;
+}
+.metadata-info .subtitle-row label {
+    margin-right:5px;
+}
 .read-more-button {
     text-decoration:underline;
-    padding-left:7px;
+    color: darkgrey;
+    padding-left:3px;
 }
