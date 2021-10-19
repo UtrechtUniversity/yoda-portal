@@ -11,6 +11,7 @@ $(document).ajaxSend(function(e, request, settings) {
 
 let preservableFormatsLists = null;
 let currentFolder;
+let show_metadata;
 
 $(function() {
     // Extract current location from query string (default to '').
@@ -220,10 +221,12 @@ function changeBrowserUrl(path)
 
 function browse(dir = '', changeHistory = false)
 {
+    console.info('Browse:' + Yoda.basePath+currentFolder);
     currentFolder = dir;
     makeBreadcrumb(dir);
     if (changeHistory)
         changeBrowserUrl(dir);
+    metadataInfo();
     topInformation(dir, true); //only here topInformation should show its alertMessage
     buildFileBrowser(dir);
 }
@@ -629,8 +632,13 @@ function topInformation(dir, showAlert) {
             // Reset action dropdown.
             $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
 
-            var icon = '<i class="fa fa-folder-open-o" aria-hidden="true"></i>';
-            $('.top-information h2').html(`<span class="icon">${icon}</span> <span class="folder-name">${folderName}</span>${systemMetadataIcon}${actionLogIcon}${statusBadge}`);
+            // Folder name
+            if(show_metadata) {
+                $('.status-badge').html(`${statusBadge}</span>`);
+                $('.top-information h2').html(`<span>${systemMetadataIcon}${actionLogIcon}</span>`);
+            } else {
+                $('.top-information h2').html(`<i class="fa fa-folder-open-o"></i> <span class="folder-name">${folderName}</span>${systemMetadataIcon}${actionLogIcon}${statusBadge}`);
+            }
 
             // Show top information and buttons.
             if (typeof vaultStatus != 'undefined') {
@@ -778,25 +786,15 @@ function vaultAccess(action, folder)
 function metadataInfo(){
     /* Loads metadata of the vault packages */
 
-    console.info('vault pad:' + Yoda.basePath+currentFolder);
+    // Metadata info tonen alleen in diepe folders (min 2 levels); niet laden op overzichtspagina's (/vault/ en /vault/browse)
+    // Goed: https://portal.yoda.test/vault/browse?dir=/vault-default-1/research-default-1[1634050841]
+    // Niet: https://portal.yoda.test/vault/?dir=%2Fvault-default-1
+    let pathParts = currentFolder.split('/');
+    if (pathParts[0] == '/' || pathParts[0] == '' )
+        pathParts = pathParts.splice(1,pathParts.length);
 
-    // TODO Metadata info niet laden op overzichtspagina's (/vault/ en /vault/browse)
-    // Goede: https://portal.yoda.test/vault/browse?dir=/vault-default-1/research-default-1[1634050841]
-    // Afvangen: https://portal.yoda.test/vault/?dir=%2Fvault-default-1
-//    let url = window.location.href;
-//    if(url.indexOf('/vault/' > 0 && url.indexOf('/vault/browse') > 0)){
-//        console.info("Vault overzicht; toon geen vault metadata");
-//        return;
-//    }
-
-// Test:
-//        Yoda.call('meta_form_load',
-//            {coll: Yoda.basePath+currentFolder},
-//            {rawResult: true})
-//        .then((result) => {
-//            console.info(result);
-//        });
-
+    if (pathParts.length <= 1)
+        return
 
    try {
 
@@ -809,11 +807,11 @@ function metadataInfo(){
 
             if (!result || jQuery.isEmptyObject(result.data))
                 return console.info('No result data from meta_form_load');
-            else
-                $('.metadata-info').show();
 
             let metadata = result.data.metadata;
             window.m = metadata; //for live availability in console
+            show_metadata = true;
+            $('.metadata-info').show();
 
             console.info('Metadata info from API: ' + result.status);
             console.info(metadata)
@@ -825,14 +823,12 @@ function metadataInfo(){
 
             if (metadata.Description){
                 let description = metadata.Description;
-                $(".metadata-description").text(truncate(description, 30));
+                $(".metadata-description").text(truncate(description, 50));
                 $('.read-more-button').on('click', function(){
                     $(".metadata-description").text(description);
                     $('.read-more-button').hide();
                     return false;
                 })
-//                $(".metadata-description-short").text(description.substring(0,300));
-//                $(".metadata-description-more").text(description.substring(300,description.length));
             }
 
             let creators = [];
@@ -846,21 +842,18 @@ function metadataInfo(){
             }
             $('.metadata-creator').text(creators.join(', '));
 
-             setTimeout(function(){
-                $(".folder-name").text(truncate(metadata.Description, 10));
-             }, 1000);
-
-//            Extra metadata
-//            $(".metadata-language").text(metadata.Language);
-//            $(".metadata-tags").text(metadata.Tag.toString());
-//            $(".metadata-version").text(metadata.Version);
-//            $(".metadata-data-access-restriction").text(metadata.Data_Access_Restriction);
-//            $(".metadata-covered-geolocation-place").text(metadata.Covered_Geolocation_Place.toString());
-//            $(".metadata-retention-period").text(metadata.Retention_Period);
-//            if(metadata.Collected){
-//                $(".metadata-start-date").text(metadata.Collected.Start_Date);
-//                $(".metadata-end-date").text(metadata.Collected.End_Date);
-//            }
+            /* Extra metadata
+            $(".metadata-language").text(metadata.Language);
+            $(".metadata-tags").text(metadata.Tag.toString());
+            $(".metadata-version").text(metadata.Version);
+            $(".metadata-data-access-restriction").text(metadata.Data_Access_Restriction);
+            $(".metadata-covered-geolocation-place").text(metadata.Covered_Geolocation_Place.toString());
+            $(".metadata-retention-period").text(metadata.Retention_Period);
+            if(metadata.Collected){
+                $(".metadata-start-date").text(metadata.Collected.Start_Date);
+                $(".metadata-end-date").text(metadata.Collected.End_Date);
+            }
+            */
 
         });
     }
@@ -874,5 +867,3 @@ function truncate(str, nr_words) {
     // Truncate string on n number of words
     return str.split(" ").splice(0,nr_words).join(" ");
 }
-
-
