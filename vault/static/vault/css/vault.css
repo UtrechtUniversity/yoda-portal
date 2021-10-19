@@ -27,11 +27,6 @@ ol.breadcrumb li.active {
     display: none;
 }
 
-.top-info-buttons {
-    padding-top: 20px;
-    text-align: right;
-}
-
 .top-info-buttons .research,
 .top-info-buttons .vault
 {
