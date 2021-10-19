@@ -21,8 +21,6 @@ $(function() {
     // Canonicalize path somewhat, for convenience.
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
 
-    metadataInfo();
-
     if ($('#file-browser').length) {
         startBrowsing(browsePageItems);
     }
@@ -226,7 +224,7 @@ function browse(dir = '', changeHistory = false)
     makeBreadcrumb(dir);
     if (changeHistory)
         changeBrowserUrl(dir);
-    metadataInfo();
+    metadataInfo(dir);
     topInformation(dir, true); //only here topInformation should show its alertMessage
     buildFileBrowser(dir);
 }
@@ -632,12 +630,8 @@ function topInformation(dir, showAlert) {
             // Reset action dropdown.
             $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
 
-            // Folder name
-            if(show_metadata) {
-                $('.top-information h2').html(`${statusBadge}${systemMetadataIcon}${actionLogIcon}`);
-            } else {
-                $('.top-information h2').html(`<i class="fa fa-folder-open-o"></i> <span class="folder-name">${folderName}</span>${systemMetadataIcon}${actionLogIcon}${statusBadge}`);
-            }
+            // Folder buttons
+            $('.top-information h2').html(`${statusBadge}${systemMetadataIcon}${actionLogIcon}`);
 
             // Show top information and buttons.
             if (typeof vaultStatus != 'undefined') {
@@ -782,25 +776,24 @@ function vaultAccess(action, folder)
     }, "json");
 }
 
-function metadataInfo(){
+function metadataInfo(dir) {
     /* Loads metadata of the vault packages */
+    let pathParts = dir.split('/');
 
-    // Metadata info tonen alleen in diepe folders (min 2 levels); niet laden op overzichtspagina's (/vault/ en /vault/browse)
-    // Goed: https://portal.yoda.test/vault/browse?dir=/vault-default-1/research-default-1[1634050841]
-    // Niet: https://portal.yoda.test/vault/?dir=%2Fvault-default-1
-    let pathParts = currentFolder.split('/');
-    if (pathParts[0] == '/' || pathParts[0] == '' )
-        pathParts = pathParts.splice(1,pathParts.length);
+    // Do not show metadata outside data package.
+    if (pathParts.length < 3) {
+        $('.metadata-info').hide();
+        return;
+    } else {
+        pathParts.length = 3;
+        dir = pathParts.join("/");
+    }
 
-    if (pathParts.length <= 1)
-        return
-
-   try {
+    try {
         Yoda.call('meta_form_load',
-            {coll: Yoda.basePath+currentFolder},
+            {coll: Yoda.basePath + dir},
             {rawResult: true})
         .then((result) => {
-
             if (!result || jQuery.isEmptyObject(result.data))
                 return console.info('No result data from meta_form_load');
 
