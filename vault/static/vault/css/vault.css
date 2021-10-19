@@ -59,6 +59,8 @@ ol.breadcrumb li.active {
 
 #statusBadge {
     margin-left: 20px;
+    font-size: 12px;
+    font-style: normal;
 }
 
 .lock-icon {
@@ -145,7 +147,7 @@ table.dataTable > tbody > tr > td i {
 }
 
 .metadata-info {
-    padding: 10px 10px 0px 10px;
+    padding: 20px 16px;
 }
 .metadata-info .metadata-creator {
     font: 21px/32px 'Open Sans', Arial;
@@ -172,4 +174,5 @@ table.dataTable > tbody > tr > td i {
 
 .read-more-button {
     text-decoration:underline;
+    padding-left:7px;
 }
