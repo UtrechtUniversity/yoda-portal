@@ -634,8 +634,7 @@ function topInformation(dir, showAlert) {
 
             // Folder name
             if(show_metadata) {
-                $('.status-badge').html(`${statusBadge}</span>`);
-                $('.top-information h2').html(`<span>${systemMetadataIcon}${actionLogIcon}</span>`);
+                $('.top-information h2').html(`${statusBadge}${systemMetadataIcon}${actionLogIcon}`);
             } else {
                 $('.top-information h2').html(`<i class="fa fa-folder-open-o"></i> <span class="folder-name">${folderName}</span>${systemMetadataIcon}${actionLogIcon}${statusBadge}`);
             }
@@ -797,9 +796,6 @@ function metadataInfo(){
         return
 
    try {
-
-        console.info("API call: " + Yoda.basePath+currentFolder);
-
         Yoda.call('meta_form_load',
             {coll: Yoda.basePath+currentFolder},
             {rawResult: true})
@@ -809,13 +805,8 @@ function metadataInfo(){
                 return console.info('No result data from meta_form_load');
 
             let metadata = result.data.metadata;
-            window.m = metadata; //for live availability in console
             show_metadata = true;
             $('.metadata-info').show();
-
-            console.info('Metadata info from API: ' + result.status);
-            console.info(metadata)
-
             $(".metadata-title").text(metadata.Title);
             $(".metadata-access").text(metadata.Data_Access_Restriction);
             $(".metadata-data-classification").text(metadata.Data_Classification);
@@ -841,20 +832,6 @@ function metadataInfo(){
                 creators.push(fullname);
             }
             $('.metadata-creator').text(creators.join(', '));
-
-            /* Extra metadata
-            $(".metadata-language").text(metadata.Language);
-            $(".metadata-tags").text(metadata.Tag.toString());
-            $(".metadata-version").text(metadata.Version);
-            $(".metadata-data-access-restriction").text(metadata.Data_Access_Restriction);
-            $(".metadata-covered-geolocation-place").text(metadata.Covered_Geolocation_Place.toString());
-            $(".metadata-retention-period").text(metadata.Retention_Period);
-            if(metadata.Collected){
-                $(".metadata-start-date").text(metadata.Collected.Start_Date);
-                $(".metadata-end-date").text(metadata.Collected.End_Date);
-            }
-            */
-
         });
     }
     catch (error) {
