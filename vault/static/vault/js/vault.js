@@ -808,10 +808,16 @@ function metadataInfo(dir) {
             if (metadata.Description){
                 let description = metadata.Description;
                 $(".metadata-description").text(truncate(description, 50));
+                $('.read-more-button').show();
                 $('.read-more-button').on('click', function(){
                     $(".metadata-description").text(description);
                     $('.read-more-button').hide();
-                    return false;
+                    $('.read-less-button').show();
+                })
+                $('.read-less-button').on('click', function(){
+                    $(".metadata-description").text(truncate(description, 50));
+                    $('.read-more-button').show();
+                    $('.read-less-button').hide();
                 })
             }
 

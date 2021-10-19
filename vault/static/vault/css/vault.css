@@ -148,8 +148,9 @@ table.dataTable > tbody > tr > td i {
 .metadata-info .subtitle-row label {
     margin-right:5px;
 }
+.read-less-button,
 .read-more-button {
     text-decoration:underline;
-    color: darkgrey;
+    color: #444;
     padding-left:3px;
 }
