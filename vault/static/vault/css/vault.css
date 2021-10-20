@@ -23,16 +23,6 @@ ol.breadcrumb li.active {
     display: none;
 }
 
-.top-information {
-    display: none;
-}
-
-.top-info-buttons .research,
-.top-info-buttons .vault
-{
-    display: none;
-}
-
 .action-list li {
     cursor: pointer;
 }
@@ -42,14 +32,6 @@ ol.breadcrumb li.active {
 }
 .panel-footer  .input-group-sm {
     margin: -6px; /* btn in panel footer */
-}
-
-.top-information h1 .icon .fa-stack {
-    font-size:22px;
-}
-
-.top-information h1 .icon .fa-stack .fa-shield.fa-stack-1x {
-    margin-top: 2px;
 }
 
 .lock-icon {
@@ -63,7 +45,7 @@ ol.breadcrumb li.active {
     cursor: pointer;
 }
 
-.hide {
+.hide, .hidden {
     display: none;
 }
 
@@ -134,19 +116,9 @@ table.dataTable > tbody > tr > td i {
 .yoda-table tr.odd {
     background-color: transparent !important;
 }
-.metadata-creator {
-    margin: 10px 0;
-}
 
 #statusBadge {
     vertical-align:middle;
-}
-.metadata-info .subtitle-row {
-    margin: 10px 0;
-    font-style: italic;
-}
-.metadata-info .subtitle-row label {
-    margin-right:5px;
 }
 .read-less-button,
 .read-more-button {
