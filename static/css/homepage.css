@@ -19,6 +19,7 @@
     overflow: hidden;
 }
 
+#general-tile,
 #deposit-tile,
 #search-tile {
     padding: 15px 30px;
