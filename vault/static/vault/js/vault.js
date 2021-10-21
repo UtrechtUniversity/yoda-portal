@@ -11,7 +11,6 @@ $(document).ajaxSend(function(e, request, settings) {
 
 let preservableFormatsLists = null;
 let currentFolder;
-let show_metadata;
 
 $(function() {
     // Extract current location from query string (default to '').
@@ -795,7 +794,6 @@ function metadataInfo(dir) {
                 return console.info('No result data from meta_form_load');
 
             let metadata = result.data.metadata;
-            show_metadata = true;
             $('.metadata-info').show();
             $(".metadata-title span").text(metadata.Title);
             $(".metadata-access").text(metadata.Data_Access_Restriction);
