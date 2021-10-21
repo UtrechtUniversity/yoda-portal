@@ -23,21 +23,6 @@ ol.breadcrumb li.active {
     display: none;
 }
 
-.top-information {
-    display: none;
-}
-
-.top-info-buttons {
-    padding-top: 20px;
-    text-align: right;
-}
-
-.top-info-buttons .research,
-.top-info-buttons .vault
-{
-    display: none;
-}
-
 .action-list li {
     cursor: pointer;
 }
@@ -49,19 +34,18 @@ ol.breadcrumb li.active {
     margin: -6px; /* btn in panel footer */
 }
 
-.top-information h1 .icon .fa-stack {
-    font-size:22px;
+.lock-icon {
+    font-size: 30px;
+    margin-left: 10px;
+    cursor: pointer;
 }
 
-.top-information h1 .icon .fa-stack .fa-shield.fa-stack-1x {
-    margin-top: 2px;
+.system-metadata-icon:hover,
+.actionlog-icon:hover {
+    cursor: pointer;
 }
 
-.top-information h1 #statusBadge {
-    margin-left: 20px;
-}
-
-.hide {
+.hide, .hidden {
     display: none;
 }
 
@@ -82,30 +66,18 @@ ol.breadcrumb li.active {
     margin-right: -15px;
 }
 
-.lock-icon {
-    font-size: 30px;
-    margin-left: 10px;
-    cursor: pointer;
-}
-
 #file-browser_length, #search_length {
     float: left;
     padding-top: 2px;
 }
 
 #file-browser tr > :nth-child(1) {
-    min-width: 40%;
+    padding-left: 10px;
 }
-
 #file-browser tr > :nth-child(2) {
-    max-width: 30px;
     text-align: right;
 }
-#file-browser tr > :nth-child(3) {
-    max-width: 40px;
-}
 #file-browser tr > :nth-child(4) {
-    max-width: 10px;
     text-align: right;
 }
 
@@ -143,4 +115,14 @@ table.dataTable > tbody > tr > td i {
 
 .yoda-table tr.odd {
     background-color: transparent !important;
+}
+
+#statusBadge {
+    vertical-align:middle;
+}
+.read-less-button,
+.read-more-button {
+    text-decoration:underline;
+    color: #444;
+    padding-left:3px;
 }
