@@ -219,7 +219,6 @@ function changeBrowserUrl(path)
 
 function browse(dir = '', changeHistory = false)
 {
-    //console.info('Browse:' + Yoda.basePath+currentFolder);
     currentFolder = dir;
     makeBreadcrumb(dir);
     if (changeHistory)
