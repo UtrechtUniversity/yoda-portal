@@ -399,14 +399,16 @@ function makeBreadcrumb(dir)
 
     let html = '';
     for (let [i, [text, path]] of crumbs.entries()) {
-        let el = $('<li class="breadcrumb-item">');
-        text = htmlEncode(text).replace(/ /g, '&nbsp;');
-        if (i === crumbs.length-1)
-             el.addClass('active').html(text);
-        else el.html(`<a class="browse" data-path="${htmlEncode(path)}"
-                         href="?dir=${encodeURIComponent(path)}">${text}</a>`);
-
-        html += el[0].outerHTML;
+        // Start at level 2, skip 'Home/deposit-pilot/deposit-pilot[]/' breadcrumbs
+        if (i > 2) {
+            let el = $('<li class="breadcrumb-item">');
+            text = htmlEncode(text).replace(/ /g, '&nbsp;');
+            if (i === crumbs.length-1)
+                 el.addClass('active').html(text);
+            else el.html(`<a class="browse" data-path="${htmlEncode(path)}"
+                             href="?dir=${encodeURIComponent(path)}">${text}</a>`);
+            html += el[0].outerHTML;
+        }
     }
 
     $('nav ol.breadcrumb').html(html);
