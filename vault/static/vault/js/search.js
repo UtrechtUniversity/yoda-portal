@@ -5,8 +5,6 @@ let currentSearchType;
 let currentSearchItems;
 
 $(document).ready(function() {
-    console.log(view);
-    console.log(searchType);
     if ($('#file-browser').length && (view == 'browse' && searchType != 'revision')) {
         // Rememeber search results
         if (searchStatusValue.length > 0) {

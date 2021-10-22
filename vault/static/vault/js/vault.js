@@ -20,7 +20,6 @@ $(function() {
     // Canonicalize path somewhat, for convenience.
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
 
-
     if ($('#file-browser').length) {
         startBrowsing(browsePageItems);
     }
@@ -223,6 +222,7 @@ function browse(dir = '', changeHistory = false)
     makeBreadcrumb(dir);
     if (changeHistory)
         changeBrowserUrl(dir);
+    metadataInfo(dir);
     topInformation(dir, true); //only here topInformation should show its alertMessage
     buildFileBrowser(dir);
 }
@@ -597,11 +597,9 @@ function topInformation(dir, showAlert) {
             }
 
             // Provenance action log
-            $('.actionlog').hide();
             let actionLogIcon = ` <i class="fa fa-book actionlog-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
 
             // System metadata.
-            $('.system-metadata').hide();
             let systemMetadataIcon = ` <i class="fa fa-info-circle system-metadata-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
 
             $('.btn-group button.folder-status').attr('data-write', hasWriteRights);
@@ -628,8 +626,8 @@ function topInformation(dir, showAlert) {
             // Reset action dropdown.
             $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
 
-            var icon = '<i class="fa fa-folder-open-o" aria-hidden="true"></i>';
-            $('.top-information h2').html(`<span class="icon">${icon}</span> ${folderName}${systemMetadataIcon}${actionLogIcon}${statusBadge}`);
+            // Folder buttons
+            $('.top-information h2').html(`${statusBadge}${systemMetadataIcon}${actionLogIcon}`);
 
             // Show top information and buttons.
             if (typeof vaultStatus != 'undefined') {
@@ -772,4 +770,71 @@ function vaultAccess(action, folder)
 
         topInformation(folder, false);
     }, "json");
+}
+
+function metadataInfo(dir) {
+    /* Loads metadata of the vault packages */
+    let pathParts = dir.split('/');
+
+    // Do not show metadata outside data package.
+    if (pathParts.length < 3) {
+        $('.metadata-info').hide();
+        return;
+    } else {
+        pathParts.length = 3;
+        dir = pathParts.join("/");
+    }
+
+    try {
+        Yoda.call('meta_form_load',
+            {coll: Yoda.basePath + dir},
+            {rawResult: true})
+        .then((result) => {
+            if (!result || jQuery.isEmptyObject(result.data))
+                return console.info('No result data from meta_form_load');
+
+            let metadata = result.data.metadata;
+            $('.metadata-info').show();
+            $(".metadata-title span").text(metadata.Title);
+            $(".metadata-access").text(metadata.Data_Access_Restriction);
+            $(".metadata-data-classification").text(metadata.Data_Classification);
+            $(".metadata-license").text(metadata.License);
+
+            if (metadata.Description){
+                let description = metadata.Description;
+                $(".metadata-description").text(truncate(description, 50));
+                $('.read-more-button').show();
+                $('.read-more-button').on('click', function(){
+                    $(".metadata-description").text(description);
+                    $('.read-more-button').hide();
+                    $('.read-less-button').show();
+                })
+                $('.read-less-button').on('click', function(){
+                    $(".metadata-description").text(truncate(description, 50));
+                    $('.read-more-button').show();
+                    $('.read-less-button').hide();
+                })
+            }
+
+            let creators = [];
+            for (let c in metadata.Creator){
+                let fullname = "";
+                if(typeof metadata.Creator[c].Name == 'string')
+                    fullname = metadata.Creator[c].Name;
+                else if(typeof metadata.Creator[c].Name == 'object')
+                    fullname = "".concat(metadata.Creator[c].Name.Given_Name, " ", metadata.Creator[c].Name.Family_Name);
+                creators.push(fullname);
+            }
+            $('.metadata-creator').text(creators.join(', '));
+        });
+    }
+    catch (error) {
+        console.error(error);
+    }
+
+}
+
+function truncate(str, nr_words) {
+    // Truncate string on n number of words
+    return str.split(" ").splice(0,nr_words).join(" ");
 }

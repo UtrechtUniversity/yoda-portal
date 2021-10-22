@@ -34,15 +34,13 @@ def index():
     searchItemsPerPage = 10
 
     if 'research-search-term' in session or 'research-search-status-value' in session:
-        if 'research-search-term' in session:
-            searchTerm = session['research-search-term']
-        if 'research-search-status-value' in session:
-            searchStatusValue = session['research-search-status-value']
+        searchTerm = session.get('research-search-term', '')
+        searchStatusValue = session.get('research-search-status-value', '')
 
-        searchType = session['research-search-type']
-        searchStart = session['research-search-start']
-        searchOrderDir = session['research-search-order-dir']
-        searchOrderColumn = session['research-search-order-column']
+        searchType = session.get('research-search-type', '')
+        searchStart = session.get('research-search-start', '')
+        searchOrderDir = session.get('research-search-order-dir', '')
+        searchOrderColumn = session.get('research-search-order-column', '')
 
     showStatus = False
     showTerm = False

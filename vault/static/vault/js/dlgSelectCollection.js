@@ -4,9 +4,6 @@ dlgCurrentFolder = '';
 
 $( document ).ready(function() {
     $("body").on("click",".dlg-browse", function(e) {
-
-        console.log('Clicked ROW');
-        console.log($(this).attr('data-path'));
         dlgBrowse($(this).attr('data-path'));
 
         // Dismiss stale messages.
@@ -40,9 +37,6 @@ async function copyVaultPackageToDynamic(urlEncodedOrigin, urlEncodedTarget)
 {
     dlgSelectAlertHide();
 
-    // console.log('COPY FROM: ' + urlEncodedOrigin);
-    // console.log('COPY TO: ' + dlgCurrentFolder);
-
     if (typeof urlEncodedOrigin == 'undefined') {
         errorMessage = 'Please select a package from the vault';
         dlgSelectAlertShow(errorMessage);
@@ -64,11 +58,6 @@ async function copyVaultPackageToDynamic(urlEncodedOrigin, urlEncodedTarget)
         dlgSelectAlertShow('Target can not be vault folder. Please select again');
         return;
     }
-
-    // console.log('COPY FROM: ' + urlEncodedOrigin);
-    // console.log('COPY TO: ' + dlgCurrentFolder);
-    //
-    //window.location.href = '/research/?dir=' + dlgCurrentFolder;
 
     try {
         let result = await Yoda.call('vault_copy_to_research',
@@ -134,7 +123,6 @@ function dlgSelectAlertHide()
 
 function startBrowsing2(items)  // deze draait om currentFolder
 {
-    console.log("startBrowsing2");
     if (!folderSelectBrowser) {
         folderSelectBrowser = $('#folder-select-browser').DataTable({
             "bFilter": false,
@@ -186,8 +174,6 @@ let getFolderContents2 = (() => {
     let cacheSortOrder = null;  // Cached sort order.
     let i = 0;                  // Keep simultaneous requests from interfering.
 
-    console.log('IN getFOlderOCNtents2');
-
     let get = async (args) => {
         // Check if we can use the cache.
         if (cache.length
@@ -197,14 +183,11 @@ let getFolderContents2 = (() => {
             && args.start               >= cacheStart
             && args.start + args.length <= cacheStart + batchSize) {
 
-            console.log('TAKE FROM CACHE');
-
             return cache.slice(args.start - cacheStart, args.start - cacheStart + args.length);
         } else {
             // Nope, load new data via the API.
             let j = ++i;
 
-            console.log('NONE CACHE' + Yoda.basePath + dlgCurrentFolder);
             // + currentFolder
             let result = await Yoda.call('browse_collections',
                 {'coll':       Yoda.basePath + dlgCurrentFolder,
@@ -213,8 +196,6 @@ let getFolderContents2 = (() => {
                     'sort_order': args.order[0].dir,
                     'sort_on':    ['name','size','modified'][args.order[0].column],
                     'space':      'Space.RESEARCH'});
-
-            console.log(result);
 
             // If another requests has come while we were waiting, simply drop this one.
             if (i !== j) return null;
@@ -319,7 +300,6 @@ const tableRenderer2 = {
 
 function dlgBrowse(dir)
 {
-    console.log('GEKLIKT: '+ dir);
     dlgCurrentFolder = dir;
 
     dlgSelectAlertHide();
@@ -342,18 +322,7 @@ function dlgBuildFileBrowser(dir)
 {
     //let fileBrowser = $('#file-browser').DataTable();
     getFolderContents2.dropCache();
-    console.log('AJAX RELOAD');
     folderSelectBrowser.ajax.reload();
-
-
-//     var url = "browse/selectData/collections/org_lock_protect";
-//     if (typeof dir != 'undefined') {
-//         url += "?dir=" +  dir;
-//     }
-//
-//     folderSelectBrowser.ajax.url(url).load();
-//
-//     return true;
 }
 
 function dlgMakeBreadcrumb(urlEncodedDir)
