@@ -83,7 +83,7 @@ def login():
 
         try:
             # Add a prefix to consume in the PAM stack
-            password = f"++portal++{password}"
+            # password = f"++portal++{password}"
             irods_login(username, password)
         except PAM_AUTH_PASSWORD_FAILED:
             flash(
