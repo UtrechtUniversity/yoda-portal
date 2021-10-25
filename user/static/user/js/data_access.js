@@ -3,7 +3,7 @@
 $(document).ready(function() {
     $("body").on("click", ".delete-token", function(e) {
         let label = $(this).siblings('label').text();
-        Yoda.call('delete_token', {"label": label}, {"quiet": true}).then(
+        Yoda.call('token_delete', {"label": label}, {"quiet": true}).then(
             (data) => {
                 $(this).parent().remove();
             },
@@ -20,7 +20,7 @@ $(document).ready(function() {
         let button = document.getElementById('generateButton');
         button.setAttribute("hidden", true);
 
-        Yoda.call("generate_token", {"label": label}, {"quiet": true}).then(
+        Yoda.call("token_generate", {"label": label}, {"quiet": true}).then(
             (data) => {
                 $('#f-token').val(data);
                 let p = document.getElementById('passwordOk');
