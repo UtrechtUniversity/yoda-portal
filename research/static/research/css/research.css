@@ -153,3 +153,8 @@ table.dataTable > tbody > tr > td i {
     word-wrap: break-word;
     display: inline-block;
 }
+
+.drag-upload {
+    border-style: dashed;
+    border-width: 4px;
+}
