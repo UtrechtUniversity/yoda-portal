@@ -82,8 +82,6 @@ def login():
             return render_template('user/login.html')
 
         try:
-            # Add a prefix to consume in the PAM stack
-            # password = f"++portal++{password}"
             irods_login(username, password)
         except PAM_AUTH_PASSWORD_FAILED:
             flash(
@@ -334,6 +332,8 @@ def oidc_authorize_url(username):
 
 
 def irods_login(username, password):
+    # Add a prefix to username to consume in the PAM stack.
+    username = f"++portal++{username}"
     password = escape_irods_pam_password(password)
 
     irods = iRODSSession(
