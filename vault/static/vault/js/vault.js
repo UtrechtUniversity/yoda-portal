@@ -802,18 +802,23 @@ function metadataInfo(dir) {
 
             if (metadata.Description){
                 let description = metadata.Description;
-                $(".metadata-description").text(truncate(description, 50));
-                $('.read-more-button').show();
-                $('.read-more-button').on('click', function(){
+                let wordCount = description.match(/(\w+)/g). length;
+                if (wordCount < 50 ){
                     $(".metadata-description").text(description);
-                    $('.read-more-button').hide();
-                    $('.read-less-button').show();
-                })
-                $('.read-less-button').on('click', function(){
+                } else {
                     $(".metadata-description").text(truncate(description, 50));
                     $('.read-more-button').show();
-                    $('.read-less-button').hide();
-                })
+                    $('.read-more-button').on('click', function(){
+                        $(".metadata-description").text(description);
+                        $('.read-more-button').hide();
+                        $('.read-less-button').show();
+                    })
+                    $('.read-less-button').on('click', function(){
+                        $(".metadata-description").text(truncate(description, 50));
+                        $('.read-more-button').show();
+                        $('.read-less-button').hide();
+                    })
+                }
             }
 
             let creators = [];
