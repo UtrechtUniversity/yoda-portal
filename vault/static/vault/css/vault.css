@@ -1,0 +1,128 @@
+
+.tab-content {
+    margin-top:10px;
+}
+
+.browse, .browse-search, .browse-select {
+    cursor: pointer;
+}
+
+ol.breadcrumb li.active {
+    font-weight: bold;
+}
+
+.panel-heading h3 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 75%;
+    float:left;
+}
+
+.search-results {
+    display: none;
+}
+
+.action-list li {
+    cursor: pointer;
+}
+
+.panel-heading .input-group-sm {
+    margin: -7px; /* btn in panel heading */
+}
+.panel-footer  .input-group-sm {
+    margin: -6px; /* btn in panel footer */
+}
+
+.lock-icon {
+    font-size: 30px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.system-metadata-icon:hover,
+.actionlog-icon:hover {
+    cursor: pointer;
+}
+
+.hide, .hidden {
+    display: none;
+}
+
+.restore-exists.cover {
+    background-color: #ffffff;
+    border-radius: 5px;
+    left: 0;
+    opacity: 1;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index:1000;
+    padding:15px;
+}
+
+#messages {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+#file-browser_length, #search_length {
+    float: left;
+    padding-top: 2px;
+}
+
+#file-browser tr > :nth-child(1) {
+    padding-left: 10px;
+}
+#file-browser tr > :nth-child(2) {
+    text-align: right;
+}
+#file-browser tr > :nth-child(4) {
+    text-align: right;
+}
+
+#file-browser .fa {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+a.dropdown-item:hover, a.dropdown-item:focus {
+    cursor: pointer;
+}
+
+.dropdown-toggle, .view-image, .view-audio, .view-video {
+    cursor: pointer;
+}
+
+table.dataTable > tbody > tr > td {
+    padding: 5px;
+    vertical-align: baseline;
+}
+table.dataTable > tbody > tr > td i {
+    font-size: 19px;
+    vertical-align: bottom;
+}
+
+/* Table */
+.yoda-table th {
+    background-color: #dcdcdc;
+    border-color: #ddd;
+    border-bottom: 1px solid transparent!important;
+    color: #333;
+    font-family: inherit;
+    font-weight: 500;
+}
+
+.yoda-table tr.odd {
+    background-color: transparent !important;
+}
+
+#statusBadge {
+    vertical-align:middle;
+}
+.read-less-button,
+.read-more-button {
+    text-decoration:underline;
+    color: #444;
+    padding-left:3px;
+}

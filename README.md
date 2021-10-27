@@ -1,21 +1,6 @@
-YODA-PORTAL
-===========
+# Yoda portal
+This is the webportal of [Yoda](https://github.com/UtrechtUniversity/yoda), a system for reliable, long-term storing and archiving large amounts of research data during all stages of a study.
 
-NAME
-----
-
-yoda-portal - A modular web platform for interfaces to Yoda
-
-LICENSE
--------
-
-Copyright (c) 2015, Utrecht University. All rights reserved.
-
-This project is licensed under the GPLv3 license.
-
-The full license text can be found in [LICENSE](LICENSE).
-
-AUTHORS
--------
-
-- [Chris Smeele](https://github.com/cjsmeele)
+## License
+This project is licensed under the GPL-v3 license.
+The full license can be found in [LICENSE](LICENSE).

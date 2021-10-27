@@ -1,0 +1,153 @@
+$(document).ready(function() {
+     var mainTable = $('#datatable').DataTable({
+        "stateSave":true,
+        "language": {
+            "sEmptyTable":     "No data found",
+            "sInfo":           "Total datasets: <span>_TOTAL_</span>",
+            "sInfoEmpty":      "No datasets present",
+            "sLoadingRecords": "Loading...",
+            "sProcessing":     "Processing...",
+            "sSearch":         "Search",
+            "sZeroRecords":    "No data found",
+            "oPaginate": {
+                "sFirst":    "First",
+                "sLast":     "Last",
+                "sNext":     "Next",
+                "sPrevious": "Previous"
+            }
+        },
+		"bSort": [],
+         "columns": [
+             { "data": "user"},
+             {
+                "data": null,
+                "orderable":  false,
+                "defaultContent": '<input type="checkbox" class="cbDataSet">'
+             },
+             {
+                 "className":      'details-control',
+                 "orderable":      false,
+                 "data":           null,
+                 "defaultContent": ''
+             },
+             { "data": "date" },
+             { "data": "pseudo" },
+             { "data": "type" },
+             { "data": "wave" },
+             { "data": "version" },
+             { "data": "file_count" },
+             { "data": "minfo" },
+             { "data": "comment" },
+             { "data": "status" },
+             { "data": "creator" }
+         ],
+         "iDisplayLength": 50,
+         "bPaginate": false,
+         "bLengthChange": false,
+	      "bFilter": false,
+         "columnDefs": [
+             { "visible": false, "targets": 0 },
+             { "type": "alt-string", "targets": 3 }
+         ],
+         "drawCallback": function ( settings ) {
+             var api = this.api();
+             var rows = api.rows( ).nodes(); //{page:'current'}
+             var last=null;
+
+             api.column(0).data().each( function ( group, i ) {
+                 if ( last !== group ) {
+                     groupname = '<div class="datasetstatus_scanned pull-left"></div><span class="pull-left ml-2 mt-3">Scanned datasets</span>';
+                     chbtext = '';
+                     if(group=='LOCKED'){
+                         groupname= '<div class="datasetstatus_locked pull-left"></div><span class="pull-left ml-2 mt-3">Submitted for transportation to vault - can be undone</span>';
+                         chbtext = '<input type="checkbox" class="group" data-target="'+group+'" class="pull-left">&nbsp;';
+                     }
+                     if(group=='FROZEN'){
+                         groupname='<div class="datasetstatus_frozen pull-left"></div><span class="pull-left ml-2 mt-3">Frozen for transportation to vault - cannot be undone</span>';
+                     }
+                     //$(rows).eq( i ).before(
+                     //    '<tr class="group"><td colspan="11">' + chbtext + '<strong>' + groupname + '</strong></td></tr>'
+                     //);
+
+                     last = group;
+                 }
+             });
+
+            // Required as every time page changes, this effect was lost.
+             $('.cbDataSet').click(function(event){
+                 event.stopPropagation();
+                 handleVaultButtonStatus();
+             });
+
+         },
+		"order": [[ 3, "desc" ]],
+		"sDom": "<'row'<'col-sm-6'T><'col-sm-6'f>r>t<'row'<'col-sm-6'i><'col-sm-6'p>>",
+		"sPaginationType": "bootstrap",
+		"fnInitComplete": function(oSettings, json) {
+			//$('.dataTables_info span').text($('#totalSignups').text());
+		}
+    });
+
+    $('#datatable tbody tr .cbDataSet').each(function(){
+        if($(this).parent().parent().data('error-count')){
+            $(this).parent().html('');
+        }
+    });
+
+    // remove the checkboxes from columns that hold frozen datasets
+    $('tr[data-target="FROZEN"] .cbDataSet').parent().html('');
+
+
+    $('#datatable tbody').on('click', 'tr', function () {
+        datasetRowClickForDetails($(this), mainTable);
+    });
+
+    // 1) prevent opening of dataset details when clicking on row.
+    // 2) enable lock/unlock buttons as to make the relation between the checkboxes and buttons more evident
+    $('.cbDataSet').click(function(event){
+        event.stopPropagation();
+        handleVaultButtonStatus();
+    });
+
+    // 1) check all checkboxes belonging to the group
+    // 2) lock/unlock buttons as to make the relation between the checkboxes and buttons more evident
+    $('#datatable tbody tr .group').click(function(){
+        $('#datatable tbody tr[data-target="'+$(this).data('target')+'"] .cbDataSet').prop('checked',$(this).prop('checked'));
+        handleVaultButtonStatus();
+    });
+
+    $('.control-all-cbDataSets').click(function(){
+        $('.cbDataSet').prop('checked',$(this).prop('checked'));
+        handleVaultButtonStatus();
+    });
+
+    // Initialize buttons
+    $('#btn-lock').prop('disabled', true).addClass('disabled');
+    $('#btn-unlock').prop('disabled', true).addClass('disabled');
+} );
+
+function handleVaultButtonStatus()
+{
+    // if no checkbox selected disable the buttons
+    var anyChecked=false;
+    $('.cbDataSet').each(function(){
+        if($(this).prop('checked')){
+            anyChecked=true;
+            return false;
+        }
+    });
+
+    if(anyChecked){
+        //$('#btn-lock').prop('disabled', false);
+//        $('#btn-lock').prop('disabled', false).removeClass('btn-default').removeClass('disabled').addClass('btn-primary');
+//        $('#btn-unlock').prop('disabled', false).removeClass('btn-default').removeClass('disabled').addClass('btn-warning');
+        $('#btn-lock').prop('disabled', false).addClass('btn-info').removeClass('disabled'); //.removeClass('btn-default').addClass('btn-primary');
+        $('#btn-unlock').prop('disabled', false).addClass('btn-warning').removeClass('disabled'); //.removeClass('btn-default').addClass('btn-warning');
+    }
+    else{
+        // $('#btn-lock').prop('disabled', true).removeClass('btn-primary').addClass('disabled').addClass('btn-default');
+        // $('#btn-unlock').prop('disabled', true).removeClass('btn-warning').addClass('disabled').addClass('btn-default');
+        $('#btn-lock').prop('disabled', true).removeClass('btn-info').addClass('disabled'); //.removeClass('btn-primary').addClass('btn-default');
+        $('#btn-unlock').prop('disabled', true).removeClass('btn-warning').addClass('disabled');// .removeClass('btn-warning').addClass('btn-default');
+    }
+}

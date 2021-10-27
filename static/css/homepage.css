@@ -1,0 +1,28 @@
+.page {
+    background: url('/assets/img/frontpage_banner.jpg');
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    min-height: 600px;
+}
+
+.header-logo-text-background {
+    position: absolute;
+    top: 200px;
+    background-color: rgba(0, 0, 0, .5);
+    right: 5%;
+    padding: 15px 30px;
+}
+
+.header-logo-text-content, .header-logo-text-content a {
+    color: #fff;
+    overflow: hidden;
+}
+
+#general-tile,
+#deposit-tile,
+#search-tile {
+    padding: 15px 30px;
+    background-color: rgba(0, 0, 0, .5);
+    min-height: 200px;
+}

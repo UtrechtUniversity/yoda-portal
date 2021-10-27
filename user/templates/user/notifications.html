@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Notifications{% endblock title %}
+
+{% block scripts %}
+    <script src="{{ url_for('user_bp.static', filename='js/notifications.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Notifications</h1>
+        </div>
+        <div class="col-md-4">
+            {% if notifications %}
+            <a href="#" id="notifications_dismiss_all" title="Mark all done" class="btn btn-primary pull-right mt-2">Mark all done <i class="fa fa-check" aria-hidden="true"></i></a>
+
+            <div class="dropdown show pull-right mt-2 me-2">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="sortMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Sort order
+                </a>
+                <div class="dropdown-menu" aria-labelledby="sortMenu">
+                    <a class="dropdown-item" href="{{ url_for('user_bp.notifications', sort_order='desc') }}">Newest first</a>
+                    <a class="dropdown-item" href="{{ url_for('user_bp.notifications', sort_order='asc') }}">Oldest first</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% if notifications %}
+    <div class="list-group">
+        {% for notification in notifications %}
+        <a href="{% if notification.link %}{{ notification.link }}{% else %}#{% endif %}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <p class="mb-1">{{ notification.message }}</p>
+                <small class="text-muted">{{ notification.datetime }}</small>
+            </div>
+            {% if notification.actor %}<small class="pull-left me-2"><i class="fa fa-user" aria-hidden="true"></i> {{ notification.actor }}</small>{% endif %}
+            {% if notification.data_package %}<small class="pull-left"><i class="fa fa-archive" aria-hidden="true"></i> {{ notification.data_package }}</small>{% endif %}
+            <h5 class="dismiss-notification pull-right" data-id="{{ notification.timestamp }}" title="Done"><i class="fa fa-check" aria-hidden="true"></i></h5>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>All caught up! You have no new notifications.</p>
+    {% endif %}
+{% endblock content %}

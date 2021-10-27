@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Statistics{% endblock title %}
+
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('stats_bp.static', filename='lib/select2/css/select2.min.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+    <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-2.7.3/chart.min.js') }}"></script>
+    <script src="{{ url_for('stats_bp.static', filename='js/stats.js') }}"></script>
+    <script src="{{ url_for('stats_bp.static', filename='lib/select2/js/select2.full.min.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+    <h1>Statistics</h1>
+
+    {% if resources %}
+    <div class="row mb-4">
+        <div class="col-md-5">
+            <div class="card resources">
+                <div class="card-header">
+                    Resources
+                </div>
+                <div class="list-group" id="resource-list">
+                    {% for resource in resources %}
+                        <a class="list-group-item list-group-item-action resource" data-name="{{ resource['name'] }}">
+                            {{ resource['name'] }}
+                            <small class="float-right resource-tier" title="<{{ resource['tier'] }}">
+                                {{ resource['tier'] }}
+                            </small>
+                        </a>
+                    {% endfor %}
+                </div>
+                <div class="card-footer">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="resource-details">
+                <div class="card">
+                    <div class="card-header">
+                        Resource properties
+                    </div>
+                    <div class="card-body">
+                        <p class="placeholder-text">
+                            Please select a resource.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if categories %}
+    <div class="row mb-4">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    Storage
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped storage-table">
+                        <tr>
+                            <th>Category</th>
+                            <th>Tier</th>
+                            <th>Storage</th>
+                        </tr>
+                        {% for category in categories %}
+                            <tr>
+                                <td>{{ category.category }}</td>
+                                <td>{{ category.tier }}</td>
+                                <td>{{ category.storage }} TB</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+
+                    <a href="{{ url_for('stats_bp.export') }}" class="btn btn-primary btn-sm">
+                        Export all details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    Groups
+                </div>
+                <div class="list-group" id="groups-list">
+                    {% for group in groups %}
+                    <a class="list-group-item list-group-item-action group" data-name="{{ group[0] }}">
+                        {{ group[0] }} ({{ group[1] }})
+                    </a>
+                    {% endfor %}
+                </div>
+                <div class="card-footer"></div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="group-details">
+                <div class="card">
+                    <div class="card-header">
+                        Group
+                    </div>
+                    <div class="card-body" id="storage-chart">
+                        <p class="placeholder-text">
+                            Please select a group.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

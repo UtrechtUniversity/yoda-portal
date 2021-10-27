@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Intake{% endblock title %}
+
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/jquery.dataTables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/datatables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/intake.css') }}">
+    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/treetable/jquery.treetable.css') }}">
+    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/treetable/jquery.treetable.theme.default.css') }}">
+    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+    <script src="{{ url_for('intake_bp.static', filename='scripts/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('intake_bp.static', filename='scripts/dataTables.bootstrap.js') }}"></script>
+    <script src="{{ url_for('intake_bp.static', filename='scripts/dataTables.bootstrapPagination-3.js') }}"></script>
+    {% if permissions.manager %}
+        <script src="{{ url_for('intake_bp.static', filename='scripts/datatables/intake_overview.js') }}"></script>
+    {% else %}
+        <script src="{{ url_for('intake_bp.static', filename='scripts/datatables/intake_overview_assistant.js') }}"></script>
+    {% endif %}
+
+    <script type="text/javascript">
+        var view = 'intake';
+        var alertNr = '{{ alertNr }}';
+        var alertMsg = '{{ alertMesg }}';
+    </script>
+
+    <script src="{{ url_for('intake_bp.static', filename='scripts/controllers/intake.js') }}"></script>
+    <script src="{{ url_for('intake_bp.static', filename='scripts/datatables/plugin_sort_on_image.js') }}"></script>
+    <script src="{{ url_for('intake_bp.static', filename='scripts/treetable/jquery.treetable.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+
+{% if alertNr == 100 %}
+    <div class="row page-header" style="margin-top:0px;">
+        <div class="col-sm-12">
+            <p>You have no access to the selected study. Please select another. </p>
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu" style="width:300px;padding:5px;">
+                    Please select a study:
+                    <br/>
+                    <table class="table table-striped hover" id="select-study">
+                        {% for study in studies %}
+                            <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}">
+                                <td>
+                                    <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+                                </td>
+                                <td>
+                                    <span>
+                                        {{ study }}
+                                    </span>
+                                </td>
+                                <td style="width:10px;">
+                                    {% if study==study_id %}
+                                        <span class="fa fa-check"></span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+
+    <div class="modal fade" id="dialog-ok" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+        <div class="modal-dialog">
+            <div class="modal-content" >
+                <div class="modal-header">
+                    <h3 class="no-offset"></h3>
+                </div>
+                <div class="modal-body">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    <div class="col-sm-10 pull-right">
+                        <span class="item"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                        <span class="glyphicon glyphicon-ok"></span> OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row page-header" style="margin-top:0px;">
+        <div class="col-sm-12">
+                <h1>
+                    <i class="fa fa-folder-open" aria-hidden="true"></i>
+                    {{ title }}
+                </h1>
+                <p>{{ full_path }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="progress_indicator" style="display:none;">
+                <h1 class="pull-right">
+                    Scanning process in progress...
+                </h1>
+                <img class="h1 pull-right" src="{{ url_for('intake_bp.static', filename='images/ajax-loader.gif') }}" style="height:30px;">
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="toprow">
+        <div class="col-sm-12">
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" id="dropdown-select-study">
+                    <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu" style="width:300px;padding:5px;">
+                    Please select a study:
+                    <br/>
+                    <table class="table table-striped hover" id="select-study">
+                        {% for study in studies %}
+                            <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}" class="ta-{{ study }}">
+                                <td>
+                                    <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+                                </td>
+                                <td>
+                                    <span>
+                                        {{ study }}
+                                    </span>
+                                </td>
+                                <td style="width:10px;">
+                                    {% if study==study_id %}
+                                        <span class="fa fa-check"></span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% if selectableScanFolders %}
+                <div class="btn-group">
+                    <button class="btn  btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fa fa-folder-open" aria-hidden="true"></i> Change folder <span class="caret"></span>
+                    </button>
+                    <div class="dropdown-menu" style="width:300px;padding:5px;">
+                        Please select a folder:
+                        <br/>
+                        <table class="table table-striped hover" id="select-study-folder">
+                            <tr data-study-folder-url="{{ url_for('intake_bp.index', studyID=study) }}">
+                                <td style="width:10px;">
+                                    <span class="glyphicon glyphicon-folder-open pull-left"></span>
+                                </td>
+                                <td colspan="2">
+                                    <strong>
+                                        {{ study_id }}
+                                    </strong>
+                                </td>
+                                <td style="width:10px;">
+                                    {% if not study_folder %}
+                                        <span class="glyphicon glyphicon-ok"></span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% for folder in selectableScanFolders %}
+                                {# <tr data-study-folder-url="?studyID={{ study_id | urlencode | replace("+", "%20") }}&studyFolder={{ folder.name | urlencode | replace("+", "%20") }}">  #}
+                                <tr data-study-folder-url="{{ url_for('intake_bp.index', studyID=study, studyFolder=folder.name) }}">
+                                    <td>
+                                    </td>
+                                    <td style="width:10px;">
+                                        <span class="glyphicon glyphicon-folder-open pull-left"></span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            {{ folder.name }}
+                                        </span>
+                                    </td>
+                                    <td style="width:10px;">
+                                        {% if folder==study_folder %}
+                                            <span class="glyphicon glyphicon-ok"></span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary" id="btn-start-scan"><i class="fa fa-search-plus" aria-hidden="true"></i> Scan all files</button>
+            </div>
+
+            {% if permissions.manager %}
+                <div class="btn-group">
+                    <button class="btn btn-outline-secondary" id="btn-lock"><span class="glyphicon glyphicon-check"></span> Lock datasets</button>
+                </div>
+                <div class="btn-group">
+                        <button class="btn btn-outline-secondary" id="btn-unlock"><span class="glyphicon glyphicon-check"></span> Unlock datasets</button>
+                </div>
+                <div class="btn-group">
+                    <a href="reports" class="btn btn-info btn-goto-reports"><span class="glyphicon glyphicon-signal"></span> Reports</a>
+                </div>
+            {% endif %}
+
+            <input type="hidden" id="studyID" value="{{ study_id }}">
+            <input type="hidden" id="studyFolder" value="{{ study_folder }}">
+            <input type="hidden" id="collection" value="{{ study_folder }}">
+
+        </div>
+    </div>
+
+    <div class="row mt-2" id="viewwindow">
+        <div class="col-sm-12">
+            {% if not permissions.manager %}
+                {% include 'intake/table_files_unrecognised.html' %}
+            {% endif %}
+            <table id="datatable" class="row-border hover table table-striped" style="width:100%;">
+                <thead>
+                    <tr>
+                        {% if permissions.manager %}
+                            <th class="th-invisible-order"></th>
+                        {% endif %}
+                        <th align="center"><input type="checkbox" class="control-all-cbDataSets"></th>
+                        <th></th>
+                        <th>Status</th>
+                        <th style="width:80px;">Date</th>
+                        <th>Pseudocode</th>
+                        <th>Experiment type</th>
+                        <th>Wave</th>
+                        <th>Version</th>
+                        <th style="text-align: right;">Nr. of files</th>
+                        <th style="text-align: right;">Nr. of errors/<br/>warnings</th>
+                        <th style="text-align: right;">Nr. of <br/>comments</th>
+                        <th>Created by</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in dataSets %}
+                        <tr class="detailrow"
+                            data-fullpath="{{ data.path }}
+                            data-target="{{ data.datasetStatus | upper }}"
+                            data-row-id="{{ loop.index0 }}"
+                            data-dataset-id="{{ data.dataset_id }}"
+                            data-ref-path="{{ data.path }}"
+                            data-error-count="{{ (data.datasetErrors + data.objectErrors) }}">
+
+                            <td data-target="{{ data.datasetStatus | upper }}">
+                                {{ data.datasetStatus | upper }}
+                            </td>
+                            {% if permissions.manager %}
+                                <td align="center">
+                                    <input type="checkbox">
+                                </td>
+                            {% endif %}
+                            <td></td>
+                            <td>
+                                <div class="datasetstatus_{{ data.datasetStatus }}" title="{{ data.datasetStatus }}"></div>
+                            </td>
+                            <td>{{ data.datasetCreateDateFormatted }}</td>
+                            <td>{{ data.pseudocode }}</td>
+                            <td>{{ data.expType }}</td>
+                            <td>{{ data.wave }}</td>
+                            <td>{{ data.version }}</td>
+                            <td style="text-align: right;">{{ data.objects }}</td>
+                            <td style="text-align: right;">
+                                {{ (data.datasetErrors + data.objectErrors) if (data.datasetErrors + data.objectErrors)>0 else '-' }}
+                                    /
+                                {{ (data.datasetWarnings + data.objectWarnings) if (data.datasetWarnings + data.objectWarnings)>0 else '-' }}
+                            </td>
+                            <td style="text-align: right;">
+                                {{ data.datasetComments if  data.datasetComments else '-' }}
+                            </td>
+                            <td>
+                                {{ data.datasetCreateName }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if permissions.manager %}
+                {% include 'intake/table_files_unrecognised.html' %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="select-generic-modal" class="modal fade"  tabindex="-2" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" >
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <h3></h3>
+                </div>
+                <div class="modal-body">
+                    <iframe class="select-generic-iframe" style="height:350px; width:99%;"frameborder="0"></iframe>
+                    <div class="select-generic-content"></div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endif %}
+
+{% endblock content %}

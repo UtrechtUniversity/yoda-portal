@@ -1,0 +1,42 @@
+<h2 id="scan_result_text">
+    Unrecognised {% if totalErrorCount %}({{ totalErrorCount }}) {% endif %}
+    and unscanned 
+        {% if (totalFileCount - totalDatasetFiles - totalErrorCount) > 0 %} 
+           ({{ totalFileCount - totalDatasetFiles - totalErrorCount }})
+        {% else %}
+            (-)
+        {% endif %}
+    files
+</h2>
+
+<table id="datatable_unrecognised" class="row-border hover table table-striped w-100">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Date</th>
+        <th>Pseudocode</th>
+        <th>Experiment type</th>
+        <th>Wave</th>
+        <th>Version</th>
+        <th>Status</th>
+        <th>Created by</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for row in dataErroneousFiles %}
+        <tr data-filename="{{ row.name }}"
+            data-path="{{ row.path }}"
+            data-error="{{ row.error }}">
+            <td class="w200px"><div class="ellipseDivText">{{ row.name }}</div></td>
+            <td>{{ row.date }}</td>
+            <td>{{ row.pseudocode }}</td>
+            <td>{{ row.experiment_type }}</td>
+            <td>{{ row.wave }}</td>
+            <td>{{ row.version }}</td>
+            <td>Unrecognised</td>
+            <td>{{ row.creator }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+

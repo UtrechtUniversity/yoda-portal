@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Home{% endblock %}
+
+{% block style %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+{% endblock %}
+
+{% block content %}
+
+    <div class="header-logo-text-background">
+        <div class="header-logo-text-content">
+            <h1>Welcome to Yoda for Humanities!</h1>
+            <p>Yoda is a share-collaborate environment for research data.</p>
+        </div>
+        <div>
+            <a class="btn btn-primary" href="https://www.uu.nl/yoda" target="_blank">Help</a>
+        </div>
+    </div>
+
+{% endblock %}

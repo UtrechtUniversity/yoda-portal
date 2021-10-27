@@ -1,0 +1,83 @@
+#dataset_detail_view {
+    padding: 10px;
+    background:#F0E68C;
+}
+.dropdown-menu {
+    width:300px;
+    padding:5px;
+}
+
+#select-study,#select-study-folder tbody tr {
+    cursor:pointer;
+}
+table.table-outside-borders {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c0c0c0;
+}
+table.tbl-fullwidth {
+    width:100%;
+}
+td.details-control {
+    background: url('../images/datatables/triangle_details_open.png') no-repeat center center;
+    background-size: 20px 20px;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+}
+tr.shown td.details-control {
+    background: url('../images/datatables/triangle_details_close.png') no-repeat center center;
+    background-size: 20px 20px;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+}
+
+div.datasetstatus_frozen{
+    background: url('../images/datatables/status_frozen.png') no-repeat center center;
+    background-size: 20px 20px;
+    width:20px;
+    height:20px;
+}
+div.datasetstatus_locked{
+    background: url('../images/datatables/status_locked.png') no-repeat center center;
+    background-size: 20px 20px;
+    width:20px;
+    height:20px;
+}
+div.datasetstatus_scanned{
+    background: url('../images/datatables/status_scanned.png') no-repeat center center;
+    background-size: 20px 20px;
+    width:20px;
+    height:20px;
+}
+
+#datatable tbody tr.detailrow {
+    cursor:pointer;
+}
+#datatable_unrecognised tbody tr {
+    cursor:pointer;
+}
+
+.ellipseDivText {
+    overflow:hidden;
+    text-overflow-multiline:ellipsis;
+}
+
+.select-generic-iframe {
+    height:350px; width:99%;
+}
+
+.w5px { width: 5px; }
+.w10px { width: 10px; }
+.w20px { width: 20px; }
+.w30px { width: 30px; }
+.w50px { width: 50px; }
+.w80px { width: 80px; }
+.w100px { width: 100px; }
+.w135px { width: 135px; }
+.w150px { width: 150px; }
+.w200px { width: 250px; }
+.w250px { width: 250px; }
+.w300px { width: 300px; }
+.w500px { width: 500px; }

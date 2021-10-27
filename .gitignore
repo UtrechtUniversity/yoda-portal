@@ -1,18 +1,38 @@
-/logs/
-/config/config_local.php
-
-# Ignore any symlinks to module document roots.
-/public/*
-!/public/.htaccess.template
-!/public/index.php
-!/public/static/
-/public/static/static_frontpage.html
-/public/static/img/custom
-
-/modules/
-
-!.keep
-
-*~*
+# Local/Editor files
 *.swp
-*.swo
+.DS_STORE
+thumbs.db
+activate.bat
+.idea/
+/.idea/
+
+# Ansible controlled config files
+flask.cfg
+
+# Github defaults for Python
+# https://github.com/github/gitignore/blob/master/Python.gitignore
+
+__pycache__/
+*.py[cod]
+
+# Distribution / packaging
+bin/
+build/
+
+# Unit test / coverage reports
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+
+# Sphinx documentation
+docs/_build/
+
+# Node modules
+/research/metadata-form/node_modules/
+/vault/metadata-form/node_modules/
+/deposit/metadata-form/node_modules/

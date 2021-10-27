@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Internal server error{% endblock title %}
+
+{% block content %}
+<div class="text-center">
+    <h1>Internal server error</h1>
+
+    <p>
+        Holy moly, something went wrong! <br>
+        You can click the button below to go back home.
+    </p>
+    <a href="{{ url_for('general_bp.index') }}" title="Home" class="btn btn-primary">Go home</a>
+</div>
+{% endblock content %}
