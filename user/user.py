@@ -333,7 +333,7 @@ def oidc_authorize_url(username):
 
 def irods_login(username, password):
     # Add a prefix to username to consume in the PAM stack.
-    username = f"++portal++{username}"
+    # username = f"++portal++{username}"
     password = escape_irods_pam_password(password)
 
     irods = iRODSSession(
