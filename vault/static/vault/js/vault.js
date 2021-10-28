@@ -375,9 +375,9 @@ const tableRenderer = {
                  + ` ${pad(date.getHours())}:${pad(date.getMinutes())}`);
          elem.attr('title', date.toString()); // (should include seconds and TZ info)
          return elem[0].outerHTML;
-     },
+    },
     context: (_, __, row) => {
-        let actions = $('');
+        let actions = $('<span>');
 
         if (row.type === 'coll')
             return '';
@@ -397,7 +397,7 @@ const tableRenderer = {
             actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file"><i class="fa fa-eye"></a>`);
         }
 
-        return actions[0].outerHTML;
+        return actions[0].innerHTML;
     }
 };
 
