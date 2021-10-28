@@ -8,6 +8,7 @@
 <script src="{{ url_for('research_bp.static', filename='js/research.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='js/search.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
+<script src="{{ url_for('research_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
 <script>
     var browsePageItems = {{ items }};
     var browseStartDir  = {{ dir|tojson|safe }};
@@ -294,7 +295,7 @@
 
     <div class="col-md-12">
         <div class="row d-block">
-            <table id="file-browser" class="table yoda-table table-striped upload-drop" ondrop="dropHandler(event);" ondragenter="dragEnterHandler(event);" ondragend="dragEndHandler(event);">
+            <table id="file-browser" class="table yoda-table table-striped upload-drop">
                 <thead>
                 <tr>
                     <th>Name</th>
