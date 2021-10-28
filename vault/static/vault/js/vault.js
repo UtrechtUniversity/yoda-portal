@@ -377,7 +377,7 @@ const tableRenderer = {
          return elem[0].outerHTML;
      },
     context: (_, __, row) => {
-        let actions = '';
+        let actions = $('');
 
         if (row.type === 'coll')
             return '';
