@@ -836,7 +836,6 @@ function metadataInfo(dir) {
     catch (error) {
         console.error(error);
     }
-
 }
 
 function truncate(str, nr_words) {
