@@ -795,7 +795,7 @@ function metadataInfo(dir) {
 
             let metadata = result.data.metadata;
             $('.metadata-info').show();
-            $(".metadata-title span").text(metadata.Title);
+            $(".metadata-title").text(metadata.Title);
             $(".metadata-access").text(metadata.Data_Access_Restriction);
             $(".metadata-data-classification").text(metadata.Data_Classification);
             $(".metadata-license").text(metadata.License);
