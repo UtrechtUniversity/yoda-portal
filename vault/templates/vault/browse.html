@@ -175,17 +175,35 @@
 <section class="metadata-info container hide">
     <h3 class="metadata-title"></h3>
     <h5 class="metadata-creator mt-3"></h5>
-    <h6 class="subtitle-row fst-italic mt-3">
-        <span class="me-3"><label class="me-1">Data classification: </label><span class="metadata-data-classification"></span></span>
-        <span class="me-3"><label class="me-1">Accessibility: </label><span class="metadata-access"></span></span>
-    </h6>
-    <div class="metadata-description mt-2 mb-2"></div>
-    <button class="btn read-more-button hide" role="button">Read more...</button>
-    <button class="btn read-less-button hide" role="button">Read less...</button>
+    <div class="row">
+        <div class="col-md-2">
+            <strong>Description</strong>
+        </div>
+        <div class="col-md-10">
+            <div class="metadata-description"></div>
+            <button class="btn read-more-button hide" role="button">Read full description...</button>
+            <button class="btn read-less-button hide" role="button">Collapse description...</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <strong>Data classification</strong>
+        </div>
+        <div class="col-md-10">
+            <span class="metadata-data-classification"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <strong>Accessibility</strong>
+        </div>
+        <div class="col-md-10">
+            <span class="metadata-access"></span>
+        </div>
+    </div>
 </section>
 
 <div class="top-information text-right">
-
     <div class="top-info-buttons text-end">
         <h2 class="me-2 d-inline"></h2>
         <div class="btn-toolbar pull-right d-inline" role="toolbar">
