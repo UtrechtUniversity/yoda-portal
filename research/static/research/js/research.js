@@ -353,6 +353,15 @@ $(function() {
     $("body").on("click", "a.action-go-to-vault", function() {
         window.location.href = '/vault/?dir=' + encodeURIComponent('/'+$(this).attr('vault-path'));
     });
+
+    $("body").on("click", "input:checkbox[name='multiSelect[]']", function() {
+        if ($("input:checkbox[name='multiSelect[]']:checked").length) {
+            $('#multiSelect').removeClass('hide');
+        } else {
+            $('#multiSelect').addClass('hide');
+        }
+    });
+
 });
 
 
@@ -623,9 +632,14 @@ let getFolderContents = (() => {
 const tableRenderer = {
     name: (name, _, row) => {
          let tgt = `${currentFolder}/${name}`;
+        let checkbox = '';
+         if (currentFolder) {
+             checkbox = `<input class="form-check-input" type="checkbox" name="multiSelect[]" value="${htmlEncode(tgt)}" data-name="${htmlEncode(name)}" data-type="${row.type}">`;
+         }
+
          if (row.type === 'coll')
-              return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
-         else return `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
+              return checkbox + `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
+         else return checkbox + `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
     },
     size: (size, _, row) => {
         if (row.type === 'coll') {
