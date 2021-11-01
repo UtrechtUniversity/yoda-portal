@@ -1,5 +1,6 @@
 var folderSelectBrowser = null;
 var dlgCurrentFolder = '';
+var currentBrowseFolder = '';
 
 $( document ).ready(function() {
     $("body").on("click", "a.file-copy, a.file-move", function() {
@@ -27,6 +28,32 @@ $( document ).ready(function() {
         $('#dlg-file-browse-operations').modal('show');
     });
 
+    $("body").on("click", "a.multiple-copy, a.multiple-move", function() {
+        // Determine action
+        if($(this).hasClass("multiple-move")) {
+            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'multiple-move');
+            $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move item(s)');
+            $('#dlg-file-browse-operations .card-title span.action').text('move');
+            $('#mutli-select-progress').attr('data-action', 'move');
+        } else {
+            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'multiple-copy');
+            $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy item(s)');
+            $('#dlg-file-browse-operations .card-title span.action').text('copy');
+            $('#mutli-select-progress').attr('data-action', 'copy');
+        }
+
+        // Set filename in modal & button attribute
+        $('#dlg-file-browse-operations span.action-file').text('selected item(s)');
+
+        // Set current folder & initiate browse object.
+        currentBrowseFolder = $('.system-metadata-icon').attr('data-folder');
+        dlgCurrentFolder = currentBrowseFolder;
+        dlgSelectAlertHide();
+        startBrowsing2();
+
+        $('#dlg-file-browse-operations').modal('show');
+    });
+
     // handling of breadcrumbs
     $("body").on("click", ".browse-select", function(e) {
         dlgBrowse($(this).attr('data-path'));
@@ -41,21 +68,79 @@ $( document ).ready(function() {
     });
 
     $('.dlg-action-button').on('click', function(){
-        let filepath = $(this).attr('data-collection') + "/" + $(this).attr('data-name');
-        let newFilepath = dlgCurrentFolder + "/" + $(this).attr('data-name');
+        let action = $(this).attr("data-action");
+        // Single file
+        if (action == 'move' || action == 'copy') {
+            let filepath = $(this).attr('data-collection') + "/" + $(this).attr('data-name');
+            let newFilepath = dlgCurrentFolder + "/" + $(this).attr('data-name');
 
-        if($(this).attr("data-action") == 'move') {
-            moveFile(filepath, newFilepath);
-        } else if ($(this).attr("data-action") == 'copy') {
-            copyFile(filepath, newFilepath);
+            if(action == 'move') {
+                moveFile(filepath, newFilepath, false);
+            } else if (action == 'copy') {
+                copyFile(filepath, newFilepath, false);
+            }
+        } else {
+            // Multiple items
+            $('.multi-select-table tbody').html('');
+            $("input:checkbox[name='multiSelect[]']:checked").each(function(index) {
+                let type = $(this).attr('data-type');
+                let name = $(this).attr('data-name');
+                let icon;
+                if (type == 'coll') {
+                    icon = '<i class="fa fa-folder-o"></i>';
+                } else {
+                    icon = '<i class="fa fa-file-o"></i>';
+                }
+
+                let row = `<tr class="row-${index}">
+                    <td>${icon} ${name}</td>
+                    <td class="item-progress">-</td>
+                </tr>    
+                `;
+                $('.multi-select-table tbody').append(row);
+            });
+
+            $('#dlg-file-browse-operations').modal('hide');
+            $('#mutli-select-progress').modal('show');
         }
+
+    });
+
+    $('#mutli-select-progress').on('show.bs.modal', function (e) {
+        // Get action (move or copy)
+        let action = $('#mutli-select-progress').attr('data-action');
+
+        $("input:checkbox[name='multiSelect[]']:checked").each(function(index) {
+            let type = $(this).attr('data-type');
+            let name = $(this).attr('data-name');
+            let currentPath = $(this).val();
+            let newPath = dlgCurrentFolder + "/" + name;
+
+            if (type == 'data') {
+                if (action == 'copy') {
+                    copyFile(currentPath, newPath, true, index);
+                } else {
+                    moveFile(currentPath, newPath, true, index);
+                }
+            } else {
+                if (action == 'copy') {
+                    copyFolder(currentPath, newPath, true, index);
+                } else {
+                    moveFolder(currentPath, newPath, true, index);
+                }
+            }
+        });
     })
 
 });
 
-async function copyFile(filepath, newFilepath)
+async function copyFile(filepath, newFilepath, multiple, multipleIndex = null)
 {
-    dlgSelectAlertHide();
+    if (multiple) {
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+    } else {
+        dlgSelectAlertHide();
+    }
 
     try {
         let result = await Yoda.call('research_file_copy',
@@ -67,20 +152,37 @@ async function copyFile(filepath, newFilepath)
         );
 
         if (result.status == 'ok') {
-            Yoda.set_message('success', 'The file has been successfully copied.');
-            $('#dlg-file-browse-operations').modal('hide');
+            if (multiple) {
+                $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text('Copy completed');
+                browse(currentBrowseFolder, true);
+            } else {
+                Yoda.set_message('success', 'The file has been successfully copied.');
+                $('#dlg-file-browse-operations').modal('hide');
+            }
         }
         else { // non api error
-            dlgSelectAlertShow(result.status_info);
+            if (multiple) {
+                $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(result.status_info);
+            } else {
+                dlgSelectAlertShow(result.status_info);
+            }
         }
     } catch(e) { // API ERROR
-        dlgSelectAlertShow(e.status_info);
+        if (multiple) {
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(dlgSelectAlertShow(e.status_info));
+        } else {
+            dlgSelectAlertShow(e.status_info);
+        }
     }
 }
 
-async function moveFile(filepath, newFilepath)
+async function moveFile(filepath, newFilepath, multiple, multipleIndex = null)
 {
-    dlgSelectAlertHide();
+    if (multiple) {
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+    } else {
+        dlgSelectAlertHide();
+    }
 
     try {
         let result = await Yoda.call('research_file_move',
@@ -92,16 +194,115 @@ async function moveFile(filepath, newFilepath)
         );
 
         if (result.status == 'ok') {
-            Yoda.set_message('success', 'The file has been successfully moved.');
-            $('#dlg-file-browse-operations').modal('hide');
-            let collection = $('#dlg-file-browse-operations .dlg-action-button').attr('data-collection');
-            browse(collection, true);
+            if (multiple) {
+                $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text('Move completed');
+                browse(currentBrowseFolder, true);
+            } else {
+                Yoda.set_message('success', 'The file has been successfully moved.');
+                $('#dlg-file-browse-operations').modal('hide');
+                let collection = $('#dlg-file-browse-operations .dlg-action-button').attr('data-collection');
+                browse(collection, true);
+            }
         }
         else { // non api error
-            dlgSelectAlertShow(result.status_info);
+            if (multiple) {
+                $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(result.status_info);
+            } else {
+                dlgSelectAlertShow(result.status_info);
+            }
         }
     } catch(e) { // API ERROR
-        dlgSelectAlertShow(e.status_info);
+        if (multiple) {
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(dlgSelectAlertShow(e.status_info));
+        } else {
+            dlgSelectAlertShow(e.status_info);
+        }
+    }
+}
+
+async function copyFolder(folderPath, newFolderpath, multiple, multipleIndex = null)
+{
+    if (multiple) {
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+    } else {
+        dlgSelectAlertHide();
+    }
+
+    try {
+        let result = await Yoda.call('research_folder_copy',
+            {
+                'folder_path': Yoda.basePath + folderPath,
+                'new_folder_path': Yoda.basePath + newFolderpath
+            },
+            {'quiet': true, 'rawResult': true}
+        );
+
+        if (result.status == 'ok') {
+            if (multiple) {
+                $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text('Copy completed');
+                browse(currentBrowseFolder, true);
+            } else {
+                Yoda.set_message('success', 'The folder has been successfully copied.');
+                $('#dlg-file-browse-operations').modal('hide');
+            }
+        }
+        else { // non api error
+            if (multiple) {
+                $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(result.status_info);
+            } else {
+                dlgSelectAlertShow(result.status_info);
+            }
+        }
+    } catch(e) { // API ERROR
+        if (multiple) {
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(dlgSelectAlertShow(e.status_info));
+        } else {
+            dlgSelectAlertShow(e.status_info);
+        }
+    }
+}
+
+async function moveFolder(folderPath, newFolderpath, multiple, multipleIndex = null)
+{
+    if (multiple) {
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+    } else {
+        dlgSelectAlertHide();
+    }
+
+    try {
+        let result = await Yoda.call('research_folder_move',
+            {
+                'folder_path': Yoda.basePath + folderPath,
+                'new_folder_path': Yoda.basePath + newFolderpath
+            },
+            {'quiet': true, 'rawResult': true}
+        );
+
+        if (result.status == 'ok') {
+            if (multiple) {
+                $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text('Move completed');
+                browse(currentBrowseFolder, true);
+            } else {
+                Yoda.set_message('success', 'The folder has been successfully moved.');
+                $('#dlg-file-browse-operations').modal('hide');
+                let collection = $('#dlg-file-browse-operations .dlg-action-button').attr('data-collection');
+                browse(collection, true);
+            }
+        }
+        else { // non api error
+            if (multiple) {
+                $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(result.status_info);
+            } else {
+                dlgSelectAlertShow(result.status_info);
+            }
+        }
+    } catch(e) { // API ERROR
+        if (multiple) {
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(dlgSelectAlertShow(e.status_info));
+        } else {
+            dlgSelectAlertShow(e.status_info);
+        }
     }
 }
 
