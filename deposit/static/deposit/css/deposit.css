@@ -92,3 +92,8 @@ nav .breadcrumb {
 a.dropdown-item:hover, a.dropdown-item:focus {
     cursor: pointer;
 }
+
+.drag-upload {
+    border-style: dashed;
+    border-width: 5px;
+}
