@@ -207,6 +207,16 @@ $(function() {
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', percent + '%');
     });
 
+    $("body").on("dragbetterenter",function(event){
+        $('.upload-drop').addClass('drag-upload');
+        Yoda.set_message('success', 'Drop the files to the file browser.');
+    });
+
+    $("body").on("dragbetterleave",function(event){
+        $('.upload-drop').removeClass('drag-upload');
+        $('#messages').html('');
+    });
+
     $("body").on("click", ".browse", function(e) {
         browse($(this).attr('data-path'), true);
         // Dismiss stale messages.
