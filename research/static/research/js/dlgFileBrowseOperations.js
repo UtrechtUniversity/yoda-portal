@@ -3,14 +3,22 @@ var dlgCurrentFolder = '';
 var currentBrowseFolder = '';
 
 $( document ).ready(function() {
-    $("body").on("click", "a.file-copy, a.file-move", function() {
+    $("body").on("click", "a.file-copy, a.file-move, a.folder-copy, a.folder-move", function() {
         // Determine action
         if($(this).hasClass("file-move")) {
-            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'move');
+            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'file-move');
             $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move');
             $('#dlg-file-browse-operations .card-title span.action').text('move');
+        } else if($(this).hasClass("folder-move")) {
+            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-move');
+            $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move');
+            $('#dlg-file-browse-operations .card-title span.action').text('move');
+        } else if($(this).hasClass("file-copy")) {
+            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'file-copy');
+            $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy');
+            $('#dlg-file-browse-operations .card-title span.action').text('copy');
         } else {
-            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'copy');
+            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-copy');
             $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy');
             $('#dlg-file-browse-operations .card-title span.action').text('copy');
         }
@@ -70,14 +78,18 @@ $( document ).ready(function() {
     $('.dlg-action-button').on('click', function(){
         let action = $(this).attr("data-action");
         // Single file
-        if (action == 'move' || action == 'copy') {
-            let filepath = $(this).attr('data-collection') + "/" + $(this).attr('data-name');
-            let newFilepath = dlgCurrentFolder + "/" + $(this).attr('data-name');
+        if (action == 'file-move' || action == 'file-copy' || action == 'folder-move' || action == 'folder-copy') {
+            let path = $(this).attr('data-collection') + "/" + $(this).attr('data-name');
+            let newPath = dlgCurrentFolder + "/" + $(this).attr('data-name');
 
-            if(action == 'move') {
-                moveFile(filepath, newFilepath, false);
-            } else if (action == 'copy') {
-                copyFile(filepath, newFilepath, false);
+            if(action == 'file-move') {
+                moveFile(path, newPath, false);
+            } else if (action == 'file-copy') {
+                copyFile(path, newPath, false);
+            } else if (action == 'folder-move') {
+                moveFolder(path, newPath, false);
+            } else if (action == 'folder-copy') {
+                copyFolder(path, newPath, false);
             }
         } else {
             // Multiple items
@@ -95,7 +107,7 @@ $( document ).ready(function() {
                 let row = `<tr class="row-${index}">
                     <td>${icon} ${name}</td>
                     <td class="item-progress">-</td>
-                </tr>    
+                </tr>
                 `;
                 $('.multi-select-table tbody').append(row);
             });
