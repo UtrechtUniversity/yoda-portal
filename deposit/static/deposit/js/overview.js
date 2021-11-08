@@ -23,43 +23,6 @@ $(function() {
         startBrowsing(browsePageItems);
     }
 
-    ////////////////////////////////////////////////
-    // File and folder management from context menu
-    ////////////////////////////////////////////////
-    $('.btn-group button.folder-create').click(function(){
-        // Destroy earlier alerts
-        fileMgmtDialogAlert('folder-create', '');
-
-        // Set initial values
-        $('#path-folder-create').val('');
-        $('#folder-create #collection').html($(this).attr('data-path')); // for user
-        $('.btn-confirm-folder-create').attr('data-path', $(this).attr('data-path'));
-
-        $('#folder-create').modal('show');
-    });
-
-    // FOLDER create
-    $('.btn-confirm-folder-create').click(function() {
-        // er kan een dubbele naam zijn? error handling afwikkelen!
-       handleFolderAdd($('#path-folder-create').val(), $(this).attr('data-path'));
-    });
-
-    // FOLDER rename
-    $("body").on("click", "a.folder-rename", function() {
-        fileMgmtDialogAlert('folder-rename', '');
-
-        // set initial values for further processing and user experience
-        $('#folder-rename-name').val($(this).attr('data-name'));
-        $('#org-folder-rename-name').val($(this).attr('data-name'));
-        $('#folder-rename #collection').html($(this).attr('data-collection'));
-        $('.btn-confirm-folder-rename').attr('data-collection', $(this).attr('data-collection'));
-
-        $('#folder-rename').modal('show');
-    });
-    $('.btn-confirm-folder-rename').click(function() {
-        handleFolderRename($('#folder-rename-name').val(), $(this).attr('data-collection'), $('#org-folder-rename-name').val());
-    });
-
     // FOLDER delete
     $("body").on("click", "a.folder-delete", function() {
         fileMgmtDialogAlert('folder-delete', '');
@@ -76,197 +39,7 @@ $(function() {
     $('.btn-confirm-folder-delete').click(function() {
         handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
-
-    // FILE rename
-    $("body").on("click", "a.file-rename", function() {
-        // Destroy earlier alerts
-        fileMgmtDialogAlert('file-rename', '');
-
-        // set initial values for further processing and user experience
-        $('#file-rename-name').val($(this).attr('data-name'));
-        $('#org-file-rename-name').val($(this).attr('data-name'));
-        $('#file-rename #collection').html($(this).attr('data-collection'));
-        $('.btn-confirm-file-rename').attr('data-collection', $(this).attr('data-collection'));
-
-        $('#file-rename').modal('show');
-        // input text selection handling - select all text in front of last '.'
-        $('#file-rename-name').focus();
-        var endSelection = $(this).attr('data-name').lastIndexOf('.');
-        if (endSelection == -1) {
-            endSelection = $(this).attr('data-name').length
-        }
-        document.getElementById('file-rename-name').setSelectionRange(0, endSelection);
-    });
-
-    $('.btn-confirm-file-rename').click(function() {
-        handleFileRename($('#file-rename-name').val(), $(this).attr('data-collection'), $('#org-file-rename-name').val());
-    });
-
-    // FILE delete
-    $("body").on("click", "a.file-delete", function() {
-        // Destroy earlier alerts
-        fileMgmtDialogAlert('file-delete', '');
-
-        // set initial values for further processing and user experience
-        $('#file-delete #collection').html($(this).attr('data-collection'));
-        $('#file-delete-name').html($(this).attr('data-name'));
-        $('.btn-confirm-file-delete').attr('data-collection', $(this).attr('data-collection'));
-        $('.btn-confirm-file-delete').attr('data-name', $(this).attr('data-name'));
-
-        $('#file-delete').modal('show');
-    });
-
-    $('.btn-confirm-file-delete').click(function() {
-        handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'));
-    });
-
-    // Flow.js upload handler
-    var r = new Flow({
-        target: '/research/upload',
-        chunkSize: 25 * 1024 * 1024,
-        forceChunkSize: true,
-        simultaneousUploads: 1,
-        query: {'csrf_token': Yoda.csrf.tokenValue, filepath : ''}
-    });
-    // Flow.js isn't supported, fall back on a different method
-    if (!r.support) {
-        Yoda.set_message('error', 'No upload browser support.');
-    }
-
-    // Assign upload places for dropping/selecting files
-    r.assignDrop($('.upload-drop')[0]);
-    r.assignBrowse($('.upload')[0]);
-    r.assignBrowse($('.upload-folder')[0], true);
-
-    // Flow.js handle events
-    r.on('filesAdded', function(files){
-        if (files.length) {
-            $('#files').html("");
-            $.each(files, function(key, file) {
-                logUpload(file.uniqueIdentifier, file);
-
-                let $self = $('#'+file.uniqueIdentifier);
-
-                // Pause btn
-                $self.find('.upload-pause').on('click', function () {
-                    file.pause();
-                    $self.find('.upload-pause').hide();
-                    $self.find('.upload-resume').show();
-                    $self.find('.msg').text('Paused');
-                });
-                // Resume btn
-                $self.find('.upload-resume').on('click', function () {
-                    file.resume();
-                    $self.find('.upload-pause').show();
-                    $self.find('.upload-resume').hide();
-                    $self.find('.msg').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
-                });
-                // Cancel btn
-                $self.find('.upload-cancel').on('click', function () {
-                    file.cancel();
-                    $self.remove();
-                });
-
-            });
-        }
-        $('#uploads').modal('show');
-    });
-    r.on('filesSubmitted', function() {
-        let path = $('.upload').attr('data-path');
-        r.opts.query.filepath = path;
-        r.upload();
-    });
-    r.on('complete', function(){
-        let path = $('.upload').attr('data-path');
-        browse(path);
-    });
-    r.on('fileSuccess', function(file,message){
-        $("#" + file.uniqueIdentifier + " .msg").html("<span class='text-success'>Upload complete</span>");
-        let $self = $('#'+file.uniqueIdentifier);
-        $self.find('.upload-btns').hide();
-
-    });
-    r.on('fileError', function(file, message){
-        $("#" + file.uniqueIdentifier + " .msg").html("Upload failed");
-        $("#" + file.uniqueIdentifier + " .progress-bar").css('width', '0%');
-        let $self = $('#'+file.uniqueIdentifier);
-        $self.find('.upload-pause').hide();
-    });
-    r.on('fileProgress', function(file){
-        var percent = Math.floor(file.progress()*100);
-        $("#" + file.uniqueIdentifier + " .progress-bar").css('width', percent + '%');
-    });
-
-    $("body").on("dragbetterenter",function(event){
-        $('.upload-drop').addClass('drag-upload');
-        Yoda.set_message('success', 'Drop the files to the file browser.');
-    });
-
-    $("body").on("dragbetterleave",function(event){
-        $('.upload-drop').removeClass('drag-upload');
-        $('#messages').html('');
-    });
-
-    $("body").on("click", ".browse", function(e) {
-        browse($(this).attr('data-path'), true);
-        // Dismiss stale messages.
-        $('#messages .close').click();
-        e.preventDefault();
-    });
-
 });
-
-
-async function handleFolderAdd(new_folder, collection) {
-
-    if (!new_folder.length) {
-        fileMgmtDialogAlert('folder-create', 'Please add a folder name');
-        return;
-    }
-
-    let result = await Yoda.call('research_folder_add',
-        {   coll: Yoda.basePath +  collection,
-            new_folder_name: new_folder
-        },
-        {'quiet': true, 'rawResult': true}
-    );
-
-    if (result.status == 'ok') {
-        Yoda.set_message('success', 'Successfully added new folder: ' + new_folder + ' to ' + collection );
-        browse(collection, true);
-        $('#folder-create').modal('hide');
-    }
-    else {
-        fileMgmtDialogAlert('folder-create', result.status_info);
-    }
-}
-
-
-async function handleFolderRename(new_folder_name, collection, org_folder_name) {
-
-    if (!new_folder_name.length) {
-        fileMgmtDialogAlert('folder-rename', 'Please add a new folder name');
-        return;
-    }
-
-    let result = await Yoda.call('research_folder_rename',
-        {   new_folder_name: new_folder_name,
-            coll: Yoda.basePath +  collection,
-            org_folder_name: org_folder_name
-        },
-        {'quiet': true, 'rawResult': true}
-    );
-
-    if (result.status == 'ok') {
-        Yoda.set_message('success', 'Successfully renamed folder to ' + new_folder_name );
-        browse(collection, true);
-        $('#folder-rename').modal('hide');
-    }
-    else {
-        fileMgmtDialogAlert('folder-rename', result.status_info);
-    }
-}
-
 
 async function handleFolderDelete(collection, folder_name) {
 
@@ -288,82 +61,6 @@ async function handleFolderDelete(collection, folder_name) {
     }
 }
 
-async function handleFileRename(new_file_name, collection, org_file_name) {
-
-    if (!new_file_name.length) {
-        fileMgmtDialogAlert('file-rename', 'Please add a new file name');
-        return;
-    }
-
-    let result = await Yoda.call('research_file_rename',
-        {   new_file_name: new_file_name,
-            coll: Yoda.basePath +  collection,
-            org_file_name: org_file_name
-        },
-        {'quiet': true, 'rawResult': true}
-    );
-
-    if (result.status == 'ok') {
-        Yoda.set_message('success', 'Successfully renamed file to ' + new_file_name );
-        browse(collection, true);
-        $('#file-rename').modal('hide');
-    }
-    else {
-        fileMgmtDialogAlert('file-rename', result.status_info);
-    }
-}
-
-async function handleFileDelete(collection, file_name) {
-    let result = await Yoda.call('research_file_delete',
-        {
-            coll: Yoda.basePath +  collection,
-            file_name: file_name
-        },
-        {'quiet': true, 'rawResult': true}
-    );
-
-    if (result.status == 'ok') {
-        Yoda.set_message('success', 'Successfully deleted file ' + file_name );
-        browse(collection, true);
-        $('#file-delete').modal('hide');
-    }
-    else {
-        fileMgmtDialogAlert('file-delete', result.status_info);
-    }
-}
-
-async function handleDepositClear()
-{
-    /* User clicks clear deposit and then confirm,
-     Then all data and metadata from the deposit-space is removed,
-     And the depositor is shown an empty deposit workflow.
-    */
-
-    let result = await Yoda.call('deposit_clear', {}, {'quiet': true, 'rawResult': true});
-
-    if (!result){
-        fileMgmtDialogAlert('deposit-clear', "API call not successfull");
-    } else if (result.status == 'ok') {
-        Yoda.set_message('success', 'Successfully cleared the deposit space');
-        $('#deposit-clear').modal('hide');
-        window.location.reload(true);
-    } else {
-        fileMgmtDialogAlert('deposit-clear', result.status_info);
-    }
-}
-
-function fileMgmtDialogAlert(dlgName, alert) {
-    //Alerts regarding folder/file management
-    //Inside the modals
-    if (alert.length) {
-        $('#alert-panel-' + dlgName + ' span').html(alert);
-        $('#alert-panel-' + dlgName).show()
-    }
-    else {
-        $('#alert-panel-' + dlgName).hide();
-    }
-}
-
 function changeBrowserUrl(path)
 {
     let url = window.location.pathname;
@@ -377,41 +74,10 @@ function changeBrowserUrl(path)
 function browse(dir = '', changeHistory = false)
 {
     currentFolder = dir;
-    makeBreadcrumb(dir);
     if (changeHistory)
         changeBrowserUrl(dir);
 
     buildFileBrowser(dir);
-    $('button.upload').attr('data-path', dir);
-    $('button.upload-folder').attr('data-path', dir);
-    $('button.folder-create').attr('data-path', dir);
-}
-
-
-function makeBreadcrumb(dir)
-{
-    let pathParts = dir.split('/').filter(x => x.length);
-
-    // [[Crumb text, Path]] - e.g. [...['x', '/research-a/x']]
-    let crumbs = [['Home', ''],
-                  ...Array.from(pathParts.entries())
-                          .map(([i,x]) => [x, '/'+pathParts.slice(0, i+1).join('/')])];
-
-    let html = '';
-    for (let [i, [text, path]] of crumbs.entries()) {
-        // Start at level 2, skip 'Home/deposit-pilot/deposit-pilot[]/' breadcrumbs
-        if (i > 1) {
-            let el = $('<li class="breadcrumb-item">');
-            text = htmlEncode(text).replace(/ /g, '&nbsp;');
-            if (i === crumbs.length-1)
-                 el.addClass('active').html(text);
-            else el.html(`<a class="browse" data-path="${htmlEncode(path)}"
-                             href="?dir=${encodeURIComponent(path)}">${text}</a>`);
-            html += el[0].outerHTML;
-        }
-    }
-
-    $('nav ol.breadcrumb').html(html);
 }
 
 function htmlEncode(value){
@@ -540,7 +206,7 @@ const tableRenderer = {
          return elem[0].outerHTML;
      },
     context: (_, __, row) => {
-        let actions = $('<div class="dropdown-menu">');
+        let actions = $('<span>');
 
         if (row.type === 'coll') {
 
@@ -549,24 +215,10 @@ const tableRenderer = {
                 return '';
             }
 
-            // Context menu folder
-            actions.append(`<a href="#" class="dropdown-item folder-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this folder">Rename</a>`);
-            actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this folder">Delete</a>`);
+            actions.append(`<a class="folder-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this deposit"><i class="fa fa-trash"></a>`);
         }
-        else {
-            // Context menu for files
-            actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this file">Rename</a>`);
-            actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
-            actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Copy this file">Copy</a>`);
-            actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this file">Move</a>`);
-        }
-        let dropdown = $(`<div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-                            </button>`);
-        dropdown.append(actions);
 
-        return dropdown[0].outerHTML;
+        return actions[0].innerHTML;
     }
 };
 
