@@ -30,7 +30,7 @@ def get_deposit_path():
 
 @deposit_bp.route('/')
 @deposit_bp.route('/browse')
-def overview():
+def index():
     """Deposit overview"""
 
     items = 25
