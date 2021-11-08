@@ -12,7 +12,7 @@
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
-<script src="{{ url_for('deposit_bp.static', filename='js/deposit.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/data.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
 <script>
     var browsePageItems = {{ items }};
@@ -45,7 +45,6 @@
                             <button type="button" class="btn btn-outline-secondary folder-create me-2" data-path="" title="Create a new folder"><i class="fa fa-folder px-2" aria-hidden="true"></i> Create Folder</button>
                             <button type="button" class="btn btn-outline-secondary upload me-2" data-path="" title="Upload files"><i class="fa fa-upload" aria-hidden="true"></i> Upload files</button>
                             <button type="button" class="btn btn-outline-secondary upload-folder me-2" data-path="" title="Upload folders"><i class="fa fa-upload" aria-hidden="true"></i> Upload folders</button>
-                            <button type="button" class="btn btn-outline-secondary deposit-delete" data-path="" title="Delete deposit"><i class="fa fa-trash" aria-hidden="true"></i> Delete deposit</button>
                         </div>
                     </div>
                 </div>

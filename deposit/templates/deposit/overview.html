@@ -9,7 +9,7 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
-<script src="{{ url_for('deposit_bp.static', filename='js/deposit.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/overview.js') }}"></script>
 <script>
     var browsePageItems = {{ items }};
     var browseStartDir = dir = path  = {{ dir|tojson|safe }};

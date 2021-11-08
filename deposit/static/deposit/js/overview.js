@@ -120,33 +120,6 @@ $(function() {
         handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
-    // Deposit delete
-    $("body").on("click", "a.deposit-delete", function() {
-        fileMgmtDialogAlert('deposit-delete', '');
-
-        // set initial values for further processing and user experience
-        $('#deposit-delete #collection').html($(this).attr('data-collection'));
-        $('#deposit-delete-name').html($(this).attr('data-name'));
-        $('.btn-confirm-deposit-delete').attr('data-collection', $(this).attr('data-collection'));
-        $('.btn-confirm-deposit-delete').attr('data-name', $(this).attr('data-name'));
-
-        $('#deposit-delete').modal('show');
-    });
-
-    $('.btn-confirm-deposit-delete').click(function() {
-        handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'));
-    });
-
-    // Deposit clear button
-    $("body").on("click", "button.deposit-delete", function() {
-        fileMgmtDialogAlert('deposit-clear', ''); // Destroy earlier alerts
-        $('#deposit-clear').modal('show');
-    });
-    $('.btn-confirm-deposit-clear').click(function() {
-        handleFolderDelete($(this).attr('data-path'));
-    });
-
-
     // Flow.js upload handler
     var r = new Flow({
         target: '/research/upload',
@@ -412,7 +385,6 @@ function browse(dir = '', changeHistory = false)
     $('button.upload').attr('data-path', dir);
     $('button.upload-folder').attr('data-path', dir);
     $('button.folder-create').attr('data-path', dir);
-    $('button.deposit-delete').attr('data-path', dir);
 }
 
 
