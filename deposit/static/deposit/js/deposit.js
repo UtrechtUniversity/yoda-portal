@@ -120,13 +120,30 @@ $(function() {
         handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
+    // Deposit delete
+    $("body").on("click", "a.deposit-delete", function() {
+        fileMgmtDialogAlert('deposit-delete', '');
+
+        // set initial values for further processing and user experience
+        $('#deposit-delete #collection').html($(this).attr('data-collection'));
+        $('#deposit-delete-name').html($(this).attr('data-name'));
+        $('.btn-confirm-deposit-delete').attr('data-collection', $(this).attr('data-collection'));
+        $('.btn-confirm-deposit-delete').attr('data-name', $(this).attr('data-name'));
+
+        $('#deposit-delete').modal('show');
+    });
+
+    $('.btn-confirm-deposit-delete').click(function() {
+        handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'));
+    });
+
     // Deposit clear button
-    $("body").on("click", "button.deposit-clear", function() {
+    $("body").on("click", "button.deposit-delete", function() {
         fileMgmtDialogAlert('deposit-clear', ''); // Destroy earlier alerts
         $('#deposit-clear').modal('show');
     });
     $('.btn-confirm-deposit-clear').click(function() {
-        handleDepositClear();
+        handleFolderDelete($(this).attr('data-path'));
     });
 
 
@@ -395,6 +412,7 @@ function browse(dir = '', changeHistory = false)
     $('button.upload').attr('data-path', dir);
     $('button.upload-folder').attr('data-path', dir);
     $('button.folder-create').attr('data-path', dir);
+    $('button.deposit-delete').attr('data-path', dir);
 }
 
 
@@ -524,7 +542,7 @@ const tableRenderer = {
     name: (name, _, row) => {
          let tgt = `${currentFolder}/${name}`;
          if (row.type === 'coll')
-              return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
+              return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
          else return `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
     },
     size: (size, _, row) => {
