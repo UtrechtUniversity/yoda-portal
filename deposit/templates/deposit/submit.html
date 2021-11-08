@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit &dash; Submit{% endblock title %}
+{% block title %}{{ super() }} &dash; Deposit &dash; Submit data{% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/stepper/bs-stepper.custom.css') }}">
@@ -32,7 +32,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="/deposit/metadata/" class="btn btn-secondary">Document data</a>
+        <a href="/deposit/metadata" class="btn btn-secondary">Document data</a>
         <button id="submit" type="submit" class="btn btn-primary pull-right" disabled>Submit data</button>
     </div>
 </div>

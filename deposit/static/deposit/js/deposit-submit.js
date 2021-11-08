@@ -80,7 +80,7 @@ async function submitToVault()
             {'rawResult': true}
         );
         if (result.status == "ok") {
-            window.location.href = '/deposit/thankyou/';
+            window.location.href = '/deposit/thank-you';
         }
     } catch (e) {
         console.log(e);
@@ -105,4 +105,3 @@ async function handleDepositClear()
         $("#alert-panel-deposit-clear").text(result.status_info);
     }
 }
-

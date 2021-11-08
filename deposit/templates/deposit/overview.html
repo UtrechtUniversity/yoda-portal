@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Deposit &dash; My deposits{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/deposit.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/deposit.js') }}"></script>
+<script>
+    var browsePageItems = {{ items }};
+    var browseStartDir = dir = path  = {{ dir|tojson|safe }};
+    var view = 'browse';
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<h2>My deposits</h2>
+
+<div class="card mt-4 page_deposit">
+    <div class="card-body">
+        <div class="row d-block">
+            <div class="row pe-0">
+                <div class="col-md-6 ps-0">
+                    <nav aria-label="breadcrumb flex-column mb-0">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item">Home</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-md-6 pe-0 mt-2 pull-right" id="top-upload-buttons">
+                    <a class="btn btn-primary mt-3 me-1" href="/deposit/data" title="Start new deposit">Start new deposit</a>
+                </div>
+            </div>
+
+            <!-- datatable -->
+            <div class="mt-3">
+                <table id="file-browser" class="table yoda-table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Modified date</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <div class="row pull-right">
+            <a class="btn btn-primary mt-3 me-1" href="/deposit/data" title="Start new deposit">Start new deposit</a>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div class="modal" tabindex="-1" role="dialog" id="deposit-delete">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Delete deposit</h5>
+                <div class="alert alert-warning" id="alert-panel-deposit-delete">
+                    <span></span>
+                </div>
+                <p>Do you want to delete deposit <span id="deposit-delete-name"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class='btn btn-primary btn-confirm-deposit-delete' data-collection="" data-name="">Delete deposit</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

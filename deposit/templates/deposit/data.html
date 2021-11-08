@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit{% endblock title %}
+{% block title %}{{ super() }} &dash; Deposit &dash; Add data{% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
@@ -66,7 +66,7 @@
             </div>
         </div>
         <div class="row pull-right">
-            <a class="btn btn-primary mt-3 me-1" href="/deposit/metadata/">Document data</a>
+            <a class="btn btn-primary mt-3 me-1" href="/deposit/metadata">Document data</a>
         </div>
     </div>
 </div>

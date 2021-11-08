@@ -188,11 +188,11 @@ class YodaButtons extends React.Component {
     }
 
     renderBackButton() {
-        return (<button onClick={this.props.backButton} type="submit" className="btn btn-secondary pull-left">Deposit</button>);
+        return (<button onClick={this.props.backButton} type="submit" className="btn btn-secondary pull-left">Deposit data</button>);
     }
 
     renderSubmitButton() {
-        return (<button onClick={this.props.submitButton} type="submit" className="btn btn-primary pull-right">Submit</button>);
+        return (<button onClick={this.props.submitButton} type="submit" className="btn btn-primary pull-right">Submit data</button>);
     }
 
     renderDeleteButton() {
@@ -390,11 +390,10 @@ async function submitData(data) {
             {coll: Yoda.basePath+path, metadata: data},
             {errorPrefix: 'Metadata could not be saved'});
 
-            //Yoda.store_message('success', `Updated metadata of folder <${path}>`);
             if (back) {
-                window.location.href = '/deposit/';
+                window.location.href = '/deposit/data';
             } else {
-                window.location.href = '/deposit/submit/';
+                window.location.href = '/deposit/submit';
             }
     } catch (e) {
         // Allow retry.
