@@ -1,4 +1,4 @@
-deposit-delete"use strict";
+"use strict";
 
 $(document).ajaxSend(function(e, request, settings) {
     // Append a CSRF token to all AJAX POST requests.
