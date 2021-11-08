@@ -20,7 +20,7 @@
 {% block content %}
 <h2>My deposits</h2>
 
-<div class="card mt-4 page_deposit">
+<div class="card mt-4">
     <div class="card-body">
         <div class="row d-block">
             <div class="row pe-0">
@@ -31,8 +31,10 @@
                         </ol>
                     </nav>
                 </div>
-                <div class="col-md-6 pe-0 mt-2 pull-right" id="top-upload-buttons">
-                    <a class="btn btn-primary mt-3 me-1" href="/deposit/data" title="Start new deposit">Start new deposit</a>
+                <div class="col-md-6">
+                    <div class="row pull-right">
+                        <a class="btn btn-primary mt-3 me-1" href="/deposit/data" title="Start new deposit">Start new deposit</a>
+                    </div>
                 </div>
             </div>
 
@@ -49,9 +51,6 @@
                     </thead>
                 </table>
             </div>
-        </div>
-        <div class="row pull-right">
-            <a class="btn btn-primary mt-3 me-1" href="/deposit/data" title="Start new deposit">Start new deposit</a>
         </div>
     </div>
 </div>
