@@ -40,6 +40,18 @@ $(function() {
     });
 });
 
+function fileMgmtDialogAlert(dlgName, alert) {
+    //Alerts regarding folder/file management
+    //Inside the modals
+    if (alert.length) {
+        $('#alert-panel-' + dlgName + ' span').html(alert);
+        $('#alert-panel-' + dlgName).show()
+    }
+    else {
+        $('#alert-panel-' + dlgName).hide();
+    }
+}
+
 async function handleFolderDelete(collection, folder_name) {
 
     let result = await Yoda.call('research_folder_delete',
