@@ -373,7 +373,7 @@ function makeBreadcrumb(dir)
     let pathParts = dir.split('/').filter(x => x.length);
 
     // [[Crumb text, Path]] - e.g. [...['x', '/research-a/x']]
-    let crumbs = [['Home', ''],
+    let crumbs = [['My deposits', ''],
                   ...Array.from(pathParts.entries())
                           .map(([i,x]) => [x, '/'+pathParts.slice(0, i+1).join('/')])];
 

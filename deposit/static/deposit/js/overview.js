@@ -64,7 +64,7 @@ async function handleFolderDelete(collection, folder_name) {
 
     if (result.status == 'ok') {
         Yoda.set_message('success', 'Successfully deleted folder ' + folder_name );
-        browse(collection, true);
+        browse(currentFolder, true);
         $('#deposit-delete').modal('hide');
     }
     else {
@@ -240,7 +240,7 @@ function startBrowsing(items)
         "bInfo": false,
         "bLengthChange": false,
         "language": {
-            "emptyTable": "Drag and drop files and folders here",
+            "emptyTable": "You have no active deposits, start a new deposit!",
             "lengthMenu": "_MENU_"
         },
         "dom": '<"top">frt<"bottom"lp><"clear">',
@@ -259,48 +259,4 @@ function startBrowsing(items)
         "pageLength": items
     });
     browse(currentFolder);
-}
-
-
-window.addEventListener('popstate', function(e) {
-    // Catch forward/backward navigation and reload the view.
-    let query = window.location.search.substr(1).split('&').reduce(
-        function(acc, kv) {
-            let xy = kv.split('=', 2);
-            acc[xy[0]] = xy.length == 1 || decodeURIComponent(xy[1]);
-            return acc;
-        }, {});
-
-    browse('dir' in query ? query.dir : '');
-});
-
-function logUpload(id, file) {
-
-   let log = `<div class="row upload-row mb-1" id="${id}">
-                  <div class="col-md-6">
-                    <div class="upload-filename text-break">${htmlEncode(file.relativePath)}</div>
-                    <div class="upload-btns btn-group btn-group-sm ms-3" role="group" aria-label="Basic example">
-                      <button type="button" class="btn btn-secondary upload-pause me-1">Pause</button>
-                      <button type="button" class="btn btn-secondary upload-resume me-1 hide">Resume</button>
-                      <button type="button" class="btn btn-secondary upload-cancel me-1">Cancel</button>
-                    </div>
-                  </div>
-                  <div class="col-md-3"><div class="progress"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>
-                  <div class="col-md-3 msg"><i class="fa fa-spinner fa-spin fa-fw"></i></div>
-               </div>`;
-    $('#files').append(log);
-}
-
-function dragEnterHandler(ev)
-{
-    $(this).addClass('flow-dragover');
-}
-
-function dragEndHandler(ev)
-{
-    $(this).removeClass('flow-dragover');
-}
-
-function dropHandler(ev) {
-    $(this).removeClass('flow-dragover');
 }

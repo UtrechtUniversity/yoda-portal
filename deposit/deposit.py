@@ -21,9 +21,9 @@ deposit_bp = Blueprint('deposit_bp', __name__,
 """
 
 
-def get_deposit_path():
-    """Returns folder to deposit files. default: '/research-initial'"""
-    response = api.call('deposit_path')
+def create_new_deposit():
+    """Creates a new deposit folder."""
+    response = api.call('deposit_create')
     path = "/" + response['data']['deposit_path']
     return path.replace('//', '/')
 
@@ -37,7 +37,6 @@ def index():
 
     return render_template('deposit/overview.html',
                            activeModule='deposit',
-                           searchHtml='',
                            items=items,
                            dir=path)
 
@@ -46,11 +45,9 @@ def index():
 def data():
     """Step 1: Add data"""
     items = 25
-    path = request.args.get('dir', get_deposit_path())
-
+    path = request.args.get('dir', create_new_deposit())
     return render_template('deposit/data.html',
                            activeModule='deposit',
-                           searchHtml='',
                            items=items,
                            dir=path)
 
