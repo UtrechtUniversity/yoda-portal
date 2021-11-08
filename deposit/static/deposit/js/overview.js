@@ -1,4 +1,4 @@
-"use strict";
+deposit-delete"use strict";
 
 $(document).ajaxSend(function(e, request, settings) {
     // Append a CSRF token to all AJAX POST requests.
@@ -24,19 +24,18 @@ $(function() {
     }
 
     // FOLDER delete
-    $("body").on("click", "a.folder-delete", function() {
-        fileMgmtDialogAlert('folder-delete', '');
+    $("body").on("click", "a.deposit-delete", function() {
+        fileMgmtDialogAlert('deposit-delete', '');
 
         // set initial values for further processing and user experience
-        $('#folder-delete #collection').html($(this).attr('data-collection'));
-        $('#folder-delete-name').html($(this).attr('data-name'));
-        $('.btn-confirm-folder-delete').attr('data-collection', $(this).attr('data-collection'));
-        $('.btn-confirm-folder-delete').attr('data-name', $(this).attr('data-name'));
+        $('#deposit-delete-name').html($(this).attr('data-name'));
+        $('.btn-confirm-deposit-delete').attr('data-collection', $(this).attr('data-collection'));
+        $('.btn-confirm-deposit-delete').attr('data-name', $(this).attr('data-name'));
 
-        $('#folder-delete').modal('show');
+        $('#deposit-delete').modal('show');
     });
 
-    $('.btn-confirm-folder-delete').click(function() {
+    $('.btn-confirm-deposit-delete').click(function() {
         handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 });
@@ -54,10 +53,10 @@ async function handleFolderDelete(collection, folder_name) {
     if (result.status == 'ok') {
         Yoda.set_message('success', 'Successfully deleted folder ' + folder_name );
         browse(collection, true);
-        $('#folder-delete').modal('hide');
+        $('#deposit-delete').modal('hide');
     }
     else {
-        fileMgmtDialogAlert('folder-delete', result.status_info);
+        fileMgmtDialogAlert('deposit-delete', result.status_info);
     }
 }
 
@@ -215,7 +214,7 @@ const tableRenderer = {
                 return '';
             }
 
-            actions.append(`<a class="folder-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this deposit"><i class="fa fa-trash"></a>`);
+            actions.append(`<a href="#" class="deposit-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this deposit"><i class="fa fa-trash"></a>`);
         }
 
         return actions[0].innerHTML;
