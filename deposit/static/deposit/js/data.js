@@ -383,10 +383,15 @@ function makeBreadcrumb(dir)
         if (i != 1) {
             let el = $('<li class="breadcrumb-item">');
             text = htmlEncode(text).replace(/ /g, '&nbsp;');
-            if (i === crumbs.length-1)
+            if (i === crumbs.length-1) {
                  el.addClass('active').html(text);
-            else el.html(`<a class="browse" data-path="${htmlEncode(path)}"
-                             href="?dir=${encodeURIComponent(path)}">${text}</a>`);
+            } else {
+                if (i == 0) {
+                    el.html(`<a data-path="${htmlEncode(path)}" href="/deposit/browse">${text}</a>`);
+                } else {
+                    el.html(`<a data-path="${htmlEncode(path)}" href="/deposit/data?dir=${encodeURIComponent(path)}">${text}</a>`);
+                }
+            }
             html += el[0].outerHTML;
         }
     }
