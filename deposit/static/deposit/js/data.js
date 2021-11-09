@@ -379,8 +379,8 @@ function makeBreadcrumb(dir)
 
     let html = '';
     for (let [i, [text, path]] of crumbs.entries()) {
-        // Start at level 2, skip 'Home/deposit-pilot/deposit-pilot[]/' breadcrumbs
-        if (i > 1) {
+        // Skip deposit group level.
+        if (i == 1) {
             let el = $('<li class="breadcrumb-item">');
             text = htmlEncode(text).replace(/ /g, '&nbsp;');
             if (i === crumbs.length-1)
