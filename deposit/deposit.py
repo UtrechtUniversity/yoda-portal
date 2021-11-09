@@ -55,19 +55,22 @@ def data():
 @deposit_bp.route('/metadata')
 def metadata():
     """Step 2: Document data"""
-    path = request.args.get('dir')
+    path = request.args.get('dir', None)
+    if path is None:
+        return redirect(url_for('deposit_bp.index'))
     return render_template('deposit/metadata-form.html', path=path)
 
 
 @deposit_bp.route('/submit')
 def submit():
     """Step 3: Submit data"""
-    path = request.args.get('dir')
+    path = request.args.get('dir', None)
+    if path is None:
+        return redirect(url_for('deposit_bp.index'))
     return render_template('deposit/submit.html', path=path)
 
 
 @deposit_bp.route('/thank-you')
 def thankyou():
     """Step 4: Thank you"""
-    path = request.args.get('dir')
-    return render_template('deposit/thank-you.html', path=path)
+    return render_template('deposit/thank-you.html')
