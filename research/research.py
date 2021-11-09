@@ -40,10 +40,10 @@ def index():
         if 'research-search-status-value' in session:
             searchStatusValue = session['research-search-status-value']
 
-        searchType = session['research-search-type']
-        searchStart = session['research-search-start']
-        searchOrderDir = session['research-search-order-dir']
-        searchOrderColumn = session['research-search-order-column']
+        searchType = session.get('research-search-type', '')
+        searchStart = session.get('research-search-start', '')
+        searchOrderDir = session.get('research-search-order-dir', '')
+        searchOrderColumn = session.get('research-search-order-column', '')
 
     showStatus = False
     showTerm = False
