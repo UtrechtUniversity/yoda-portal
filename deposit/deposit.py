@@ -3,7 +3,7 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, redirect, render_template, request, url_for
 
 import api
 
