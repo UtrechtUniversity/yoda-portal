@@ -380,7 +380,7 @@ function makeBreadcrumb(dir)
     let html = '';
     for (let [i, [text, path]] of crumbs.entries()) {
         // Skip deposit group level.
-        if (i == 1) {
+        if (i != 1) {
             let el = $('<li class="breadcrumb-item">');
             text = htmlEncode(text).replace(/ /g, '&nbsp;');
             if (i === crumbs.length-1)
