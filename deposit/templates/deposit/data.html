@@ -28,21 +28,19 @@
 
 <h2>Upload data</h2>
 
-<div class="row d-block">
-    <nav aria-label="breadcrumb flex-column">
+<div class="row">
+    <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">Home</li>
         </ol>
     </nav>
 
-    <div class="row">
-        <div class="col-md-12 pe-0 mt-2" id="top-upload-buttons">
-            <div class="btn-toolbar pull-right" role="toolbar">
-                <div class="btn-group pe-0" role="group">
-                    <button type="button" class="btn btn-outline-secondary folder-create me-2" data-path="" title="Create a new folder"><i class="fa fa-folder px-2" aria-hidden="true"></i> Create Folder</button>
-                    <button type="button" class="btn btn-outline-secondary upload me-2" data-path="" title="Upload files"><i class="fa fa-upload" aria-hidden="true"></i> Upload files</button>
-                    <button type="button" class="btn btn-outline-secondary upload-folder me-2" data-path="" title="Upload folders"><i class="fa fa-upload" aria-hidden="true"></i> Upload folders</button>
-                </div>
+    <div class="col-md-12">
+        <div class="btn-toolbar pull-right" role="toolbar">
+            <div class="btn-group pe-0" role="group">
+                <button type="button" class="btn btn-outline-secondary folder-create me-2" data-path="" title="Create a new folder"><i class="fa fa-folder px-2" aria-hidden="true"></i> Create Folder</button>
+                <button type="button" class="btn btn-outline-secondary upload me-2" data-path="" title="Upload files"><i class="fa fa-upload" aria-hidden="true"></i> Upload files</button>
+                <button type="button" class="btn btn-outline-secondary upload-folder" data-path="" title="Upload folders"><i class="fa fa-upload" aria-hidden="true"></i> Upload folders</button>
             </div>
         </div>
     </div>
@@ -61,14 +59,15 @@
             </table>
         </div>
     </div>
-    <div class="row pull-right">
-        <a class="btn btn-primary mt-3 me-1" href="/deposit/metadata?dir={{ dir|urlencode }}">Document data</a>
+
+    <div class="col-md-12">
+        <a class="btn btn-primary mt-3 pull-right" href="/deposit/metadata?dir={{ dir|urlencode }}">Document data</a>
     </div>
 </div>
 
 <div class="card upload-large-files mt-4">
     <div class="card-header">
-        <h5 class="card-title">Alternative upload methods</h5>
+        <h6 class="card-title">Alternative upload methods</h6>
     </div>
     <div class="card-body">
         <p>For frequent large uploads (bigger than 1GB) we recommend using one of the following:</p>
