@@ -10,11 +10,9 @@
 {% endblock scripts %}
 
 {% block content %}
+    <h2>Thank you!</h2>
 
-    <div class="card page_deposit_thankyou">
-        <div class="card-header">
-            <h5 class="card-title pull-left">Thank you!</h5>
-        </div>
+    <div class="card mt-4 page_deposit_thankyou">
         <div class="card-body">
             <p>Thank you for your deposit!</p>
             <p>We are preparing your data package! You will receive a <a href="{{ url_for('user_bp.notifications') }}">notification</a> message with Yoda when your datapackage is ready! This can take minutes for large submissions.</p>

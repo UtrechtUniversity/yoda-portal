@@ -13,15 +13,15 @@ deposit_bp = Blueprint('deposit_bp', __name__,
                        static_url_path='/assets')
 
 """
-    1. Upload data:     /deposit/
-    2. Add metadata:    /deposit/metadata/
-    3. Submit:          /deposit/submit/
-    4. Thankyou page    /deposit/thankyou/
+    1. Add data:      /deposit/
+    2. Document data: /deposit/metadata/
+    3. Submit data:   /deposit/submit/
+    4. Thank you:     /deposit/thankyou/
 """
 
 
 def get_deposit_path():
-    """ Returns folder to deposit files. default: '/research-initial' """
+    """Returns folder to deposit files. default: '/research-initial'"""
     response = api.call('deposit_path')
     path = "/" + response['data']['deposit_path']
     return path.replace('//', '/')
@@ -30,7 +30,7 @@ def get_deposit_path():
 @deposit_bp.route('/', strict_slashes=False)
 @deposit_bp.route('/browse')
 def index():
-    """ Step 1: Deposit files and folders """
+    """Step 1: Add data"""
 
     items = 25
     # path = request.args.get('dir')
@@ -45,20 +45,20 @@ def index():
 
 @deposit_bp.route('/metadata/', strict_slashes=False)
 def form():
-    """Step 2: Add metadata to your upload"""
+    """Step 2: Document data"""
     path = get_deposit_path()
     return render_template('deposit/metadata-form.html', path=path)
 
 
 @deposit_bp.route('/submit/', strict_slashes=False)
 def submit():
-    """Step 3: Submit upload"""
+    """Step 3: Submit data"""
     path = get_deposit_path()
     return render_template('deposit/submit.html', path=path)
 
 
 @deposit_bp.route('/thankyou/', strict_slashes=False)
 def thankyou():
-    """Step 4: Thank you page """
+    """Step 4: Thank you"""
     path = get_deposit_path()
     return render_template('deposit/thankyou.html', path=path)

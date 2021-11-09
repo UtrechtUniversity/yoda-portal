@@ -17,15 +17,13 @@
 {% include 'deposit/workflow.html' %}
 {% endwith %}
 
-<div class="card">
-    <div class="card-header">
-        <h5 class="card-title pull-left">Submit your data package</h5>
-        <button type="button" class="btn btn-outline-secondary deposit-clear pull-right" title="Clear deposit"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp; Clear deposit</button>
-    </div>
+<h2>Submit data</h2>
+
+<div class="card mt-4">
     <div class="card-body">
         <div class="form-check">
-            <p>Data uploaded <i id="data_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
-            <p>Metadata complete <i id="metadata_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
+            <p>Data uploaded? <i id="data_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
+            <p>Data documented? <i id="metadata_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
             <p class="accept_terms_line ps-4">
                 <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms">
                 <label class="form-check-label" for="accept_terms">I accept the</label>
@@ -34,8 +32,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="/deposit/metadata/" class="btn btn-secondary">Metadata</a>
-        <button id="submit" type="submit" class="btn btn-primary pull-right" disabled>Submit</button>
+        <a href="/deposit/metadata/" class="btn btn-secondary">Document data</a>
+        <button id="submit" type="submit" class="btn btn-primary pull-right" disabled>Submit data</button>
     </div>
 </div>
 
