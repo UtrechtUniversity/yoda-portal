@@ -1,11 +1,3 @@
-.browse, .browse-search, .browse-select {
-    cursor: pointer;
-}
-
-nav .breadcrumb {
-    background-color: transparent;
-}
-
 .action-list li {
     cursor: pointer;
 }
