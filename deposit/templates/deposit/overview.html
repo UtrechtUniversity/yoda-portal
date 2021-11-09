@@ -20,31 +20,22 @@
 {% block content %}
 <h2>My deposits</h2>
 
-<div class="card mt-4">
-    <div class="card-body">
-        <div class="row">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="row pull-right">
-                        <a class="btn btn-primary mt-3 me-1" href="/deposit/data" title="Start new deposit">Start new deposit</a>
-                    </div>
-                </div>
-            </div>
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-primary mt-3 pull-right" href="/deposit/data" title="Start new deposit">Start new deposit</a>
+    </div>
 
-            <!-- datatable -->
-            <div class="mt-3">
-                <table id="file-browser" class="table yoda-table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Size</th>
-                        <th>Modified date</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                </table>
-            </div>
-        </div>
+    <div class="mt-3">
+        <table id="file-browser" class="table yoda-table table-striped">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Modified date</th>
+                <th></th>
+            </tr>
+            </thead>
+        </table>
     </div>
 </div>
 
