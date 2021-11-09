@@ -391,9 +391,9 @@ async function submitData(data) {
             {errorPrefix: 'Metadata could not be saved'});
 
             if (back) {
-                window.location.href = '/deposit/data';
+                window.location.href = '/deposit/data?dir=' + path;
             } else {
-                window.location.href = '/deposit/submit';
+                window.location.href = '/deposit/submit?dir=' + path;
             }
     } catch (e) {
         // Allow retry.
