@@ -9,6 +9,9 @@
 
 {% block scripts %}
 <script src="{{ url_for('deposit_bp.static', filename='js/submit.js') }}"></script>
+<script>
+    var path  = {{ path|tojson|safe }};
+</script>
 {% endblock scripts %}
 
 {% block content %}

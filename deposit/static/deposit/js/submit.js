@@ -40,7 +40,7 @@ async function submitStatus()
 async function getStatus()
 {
     try {
-        let status = await Yoda.call('deposit_status', {})
+        let status = await Yoda.call('deposit_status', {'path': path})
         if (status.data) {
             $('#data_check').removeClass('fa-times text-danger').addClass('fa-check text-success');
         } else {
@@ -67,7 +67,7 @@ async function getStatus()
 async function submitToVault()
 {
     try {
-        let result = await Yoda.call('deposit_submit', {},
+        let result = await Yoda.call('deposit_submit', {'path': path},
             {'rawResult': true}
         );
         if (result.status == "ok") {
