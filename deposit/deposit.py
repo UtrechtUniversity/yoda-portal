@@ -32,23 +32,22 @@ def create_new_deposit():
 @deposit_bp.route('/browse')
 def index():
     """Deposit overview"""
-    items = 25
     path = "/deposit-pilot"
-
     return render_template('deposit/overview.html',
                            activeModule='deposit',
-                           items=items,
+                           items=25,
                            dir=path)
 
 
 @deposit_bp.route('/data')
 def data():
     """Step 1: Add data"""
-    items = 25
-    path = request.args.get('dir', create_new_deposit())
+    path = request.args.get('dir', None)
+    if path is None:
+        path = create_new_deposit()
     return render_template('deposit/data.html',
                            activeModule='deposit',
-                           items=items,
+                           items=25,
                            dir=path)
 
 
