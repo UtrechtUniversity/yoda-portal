@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit{% endblock title %}
+{% block title %}{{ super() }} &dash; Deposit &dash; Add data{% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
@@ -12,7 +12,7 @@
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
-<script src="{{ url_for('deposit_bp.static', filename='js/deposit.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/data.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
 <script>
     var browsePageItems = {{ items }};
@@ -35,7 +35,7 @@
                 <div class="col-md-6 ps-0">
                     <nav aria-label="breadcrumb flex-column mb-0">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item">Home</li>
+                            <li class="breadcrumb-item">My deposits</li>
                         </ol>
                     </nav>
                 </div>
@@ -45,7 +45,6 @@
                             <button type="button" class="btn btn-outline-secondary folder-create me-2" data-path="" title="Create a new folder"><i class="fa fa-folder px-2" aria-hidden="true"></i> Create Folder</button>
                             <button type="button" class="btn btn-outline-secondary upload me-2" data-path="" title="Upload files"><i class="fa fa-upload" aria-hidden="true"></i> Upload files</button>
                             <button type="button" class="btn btn-outline-secondary upload-folder me-2" data-path="" title="Upload folders"><i class="fa fa-upload" aria-hidden="true"></i> Upload folders</button>
-                            <button type="button" class="btn btn-outline-secondary deposit-clear" data-path="" title="Clear deposit"><i class="fa fa-trash" aria-hidden="true"></i> Clear deposit</button>
                         </div>
                     </div>
                 </div>
@@ -66,7 +65,7 @@
             </div>
         </div>
         <div class="row pull-right">
-            <a class="btn btn-primary mt-3 me-1" href="/deposit/metadata/">Document data</a>
+            <a class="btn btn-primary mt-3 me-1" href="/deposit/metadata?dir={{ dir|urlencode }}">Document data</a>
         </div>
     </div>
 </div>
@@ -199,24 +198,6 @@
     </div>
 </div>
 
-<div class="modal" tabindex="-1" role="dialog" id="deposit-clear">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <h5 class="modal-title">Clear deposit</h5>
-                <div class="alert alert-warning" id="alert-panel-deposit-clear">
-                    <span></span>
-                </div>
-                <p class="mt-2">Clear the full deposit and start over?</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-danger btn-confirm-deposit-clear'>Clear deposit</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal" id="dlg-file-browse-operations">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -247,7 +228,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" dataca-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button class="btn btn-primary dlg-action-button" data-action="" data-name="" data-collection=""><span class="action"></span></button>
             </div>
         </div>

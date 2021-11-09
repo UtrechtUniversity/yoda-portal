@@ -120,16 +120,6 @@ $(function() {
         handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
-    // Deposit clear button
-    $("body").on("click", "button.deposit-clear", function() {
-        fileMgmtDialogAlert('deposit-clear', ''); // Destroy earlier alerts
-        $('#deposit-clear').modal('show');
-    });
-    $('.btn-confirm-deposit-clear').click(function() {
-        handleDepositClear();
-    });
-
-
     // Flow.js upload handler
     var r = new Flow({
         target: '/research/upload',
@@ -342,26 +332,6 @@ async function handleFileDelete(collection, file_name) {
     }
 }
 
-async function handleDepositClear()
-{
-    /* User clicks clear deposit and then confirm,
-     Then all data and metadata from the deposit-space is removed,
-     And the depositor is shown an empty deposit workflow.
-    */
-
-    let result = await Yoda.call('deposit_clear', {}, {'quiet': true, 'rawResult': true});
-
-    if (!result){
-        fileMgmtDialogAlert('deposit-clear', "API call not successfull");
-    } else if (result.status == 'ok') {
-        Yoda.set_message('success', 'Successfully cleared the deposit space');
-        $('#deposit-clear').modal('hide');
-        window.location.reload(true);
-    } else {
-        fileMgmtDialogAlert('deposit-clear', result.status_info);
-    }
-}
-
 function fileMgmtDialogAlert(dlgName, alert) {
     //Alerts regarding folder/file management
     //Inside the modals
@@ -403,20 +373,25 @@ function makeBreadcrumb(dir)
     let pathParts = dir.split('/').filter(x => x.length);
 
     // [[Crumb text, Path]] - e.g. [...['x', '/research-a/x']]
-    let crumbs = [['Home', ''],
+    let crumbs = [['My deposits', ''],
                   ...Array.from(pathParts.entries())
                           .map(([i,x]) => [x, '/'+pathParts.slice(0, i+1).join('/')])];
 
     let html = '';
     for (let [i, [text, path]] of crumbs.entries()) {
-        // Start at level 2, skip 'Home/deposit-pilot/deposit-pilot[]/' breadcrumbs
-        if (i > 1) {
+        // Skip deposit group level.
+        if (i != 1) {
             let el = $('<li class="breadcrumb-item">');
             text = htmlEncode(text).replace(/ /g, '&nbsp;');
-            if (i === crumbs.length-1)
+            if (i === crumbs.length-1) {
                  el.addClass('active').html(text);
-            else el.html(`<a class="browse" data-path="${htmlEncode(path)}"
-                             href="?dir=${encodeURIComponent(path)}">${text}</a>`);
+            } else {
+                if (i == 0) {
+                    el.html(`<a data-path="${htmlEncode(path)}" href="/deposit/browse">${text}</a>`);
+                } else {
+                    el.html(`<a data-path="${htmlEncode(path)}" href="/deposit/data?dir=${encodeURIComponent(path)}">${text}</a>`);
+                }
+            }
             html += el[0].outerHTML;
         }
     }
