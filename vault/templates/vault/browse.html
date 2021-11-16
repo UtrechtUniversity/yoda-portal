@@ -173,22 +173,45 @@
 </nav>
 
 <section class="metadata-info container hide">
-    <h3 class="metadata-title">
-        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
-        <span></span>
-    </h3>
+    <h3 class="metadata-title"></h3>
     <h5 class="metadata-creator mt-3"></h5>
-    <h6 class="subtitle-row fst-italic mt-3">
-        <span class="me-3"><label class="me-1">Data classification: </label><span class="metadata-data-classification"></span></span>
-        <span class="me-3"><label class="me-1">Accessibility: </label><span class="metadata-access"></span></span>
-    </h6>
-    <div class="metadata-description mt-2 mb-2"></div>
-    <button class="btn read-more-button hide" role="button">Read more...</button>
-    <button class="btn read-less-button hide" role="button">Read less...</button>
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Description <i class="fa fa-question-circle" aria-hidden="true" title="Description of this data package"></i></strong>
+        </div>
+        <div class="col-lg-10">
+            <div class="metadata-description"></div>
+            <button class="btn read-more-button hide" role="button">Read full description...</button>
+            <button class="btn read-less-button hide" role="button">Collapse description...</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Data classification <i class="fa fa-question-circle" aria-hidden="true" title="Classification of data package with regards to information security policy"></i></strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-data-classification"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Data package access <i class="fa fa-question-circle" aria-hidden="true" title="Data package accessibility to third parties"></i></strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-access"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>License <i class="fa fa-question-circle" aria-hidden="true" title="The license under which this data package is available for use by third parties"></i></strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-license"></span>
+        </div>
+    </div>
 </section>
 
 <div class="top-information text-right">
-
     <div class="top-info-buttons text-end">
         <h2 class="me-2 d-inline"></h2>
         <div class="btn-toolbar pull-right d-inline" role="toolbar">

@@ -1,11 +1,3 @@
-.browse, .browse-search, .browse-select {
-    cursor: pointer;
-}
-
-nav .breadcrumb {
-    background-color: transparent;
-}
-
 .action-list li {
     cursor: pointer;
 }
@@ -91,4 +83,9 @@ nav .breadcrumb {
 
 a.dropdown-item:hover, a.dropdown-item:focus {
     cursor: pointer;
+}
+
+.drag-upload {
+    border-style: dashed;
+    border-width: 5px;
 }

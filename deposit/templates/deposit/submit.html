@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit &dash; Submit{% endblock title %}
+{% block title %}{{ super() }} &dash; Deposit &dash; Submit data{% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/stepper/bs-stepper.custom.css') }}">
@@ -8,7 +8,10 @@
 {% endblock style %}
 
 {% block scripts %}
-<script src="{{ url_for('deposit_bp.static', filename='js/deposit-submit.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/submit.js') }}"></script>
+<script>
+    var path  = {{ path|tojson|safe }};
+</script>
 {% endblock scripts %}
 
 {% block content %}
@@ -17,15 +20,13 @@
 {% include 'deposit/workflow.html' %}
 {% endwith %}
 
-<div class="card">
-    <div class="card-header">
-        <h5 class="card-title pull-left">Submit your data package</h5>
-        <button type="button" class="btn btn-outline-secondary deposit-clear pull-right" title="Clear deposit"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp; Clear deposit</button>
-    </div>
+<h2>Submit data</h2>
+
+<div class="card mt-4">
     <div class="card-body">
         <div class="form-check">
-            <p>Data uploaded <i id="data_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
-            <p>Metadata complete <i id="metadata_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
+            <p>Data uploaded? <i id="data_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
+            <p>Data documented? <i id="metadata_check" aria-hidden="true" class="fa fa-times text-danger"></i></p>
             <p class="accept_terms_line ps-4">
                 <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms">
                 <label class="form-check-label" for="accept_terms">I accept the</label>
@@ -34,8 +35,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="/deposit/metadata/" class="btn btn-secondary">Metadata</a>
-        <button id="submit" type="submit" class="btn btn-primary pull-right" disabled>Submit</button>
+        <a href="/deposit/metadata?dir={{ path|urlencode }}" class="btn btn-secondary">Document data</a>
+        <button id="submit" type="submit" class="btn btn-primary pull-right" disabled>Submit data</button>
     </div>
 </div>
 
@@ -51,23 +52,4 @@
         </div>
     </div>
 </div>
-
-<div class="modal" tabindex="-1" role="dialog" id="deposit-clear">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <h5 class="modal-title">Clear deposit</h5>
-                <div class="alert alert-warning" id="alert-panel-deposit-clear">
-                    <span></span>
-                </div>
-                <p class="mt-2">Clear the full deposit and start over?</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-danger btn-confirm-deposit-clear'>Clear deposit</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% endblock content %}

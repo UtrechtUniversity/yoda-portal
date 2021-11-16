@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit {% endblock title %}
+{% block title %}{{ super() }} &dash; Deposit &dash; Document data {% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
@@ -21,6 +21,8 @@
 {% with step=2 %}
     {% include 'deposit/workflow.html' %}
 {% endwith %}
+
+<h2>Document data</h2>
 
 <div id="form-errors" class="row hide">
     <div class="col-md-12">
@@ -45,10 +47,6 @@
 <div id="metadata-form" class="row page_deposit_metadata">
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header">
-                <h5 class="card-title pull-left mt-3">Metadata for your deposit</h5>
-<!--                <button type="button" class="btn btn-outline-secondary deposit-clear pull-right" title="Clear deposit"><i class="fa fa-trash" aria-hidden="true"></i> Clear deposit</button>-->
-            </div>
             <div class="card-body">
                 <div id="no-metadata" class="hide">
                     <p>There is no metadata present for this folder.</p>

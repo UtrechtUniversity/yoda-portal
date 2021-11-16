@@ -375,9 +375,9 @@ const tableRenderer = {
                  + ` ${pad(date.getHours())}:${pad(date.getMinutes())}`);
          elem.attr('title', date.toString()); // (should include seconds and TZ info)
          return elem[0].outerHTML;
-     },
+    },
     context: (_, __, row) => {
-        let actions = $('<div class="dropdown-menu">');
+        let actions = $('<span>');
 
         if (row.type === 'coll')
             return '';
@@ -390,20 +390,14 @@ const tableRenderer = {
         };
         let ext = row.name.replace(/.*\./, '').toLowerCase();
 
-        actions.append(`<a class="dropdown-item" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file">Download</a>`);
+        actions.append(`<a href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file"><i class="fa fa-download"></a>`);
 
         // Generate dropdown "view" actions for different media types.
         for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-            actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`);
+            actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file"><i class="fa fa-eye"></a>`);
         }
 
-        let dropdown = $(`<div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-                            </button>`);
-        dropdown.append(actions);
-
-        return dropdown[0].outerHTML;
+        return actions[0].innerHTML;
     }
 };
 
@@ -795,7 +789,7 @@ function metadataInfo(dir) {
 
             let metadata = result.data.metadata;
             $('.metadata-info').show();
-            $(".metadata-title span").text(metadata.Title);
+            $(".metadata-title").text(metadata.Title);
             $(".metadata-access").text(metadata.Data_Access_Restriction);
             $(".metadata-data-classification").text(metadata.Data_Classification);
             $(".metadata-license").text(metadata.License);
@@ -836,7 +830,6 @@ function metadataInfo(dir) {
     catch (error) {
         console.error(error);
     }
-
 }
 
 function truncate(str, nr_words) {

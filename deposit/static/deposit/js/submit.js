@@ -16,15 +16,6 @@ $(function() {
         submitToVault();
     });
 
-    // Deposit clear button
-    $("#alert-panel-deposit-clear").hide();
-    $("body").on("click", ".deposit-clear", function() {
-        $('#deposit-clear').modal('show');
-    });
-    $('.btn-confirm-deposit-clear').click(function() {
-        handleDepositClear();
-    });
-
     $("#accept_terms").change(function() {
         submitStatus();
     });
@@ -49,7 +40,7 @@ async function submitStatus()
 async function getStatus()
 {
     try {
-        let status = await Yoda.call('deposit_status', {})
+        let status = await Yoda.call('deposit_status', {'path': path})
         if (status.data) {
             $('#data_check').removeClass('fa-times text-danger').addClass('fa-check text-success');
         } else {
@@ -76,33 +67,13 @@ async function getStatus()
 async function submitToVault()
 {
     try {
-        let result = await Yoda.call('deposit_submit', {},
+        let result = await Yoda.call('deposit_submit', {'path': path},
             {'rawResult': true}
         );
         if (result.status == "ok") {
-            window.location.href = '/deposit/thankyou/';
+            window.location.href = '/deposit/thank-you';
         }
     } catch (e) {
         console.log(e);
     }
 }
-
-async function handleDepositClear()
-{
-    /* User clicks clear deposit and then confirm,
-     Then all data and metadata from the deposit-space is removed,
-     And the depositor is shown an empty deposit workflow.
-    */
-
-    let result = await Yoda.call('deposit_clear', {}, {'quiet': true, 'rawResult': true});
-
-    if (!result){
-        $("#alert-panel-deposit-clear").text("API call not successfull");
-    } else if (result.status == 'ok') {
-        Yoda.set_message('success', 'Successfully cleared the deposit space');
-        window.location.href = '/deposit/';
-    } else {
-        $("#alert-panel-deposit-clear").text(result.status_info);
-    }
-}
-
