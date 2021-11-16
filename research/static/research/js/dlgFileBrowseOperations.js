@@ -62,6 +62,11 @@ $( document ).ready(function() {
         $('#dlg-file-browse-operations').modal('show');
     });
 
+    $("body").on("click", "a.multiple-delete", function() {
+        $('#multi-select-delete .collection').text($('.system-metadata-icon').attr('data-folder'));
+        $('#mutli-select-progress').attr('data-action', 'delete');
+        $('#multi-select-delete').modal('show');
+    });
     // handling of breadcrumbs
     $("body").on("click", ".browse-select", function(e) {
         dlgBrowse($(this).attr('data-path'));
@@ -112,7 +117,11 @@ $( document ).ready(function() {
                 $('.multi-select-table tbody').append(row);
             });
 
-            $('#dlg-file-browse-operations').modal('hide');
+            if (action == 'multiple-delete') {
+                $('#multi-select-delete').modal('hide');
+            } else {
+                $('#dlg-file-browse-operations').modal('hide');
+            }
             $('#mutli-select-progress').modal('show');
         }
 
@@ -126,19 +135,29 @@ $( document ).ready(function() {
             let type = $(this).attr('data-type');
             let name = $(this).attr('data-name');
             let currentPath = $(this).val();
-            let newPath = dlgCurrentFolder + "/" + name;
+            let collection;
+            let newPath;
+            if (action == 'delete') {
+                collection = $('.system-metadata-icon').attr('data-folder');
+            } else {
+                newPath = dlgCurrentFolder + "/" + name;
+            }
 
             if (type == 'data') {
                 if (action == 'copy') {
                     copyFile(currentPath, newPath, true, index);
-                } else {
+                } else if (action == 'move') {
                     moveFile(currentPath, newPath, true, index);
+                } else if (action == 'delete') {
+                    deleteFile(collection, name, index);
                 }
             } else {
                 if (action == 'copy') {
                     copyFolder(currentPath, newPath, true, index);
-                } else {
+                } else if (action == 'move') {
                     moveFolder(currentPath, newPath, true, index);
+                } else if (action == 'delete') {
+                    deleteFolder(collection, name, index);
                 }
             }
         });
@@ -315,6 +334,53 @@ async function moveFolder(folderPath, newFolderpath, multiple, multipleIndex = n
         } else {
             dlgSelectAlertShow(e.status_info);
         }
+    }
+}
+async function deleteFolder(collection, folderName, multipleIndex = null)
+{
+    $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+
+    try {
+        let result = await Yoda.call('research_folder_delete',
+            {
+                'coll': Yoda.basePath + collection,
+                'folder_name': folderName
+            },
+            {'quiet': true, 'rawResult': true}
+        );
+
+        if (result.status == 'ok') {
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text('Delete completed');
+            browse(collection, true);
+        } else { // non api error
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(result.status_info);
+        }
+    } catch(e) { // API ERROR
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(dlgSelectAlertShow(e.status_info));
+    }
+}
+
+async function deleteFile(collection, fileName, multipleIndex = null)
+{
+    $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+
+    try {
+        let result = await Yoda.call('research_file_delete',
+            {
+                'coll': Yoda.basePath + collection,
+                'file_name': fileName
+            },
+            {'quiet': true, 'rawResult': true}
+        );
+
+        if (result.status == 'ok') {
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text('Delete completed');
+            browse(collection, true);
+        } else { // non api error
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(result.status_info);
+        }
+    } catch(e) { // API ERROR
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(dlgSelectAlertShow(e.status_info));
     }
 }
 
