@@ -281,21 +281,9 @@ function saveSearchRequest() {
                     $('#search').hide();
                     $('.search-results').hide();
                     $('.revision-results').show();
-                    return false;
+                } else {
+                    showSearchResults();
                 }
-
-                if (currentSearchType == 'revision' && view == 'browse') {
-                    $('#search').hide();
-                    $('.search-results').hide();
-                    window.location.href = "?filter=" + encodeURIComponent(currentSearchString, );
-                    return false;
-                }
-
-                if (currentSearchType != 'revision' && view == 'revision') {
-                    window.location.href = "/search/";
-                    return false;
-                }
-                showSearchResults();
             }
         });
     }
