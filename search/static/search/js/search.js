@@ -287,12 +287,12 @@ function saveSearchRequest() {
                     $('#search').hide();
                     $('.search-results').hide();
 
-                    window.location.href = "revision?filter=" + encodeURIComponent(currentSearchString, );
+                    window.location.href = "?filter=" + encodeURIComponent(currentSearchString, );
                     return false;
                 }
 
                 if (currentSearchType != 'revision' && view == 'revision') {
-                    window.location.href = "browse";
+                    window.location.href = "/search/";
                     return false;
                 }
                 showSearchResults();
