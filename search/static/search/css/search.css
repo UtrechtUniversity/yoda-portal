@@ -1,10 +1,5 @@
-
 .tab-content {
     margin-top:10px;
-}
-
-.browse, .browse-search, .browse-select {
-    cursor: pointer;
 }
 
 ol.breadcrumb li.active {
@@ -23,42 +18,8 @@ ol.breadcrumb li.active {
     display: none;
 }
 
-.top-information {
+.revision-results {
     display: none;
-}
-
-.top-info-buttons {
-    padding-top: 20px;
-    text-align: right;
-}
-
-.top-info-buttons .research,
-.top-info-buttons .vault
-{
-    display: none;
-}
-
-.action-list li {
-    cursor: pointer;
-}
-
-.panel-heading .input-group-sm {
-    margin: -7px; /* btn in panel heading */
-}
-.panel-footer  .input-group-sm {
-    margin: -6px; /* btn in panel footer */
-}
-
-.top-information h1 .icon .fa-stack {
-    font-size:22px;
-}
-
-.top-information h1 .icon .fa-stack .fa-shield.fa-stack-1x {
-    margin-top: 2px;
-}
-
-.top-information h1 #statusBadge {
-    margin-left: 20px;
 }
 
 .hide {
@@ -142,19 +103,4 @@ table.dataTable > tbody > tr > td i {
 
 .yoda-table tr.odd {
     background-color: transparent !important;
-}
-
-/* Upload */
-.upload-row {
-    margin-bottom: 5px;
-}
-
-.upload-filename {
-    word-wrap: break-word;
-    display: inline-block;
-}
-
-.drag-upload {
-    border-style: dashed;
-    border-width: 4px;
 }
