@@ -15,18 +15,11 @@ search_bp = Blueprint('search_bp', __name__,
 def index():
     items = 10
     dlgPageItems = 10
-    filter = request.args.get('filter', None)
-
-    view = 'browse'
-    if filter is not None:
-        view = 'revision'
 
     # Search results data
     searchTerm = ''
     searchStatusValue = ''
     searchType = 'filename'
-    if filter is not None:
-        searchType = 'revision'
     searchStart = 0
     searchOrderDir = 'asc'
     searchOrderColumn = 0
@@ -57,7 +50,6 @@ def index():
                            searchStart=searchStart,
                            searchOrderDir=searchOrderDir,
                            searchOrderColumn=searchOrderColumn,
-                           view=view,
                            showStatus=showStatus,
                            showTerm=showTerm,
                            searchItemsPerPage=searchItemsPerPage,
