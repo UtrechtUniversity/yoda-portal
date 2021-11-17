@@ -11,11 +11,9 @@ $(document).ready(function() {
             $('[name=status]').val(searchStatusValue);
             currentSearchString = searchStatusValue;
             search();
-            showSearchResults();
         } else if (searchTerm.length > 0) {
             currentSearchString = searchTerm;
             search();
-            showSearchResults();
         }
     }
 
@@ -37,7 +35,6 @@ $(document).ready(function() {
             currentSearchItems = $(".search-btn").attr('data-items-per-page');
         }
         search();
-        saveSearchRequest();
     });
 
     $(".search-btn").click(function() {
@@ -45,7 +42,6 @@ $(document).ready(function() {
         currentSearchType = $("#search_concept").attr('data-type');
         currentSearchItems = $(".search-btn").attr('data-items-per-page');
         search();
-        saveSearchRequest();
     });
 
     $("#search-filter").bind('keypress', function(e) {
@@ -54,7 +50,6 @@ $(document).ready(function() {
             currentSearchType = $("#search_concept").attr('data-type');
             currentSearchItems = $(".search-btn").attr('data-items-per-page');
             search();
-            saveSearchRequest();
         }
     });
 
@@ -63,11 +58,6 @@ $(document).ready(function() {
         currentSearchType = 'status';
         currentSearchItems = $(".search-btn").attr('data-items-per-page');
         search();
-        saveSearchRequest();
-    });
-
-    $(".close-search-results").click(function() {
-        closeSearchResults();
     });
 });
 
@@ -116,11 +106,22 @@ let getSearchResults = (() => {
 // Functions for rendering table cells, per column.
 const resultsRenderer = {
     name: (name, _, row) => {
-        if (row.type === 'coll') {
-            return `<a class="browse-search" data-path="${htmlEncode(name)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
+        let href = '';
+        let target = name;
+        if (row.type != 'coll') {
+            target = name.split("/").slice(0, -1).join("/");
+        }
+
+        if (name.startsWith('/research-')) {
+            href = "/research/?dir=" + target;
         } else {
-            let tgt = name.split("/").slice(0, -1).join("/");
-            return `<a class="browse-search" data-path="${htmlEncode(tgt)}"><i class="fa fa-file-o"></i> ${htmlEncode(name)}</a>`;
+            href = "/vault/?dir=" + target;
+        }
+
+        if (row.type === 'coll') {
+            return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
+        } else {
+            return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa fa-file-o"></i> ${htmlEncode(name)}</a>`;
         }
     },
     size: (size, _, row) => {
@@ -229,17 +230,7 @@ function search() {
             "ajax": getSearchResults,
             "processing": true,
             "serverSide": true,
-            "pageLength": $("select[name='search_length']").val(), //currentSearchItems,
-            "drawCallback": function(settings) {
-                $(".browse-search").on("click", function() {
-                    var path = $(this).attr('data-path');
-                    if (path.startsWith('/research-')) {
-                        browse(path, true);
-                    } else {
-                        window.location = "/vault/?dir=" + path;
-                    }
-                });
-            }
+            "pageLength": $("select[name='search_length']").val() //currentSearchItems,
         });
 
         if (currentSearchType == 'status') {
@@ -248,43 +239,17 @@ function search() {
         } else {
             $('.search-string').html(htmlEncode(currentSearchString).replace(/ /g, "&nbsp;"));
         }
+
+        if (currentSearchType == 'revision') {
+            $('#search').hide();
+            $('.search-results').hide();
+            $('.revision-results').show();
+        } else {
+            $('#search').show();
+            $('.revision-results').hide();
+            $('.search-results').show();
+        }
     }
 
     return true;
-}
-
-function closeSearchResults() {
-    $('.search-results').hide();
-    $('#search-filter').val('');
-    $('[name=status]').val('');
-    $.get("/search/unset_session");
-}
-
-function showSearchResults() {
-    $('.search-results').show();
-}
-
-function saveSearchRequest() {
-    if (typeof currentSearchString != 'undefined' && currentSearchString.length > 0) {
-        var url = "/search/set_session";
-
-        $.ajax({
-            url: url,
-            method: "POST",
-            async: false, //blocks window close
-            data: {
-                value: currentSearchString,
-                type: currentSearchType
-            },
-            success: function() {
-                if (currentSearchType == 'revision' && view == 'revision') {
-                    $('#search').hide();
-                    $('.search-results').hide();
-                    $('.revision-results').show();
-                } else {
-                    showSearchResults();
-                }
-            }
-        });
-    }
 }
