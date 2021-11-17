@@ -57,6 +57,43 @@ def index():
                            searchItemsPerPage=searchItemsPerPage)
 
 
+@research_bp.route('/revision')
+def revision():
+    items = 10
+    dlgPageItems = 10
+    filter = request.args.get('filter')
+
+    # Search results data
+    searchTerm = filter
+    searchStatusValue = ''
+    searchType = 'revision'
+    searchStart = 0
+    searchOrderDir = 'asc'
+    searchOrderColumn = 0
+    searchItemsPerPage = 10
+    showStatus = False
+    showTerm = True
+
+    # Get the HTML for search part
+    searchHtml = render_template('research/search.html',
+                                 searchTerm=searchTerm,
+                                 searchStatusValue=searchStatusValue,
+                                 searchType=searchType,
+                                 searchStart=searchStart,
+                                 searchOrderDir=searchOrderDir,
+                                 searchOrderColumn=searchOrderColumn,
+                                 showStatus=showStatus,
+                                 showTerm=showTerm,
+                                 searchItemsPerPage=searchItemsPerPage)
+
+    return render_template('research/revision.html',
+                           activeModule='research',
+                           searchHtml=searchHtml,
+                           items=items,
+                           dlgPageItems=dlgPageItems,
+                           filter=filter)
+
+
 @search_bp.route('/set_session', methods=['POST'])
 def set_session():
     value = request.args.get('value')

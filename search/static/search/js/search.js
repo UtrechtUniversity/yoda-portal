@@ -257,7 +257,7 @@ function closeSearchResults() {
     $('.search-results').hide();
     $('#search-filter').val('');
     $('[name=status]').val('');
-    $.get("search/unset_session");
+    $.get("/search/unset_session");
 }
 
 function showSearchResults() {
@@ -266,7 +266,7 @@ function showSearchResults() {
 
 function saveSearchRequest() {
     if (typeof currentSearchString != 'undefined' && currentSearchString.length > 0) {
-        var url = "search/set_session";
+        var url = "/search/set_session";
 
         $.ajax({
             url: url,
