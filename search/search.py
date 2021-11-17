@@ -83,7 +83,7 @@ def revision():
                            searchOrderColumn=searchOrderColumn,
                            showStatus=showStatus,
                            showTerm=showTerm,
-                           searchItemsPerPage=searchItemsPerPage    
+                           searchItemsPerPage=searchItemsPerPage,
                            activeModule='research',
                            items=items,
                            dlgPageItems=dlgPageItems,
