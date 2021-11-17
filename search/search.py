@@ -57,7 +57,7 @@ def index():
                            searchItemsPerPage=searchItemsPerPage)
 
 
-@research_bp.route('/revision')
+@search_bp.route('/revision')
 def revision():
     items = 10
     dlgPageItems = 10
@@ -74,21 +74,17 @@ def revision():
     showStatus = False
     showTerm = True
 
-    # Get the HTML for search part
-    searchHtml = render_template('research/search.html',
-                                 searchTerm=searchTerm,
-                                 searchStatusValue=searchStatusValue,
-                                 searchType=searchType,
-                                 searchStart=searchStart,
-                                 searchOrderDir=searchOrderDir,
-                                 searchOrderColumn=searchOrderColumn,
-                                 showStatus=showStatus,
-                                 showTerm=showTerm,
-                                 searchItemsPerPage=searchItemsPerPage)
-
-    return render_template('research/revision.html',
+    return render_template('search/revision.html',
+                           searchTerm=searchTerm,
+                           searchStatusValue=searchStatusValue,
+                           searchType=searchType,
+                           searchStart=searchStart,
+                           searchOrderDir=searchOrderDir,
+                           searchOrderColumn=searchOrderColumn,
+                           showStatus=showStatus,
+                           showTerm=showTerm,
+                           searchItemsPerPage=searchItemsPerPage    
                            activeModule='research',
-                           searchHtml=searchHtml,
                            items=items,
                            dlgPageItems=dlgPageItems,
                            filter=filter)
