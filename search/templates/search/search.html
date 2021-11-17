@@ -8,7 +8,9 @@
 <script src="{{ url_for('search_bp.static', filename='js/search.js') }}"></script>
 <script src="{{ url_for('search_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
 <script>
-    var view = 'browse';
+    var revisionItemsPerPage = {{ items }};
+    var browseDlgPageItems = {{ dlgPageItems }};
+    var view = '{{ view }}';
 </script>
 {% endblock scripts %}
 

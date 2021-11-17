@@ -13,10 +13,20 @@ search_bp = Blueprint('search_bp', __name__,
 
 @search_bp.route('/')
 def index():
+    items = 10
+    dlgPageItems = 10
+    filter = request.args.get('filter', None)
+
+    view = 'browse'
+    if filter is not None:
+        view = 'revision'
+
     # Search results data
     searchTerm = ''
     searchStatusValue = ''
     searchType = 'filename'
+    if filter is not None:
+        searchType = 'revision'
     searchStart = 0
     searchOrderDir = 'asc'
     searchOrderColumn = 0
@@ -47,39 +57,10 @@ def index():
                            searchStart=searchStart,
                            searchOrderDir=searchOrderDir,
                            searchOrderColumn=searchOrderColumn,
-                           showStatus=showStatus,
-                           showTerm=showTerm,
-                           searchItemsPerPage=searchItemsPerPage)
-
-
-@search_bp.route('/revision')
-def revision():
-    items = 10
-    dlgPageItems = 10
-    filter = request.args.get('filter')
-
-    # Search results data
-    searchTerm = filter
-    searchStatusValue = ''
-    searchType = 'revision'
-    searchStart = 0
-    searchOrderDir = 'asc'
-    searchOrderColumn = 0
-    searchItemsPerPage = 10
-    showStatus = False
-    showTerm = True
-
-    return render_template('search/revision.html',
-                           searchTerm=searchTerm,
-                           searchStatusValue=searchStatusValue,
-                           searchType=searchType,
-                           searchStart=searchStart,
-                           searchOrderDir=searchOrderDir,
-                           searchOrderColumn=searchOrderColumn,
+                           view=view,
                            showStatus=showStatus,
                            showTerm=showTerm,
                            searchItemsPerPage=searchItemsPerPage,
-                           activeModule='research',
                            items=items,
                            dlgPageItems=dlgPageItems,
                            filter=filter)
