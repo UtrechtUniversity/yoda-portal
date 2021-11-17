@@ -13,11 +13,6 @@ search_bp = Blueprint('search_bp', __name__,
 
 @search_bp.route('/')
 def index():
-    dir = request.args.get('dir')
-
-    if dir is None:
-        dir = ''
-
     # Search results data
     searchTerm = ''
     searchStatusValue = ''
