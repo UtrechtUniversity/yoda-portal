@@ -280,13 +280,13 @@ function saveSearchRequest() {
                 if (currentSearchType == 'revision' && view == 'revision') {
                     $('#search').hide();
                     $('.search-results').hide();
+                    $('.revision-results').show();
                     return false;
                 }
 
                 if (currentSearchType == 'revision' && view == 'browse') {
                     $('#search').hide();
                     $('.search-results').hide();
-
                     window.location.href = "?filter=" + encodeURIComponent(currentSearchString, );
                     return false;
                 }
