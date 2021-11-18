@@ -107,10 +107,10 @@ const resultsRenderer = {
             target = name.split("/").slice(0, -1).join("/");
         }
 
-        if (name.startsWith('/research-')) {
-            href = "/research/?dir=" + target;
-        } else {
+        if (name.startsWith('/vault-')) {
             href = "/vault/?dir=" + target;
+        } else {
+            href = "/research/?dir=" + target;
         }
 
         if (row.type === 'coll') {
