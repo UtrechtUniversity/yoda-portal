@@ -6,10 +6,6 @@
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
 <script src="{{ url_for('search_bp.static', filename='js/revision.js') }}"></script>
 <script src="{{ url_for('search_bp.static', filename='js/search.js') }}"></script>
-<script>
-    var revisionItemsPerPage = {{ items }};
-    var browseDlgPageItems = {{ dlgPageItems }};
-</script>
 {% endblock scripts %}
 
 {% block style %}

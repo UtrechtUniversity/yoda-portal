@@ -6,7 +6,7 @@ let currentSearchItems;
 
 $(document).ready(function() {
     if ($('#file-browser').length && searchType == 'filename') {
-        currentSearchString = searchTerm;
+        currentSearchString = $("#search-filter").val();
         search();
     }
 
