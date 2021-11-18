@@ -9,7 +9,6 @@
 <script>
     var revisionItemsPerPage = {{ items }};
     var browseDlgPageItems = {{ dlgPageItems }};
-    var view = 'browse';
 </script>
 {% endblock scripts %}
 
@@ -32,7 +31,7 @@
     <div class="input-group mb-3">
         <div class="input-group-prepend search-panel">
             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span id="search_concept" data-type="{{ searchType }}">Search by {{ searchType }}</span>
+                <span id="search_concept" data-type="filename">Search by filename</span>
             </button>
             <div class="dropdown-menu">
                 <a href="#" class="dropdown-item" data-type="filename">Search by filename</a>
@@ -46,14 +45,14 @@
             <input type="hidden" name="search_param" value="all" id="search_param">
         </div>
 
-        <input type="text" class="form-control search-term{{ ' hide' if showStatus else '' }}" id="search-filter" placeholder="Search term..." value="{{ searchTerm|safe }}" maxlength="255">
-        <div class="input-group-append search-term{{ ' hide' if showStatus else '' }}">
-            <button class="btn btn-outline-secondary" data-items-per-page="{{ searchItemsPerPage }}" type="button">
+        <input type="text" class="form-control search-term" id="search-filter" placeholder="Search term..." value="{{ searchTerm|safe }}" maxlength="255">
+        <div class="input-group-append search-term">
+            <button class="btn btn-outline-secondary" data-items-per-page="25" type="button">
                 <i class="fa fa-search" aria-hidden="true"></i>
             </button>
         </div>
 
-        <select name="status" class="form-control search-status{{ ' hide' if showTerm else '' }}">
+        <select name="status" class="form-control search-status hide">
             <option disabled selected value>Select status...</option>
             <optgroup label="Research">
                 <option value="research:LOCKED">Locked</option>
