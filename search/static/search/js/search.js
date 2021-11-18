@@ -7,6 +7,8 @@ let currentSearchItems;
 $(document).ready(function() {
     if ($('#file-browser').length && searchType == 'filename') {
         currentSearchString = $("#search-filter").val();
+        currentSearchType = $("#search_concept").attr('data-type');
+        currentSearchItems = $(".search-btn").attr('data-items-per-page');        
         search();
     }
 
