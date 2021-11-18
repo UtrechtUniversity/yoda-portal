@@ -19,10 +19,6 @@ ol.breadcrumb li.active {
     float:left;
 }
 
-.search-results {
-    display: none;
-}
-
 .top-information {
     display: none;
 }
