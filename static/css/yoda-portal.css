@@ -23,6 +23,10 @@
   font-weight: 700;
   src: local("Open Sans Bold Italic"), local("OpenSans-BoldItalic"), url(/assets/font/open-sans/OpenSans-BoldItalic.woff) format("woff");
 }
+img.logo {
+  height: 48px;
+}
+
 .hidden {
   display: none;
 }

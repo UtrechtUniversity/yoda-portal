@@ -23,6 +23,10 @@
   font-weight: 700;
   src: local("Open Sans Bold Italic"), local("OpenSans-BoldItalic"), url(/assets/font/open-sans/OpenSans-BoldItalic.woff) format("woff");
 }
+img.logo {
+  height: 48px;
+}
+
 .hidden {
   display: none;
 }
@@ -269,11 +273,11 @@ sup {
 }
 
 a {
-  color: #007ecc;
+  color: #000;
   text-decoration: underline;
 }
 a:hover {
-  color: #0065a3;
+  color: black;
 }
 
 a:not([href]):not([class]), a:not([href]):not([class]):hover {
@@ -3404,11 +3408,11 @@ textarea.form-control-lg {
 
 .btn-link {
   font-weight: 400;
-  color: #007ecc;
+  color: #000;
   text-decoration: underline;
 }
 .btn-link:hover {
-  color: #0065a3;
+  color: black;
 }
 .btn-link:disabled, .btn-link.disabled {
   color: #6c757d;
@@ -3876,7 +3880,7 @@ textarea.form-control-lg {
 .nav-link {
   display: block;
   padding: 0.5rem 1rem;
-  color: #007ecc;
+  color: #000;
   text-decoration: none;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
@@ -3886,7 +3890,7 @@ textarea.form-control-lg {
   }
 }
 .nav-link:hover, .nav-link:focus {
-  color: #0065a3;
+  color: black;
 }
 .nav-link.disabled {
   color: #6c757d;
@@ -4712,9 +4716,10 @@ textarea.form-control-lg {
 .breadcrumb {
   display: flex;
   flex-wrap: wrap;
-  padding: 0 0;
+  padding: 0.75rem 1rem;
   margin-bottom: 1rem;
   list-style: none;
+  background-color: #e9ecef;
 }
 
 .breadcrumb-item + .breadcrumb-item {
@@ -4739,7 +4744,7 @@ textarea.form-control-lg {
 .page-link {
   position: relative;
   display: block;
-  color: #007ecc;
+  color: #000;
   text-decoration: none;
   background-color: #fff;
   border: 1px solid #dee2e6;
@@ -4752,13 +4757,13 @@ textarea.form-control-lg {
 }
 .page-link:hover {
   z-index: 2;
-  color: #0065a3;
+  color: black;
   background-color: #e9ecef;
   border-color: #dee2e6;
 }
 .page-link:focus {
   z-index: 3;
-  color: #0065a3;
+  color: black;
   background-color: #e9ecef;
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgba(0, 126, 204, 0.25);
@@ -5041,7 +5046,7 @@ textarea.form-control-lg {
 }
 .list-group-item.active {
   z-index: 2;
-  color: #fff;
+  color: #000;
   background-color: #007ecc;
   border-color: #007ecc;
 }
@@ -7632,7 +7637,7 @@ textarea.form-control-lg {
   color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
 }
 
-.text-black {
+.text-black, #statusBadge {
   --bs-text-opacity: 1;
   color: rgba(var(--bs-black-rgb), var(--bs-text-opacity)) !important;
 }
