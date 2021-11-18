@@ -5,10 +5,10 @@ let currentSearchType;
 let currentSearchItems;
 
 $(document).ready(function() {
-    if ($('#file-browser').length && searchType == 'filename') {
+    if ($('#file-browser').length && $("#search_concept").attr('data-type') == 'filename') {
         currentSearchString = $("#search-filter").val();
         currentSearchType = $("#search_concept").attr('data-type');
-        currentSearchItems = $(".search-btn").attr('data-items-per-page');        
+        currentSearchItems = $(".search-btn").attr('data-items-per-page');
         search();
     }
 
@@ -144,8 +144,8 @@ const resultsRenderer = {
 };
 
 function search() {
-    searchOrderDir = 'asc';
-    searchOrderColumn = 0;
+    var searchOrderDir = 'asc';
+    var searchOrderColumn = 0;
 
     if (typeof currentSearchString != 'undefined' && currentSearchString.length > 0 && currentSearchType != 'revision') {
         // Table columns definition.
