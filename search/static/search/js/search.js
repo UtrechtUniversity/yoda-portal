@@ -5,16 +5,9 @@ let currentSearchType;
 let currentSearchItems;
 
 $(document).ready(function() {
-    if ($('#file-browser').length && (view == 'browse' && searchType != 'revision')) {
-        // Rememeber search results
-        if (searchStatusValue.length > 0) {
-            $('[name=status]').val(searchStatusValue);
-            currentSearchString = searchStatusValue;
-            search();
-        } else if (searchTerm.length > 0) {
-            currentSearchString = searchTerm;
-            search();
-        }
+    if ($('#file-browser').length && searchType == 'filename') {
+        currentSearchString = searchTerm;
+        search();
     }
 
     $(".search-panel .dropdown-menu a").click(function() {

@@ -21,14 +21,13 @@
 {% block content %}
 <script>
     var searchTerm = '{{ searchTerm | urlencode | replace("+", "%20") }}';
-    var searchStatusValue = '{{ searchStatusValue }}';
+    var searchStatusValue = '';
     var searchType = 'filename';
-    var searchStart = {{ searchStart }};
-    var searchOrderDir = '{{ searchOrderDir }}';
-    var searchOrderColumn = {{ searchOrderColumn }};
-    var searchPageItems = {{ searchItemsPerPage }};
+    var searchStart = 0;
+    var searchOrderDir = 'asc';
+    var searchOrderColumn = 0;
+    var searchPageItems = 25;
 </script>
-
 <div class="row">
     <div class="input-group mb-3">
         <div class="input-group-prepend search-panel">
