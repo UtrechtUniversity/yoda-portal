@@ -13,21 +13,20 @@ var revisionTargetColl = '',
 const browsePageItems = 10;
 
 $( document ).ready(function() {
+    // Click on file browser -> open revision details
+    startBrowsing(browsePageItems);
+
     $('#file-browser tbody').on('click', 'tr', function () {
         clickFileForRevisionDetails($(this), mainTable);
     });
 
     $('.search-btn').on('click', function() {
-        if ($("#search_concept").attr('data-type') == 'revision') {
-            browseRevisions();
-        }
+        browseRevisions();
     });
 
     $("#search-filter").bind('keypress', function(e) {
         if (e.keyCode==13) {
-            if ($("#search_concept").attr('data-type') == 'revision') {
-                browseRevisions();
-            }
+            browseRevisions();
         }
     });
 });

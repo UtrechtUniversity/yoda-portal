@@ -14,15 +14,6 @@
 {% endblock style %}
 
 {% block content %}
-<script>
-    var searchTerm = '{{ searchTerm | urlencode | replace("+", "%20") }}';
-    var searchStatusValue = '';
-    var searchType = 'filename';
-    var searchStart = 0;
-    var searchOrderDir = 'asc';
-    var searchOrderColumn = 0;
-    var searchPageItems = 25;
-</script>
 <div class="row">
     <div class="input-group mb-3">
         <div class="input-group-prepend search-panel">
