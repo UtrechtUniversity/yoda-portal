@@ -5,7 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 import io
 
-from flask import abort, Blueprint, g, render_template, request, Response, session, stream_with_context
+from flask import abort, Blueprint, g, render_template, request, Response, stream_with_context
 
 import api
 
@@ -24,46 +24,8 @@ def index():
     if dir is None:
         dir = ''
 
-    # Search results data
-    searchTerm = ''
-    searchStatusValue = ''
-    searchType = 'filename'
-    searchStart = 0
-    searchOrderDir = 'asc'
-    searchOrderColumn = 0
-    searchItemsPerPage = 10
-
-    if 'research-search-term' in session or 'research-search-status-value' in session:
-        searchTerm = session.get('research-search-term', '')
-        searchStatusValue = session.get('research-search-status-value', '')
-
-        searchType = session.get('research-search-type', '')
-        searchStart = session.get('research-search-start', '')
-        searchOrderDir = session.get('research-search-order-dir', '')
-        searchOrderColumn = session.get('research-search-order-column', '')
-
-    showStatus = False
-    showTerm = False
-    if searchType == 'status':
-        showStatus = True
-    else:
-        showTerm = True
-
-    # Get the HTML for search part
-    searchHtml = render_template('vault/search.html',
-                                 searchTerm=searchTerm,
-                                 searchStatusValue=searchStatusValue,
-                                 searchType=searchType,
-                                 searchStart=searchStart,
-                                 searchOrderDir=searchOrderDir,
-                                 searchOrderColumn=searchOrderColumn,
-                                 showStatus=showStatus,
-                                 showTerm=showTerm,
-                                 searchItemsPerPage=searchItemsPerPage)
-
     return render_template('vault/browse.html',
                            activeModule='vault',
-                           searchHtml=searchHtml,
                            items=items,
                            dir=dir)
 
@@ -103,35 +65,6 @@ def form():
     path = request.args.get('path')
 
     return render_template('vault/metadata-form.html', path=path)
-
-
-@vault_bp.route('/search/unset_session')
-def unset_session():
-    session.pop('research-search-term', None)
-    session.pop('research-search-start', None)
-    session.pop('research-search-type', None)
-    session.pop('research-search-order-dir', None)
-    session.pop('research-search-order-column', None)
-    session.pop('research-search-status-value', None)
-
-    return 'OK'
-
-
-@vault_bp.route('/search/set_session', methods=['POST'])
-def set_session():
-    value = request.form.get('value')
-    type = request.form.get('type')
-
-    if type == 'status':
-        session['research-search-status-value'] = value
-    else:
-        session['research-search-term'] = value
-        session.pop('research-search-status-value', None)
-
-    session['research-search-type'] = type
-    session['research-search-start'] = 0
-
-    return 'OK'
 
 
 @vault_bp.route('/access', methods=['POST'])

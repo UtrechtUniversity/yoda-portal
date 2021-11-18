@@ -10,7 +10,6 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
-<script src="{{ url_for('vault_bp.static', filename='js/search.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
 <script type="text/javascript">
         var browsePageItems = {{ items }};
@@ -161,10 +160,6 @@
         </div>
     </div>
 </div>
-
-{% autoescape false %}
-{{ searchHtml }}
-{% endautoescape %}
 
 <nav aria-label="breadcrumb flex-column">
     <ol class="breadcrumb">
