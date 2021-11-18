@@ -232,16 +232,16 @@ function search() {
         } else {
             $('.search-string').html(htmlEncode(currentSearchString).replace(/ /g, "&nbsp;"));
         }
+    }
 
-        if (currentSearchType == 'revision') {
-            $('#search').hide();
-            $('.search-results').hide();
-            $('.revision-results').show();
-        } else {
-            $('#search').show();
-            $('.revision-results').hide();
-            $('.search-results').show();
-        }
+    if (currentSearchType == 'revision') {
+        $('#search').hide();
+        $('.search-results').hide();
+        $('.revision-results').show();
+    } else {
+        $('#search').show();
+        $('.revision-results').hide();
+        $('.search-results').show();
     }
 
     return true;
