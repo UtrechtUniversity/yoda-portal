@@ -1,0 +1,10 @@
+// sass build_uu.scss ../../static/css/yoda-portal.css
+
+// Import (default) UU theme
+@import "uu";
+
+// Import Yoda components
+@import "components";
+
+// Import Bootstrap 5
+@import "node_modules/bootstrap/scss/bootstrap";
