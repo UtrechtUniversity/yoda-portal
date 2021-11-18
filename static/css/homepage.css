@@ -19,9 +19,7 @@
     overflow: hidden;
 }
 
-#general-tile,
-#deposit-tile,
-#search-tile {
+.tile {
     padding: 15px 30px;
     background-color: rgba(0, 0, 0, .5);
     min-height: 200px;
