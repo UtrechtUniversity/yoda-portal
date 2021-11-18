@@ -12,7 +12,7 @@ $(document).ready(function() {
         search();
     }
 
-    $(".search-panel .dropdown-menu a").click(function() {
+    $("#search-panel a").click(function() {
         $("#search_concept").html($(this).text());
         $("#search_concept").attr('data-type', $(this).attr('data-type'));
 
