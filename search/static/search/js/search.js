@@ -5,7 +5,9 @@ let currentSearchType;
 let currentSearchItems;
 
 $(document).ready(function() {
-    if ($('#file-browser').length && $("#search_concept").attr('data-type') == 'filename') {
+    if ($('#file-browser').length
+        && $("#search-filter").val().length > 0
+        && $("#search_concept").attr('data-type') == 'filename') {
         currentSearchString = $("#search-filter").val();
         currentSearchType = $("#search_concept").attr('data-type');
         currentSearchItems = $(".search-btn").attr('data-items-per-page');
