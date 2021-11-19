@@ -1,0 +1,10 @@
+// sass build_vu.scss ../../themes/vu/static/css/yoda-portal.css
+
+// Import VU theme
+@import "vu";
+
+// Import Yoda components
+@import "components";
+
+// Import Bootstrap 5
+@import "node_modules/bootstrap/scss/bootstrap";

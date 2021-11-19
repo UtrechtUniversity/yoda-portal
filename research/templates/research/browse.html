@@ -6,7 +6,6 @@
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='js/research.js') }}"></script>
-<script src="{{ url_for('research_bp.static', filename='js/search.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
 <script>
@@ -179,7 +178,7 @@
                     <div class="card">
                         <div class="card-body">
                             <ol class="breadcrumb dlg-breadcrumb">
-                                <li class="active">Home</li>
+                                <li class="active">Research</li>
                             </ol>
 
                             <table id="folder-select-browser" class="table yoda-table table-bordered">
@@ -278,10 +277,6 @@
         </div>
     </div>
 </div>
-
-{% autoescape false %}
-{{ searchHtml }}
-{% endautoescape %}
 
 <div class="row d-block">
     <nav aria-label="breadcrumb flex-column">

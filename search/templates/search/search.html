@@ -1,24 +1,83 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Research{% endblock title %}
+{% block title %}{{ super() }} &dash; Search{% endblock title %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
-<script src="{{ url_for('research_bp.static', filename='js/revision.js') }}"></script>
-<script src="{{ url_for('research_bp.static', filename='js/search.js') }}"></script>
-<script>
-    var revisionItemsPerPage = {{ items }};
-    var browseDlgPageItems = {{ dlgPageItems }};
-    var view = 'revision';
-</script>
+<script src="{{ url_for('search_bp.static', filename='js/revision.js') }}"></script>
+<script src="{{ url_for('search_bp.static', filename='js/search.js') }}"></script>
 {% endblock scripts %}
 
 {% block style %}
-<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/research.css') }}">
+<link rel="stylesheet" href="{{ url_for('search_bp.static', filename='css/search.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
 {% endblock style %}
 
 {% block content %}
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="input-group mb-3">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span id="search_concept" data-type="filename">Search by filename</span>
+            </button>
+            <ul id="search-panel" class="dropdown-menu">
+                <li><a class="dropdown-item" data-type="filename">Search by filename</a></li>
+                <li><a class="dropdown-item" data-type="folder">Search by folder</a></li>
+                <li><a class="dropdown-item" data-type="metadata">Search by metadata</a></li>
+                <li><a class="dropdown-item" data-type="status">Search by status</a></li>
+                <li><a class="dropdown-item" data-type="revision">Search revision by name</a></li>
+            </ul>
+            <input type="text" class="form-control search-term" id="search-filter" placeholder="Search term..." value="{{ searchTerm|safe }}" maxlength="255">
+            <button class="btn btn-outline-secondary search-term" type="button" data-items-per-page="25"><i class="fa fa-search" aria-hidden="true"></i></button>
+
+            <select name="status" class="form-control search-status hide">
+                <option disabled selected value>Select status...</option>
+                <optgroup label="Research">
+                    <option value="research:LOCKED">Locked</option>
+                    <option value="research:SUBMITTED">Submitted for vault</option>
+                    <option value="research:ACCEPTED">Accepted for vault</option>
+                    <option value="research:REJECTED">Rejected for vault</option>
+                    <option value="research:SECURED">Secured in vault</option>
+                </optgroup>
+                <optgroup label="Vault">
+                    <option value="vault:UNPUBLISHED">Unpublished</option>
+                    <option value="vault:SUBMITTED_FOR_PUBLICATION">Submitted for publication</option>
+                    <option value="vault:APPROVED_FOR_PUBLICATION">Approved for publication</option>
+                    <option value="vault:PUBLISHED">Published</option>
+                    <option value="vault:DEPUBLISHED">Depublished</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div class="search-results">
+            <table class="table yoda-table table-bordered" id="search">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <div class="revision-results">
+            <p class="alert-card-main hide">
+                <i class="fa fa-check"></i> Your file was successfully restored!
+            </p>
+
+            <table id="file-browser" class="table yoda-table table-bordered" role="grid">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Number of revisions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="select-folder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -98,41 +157,6 @@
                     </div>
                 </div>
             </div>>
-        </div>
-    </div>
-</div>
-
-{% autoescape false %}
-{{ searchHtml }}
-{% endautoescape %}
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="row d-block">
-            <div class="card">
-                <div class="card-header clearfix">
-                    <h5 class="card-title pull-left">
-                        Revisions
-                    </h5>
-                    <div class="input-group-sm has-feedback pull-right">
-                        <a class="btn btn-secondary cancel" href="/research/browse">Close</a>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <p class="alert-card-main hide">
-                        <i class="fa fa-check"></i> Your file was successfully restored!
-                    </p>
-
-                    <table id="file-browser" class="table yoda-table dataTable no-footer" role="grid">
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Number of revisions</th>
-                        </tr>
-                        </thead>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 </div>

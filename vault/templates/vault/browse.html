@@ -10,7 +10,6 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
-<script src="{{ url_for('vault_bp.static', filename='js/search.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
 <script type="text/javascript">
         var browsePageItems = {{ items }};
@@ -42,7 +41,7 @@
                     <div class="card revision-restore-dialog">
                         <div class="card-body">
                             <ol class="breadcrumb dlg-breadcrumb">
-                                <li class="active">Home</li>
+                                <li class="active">Research</li>
                             </ol>
 
                             <table id="folder-select-browser" class="table yoda-table table-bordered">
@@ -162,13 +161,9 @@
     </div>
 </div>
 
-{% autoescape false %}
-{{ searchHtml }}
-{% endautoescape %}
-
 <nav aria-label="breadcrumb flex-column">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item">Home</li>
+        <li class="breadcrumb-item">Vault</li>
     </ol>
 </nav>
 

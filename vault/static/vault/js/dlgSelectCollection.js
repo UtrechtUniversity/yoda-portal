@@ -346,7 +346,7 @@ function dlgMakeBreadcrumb(urlEncodedDir)
     var totalParts = parts.length;
 
     if (totalParts > 0 && parts[0]!='undefined') {
-        var html = '<li class="browse-select" data-path="">Home</li>'; // HdR added to differentiate from main browser and avoid collisions
+        var html = '<li class="browse-select" data-path="">Research</li>'; // HdR added to differentiate from main browser and avoid collisions
         var path = "";
         $.each( parts, function( k, part ) {
             path += '/' + encodeURIComponent(part);
@@ -360,7 +360,7 @@ function dlgMakeBreadcrumb(urlEncodedDir)
             }
         });
     } else {
-        var html = '<li class="active">Home</li>';
+        var html = '<li class="active">Research</li>';
     }
 
     $('ol.dlg-breadcrumb').html(html);

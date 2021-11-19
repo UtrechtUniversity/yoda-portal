@@ -226,13 +226,7 @@ function showFolderSelectDialog(restorationObjectId, path, orgFileName)
 
     var decodedFileName = decodeURIComponent(orgFileName);
 
-    // Dit moet allemaal naar de sub dlg Duplicate
-    // $('#newFileName').val(orgFileName);  //val(decodedFileName); // Is in dialog where to enter a new name when duplicate
-    // // .path is for error reporting
-    // $('.path').text(path); // For ability to mention file already exists in duplicate dialog.
-    // $('.orgFileName').text(orgFileName);   //
-
-    startBrowsing2(path, browseDlgPageItems);
+    startBrowsing2(path, 25);
 
     $('.mode-dlg-locked').addClass('hide');
     $('.mode-dlg-exists').addClass('hide');

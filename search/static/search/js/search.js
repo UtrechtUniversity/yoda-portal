@@ -5,21 +5,16 @@ let currentSearchType;
 let currentSearchItems;
 
 $(document).ready(function() {
-    if ($('#file-browser').length && (view == 'browse' && searchType != 'revision')) {
-        // Rememeber search results
-        if (searchStatusValue.length > 0) {
-            $('[name=status]').val(searchStatusValue);
-            currentSearchString = searchStatusValue;
-            search();
-            showSearchResults();
-        } else if (searchTerm.length > 0) {
-            currentSearchString = searchTerm;
-            search();
-            showSearchResults();
-        }
+    if ($('#file-browser').length
+        && $("#search-filter").val().length > 0
+        && $("#search_concept").attr('data-type') == 'filename') {
+        currentSearchString = $("#search-filter").val();
+        currentSearchType = $("#search_concept").attr('data-type');
+        currentSearchItems = $(".search-btn").attr('data-items-per-page');
+        search();
     }
 
-    $(".search-panel .dropdown-menu a").click(function() {
+    $("#search-panel a").click(function() {
         $("#search_concept").html($(this).text());
         $("#search_concept").attr('data-type', $(this).attr('data-type'));
 
@@ -37,7 +32,6 @@ $(document).ready(function() {
             currentSearchItems = $(".search-btn").attr('data-items-per-page');
         }
         search();
-        saveSearchRequest();
     });
 
     $(".search-btn").click(function() {
@@ -45,7 +39,6 @@ $(document).ready(function() {
         currentSearchType = $("#search_concept").attr('data-type');
         currentSearchItems = $(".search-btn").attr('data-items-per-page');
         search();
-        saveSearchRequest();
     });
 
     $("#search-filter").bind('keypress', function(e) {
@@ -54,7 +47,6 @@ $(document).ready(function() {
             currentSearchType = $("#search_concept").attr('data-type');
             currentSearchItems = $(".search-btn").attr('data-items-per-page');
             search();
-            saveSearchRequest();
         }
     });
 
@@ -63,11 +55,6 @@ $(document).ready(function() {
         currentSearchType = 'status';
         currentSearchItems = $(".search-btn").attr('data-items-per-page');
         search();
-        saveSearchRequest();
-    });
-
-    $(".close-search-results").click(function() {
-        closeSearchResults();
     });
 });
 
@@ -116,11 +103,22 @@ let getSearchResults = (() => {
 // Functions for rendering table cells, per column.
 const resultsRenderer = {
     name: (name, _, row) => {
-        if (row.type === 'coll') {
-            return `<a class="browse-search" data-path="${htmlEncode(name)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
+        let href = '';
+        let target = name;
+        if (row.type != 'coll') {
+            target = name.split("/").slice(0, -1).join("/");
+        }
+
+        if (name.startsWith('/vault-')) {
+            href = "/vault/?dir=" + target;
         } else {
-            let tgt = name.split("/").slice(0, -1).join("/");
-            return `<a class="browse-search" data-path="${htmlEncode(tgt)}"><i class="fa fa-file-o"></i> ${htmlEncode(name)}</a>`;
+            href = "/research/?dir=" + target;
+        }
+
+        if (row.type === 'coll') {
+            return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
+        } else {
+            return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa fa-file-o"></i> ${htmlEncode(name)}</a>`;
         }
     },
     size: (size, _, row) => {
@@ -148,8 +146,8 @@ const resultsRenderer = {
 };
 
 function search() {
-    searchOrderDir = 'asc';
-    searchOrderColumn = 0;
+    var searchOrderDir = 'asc';
+    var searchOrderColumn = 0;
 
     if (typeof currentSearchString != 'undefined' && currentSearchString.length > 0 && currentSearchType != 'revision') {
         // Table columns definition.
@@ -229,17 +227,7 @@ function search() {
             "ajax": getSearchResults,
             "processing": true,
             "serverSide": true,
-            "pageLength": $("select[name='search_length']").val(), //currentSearchItems,
-            "drawCallback": function(settings) {
-                $(".browse-search").on("click", function() {
-                    var path = $(this).attr('data-path');
-                    if (path.startsWith('/research-')) {
-                        browse(path, true);
-                    } else {
-                        window.location = "/vault/?dir=" + path;
-                    }
-                });
-            }
+            "pageLength": $("select[name='search_length']").val() //currentSearchItems,
         });
 
         if (currentSearchType == 'status') {
@@ -250,53 +238,15 @@ function search() {
         }
     }
 
-    return true;
-}
-
-function closeSearchResults() {
-    $('.search-results').hide();
-    $('#search-filter').val('');
-    $('[name=status]').val('');
-    $.get("search/unset_session");
-}
-
-function showSearchResults() {
-    $('.search-results').show();
-}
-
-function saveSearchRequest() {
-    if (typeof currentSearchString != 'undefined' && currentSearchString.length > 0) {
-        var url = "search/set_session";
-
-        $.ajax({
-            url: url,
-            method: "POST",
-            async: false, //blocks window close
-            data: {
-                value: currentSearchString,
-                type: currentSearchType
-            },
-            success: function() {
-                if (currentSearchType == 'revision' && view == 'revision') {
-                    $('#search').hide();
-                    $('.search-results').hide();
-                    return false;
-                }
-
-                if (currentSearchType == 'revision' && view == 'browse') {
-                    $('#search').hide();
-                    $('.search-results').hide();
-
-                    window.location.href = "revision?filter=" + encodeURIComponent(currentSearchString, );
-                    return false;
-                }
-
-                if (currentSearchType != 'revision' && view == 'revision') {
-                    window.location.href = "browse";
-                    return false;
-                }
-                showSearchResults();
-            }
-        });
+    if (currentSearchType == 'revision') {
+        $('#search').hide();
+        $('.search-results').hide();
+        $('.revision-results').show();
+    } else {
+        $('#search').show();
+        $('.revision-results').hide();
+        $('.search-results').show();
     }
+
+    return true;
 }
