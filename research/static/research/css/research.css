@@ -95,10 +95,12 @@ ol.breadcrumb li.active {
     max-width: 40px;
 }
 #file-browser tr > :nth-child(4) {
+    max-width: 40px;
+}
+#file-browser tr > :nth-child(5) {
     max-width: 10px;
     text-align: right;
 }
-
 #file-browser .fa {
     padding-left: 4px;
     padding-right: 4px;

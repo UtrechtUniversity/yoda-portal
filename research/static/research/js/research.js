@@ -655,14 +655,21 @@ const tableRenderer = {
         }
     },
     date: ts => {
-         let date = new Date(ts*1000);
-         let pad = n => n < 10 ? '0'+n : ''+n;
-         let elem = $('<span>');
-         elem.text(`${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
+        let date = new Date(ts*1000);
+        let pad = n => n < 10 ? '0'+n : ''+n;
+        let elem = $('<span>');
+        elem.text(`${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
                  + ` ${pad(date.getHours())}:${pad(date.getMinutes())}`);
-         elem.attr('title', date.toString()); // (should include seconds and TZ info)
-         return elem[0].outerHTML;
-     },
+        elem.attr('title', date.toString()); // (should include seconds and TZ info)
+        return elem[0].outerHTML;
+    },
+    state: (_, __, row) => {
+        let state = $('<span>');
+        if (row.type === 'data' && row.status === 'OFFLINE') {
+            state = $('<span class="badge bg-secondary">Offline</span>');
+        }
+        return state[0].outerHTML;
+    },
     context: (_, __, row) => {
         let actions = $('<div class="dropdown-menu">');
 
@@ -725,6 +732,7 @@ function startBrowsing(items)
                     // (enabling this as is may result in duplicated results for data objects)
                     {render: tableRenderer.size,    orderable: false, data: 'size'},
                     {render: tableRenderer.date,    orderable: false, data: 'modify_time'},
+                    {render: tableRenderer.state,   orderable: false},
                     {render: tableRenderer.context, orderable: false }],
         "ajax": getFolderContents,
         "processing": true,
