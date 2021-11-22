@@ -73,11 +73,6 @@ ol.breadcrumb li.active {
     padding:15px;
 }
 
-#messages {
-    margin-left: -15px;
-    margin-right: -15px;
-}
-
 .lock-icon {
     margin-left: 10px;
     cursor: pointer;

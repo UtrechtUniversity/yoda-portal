@@ -1,16 +1,3 @@
-.action-list li {
-    cursor: pointer;
-}
-
-#messages {
-    margin-left: -15px;
-    margin-right: -15px;
-}
-
-.dropdown-toggle {
-    cursor: pointer;
-}
-
 /* Upload */
 .upload-filename {
     word-break: break-all;
@@ -19,14 +6,6 @@
 
 .hide {
     display:none;
-}
-
-.card-title {
-    margin: 4px 0;
-}
-
-.page_deposit_thankyou a {
-    text-decoration: underline;
 }
 
 /* Data table */
