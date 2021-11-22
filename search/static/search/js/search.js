@@ -111,6 +111,8 @@ const resultsRenderer = {
 
         if (name.startsWith('/vault-')) {
             href = "/vault/?dir=" + target;
+        } else if (name.startsWith('/deposit-')) {
+            href = "/deposit/data?dir=" + target;
         } else {
             href = "/research/?dir=" + target;
         }
