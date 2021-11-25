@@ -94,8 +94,6 @@ class YodaForm extends React.Component {
     }
 
     onChange(form) {
-        updateCompleteness();
-
         // Turn save mode off.
         saving = false;
         const formContext = { saving: false };
@@ -191,10 +189,6 @@ class YodaButtons extends React.Component {
         return (<button onClick={this.props.updateMetadata} type="button" className="btn btn-primary">Update metadata</button>);
     }
 
-    renderFormCompleteness() {
-        return (<div><span className="text-sm pull-left text-muted text-center ms-3 mt-1">Required for the vault:</span><div className="form-completeness progress pull-left ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
-    }
-
     renderButtons() {
         let buttons = [];
 
@@ -203,7 +197,6 @@ class YodaButtons extends React.Component {
                 buttons.push(this.renderUpdateButton());
             } else {
                 buttons.push(this.renderSaveButton());
-                buttons.push(this.renderFormCompleteness());
             }
         }
         return (<div>{buttons}</div>);
@@ -321,8 +314,6 @@ function loadForm() {
             // Metadata present or user has write access, load the form and must be in actual_edit_mode as chosen by user
             if (formProperties.data.can_edit && actual_edit_mode) {
                 uiSchema = formProperties.data.uischema; // take over original ui-shema again- not the readonly one
-
-                $(".form-completeness .progress-bar").css('width', '100%');
             } else {
                 uiSchema['ui:readonly'] = true;
             }
@@ -335,8 +326,6 @@ function loadForm() {
                 $('#metadata-form').fadeIn(220);
                 $('#metadata-form').removeClass('hide');
             }
-
-            updateCompleteness();
         }
     });
 }
@@ -553,31 +542,4 @@ function ArrayFieldTemplate(props) {
             </fieldset>
         );
     }
-}
-
-function updateCompleteness()
-{
-    let mandatoryTotal = 0;
-    let mandatoryFilled = 0;
-    $(".form-control").each(function() {
-        if ($(this)[0].required && !$(this)[0].id.startsWith("yoda_links_")) {
-            mandatoryTotal++;
-            if ($(this)[0].value != "") {
-                mandatoryFilled++;
-            }
-        }
-    });
-
-    $(".select-required").each(function() {
-        mandatoryTotal++;
-    });
-    $(".select-filled").each(function() {
-        mandatoryFilled++;
-    });
-
-    let percent = (mandatoryFilled / mandatoryTotal) * 100;
-    $(".form-completeness .progress-bar").css('width', percent + '%');
-    $('.form-completeness').attr('title', `Required for the vault: ${mandatoryTotal}, currently filled required fields: ${mandatoryFilled}`);
-
-    return mandatoryTotal == mandatoryFilled;
 }

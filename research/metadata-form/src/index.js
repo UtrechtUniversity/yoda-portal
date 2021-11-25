@@ -96,8 +96,6 @@ class YodaForm extends React.Component {
     }
 
     onChange(form) {
-        updateCompleteness();
-
         // Turn save mode off.
         saving = false;
         const formContext = { saving: false };
@@ -198,16 +196,11 @@ class YodaButtons extends React.Component {
         return (<button onClick={this.props.cloneMetadata} type="button" className="btn btn-primary clone-metadata-btn pull-right">Clone from parent folder</button>);
     }
 
-    renderFormCompleteness() {
-        return (<div><span className="text-sm pull-left text-muted text-center ms-3 mt-1">Required for the vault:</span><div className="form-completeness progress pull-left ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
-    }
-
     renderButtons() {
         let buttons = [];
 
         if (formProperties.data.can_edit) {
             buttons.push(this.renderSaveButton());
-            buttons.push(this.renderFormCompleteness());
 
             // Delete and clone are mutually exclusive.
             if (formProperties.data.metadata !== null)
@@ -381,8 +374,6 @@ function loadForm() {
                 $('#metadata-form').fadeIn(220);
                 $('#metadata-form').removeClass('hide');
             }
-
-            updateCompleteness();
         }
     });
 }
@@ -528,7 +519,7 @@ function ObjectFieldTemplate(props) {
 function ArrayFieldTemplate(props) {
     const { DescriptionField, readonly, disabled } = props;
 
-    if (disabled) {
+    if (disabled || props.uiSchema["ui:widget"]=="hidden") {
         let output = props.items.map((element, i) => {
             // Disabled view
             if (disabled) {
@@ -613,31 +604,4 @@ function ArrayFieldTemplate(props) {
             </fieldset>
         );
     }
-}
-
-function updateCompleteness()
-{
-    let mandatoryTotal = 0;
-    let mandatoryFilled = 0;
-    $(".form-control").each(function() {
-        if ($(this)[0].required && !$(this)[0].id.startsWith("yoda_links_")) {
-            mandatoryTotal++;
-            if ($(this)[0].value != "") {
-                mandatoryFilled++;
-            }
-        }
-    });
-
-    $(".select-required").each(function() {
-        mandatoryTotal++;
-    });
-    $(".select-filled").each(function() {
-        mandatoryFilled++;
-    });
-
-    let percent = (mandatoryFilled / mandatoryTotal) * 100;
-    $(".form-completeness .progress-bar").css('width', percent + '%');
-    $('.form-completeness').attr('title', `Required for the vault: ${mandatoryTotal}, currently filled required fields: ${mandatoryFilled}`);
-
-    return mandatoryTotal == mandatoryFilled;
 }
