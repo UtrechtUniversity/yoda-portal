@@ -364,8 +364,10 @@ $(function() {
 
     $("body").on("click", "input:checkbox[id='multi-select-all']", function() {
         if ($(this).is(':checked')) {
-            $("input:checkbox[name='multiSelect[]']").prop("checked", true);
-            $('#multiSelect').removeClass('hide');
+            if ($("input:checkbox[name='multiSelect[]']").length) {
+                $("input:checkbox[name='multiSelect[]']").prop("checked", true);
+                $('#multiSelect').removeClass('hide');
+            }
         } else {
             $("input:checkbox[name='multiSelect[]']").prop("checked", false);
             $('#multiSelect').addClass('hide');
