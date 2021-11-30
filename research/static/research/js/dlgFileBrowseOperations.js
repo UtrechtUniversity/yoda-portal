@@ -3,14 +3,22 @@ var dlgCurrentFolder = '';
 var currentBrowseFolder = '';
 
 $( document ).ready(function() {
-    $("body").on("click", "a.file-copy, a.file-move", function() {
+    $("body").on("click", "a.file-copy, a.file-move, a.folder-copy, a.folder-move", function() {
         // Determine action
         if($(this).hasClass("file-move")) {
-            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'move');
+            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'file-move');
             $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move');
             $('#dlg-file-browse-operations .card-title span.action').text('move');
+        } else if($(this).hasClass("folder-move")) {
+            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-move');
+            $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move');
+            $('#dlg-file-browse-operations .card-title span.action').text('move');
+        } else if($(this).hasClass("file-copy")) {
+            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'file-copy');
+            $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy');
+            $('#dlg-file-browse-operations .card-title span.action').text('copy');
         } else {
-            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'copy');
+            $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-copy');
             $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy');
             $('#dlg-file-browse-operations .card-title span.action').text('copy');
         }
@@ -54,6 +62,11 @@ $( document ).ready(function() {
         $('#dlg-file-browse-operations').modal('show');
     });
 
+    $("body").on("click", "a.multiple-delete", function() {
+        $('#multi-select-delete .collection').text($('.system-metadata-icon').attr('data-folder'));
+        $('#mutli-select-progress').attr('data-action', 'delete');
+        $('#multi-select-delete').modal('show');
+    });
     // handling of breadcrumbs
     $("body").on("click", ".browse-select", function(e) {
         dlgBrowse($(this).attr('data-path'));
@@ -70,14 +83,18 @@ $( document ).ready(function() {
     $('.dlg-action-button').on('click', function(){
         let action = $(this).attr("data-action");
         // Single file
-        if (action == 'move' || action == 'copy') {
-            let filepath = $(this).attr('data-collection') + "/" + $(this).attr('data-name');
-            let newFilepath = dlgCurrentFolder + "/" + $(this).attr('data-name');
+        if (action == 'file-move' || action == 'file-copy' || action == 'folder-move' || action == 'folder-copy') {
+            let path = $(this).attr('data-collection') + "/" + $(this).attr('data-name');
+            let newPath = dlgCurrentFolder + "/" + $(this).attr('data-name');
 
-            if(action == 'move') {
-                moveFile(filepath, newFilepath, false);
-            } else if (action == 'copy') {
-                copyFile(filepath, newFilepath, false);
+            if(action == 'file-move') {
+                moveFile(path, newPath, false);
+            } else if (action == 'file-copy') {
+                copyFile(path, newPath, false);
+            } else if (action == 'folder-move') {
+                moveFolder(path, newPath, false);
+            } else if (action == 'folder-copy') {
+                copyFolder(path, newPath, false);
             }
         } else {
             // Multiple items
@@ -95,12 +112,16 @@ $( document ).ready(function() {
                 let row = `<tr class="row-${index}">
                     <td>${icon} ${name}</td>
                     <td class="item-progress">-</td>
-                </tr>    
+                </tr>
                 `;
                 $('.multi-select-table tbody').append(row);
             });
 
-            $('#dlg-file-browse-operations').modal('hide');
+            if (action == 'multiple-delete') {
+                $('#multi-select-delete').modal('hide');
+            } else {
+                $('#dlg-file-browse-operations').modal('hide');
+            }
             $('#mutli-select-progress').modal('show');
         }
 
@@ -114,24 +135,37 @@ $( document ).ready(function() {
             let type = $(this).attr('data-type');
             let name = $(this).attr('data-name');
             let currentPath = $(this).val();
-            let newPath = dlgCurrentFolder + "/" + name;
+            let collection;
+            let newPath;
+            if (action == 'delete') {
+                collection = $('.system-metadata-icon').attr('data-folder');
+            } else {
+                newPath = dlgCurrentFolder + "/" + name;
+            }
 
             if (type == 'data') {
                 if (action == 'copy') {
                     copyFile(currentPath, newPath, true, index);
-                } else {
+                } else if (action == 'move') {
                     moveFile(currentPath, newPath, true, index);
+                } else if (action == 'delete') {
+                    deleteFile(collection, name, index);
                 }
             } else {
                 if (action == 'copy') {
                     copyFolder(currentPath, newPath, true, index);
-                } else {
+                } else if (action == 'move') {
                     moveFolder(currentPath, newPath, true, index);
+                } else if (action == 'delete') {
+                    deleteFolder(collection, name, index);
                 }
             }
         });
     })
 
+    $('#finishMultiSelect').on('click', function(){
+        $("input:checkbox[id='multi-select-all']").prop("checked", false);
+    });
 });
 
 async function copyFile(filepath, newFilepath, multiple, multipleIndex = null)
@@ -303,6 +337,53 @@ async function moveFolder(folderPath, newFolderpath, multiple, multipleIndex = n
         } else {
             dlgSelectAlertShow(e.status_info);
         }
+    }
+}
+async function deleteFolder(collection, folderName, multipleIndex = null)
+{
+    $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+
+    try {
+        let result = await Yoda.call('research_folder_delete',
+            {
+                'coll': Yoda.basePath + collection,
+                'folder_name': folderName
+            },
+            {'quiet': true, 'rawResult': true}
+        );
+
+        if (result.status == 'ok') {
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text('Delete completed');
+            browse(collection, true);
+        } else { // non api error
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(result.status_info);
+        }
+    } catch(e) { // API ERROR
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(dlgSelectAlertShow(e.status_info));
+    }
+}
+
+async function deleteFile(collection, fileName, multipleIndex = null)
+{
+    $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+
+    try {
+        let result = await Yoda.call('research_file_delete',
+            {
+                'coll': Yoda.basePath + collection,
+                'file_name': fileName
+            },
+            {'quiet': true, 'rawResult': true}
+        );
+
+        if (result.status == 'ok') {
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text('Delete completed');
+            browse(collection, true);
+        } else { // non api error
+            $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(result.status_info);
+        }
+    } catch(e) { // API ERROR
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').text(dlgSelectAlertShow(e.status_info));
     }
 }
 

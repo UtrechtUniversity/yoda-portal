@@ -362,6 +362,15 @@ $(function() {
         }
     });
 
+    $("body").on("click", "input:checkbox[id='multi-select-all']", function() {
+        if ($(this).is(':checked')) {
+            $("input:checkbox[name='multiSelect[]']").prop("checked", true);
+            $('#multiSelect').removeClass('hide');
+        } else {
+            $("input:checkbox[name='multiSelect[]']").prop("checked", false);
+            $('#multiSelect').addClass('hide');
+        }
+    });
 });
 
 
@@ -630,16 +639,19 @@ let getFolderContents = (() => {
 
 // Functions for rendering table cells, per column.
 const tableRenderer = {
-    name: (name, _, row) => {
-         let tgt = `${currentFolder}/${name}`;
+    multiselect: (name, _, row) => {
+        let tgt = `${currentFolder}/${name}`;
         let checkbox = '';
-         if (currentFolder) {
-             checkbox = `<input class="form-check-input" type="checkbox" name="multiSelect[]" value="${htmlEncode(tgt)}" data-name="${htmlEncode(name)}" data-type="${row.type}">`;
-         }
-
-         if (row.type === 'coll')
-              return checkbox + `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
-         else return checkbox + `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
+        if (currentFolder) {
+            checkbox = `<input class="form-check-input ms-1" type="checkbox" name="multiSelect[]" value="${htmlEncode(tgt)}" data-name="${htmlEncode(name)}" data-type="${row.type}">`;
+        }
+        return checkbox;
+    },
+    name: (name, _, row) => {
+        let tgt = `${currentFolder}/${name}`;
+        if (row.type === 'coll')
+            return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
+        else return `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
     },
     size: (size, _, row) => {
         if (row.type === 'coll') {
@@ -672,6 +684,8 @@ const tableRenderer = {
                 return '';
             }
             actions.append(`<a href="#" class="dropdown-item folder-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this folder" >Rename</a>`);
+            actions.append(`<a href="#" class="dropdown-item folder-copy" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Copy this folder">Copy</a>`);
+            actions.append(`<a href="#" class="dropdown-item folder-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this folder">Move</a>`);
             actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
         }
         else {
@@ -691,9 +705,9 @@ const tableRenderer = {
             }
 
             actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this file">Rename</a>`);
-            actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
             actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Copy this file">Copy</a>`);
             actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this file">Move</a>`);
+            actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
         }
         let dropdown = $(`<div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -716,7 +730,8 @@ function startBrowsing(items)
             "lengthMenu": "_MENU_"
         },
         "dom": '<"top">frt<"bottom"lp><"clear">',
-        'columns': [{render: tableRenderer.name,    data: 'name'},
+        'columns': [{render: tableRenderer.multiselect,    orderable: false, data: 'name'},
+                    {render: tableRenderer.name,    data: 'name'},
                     // Size and date should be orderable, but limitations
                     // on how queries work prevent us from doing this
                     // correctly without significant overhead.
@@ -728,6 +743,7 @@ function startBrowsing(items)
         "processing": true,
         "serverSide": true,
         "iDeferLoading": 0,
+        "order": [[ 1, "asc" ]],
         "pageLength": items
     });
     browse(currentFolder);
@@ -857,6 +873,9 @@ function topInformation(dir, showAlert)
 
             $('a.folder-delete').addClass("disabled");
             $('a.folder-rename').addClass("disabled");
+            $('a.folder-copy').addClass("disabled");
+            $('a.folder-move').addClass("disabled");
+
             $('a.file-delete').addClass("disabled");
             $('a.file-rename').addClass("disabled");
             $('a.file-copy').addClass("disabled");
@@ -929,10 +948,10 @@ function topInformation(dir, showAlert)
 
                 $('a.folder-delete').removeClass("disabled");
                 $('a.folder-rename').removeClass("disabled");
-                $('a.file-delete').removeClass("disabled");
                 $('a.file-rename').removeClass("disabled");
                 $('a.file-copy').removeClass("disabled");
                 $('a.file-move').removeClass("disabled");
+                $('a.file-delete').removeClass("disabled");
             }
 
             // Lock icon
