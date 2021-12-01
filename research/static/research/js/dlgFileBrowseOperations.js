@@ -163,6 +163,9 @@ $( document ).ready(function() {
         });
     })
 
+    $('#finishMultiSelect').on('click', function(){
+        $("input:checkbox[id='multi-select-all']").prop("checked", false);
+    });
 });
 
 async function copyFile(filepath, newFilepath, multiple, multipleIndex = null)
