@@ -52,7 +52,7 @@ def download():
                         break
         except CAT_NO_ACCESS_PERMISSION:
             abort(403)
-        except:
+        except Exception:
             abort(500)
 
     if session.data_objects.exists(path):
