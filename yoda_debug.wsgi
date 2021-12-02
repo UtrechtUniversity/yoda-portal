@@ -7,4 +7,4 @@ sys.path = [os.path.dirname(__file__)] + sys.path
 
 from app import app
 from werkzeug.debug import DebuggedApplication
-application = app
+application = DebuggedApplication(app, True)
