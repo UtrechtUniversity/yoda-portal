@@ -1,6 +1,6 @@
 "use strict";
 
-$(function() {
+$(document).ready(function() {
     $("body").on("click", ".custom-switch", function(e) {
         let type = $("#mail_notifications_type")
         if($('#mail_notifications').prop('checked')) {

@@ -152,6 +152,13 @@ def settings():
     return render_template('user/settings.html', **settings)
 
 
+@user_bp.route('/data_access')
+def data_access():
+    # Load tokens.
+    response = api.call('token_load')
+    return render_template('user/data_access.html', tokens=response['data'])
+
+
 @user_bp.route('/callback')
 def callback():
     def token_request():
@@ -302,7 +309,7 @@ def callback():
                 'danger'
             )
 
-            return redirect(url_for('user_bp.login'))
+            return redirect(url_for('user_bp.gate'))
 
     return redirect(original_destination())
 
@@ -325,6 +332,8 @@ def oidc_authorize_url(username):
 
 
 def irods_login(username, password):
+    # Add a prefix to username to consume in the PAM stack.
+    # username = f"++portal++{username}"
     password = escape_irods_pam_password(password)
 
     irods = iRODSSession(
