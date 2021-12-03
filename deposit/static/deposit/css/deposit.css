@@ -15,15 +15,18 @@
 }
 
 #file-browser tr > :nth-child(1) {
+    width: 16px;
+}
+#file-browser tr > :nth-child(2) {
     min-width: 60%;
     word-break:break-all;
 }
-#file-browser tr > :nth-child(2) {
+#file-browser tr > :nth-child(3) {
     text-align: right;
 }
-#file-browser tr > :nth-child(3) {
-}
 #file-browser tr > :nth-child(4) {
+}
+#file-browser tr > :nth-child(5) {
     max-width: 90px;
     text-align: right;
 }
@@ -60,7 +63,9 @@
     background-color: transparent !important;
 }
 
-a.dropdown-item:hover, a.dropdown-item:focus {
+.breadcrumb-item.active, .breadcrumb-item:hover, .breadcrumb-item:focus,
+a.dropdown-item:hover, a.dropdown-item:focus
+{
     cursor: pointer;
 }
 
