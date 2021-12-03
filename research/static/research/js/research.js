@@ -931,7 +931,7 @@ function topInformation(dir, showAlert)
                 $('.btn-group button.folder-status').attr('data-datamanager', isDatamanager);
             }
 
-            if (userType == 'reader') {
+            if (userType == 'reader' || userType == 'none') {
                 var actions = [];
                 hasWriteRights = false;
             }

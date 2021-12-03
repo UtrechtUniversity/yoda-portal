@@ -22,6 +22,11 @@ def csrf_error(e):
     return redirect(url_for('user_bp.login'))
 
 
+@general_bp.app_errorhandler(403)
+def access_forbidden(e):
+    return render_template('403.html'), 403
+
+
 @general_bp.app_errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404

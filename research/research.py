@@ -7,6 +7,7 @@ import io
 import os
 
 from flask import abort, Blueprint, g, jsonify, make_response, render_template, request, Response, stream_with_context
+from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
 from werkzeug.utils import secure_filename
 
@@ -41,13 +42,18 @@ def download():
 
     def read_file_chunks(path):
         obj = session.data_objects.get(path)
-        with obj.open('r') as fd:
-            while True:
-                buf = fd.read(READ_BUFFER_SIZE)
-                if buf:
-                    yield buf
-                else:
-                    break
+        try:
+            with obj.open('r') as fd:
+                while True:
+                    buf = fd.read(READ_BUFFER_SIZE)
+                    if buf:
+                        yield buf
+                    else:
+                        break
+        except CAT_NO_ACCESS_PERMISSION:
+            abort(403)
+        except Exception:
+            abort(500)
 
     if session.data_objects.exists(path):
         return Response(
