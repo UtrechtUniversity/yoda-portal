@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Data Access Tokens{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('user_bp.static', filename='js/data_access.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h1>Data Access Password</h1>
+<p>
+    In order to upload, download or view the content of files via iCommands or network disk (webDAV), you need a one-time data access password.
+    <br />
+    <br />
+    Below you can generate a data access password.
+    The password is valid for 72 hours.
+    If the password has expired, you can simply repeat this procedure.
+</p>
+<div class="card">
+    <div class="card-header">
+        Data Access Passwords
+    </div>
+    <div class="card-body">
+        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#dataAccessPassword">
+          Generate new data access password
+        </button>
+        <div class="list-group">
+            <div class="list-group-item d-inline-flex">
+                <label class="col-sm-7">Password Label</label>
+                <span class="col-sm-3">Expiration Time</span>
+            </div>
+            {% for t in tokens %}
+            <div class="list-group-item d-inline-flex">
+                <label class="col-sm-7">{{ t.label }}</label>
+                <span class="col-sm-3">{{ t.exp_time }}</span>
+                <input class="btn btn-danger col-sm-2 delete-token" type="button" value="Delete"/>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Generate data access password modal -->
+<div class="modal fade" id="dataAccessPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="dataAccessPassword" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dataAccessPassword">Generate new data access password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form method="post" class="form-horizontal">
+              <div class="form-group row mb-3">
+                  <label id="label-input" class="col-sm-3 col-form-label" for="f-token-label">Label</label>
+                  <div class="col-sm-9">
+                      <input
+                          name="token-label"
+                          id="f-token-label"
+                          class="form-control"
+                          type="text"
+                          placeholder="Enter a label to identify the new password by"
+                          autofocus
+                          required />
+                  </div>
+              </div>
+              <div class="form-group row">
+                  <label class="col-sm-3 col-form-label" for="f-token">Password</label>
+                  <div class="col-sm-9">
+                      <input
+                          id="f-token"
+                          class="form-control"
+                          type="text"
+                          disabled/>
+                  </div>
+              </div>
+              <div id="passwordError" class="alert alert-danger mt-3" role="alert" hidden>
+                  An error occurred while creating the token, please try another label. If the issue persists, contact your administrator
+              </div>
+              <a id="generateButton" class="btn btn-primary mt-3">Generate data access password</a>
+              <div id="passwordOk" class="alert alert-success mt-3" role="alert" hidden>
+                  Please store the password somewhere safe, you will not be able to do so after you close this window!
+              </div>
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
