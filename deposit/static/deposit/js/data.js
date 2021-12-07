@@ -214,6 +214,26 @@ $(function() {
         e.preventDefault();
     });
 
+    $("body").on("click", "input:checkbox[name='multiSelect[]']", function() {
+        if ($("input:checkbox[name='multiSelect[]']:checked").length) {
+            $('#multiSelect').removeClass('hide');
+        } else {
+            $('#multiSelect').addClass('hide');
+        }
+    });
+
+    $("body").on("click", "input:checkbox[id='multi-select-all']", function() {
+        if ($(this).is(':checked')) {
+            if ($("input:checkbox[name='multiSelect[]']").length) {
+                $("input:checkbox[name='multiSelect[]']").prop("checked", true);
+                $('#multiSelect').removeClass('hide');
+            }
+        } else {
+            $("input:checkbox[name='multiSelect[]']").prop("checked", false);
+            $('#multiSelect').addClass('hide');
+        }
+    });
+
 });
 
 
@@ -496,6 +516,15 @@ let getFolderContents = (() => {
 
 // Functions for rendering table cells, per column.
 const tableRenderer = {
+
+    multiselect: (name, _, row) => {
+        let tgt = `${currentFolder}/${name}`;
+        let checkbox = '';
+        if (currentFolder) {
+            checkbox = `<input class="form-check-input ms-1" type="checkbox" name="multiSelect[]" value="${htmlEncode(tgt)}" data-name="${htmlEncode(name)}" data-type="${row.type}">`;
+        }
+        return checkbox;
+    },
     name: (name, _, row) => {
          let tgt = `${currentFolder}/${name}`;
          if (row.type === 'coll')
@@ -566,7 +595,8 @@ function startBrowsing(items)
             "lengthMenu": "_MENU_"
         },
         "dom": '<"top">frt<"bottom"lp><"clear">',
-        'columns': [{render: tableRenderer.name,    data: 'name'},
+        'columns': [{render: tableRenderer.multiselect, orderable: false, data: 'name'},
+                    {render: tableRenderer.name, data: 'name'},
                     // Size and date should be orderable, but limitations
                     // on how queries work prevent us from doing this
                     // correctly without significant overhead.
@@ -578,6 +608,7 @@ function startBrowsing(items)
         "processing": true,
         "serverSide": true,
         "iDeferLoading": 0,
+        "order": [[ 1, "asc" ]],
         "pageLength": items
     });
     browse(currentFolder);

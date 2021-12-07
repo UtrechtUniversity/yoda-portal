@@ -50,10 +50,22 @@
             <table id="file-browser" class="table yoda-table table-striped upload-drop" ondrop="dropHandler(event);" ondragenter="dragEnterHandler(event);" ondragend="dragEndHandler(event);">
                 <thead>
                 <tr>
+                    <th><input class="form-check-input" type="checkbox" id="multi-select-all"></th>
                     <th>Name</th>
                     <th>Size</th>
                     <th>Modified date</th>
-                    <th></th>
+                    <th>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle hide" type="button" data-bs-toggle="dropdown" id="multiSelect" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="multiSelect">
+                                <a class="dropdown-item multiple-move" title="Move">Move</a>
+                                <a class="dropdown-item multiple-copy" title="Copy">Copy</a>
+                                <a class="dropdown-item multiple-delete" title="Delete">Delete</a>
+                            </div>
+                        </div>
+                    </th>
                 </tr>
                 </thead>
             </table>
@@ -229,6 +241,57 @@
         </div>
     </div>
 </div>
+
+<div class="modal" tabindex="-1" role="dialog" id="multi-select-delete">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Delete selected items in <span class="collection"></span></h5>
+                <p>Do you want to delete the selected items?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary dlg-action-button" data-action="multiple-delete">Delete selected items</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="mutli-select-progress" data-action="">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="card-body">
+                <div class="card">
+                    <div class="card-header clearfix">
+                        <h5 class="card-title pull-left">
+                            <span class="action"></span> selected items
+                        </h5>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-bordered multi-select-table">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Progress</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="finishMultiSelect" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="modal" tabindex="-1" role="dialog" id="uploads">
     <div class="modal-dialog mw-100 w-75">
