@@ -500,10 +500,10 @@ async function handleFileStage(collection, file_name) {
     );
 
     if (result.status == 'ok') {
-        Yoda.set_message('success', 'Successfully requested to bring file <' + + '> online');
+        Yoda.set_message('success', 'Successfully requested to bring file <' + file_name + '> online');
     }
     else {
-        Yoda.set_message('error', 'Failed to request to bring file <' + + '> online');
+        Yoda.set_message('error', 'Failed to request to bring file <' + file_name + '> online');
     }
 }
 
