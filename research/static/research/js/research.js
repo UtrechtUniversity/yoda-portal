@@ -126,6 +126,11 @@ $(function() {
         handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
+    // FILE stage
+    $("body").on("click", "a.file-stage", function() {
+        handleFileStage($(this).attr('data-collection'), $(this).attr('data-name'));
+    });
+
     // Flow.js upload handler
     var r = new Flow({
         target: '/research/upload',
@@ -488,6 +493,21 @@ async function handleFileDelete(collection, file_name) {
 }
 
 
+async function handleFileStage(collection, file_name) {
+    let result = await Yoda.call('tape_archive_stage',
+        {path: Yoda.basePath +  collection + "/" + file_name},
+        {'quiet': true, 'rawResult': true}
+    );
+
+    if (result.status == 'ok') {
+        Yoda.set_message('success', 'Successfully requested to bring file <' + + '> online');
+    }
+    else {
+        Yoda.set_message('error', 'Failed to request to bring file <' + + '> online');
+    }
+}
+
+
 // Alerts regarding folder/file management
 function fileMgmtDialogAlert(dlgName, alert) {
     if (alert.length) {
@@ -698,7 +718,7 @@ const tableRenderer = {
             actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
         }
         else {
-            if (row.status === 'OFFLINE') {
+            if (row.status === 'OFL') {
                 actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`);
             } else {
                 // Render context menu for files.
