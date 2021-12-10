@@ -679,7 +679,7 @@ const tableRenderer = {
     },
     state: (_, __, row) => {
         let state = $('<span>');
-        if (row.type === 'data' && row.status === 'OFFLINE') {
+        if (row.type === 'data' && row.status === 'OFL') {
             state = $('<span class="badge bg-secondary">Offline</span>');
         }
         return state[0].outerHTML;
