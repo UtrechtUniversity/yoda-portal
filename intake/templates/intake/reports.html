@@ -167,7 +167,13 @@
                         {% for descr in aggregatedInfo[version] %}
                             <tr class="dataset-aggregated-version-raw">
                                 <td style="width:250px;">{{ title_translate[descr] }}</td>
-                                <td align="right">{{ aggregatedInfo[version][descr] }}</td>
+                                <td align="right">
+                                    {% if descr in ['totalFileSize', 'totalFileSizeMonthGrowth'] %}
+                                        {{ aggregatedInfo[version][descr] | filesizeformat(false) }}
+                                    {% else %}
+                                        {{ aggregatedInfo[version][descr] }}
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     {% endif %}
@@ -184,7 +190,13 @@
                         {% for descr in aggregatedInfo[version] %}
                             <tr class="dataset-aggregated-version-processed">
                                 <td style="width:250px;">{{ title_translate[descr] }}</td>
-                                <td align="right">{{ aggregatedInfo[version][descr] }}</td>
+                                <td align="right">
+                                    {% if descr in ['totalFileSize', 'totalFileSizeMonthGrowth'] %}
+                                        {{ aggregatedInfo[version][descr] | filesizeformat(false) }}
+                                    {% else %}
+                                        {{ aggregatedInfo[version][descr] }}
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     {% endif %}
@@ -201,7 +213,13 @@
                         {% for descr in aggregatedInfo[version] %}
                             <tr class="dataset-aggregated-version-total">
                                 <td style="width:250px;">{{ title_translate[descr] }}</td>
-                                <td align="right">{{ aggregatedInfo[version][descr] }}</td>
+                                <td align="right">
+                                    {% if descr in ['totalFileSize', 'totalFileSizeMonthGrowth'] %}
+                                        {{ aggregatedInfo[version][descr] | filesizeformat(false) }}
+                                    {% else %}
+                                        {{ aggregatedInfo[version][descr] }}
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     {% endif %}
