@@ -568,6 +568,7 @@ const tableRenderer2 = {
 
 function dlgBrowse(dir)
 {
+    dir = decodeURIComponent(dir);
     dlgCurrentFolder = dir;
 
     dlgSelectAlertHide();
