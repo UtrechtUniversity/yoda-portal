@@ -85,8 +85,10 @@ $(function() {
 
     async function handleLockingAndAlerts(intake_path, dataset_ids)
     {
-        result = await Yoda.call('intake_lock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
+        let result = await Yoda.call('intake_lock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
+        console.log(result);
         if (result.proc_status!='OK') {
+            alert(result.error_msg);
             reload_page_with_alert('2');
             return;
         }
@@ -95,7 +97,8 @@ $(function() {
 
     async function handleUnlockingAndAlerts(intake_path, dataset_ids)
     {
-        result = await Yoda.call('intake_unlock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
+        let result = await Yoda.call('intake_unlock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
+        console.log(result);
         if (result.proc_status!='OK') {
             reload_page_with_alert('4');
             return;
