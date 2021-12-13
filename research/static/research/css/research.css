@@ -83,7 +83,7 @@ ol.breadcrumb li.active {
     padding-top: 2px;
 }
 #file-browser tr > :nth-child(1) {
-    max-width: 0px;
+    max-width: 2px;
 }
 
 #file-browser tr > :nth-child(2) {
