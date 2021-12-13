@@ -84,7 +84,7 @@ ol.breadcrumb li.active {
 }
 
 #file-browser tr > :nth-child(1) {
-    max-width: 0px;
+    max-width: 2px;
 }
 #file-browser tr > :nth-child(2) {
     min-width: 40%;
