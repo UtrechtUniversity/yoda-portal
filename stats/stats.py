@@ -20,10 +20,16 @@ def index():
     resource_tiers_response = api.call('resource_resource_and_tier_data', data={})
     group_response = api.call('resource_list_groups', data={})
     category_response = api.call('resource_category_stats', data={})
+
+    has_access = False
+    if (resource_tiers_response['data'] or group_response['data'] or category_response['data']):
+        has_access = True
+
     return render_template('stats/stats.html',
                            resources=resource_tiers_response['data'],
                            groups=group_response['data'],
-                           categories=category_response['data'])
+                           categories=category_response['data'],
+                           access=has_access)
 
 
 @stats_bp.route('get_tiers', methods=['GET'])
