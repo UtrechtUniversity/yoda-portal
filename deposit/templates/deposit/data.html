@@ -9,16 +9,16 @@
 {% endblock style %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
-<script src="{{ url_for('deposit_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
-<script src="{{ url_for('deposit_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
-<script src="{{ url_for('deposit_bp.static', filename='js/data.js') }}"></script>
-<script src="{{ url_for('deposit_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
 <script>
     var browsePageItems = {{ items }};
     var browseStartDir = dir = path  = {{ dir|tojson|safe }};
     var view = 'browse';
 </script>
+<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/data.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -73,7 +73,7 @@
     </div>
 
     <div class="col-md-12">
-        <a class="btn btn-primary mt-3 pull-right" href="/deposit/metadata?dir={{ dir|urlencode }}">Document data</a>
+        <a class="btn btn-primary mt-3 pull-right" href="/deposit/metadata?dir={{ dir|urlencode }}" title="Document your data">Document data</a>
     </div>
 </div>
 
@@ -114,8 +114,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button class='btn btn-primary btn-confirm-folder-create' data-path="">Create new folder</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Close modal">Close</button>
+                <button class='btn btn-primary btn-confirm-folder-create' title="Create new folder" data-path="">Create new folder</button>
             </div>
         </div>
     </div>
@@ -132,8 +132,8 @@
                 <p>Do you want to delete folder <span id="folder-delete-name"></span>?</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-primary btn-confirm-folder-delete' data-collection="" data-name="">Delete folder</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class='btn btn-primary btn-confirm-folder-delete' data-collection="" data-name="" title="Delete folder">Delete folder</button>
             </div>
         </div>
     </div>
@@ -156,8 +156,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-primary btn-confirm-folder-rename' data-collection="">Rename folder</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class='btn btn-primary btn-confirm-folder-rename' data-collection="" title="Rename folder">Rename folder</button>
             </div>
         </div>
     </div>
@@ -180,8 +180,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-primary btn-confirm-file-rename' data-collection="">Rename file</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class='btn btn-primary btn-confirm-file-rename' data-collection="" title="Rename file">Rename file</button>
             </div>
         </div>
     </div>
@@ -198,8 +198,8 @@
                 <p>Do you want to delete file <span id="file-delete-name"></span>?</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-primary btn-confirm-file-delete' data-collection="" data-name="">Delete file</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class='btn btn-primary btn-confirm-file-delete' data-collection="" data-name="" title="Yes delete file">Delete file</button>
             </div>
         </div>
     </div>
@@ -235,7 +235,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
                 <button class="btn btn-primary dlg-action-button" data-action="" data-name="" data-collection=""><span class="action"></span></button>
             </div>
         </div>
@@ -250,8 +250,8 @@
                 <p>Do you want to delete the selected items?</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-primary dlg-action-button" data-action="multiple-delete">Delete selected items</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class="btn btn-primary dlg-action-button" data-action="multiple-delete" title="Yes delete items">Delete selected items</button>
             </div>
         </div>
     </div>
@@ -286,7 +286,7 @@
             </div>
 
             <div class="modal-footer">
-                <button id="finishMultiSelect" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="finishMultiSelect" class="btn btn-secondary" data-bs-dismiss="modal" title="Close">Close</button>
             </div>
         </div>
     </div>
@@ -298,13 +298,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Uploads</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="files"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Close">Close</button>
             </div>
         </div>
     </div>

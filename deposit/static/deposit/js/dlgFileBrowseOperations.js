@@ -475,8 +475,6 @@ let getFolderContents2 = (() => {
             // Nope, load new data via the API.
             let j = ++i;
 
-            let printtempPath = Yoda.basePath + dlgCurrentFolder;
-            console.info('Browse folder: ' + printtempPath);
             let result = await Yoda.call('browse_folder',
                 {'coll':       Yoda.basePath + dlgCurrentFolder,
                     'offset':     args.start,
@@ -501,6 +499,10 @@ let getFolderContents2 = (() => {
             cacheFolder    = dlgCurrentFolder;
             cacheSortCol   = args.order[0].column;
             cacheSortOrder = args.order[0].dir;
+
+            // hide the pagination if needed
+           if (total < 10)
+                $(".bottom").hide();
 
             return cache.slice(args.start - cacheStart, args.length);
         }
@@ -566,6 +568,7 @@ const tableRenderer2 = {
 
 function dlgBrowse(dir)
 {
+    dir = decodeURIComponent(dir);
     dlgCurrentFolder = dir;
 
     dlgSelectAlertHide();
