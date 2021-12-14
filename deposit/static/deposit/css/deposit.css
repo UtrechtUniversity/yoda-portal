@@ -15,7 +15,7 @@
 }
 
 #file-browser tr > :nth-child(1) {
-    width: 16px;
+    width: 50px;
 }
 #file-browser tr > :nth-child(2) {
     min-width: 60%;
