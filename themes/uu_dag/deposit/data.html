@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Deposit &dash; Add data{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/stepper/bs-stepper.custom.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/deposit.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+<script>
+    var browsePageItems = {{ items }};
+    var browseStartDir = dir = path  = {{ dir|tojson|safe }};
+    var view = 'browse';
+</script>
+<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/data.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+{% with step=1 %}
+{% include 'deposit/workflow.html' %}
+{% endwith %}
+
+<div class="row mt-2 mb-1">
+    <div class="col-9">
+        <h2>Upload data</h2>
+    </div>
+    <div class="col-3">
+        <a href="https://dag.sites.uu.nl/deposit/upload-data/" target="_blank" title="Information" class="btn border-bottom pull-right">Info & Help</a>
+    </div>
+</div>
+<div class="row">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">My deposits</li>
+        </ol>
+    </nav>
+
+    <div class="col-md-12">
+        <div class="btn-toolbar pull-right" role="toolbar">
+            <div class="btn-group pe-0" role="group">
+                <button type="button" class="btn btn-outline-secondary folder-create me-2" data-path="" title="Create a new folder"><i class="fa fa-folder px-2" aria-hidden="true"></i> Create Folder</button>
+                <button type="button" class="btn btn-outline-secondary upload me-2" data-path="" title="Upload files"><i class="fa fa-upload" aria-hidden="true"></i> Upload files</button>
+                <button type="button" class="btn btn-outline-secondary upload-folder" data-path="" title="Upload folders"><i class="fa fa-upload" aria-hidden="true"></i> Upload folders</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="row d-block">
+            <table id="file-browser" class="table yoda-table table-striped upload-drop" ondrop="dropHandler(event);" ondragenter="dragEnterHandler(event);" ondragend="dragEndHandler(event);">
+                <thead>
+                <tr>
+                    <th>
+                        <input class="form-check-input" type="checkbox" id="multi-select-all">
+                        <div class="dropdown float-end">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle hide" type="button" data-bs-toggle="dropdown" id="multiSelect" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu" aria-labelledby="multiSelect">
+                                <a class="dropdown-item multiple-move" title="Move">Move</a>
+                                <a class="dropdown-item multiple-copy" title="Copy">Copy</a>
+                                <a class="dropdown-item multiple-delete" title="Delete">Delete</a>
+                            </div>
+                        </div>
+                    </th>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Modified date</th>
+                    <th></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <a class="btn btn-primary mt-3 pull-right" href="/deposit/metadata?dir={{ dir|urlencode }}" title="Document your data">Document data</a>
+    </div>
+</div>
+
+<div class="card upload-large-files mt-4">
+    <div class="card-header">
+        Alternative upload methods
+    </div>
+    <div class="card-body">
+        <p>For frequent large uploads (bigger than 1GB) we recommend using one of the following:</p>
+        <ul>
+            <li>
+                <a href="https://www.uu.nl/en/research/yoda/guide-to-yoda/i-am-using-yoda/using-icommands-for-large-datasets" title="Using iCommands for large datasets" target="_blank">iCommands</a><br>
+                Requires familiarity with using the commandline.
+            </li>
+            <li>
+                <a href="https://www.uu.nl/en/research/yoda/guide-to-yoda/i-want-to-start-using-yoda/connecting-to-the-yoda-network-disk-on-windows" title="Yoda drive" target="_blank">Yoda network disk / WebDAV</a><br>
+                Useful for large files and when you need to be able to connect to multiple Yoda environments simultaneously.<br>
+                See the menu links on the left for Windows, MacOS and Linux software.
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Modals -->
+<div class="modal" tabindex="-1" role="dialog" id="folder-create">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Create new folder in <span id="collection"></span></h5>
+                <div class="alert alert-warning" id="alert-panel-folder-create">
+                    <span></span>
+                </div>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Folder name</span>
+                    </div>
+                    <input type="text" class="form-control" id='path-folder-create' value="">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Close modal">Close</button>
+                <button class='btn btn-primary btn-confirm-folder-create' title="Create new folder" data-path="">Create new folder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="folder-delete">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Delete folder in <span id="collection"></span></h5>
+                <div class="alert alert-warning" id="alert-panel-folder-delete">
+                    <span></span>
+                </div>
+                <p>Do you want to delete folder <span id="folder-delete-name"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class='btn btn-primary btn-confirm-folder-delete' data-collection="" data-name="" title="Delete folder">Delete folder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="folder-rename">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Rename folder in <span id="collection"></span></h5>
+                <div class="alert alert-warning" id="alert-panel-folder-rename">
+                    <span></span>
+                </div>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">New folder name</span>
+                    </div>
+                    <input type="hidden" id='org-folder-rename-name' value="">
+                    <input type="text" class="form-control" id='folder-rename-name' value="">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class='btn btn-primary btn-confirm-folder-rename' data-collection="" title="Rename folder">Rename folder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="file-rename">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Rename file in <span id="collection"></span></h5>
+                <div class="alert alert-warning" id="alert-panel-file-rename">
+                    <span></span>
+                </div>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">New file name</span>
+                    </div>
+                    <input type="hidden" id='org-file-rename-name' value="">
+                    <input type="text" class="form-control" id='file-rename-name' value="">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class='btn btn-primary btn-confirm-file-rename' data-collection="" title="Rename file">Rename file</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="file-delete">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Delete file in <span id="collection"></span></h5>
+                <div class="alert alert-warning" id="alert-panel-file-delete">
+                    <span></span>
+                </div>
+                <p>Do you want to delete file <span id="file-delete-name"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class='btn btn-primary btn-confirm-file-delete' data-collection="" data-name="" title="Yes delete file">Delete file</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="dlg-file-browse-operations">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="card-body">
+                <div class="alert alert-warning hide" id="dlg-select-alert-panel">
+                    <span></span>
+                </div>
+                <div class="card">
+                    <div class="card-header clearfix">
+                        <h5 class="card-title pull-left">Select folder to <span class="action"></span> <span class="action-file"></span></h5>
+                    </div>
+                    <input type="hidden" id="restoration-objectid" value="">
+                    <div class="card">
+                        <div class="card-body">
+                            <ol class="breadcrumb dlg-breadcrumb">
+                                <li class="active">Home</li>
+                            </ol>
+                            <table id="folder-select-browser" class="table yoda-table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Modified date</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class="btn btn-primary dlg-action-button" data-action="" data-name="" data-collection=""><span class="action"></span></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="multi-select-delete">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Delete selected items in <span class="collection"></span></h5>
+                <p>Do you want to delete the selected items?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class="btn btn-primary dlg-action-button" data-action="multiple-delete" title="Yes delete items">Delete selected items</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="mutli-select-progress" data-action="">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="card-body">
+                <div class="card">
+                    <div class="card-header clearfix">
+                        <h5 class="card-title pull-left">
+                            <span class="action"></span> selected items
+                        </h5>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-bordered multi-select-table">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Progress</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="finishMultiSelect" class="btn btn-secondary" data-bs-dismiss="modal" title="Close">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" tabindex="-1" role="dialog" id="uploads">
+    <div class="modal-dialog mw-100 w-75">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Uploads</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="files"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Close">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
