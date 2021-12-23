@@ -20,8 +20,14 @@
 {% include 'deposit/workflow.html' %}
 {% endwith %}
 
-<h2>Submit data</h2>
-
+<div class="row mt-2 mb-1">
+    <div class="col-9">
+        <h2>Submit data</h2>
+    </div>
+    <div class="col-3">
+        <a href="https://dag.sites.uu.nl/deposit/submit-data-package/" target="_blank" title="Information" class="btn btn-information border-bottom pull-right">Info & Help</a>
+    </div>
+</div>
 <div class="card mt-4">
     <div class="card-body">
         <div class="form-check">
@@ -30,13 +36,13 @@
             <p class="accept_terms_line ps-4">
                 <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms">
                 <label class="form-check-label" for="accept_terms">I accept the</label>
-                <a href="" data-bs-toggle="modal" data-bs-target="#terms_conditions_modal">Terms and Conditions</a>
+                <a href="" data-bs-toggle="modal" data-bs-target="#terms_conditions_modal" title="Click to accept Terms and Conditions" class="btn-terms-conditions">Terms and Conditions</a>
             </p>
         </div>
     </div>
     <div class="modal-footer">
-        <a href="/deposit/metadata?dir={{ path|urlencode }}" class="btn btn-secondary">Document data</a>
-        <button id="submit" type="submit" class="btn btn-primary pull-right" disabled>Submit data</button>
+        <a href="/deposit/metadata?dir={{ path|urlencode }}" class="btn btn-secondary btn-document-data" title="Go back to document data">Document data</a>
+        <button id="submit" type="submit" class="btn btn-primary pull-right btn-submit-data" title="Submit data" disabled>Submit data</button>
     </div>
 </div>
 
@@ -45,7 +51,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Terms and conditions</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close"></button>
             </div>
             <div class="modal-body">
             </div>

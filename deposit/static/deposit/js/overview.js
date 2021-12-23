@@ -164,6 +164,9 @@ let getFolderContents = (() => {
             cacheSortCol   = args.order[0].column;
             cacheSortOrder = args.order[0].dir;
 
+           if (total < 10)
+                $(".bottom").hide();
+
             return cache.slice(args.start - cacheStart, args.length);
         }
     };

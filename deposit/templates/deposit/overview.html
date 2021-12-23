@@ -8,13 +8,13 @@
 {% endblock style %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
-<script src="{{ url_for('deposit_bp.static', filename='js/overview.js') }}"></script>
 <script>
     var browsePageItems = {{ items }};
     var browseStartDir = dir = path  = {{ dir|tojson|safe }};
     var view = 'browse';
 </script>
+<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/overview.js') }}"></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -23,7 +23,8 @@
         <h2>My deposits</h2>
     </div>
     <div class="col-md-6">
-        <a class="btn btn-primary pull-right" href="/deposit/data" title="Start new deposit">Start new deposit</a>
+        <a class="btn btn-primary pull-right btn-start-deposit" href="/deposit/data" title="Start new deposit">Start new deposit</a>
+        <a href="https://dag.sites.uu.nl/deposit/my-deposits/" target="_blank" title="Information" class="btn pull-right me-3 btn-information border-bottom">Info & Help</a>
     </div>
 
     <div class="mt-3">
@@ -53,8 +54,8 @@
                 <p>Do you want to delete deposit <span id="deposit-delete-name"></span>?</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-primary btn-confirm-deposit-delete' data-collection="" data-name="">Delete deposit</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                <button class='btn btn-primary btn-confirm-deposit-delete' data-collection="" data-name="" title="Delete deposit">Delete deposit</button>
             </div>
         </div>
     </div>
