@@ -42,7 +42,41 @@ const enumWidget = (props) => {
 
     let error = "should be equal to one of the allowed values";
 
-    if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) || (props.required && props.value == null)) {
+    // Intervene handling of Required attribute as determined by React
+    var list =  props.id.replace('yoda_', '').split('_')
+    var name_hierarchy = [], level_counter = 0, level_name = '', last_was_numeric = false
+    list.forEach(function (item, index) {
+        if (isNaN(item)) {
+            last_was_numeric = false
+            level_name = level_name + ((level_name.length) ? '_' : '') + item
+        }
+        else {
+            last_was_numeric = true
+            name_hierarchy[level_counter] = level_name
+            level_counter++
+            level_name = ''
+         }
+    });
+    if (!last_was_numeric) {
+        name_hierarchy[level_counter] = level_name
+    }
+
+    console.log('+++++++')
+    console.log('------')
+    console.log(props.id)
+    console.log(name_hierarchy)
+    console.log(name_hierarchy.length)
+    console.log(formProperties.data.schema.required.includes(name_hierarchy[0]))
+
+    if (name_hierarchy.length == 1) {
+        props.required = formProperties.data.schema.required.includes(name_hierarchy[0])
+    }
+    console.log('REQUIRED: ')
+    console.log(props.required)
+    console.log('^^^^^^^^')
+
+
+    if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) && (props.required && props.value == null)) {
         label = <label className="text-danger form-label select-required">{title}*</label>
         customStyles = {
             control: styles => ({
