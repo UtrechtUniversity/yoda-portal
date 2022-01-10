@@ -61,20 +61,9 @@ const enumWidget = (props) => {
         name_hierarchy[level_counter] = level_name
     }
 
-    console.log('+++++++')
-    console.log('------')
-    console.log(props.id)
-    console.log(name_hierarchy)
-    console.log(name_hierarchy.length)
-    console.log(formProperties.data.schema.required.includes(name_hierarchy[0]))
-
     if (name_hierarchy.length == 1) {
         props.required = formProperties.data.schema.required.includes(name_hierarchy[0])
     }
-    console.log('REQUIRED: ')
-    console.log(props.required)
-    console.log('^^^^^^^^')
-
 
     if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) && (props.required && props.value == null)) {
         label = <label className="text-danger form-label select-required">{title}*</label>
