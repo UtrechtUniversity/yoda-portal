@@ -26,8 +26,14 @@
 {% include 'deposit/workflow.html' %}
 {% endwith %}
 
-<h2>Upload data</h2>
-
+<div class="row mt-2 mb-1">
+    <div class="col-9">
+        <h2>Upload data</h2>
+    </div>
+    <div class="col-3">
+        <a href="https://dag.sites.uu.nl/deposit/upload-data/" target="_blank" title="Information" class="btn btn-information border-bottom pull-right">Info & Help</a>
+    </div>
+</div>
 <div class="row">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -50,15 +56,10 @@
             <table id="file-browser" class="table yoda-table table-striped upload-drop" ondrop="dropHandler(event);" ondragenter="dragEnterHandler(event);" ondragend="dragEndHandler(event);">
                 <thead>
                 <tr>
-                    <th><input class="form-check-input" type="checkbox" id="multi-select-all"></th>
-                    <th>Name</th>
-                    <th>Size</th>
-                    <th>Modified date</th>
                     <th>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle hide" type="button" data-bs-toggle="dropdown" id="multiSelect" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-check-square-o" aria-hidden="true"></i>
-                            </button>
+                        <input class="form-check-input" type="checkbox" id="multi-select-all">
+                        <div class="dropdown float-end">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle hide" type="button" data-bs-toggle="dropdown" id="multiSelect" aria-haspopup="true" aria-expanded="false"></button>
                             <div class="dropdown-menu" aria-labelledby="multiSelect">
                                 <a class="dropdown-item multiple-move" title="Move">Move</a>
                                 <a class="dropdown-item multiple-copy" title="Copy">Copy</a>
@@ -66,6 +67,10 @@
                             </div>
                         </div>
                     </th>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Modified date</th>
+                    <th></th>
                 </tr>
                 </thead>
             </table>
@@ -73,7 +78,7 @@
     </div>
 
     <div class="col-md-12">
-        <a class="btn btn-primary mt-3 pull-right" href="/deposit/metadata?dir={{ dir|urlencode }}" title="Document your data">Document data</a>
+        <a class="btn btn-primary mt-3 pull-right btn-document-data" href="/deposit/metadata?dir={{ dir|urlencode }}" title="Document your data">Document data</a>
     </div>
 </div>
 

@@ -234,6 +234,17 @@ $(function() {
         }
     });
 
+    // hide file browser pagination when there is more then one page
+    $('#file-browser').on('processing.dt', function () {
+        let pages =  $('li.page-item').length;
+
+        // previous and next buttons are also counted
+        if (pages > 3) {
+            $("#file-browser_paginate").show();
+        } else {
+            $("#file-browser_paginate").hide();
+        }
+    });
 });
 
 
@@ -589,7 +600,7 @@ function startBrowsing(items)
     $('#file-browser').DataTable({
         "bFilter": false,
         "bInfo": false,
-        "bLengthChange": false,
+        "bLengthChange": true,
         "language": {
             "emptyTable": "Drag and drop files and folders here",
             "lengthMenu": "_MENU_"

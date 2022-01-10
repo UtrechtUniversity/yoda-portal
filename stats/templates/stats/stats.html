@@ -15,6 +15,12 @@
 {% block content %}
     <h1>Statistics</h1>
 
+    {% if access is sameas false %}
+    <div class="alert alert-danger" role="alert">
+        You are not authorized to view any (group) statistics on this system.
+    </div>
+    {% endif %}
+
     {% if resources %}
     <div class="row mb-4">
         <div class="col-md-5">
@@ -85,6 +91,7 @@
     </div>
     {% endif %}
 
+    {% if groups %}
     <div class="row">
         <div class="col-md-5">
             <div class="card">
@@ -116,4 +123,5 @@
             </div>
         </div>
     </div>
+    {% endif %}
 {% endblock content %}

@@ -342,15 +342,10 @@
             <table id="file-browser" class="table yoda-table table-striped upload-drop">
                 <thead>
                 <tr>
-                    <th><input class="form-check-input" type="checkbox" id="multi-select-all"></th>
-                    <th>Name</th>
-                    <th>Size</th>
-                    <th>Modified date</th>
                     <th>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle hide" type="button" data-bs-toggle="dropdown" id="multiSelect" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-check-square-o" aria-hidden="true"></i>
-                            </button>
+                        <input class="form-check-input" type="checkbox" id="multi-select-all">
+                        <div class="dropdown float-end">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle hide" type="button" data-bs-toggle="dropdown" id="multiSelect" aria-haspopup="true" aria-expanded="false"></button>
                             <div class="dropdown-menu" aria-labelledby="multiSelect">
                                 <a class="dropdown-item multiple-move" title="Move">Move</a>
                                 <a class="dropdown-item multiple-copy" title="Copy">Copy</a>
@@ -358,6 +353,10 @@
                             </div>
                         </div>
                     </th>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Modified date</th>
+                    <th></th>
                 </tr>
                 </thead>
             </table>
