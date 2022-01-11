@@ -365,7 +365,7 @@ async function submitData(data) {
     for (const property in data) {
         if (Array.isArray(data[property])) {
             var unfiltered = data[property];
-            var filtered = unfiltered.filter(e => e != null);
+            var filtered = unfiltered.filter(e => e);
 
             if (filtered.length === 0) {
                 delete data[property];
