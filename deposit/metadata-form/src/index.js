@@ -43,6 +43,38 @@ const enumWidget = (props) => {
 
     let error = "should be equal to one of the allowed values";
 
+    // Intervene handling of Required attribute as determined by React
+    var list = props.id.replace('yoda_', '').split('_');
+    var name_hierarchy = [], level_counter = 0, level_name = '', last_was_numeric = false;
+
+    // Determination of actual field name is based on seperation of id by numbers (which are introduced by React)
+    // Example (first level only) Ancillary_Equipment_0
+    // Example 2: Contact_0_Person_Identifier_Scheme consists of 2 fields
+    // This way an array can be constructed listing the hierachy of names leading up the id of the field
+    list.forEach(function (item, index) {
+        if (isNaN(item)) {
+            last_was_numeric = false;
+            level_name = level_name + ((level_name.length) ? '_' : '') + item;
+        } else {
+            last_was_numeric = true;
+            name_hierarchy[level_counter] = level_name;
+            level_counter++;
+            level_name = '';
+         }
+    });
+
+    // If the final item was not numeric, it is not yet added to the name_hierarchy array
+    // Therefore, do it now explicitely
+    if (!last_was_numeric) {
+        name_hierarchy[level_counter] = level_name;
+    }
+
+    // Only perform a correction for highest level select fields (i.e. length == 1)
+    if (name_hierarchy.length == 1) {
+        // Determine actual value for required from top level required list within the jsonschema
+        props.required = formProperties.data.schema.required.includes(name_hierarchy[0]);
+    }
+
     if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) || (props.required && props.value == null)) {
         label = <label className="text-danger form-label select-required">{title}*</label>
         customStyles = {
@@ -365,7 +397,7 @@ async function submitData(data) {
     for (const property in data) {
         if (Array.isArray(data[property])) {
             var unfiltered = data[property];
-            var filtered = unfiltered.filter(e => e != null);
+            var filtered = unfiltered.filter(e => e);
 
             if (filtered.length === 0) {
                 delete data[property];

@@ -26,8 +26,14 @@
 {% include 'deposit/workflow.html' %}
 {% endwith %}
 
-<h2>Upload data</h2>
-
+<div class="row mt-2 mb-1">
+    <div class="col-9">
+        <h2>Upload data</h2>
+    </div>
+    <div class="col-3">
+        <a class="btn btn-light pull-right" href="https://dag.sites.uu.nl/deposit/upload-data/" target="_blank" title="Guidance"><i class="fa fa-info-circle"></i> Guidance</a>
+    </div>
+</div>
 <div class="row">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -72,7 +78,7 @@
     </div>
 
     <div class="col-md-12">
-        <a class="btn btn-primary mt-3 pull-right" href="/deposit/metadata?dir={{ dir|urlencode }}" title="Document your data">Document data</a>
+        <a class="btn btn-primary mt-3 pull-right btn-document-data" href="/deposit/metadata?dir={{ dir|urlencode }}" title="Document your data">Document data</a>
     </div>
 </div>
 
