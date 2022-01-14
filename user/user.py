@@ -315,8 +315,8 @@ def callback():
 
 
 def should_redirect_to_oidc(username):
-    domain = app.config.get('OIDC_DOMAIN')
-    if app.config.get('OIDC_ENABLED') and username.endswith(domain):
+    domains = app.config.get('OIDC_DOMAINS')
+    if app.config.get('OIDC_ENABLED') and username.endswith(tuple(domains)):
         return True
     else:
         return False
