@@ -700,7 +700,11 @@ const tableRenderer = {
     state: (_, __, row) => {
         let state = $('<span>');
         if (row.type === 'data' && row.status === 'OFL') {
-            state = $('<span class="badge bg-secondary">Offline</span>');
+            state = $('<span class="badge bg-secondary" title="Stored offline on tape archive">Offline</span>');
+        } else if (row.type === 'data' && row.status === 'UNM') {
+            state = $('<span class="badge bg-secondary" title="Migrating from tape archive to disk">Bringing online</span>');
+        } else if (row.type === 'data' && row.status === 'MIG') {
+            state = $('<span class="badge bg-secondary" title="Migrating from disk to tape archive">Storing offline</span>');
         }
         return state[0].outerHTML;
     },
@@ -720,6 +724,9 @@ const tableRenderer = {
         else {
             if (row.status === 'OFL') {
                 actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`);
+            } else if (row.status === 'MIG' || row.status === 'UNM') {
+                // no context menu for data objects migrating from or to tape archive
+                return ''
             } else {
                 // Render context menu for files.
                 const viewExts = {
