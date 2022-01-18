@@ -699,11 +699,11 @@ const tableRenderer = {
     },
     state: (_, __, row) => {
         let state = $('<span>');
-        if (row.type === 'data' && row.status === 'OFL') {
+        if (row.type === 'data' && row.state === 'OFL') {
             state = $('<span class="badge bg-secondary" title="Stored offline on tape archive">Offline</span>');
-        } else if (row.type === 'data' && row.status === 'UNM') {
+        } else if (row.type === 'data' && row.state === 'UNM') {
             state = $('<span class="badge bg-secondary" title="Migrating from tape archive to disk">Bringing online</span>');
-        } else if (row.type === 'data' && row.status === 'MIG') {
+        } else if (row.type === 'data' && row.state === 'MIG') {
             state = $('<span class="badge bg-secondary" title="Migrating from disk to tape archive">Storing offline</span>');
         }
         return state[0].outerHTML;
@@ -722,9 +722,9 @@ const tableRenderer = {
             actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
         }
         else {
-            if (row.status === 'OFL') {
+            if (row.state === 'OFL') {
                 actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`);
-            } else if (row.status === 'MIG' || row.status === 'UNM') {
+            } else if (row.state === 'MIG' || row.state === 'UNM') {
                 // no context menu for data objects migrating from or to tape archive
                 return ''
             } else {
