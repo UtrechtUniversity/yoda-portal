@@ -113,11 +113,6 @@ def logout():
     return redirect(url_for('general_bp.index'))
 
 
-@user_bp.route('/forgot-password')
-def forgot_password():
-    return render_template('user/login.html')
-
-
 @user_bp.route('/notifications')
 def notifications():
     sort_order = request.args.get('sort_order', 'desc')
