@@ -70,7 +70,7 @@ def call(fn, data=None):
         params={},
         output='ruleExecOut')
 
-    x = x.execute()
+    x = x.execute(session_cleanup=False)
     x = bytesbuf_to_str(x._values['MsParam_PI'][0]._values['inOutStruct']._values['stdoutBuf'])
 
     result = x.decode()
