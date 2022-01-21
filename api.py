@@ -59,13 +59,13 @@ def call(fn, data=None):
     arg_str_expr = nrep_string_expr(params)
 
     # Set parameters as variable instead of parameter input to circumvent iRODS string limits.
-    rule_body = '''a {{ *x={}
-                        api_{}(*x)
-                     }}
+    rule_body = ''' *x={}
+                    api_{}(*x)
                 '''.format(arg_str_expr, fn)
 
     x = rule.Rule(
         g.irods,
+        instance_name='irods_rule_engine_plugin-irods_rule_language-instance',
         body=rule_body,
         params={},
         output='ruleExecOut')
