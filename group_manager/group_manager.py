@@ -80,7 +80,7 @@ def group_create():
                                               'description': request.form['group_description'],
                                               'data_classification': data_classification})
 
-    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
+    output = make_response({'status': 0 if response['data']['proc_status'] == '0' else 1, 'message': response['data']['proc_status_info']})
     output.headers["Content-type"] = "application/json"
     return output
 
