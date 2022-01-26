@@ -98,10 +98,11 @@ def group_update():
                                                       'property_name': property,
                                                       'property_value': value})
 
-            if response['status'] != 'ok':
+            if response['data']['proc_status'] != '0':
                 break
 
-    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
+    output = make_response({'status': 0 if response['data']['proc_status'] == '0'
+                            else 1, 'message': response['data']['proc_status_info']})
     output.headers["Content-type"] = "application/json"
     return output
 
