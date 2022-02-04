@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
+from uuid import UUID
 
-from flask import abort, Blueprint, g, render_template, request, Response, stream_with_context
+from flask import abort, Blueprint, g, redirect, render_template, request, Response, stream_with_context, url_for
 
 import api
 
@@ -80,3 +81,21 @@ def access():
         response = api.call('revoke_read_access_research_group', {"coll": full_path})
 
     return response
+
+
+@vault_bp.route('/yda/<data_package_reference>')
+def resolve(data_package_reference):
+    # Check if Data Package Reference is a valid UUID4.
+    try:
+        if UUID(data_package_reference).version != 4:
+            abort(404)
+    except ValueError:
+        abort(404)
+
+    # Find data package with provided reference.
+    response = api.call('vault_get_package_by_reference',
+                        {"data_package_reference": data_package_reference})
+    if response['status'] == 'ok':
+        return redirect(url_for('vault_bp.index', dir=response['data']))
+    else:
+        abort(404)
