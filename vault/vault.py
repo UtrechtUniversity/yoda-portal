@@ -83,17 +83,18 @@ def access():
     return response
 
 
-@vault_bp.route('/yda/<yoda_id>')
-def resolve(yoda_id):
-    # Check if Yoda ID is a valid UUID4.
+@vault_bp.route('/yda/<data_package_reference>')
+def resolve(data_package_reference):
+    # Check if Data Package Reference is a valid UUID4.
     try:
-        if UUID(yoda_id).version != 4:
+        if UUID(data_package_reference).version != 4:
             abort(404)
     except ValueError:
         abort(404)
 
-    # Find data package with provided Yoda ID.
-    response = api.call('vault_get_package_by_id', {"yoda_id": yoda_id})
+    # Find data package with provided reference.
+    response = api.call('vault_get_package_by_reference',
+                        {"data_package_reference": data_package_reference})
     if response['status'] == 'ok':
         return redirect(url_for('vault_bp.index', dir=response['data']))
     else:
