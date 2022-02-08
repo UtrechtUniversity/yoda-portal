@@ -16,7 +16,7 @@ host = 'localhost'
 port = 9200
 
 
-@api_index_bp.route('/query', methods['POST'])
+@api_index_bp.route('/query', methods=['POST'])
 def _query():
   data = json.loads(request.form['data'])
   name = data['name']
@@ -49,8 +49,8 @@ def _query():
 
 def query(name, value, start=0, size=500, sort=None, reverse=False):
   client = OpenSearch(
-    hosts = [{ 'host': host, 'port': port }],
-    http_compress = True
+    hosts=[{ 'host': host, 'port': port }],
+    http_compress=True
   )
 
   query = {
