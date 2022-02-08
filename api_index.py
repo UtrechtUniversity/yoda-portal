@@ -49,7 +49,10 @@ def _query():
 
 def query(name, value, start=0, size=500, sort=None, reverse=False):
     client = OpenSearch(
-        hosts=[{ 'host': host, 'port': port }],
+        hosts=[{
+            'host': host,
+            'port': port
+        }],
         http_compress=True
     )
 
@@ -99,34 +102,33 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
             }
         ]
 
-    try:
-        response = client.search(body = query, index = 'yoda')
-        matches = []
-        for hit in response['hits']['hits']:
-            src = hit['_source']
-            match = {
-                'fileName': src['fileName'],
-                'parentPath': src['parentPath']
-            }
-            attributes = []
-            for avu in src['metadataEntries']:
-                attribute = avu['attribute']
-                if attribute.startswith('YodaIndex'):
-                    attributes.append({
-                        'name': attribute[9:],
-                        'value': avu['value']
-                    })
-            match['attributes'] = attributes
-            matches.append(match)
-        result = { 'matches': matches, 'status': 'ok' }
-    except:
-        result = { 'status': 'the sky is falling (TBD)' }
-
-    result['query'] = {
-        'name': name,
-        'value': value,
-        'from': start,
-        'size': size
+    response = client.search(body=query, index='yoda')
+    matches = []
+    for hit in response['hits']['hits']:
+        src = hit['_source']
+        match = {
+            'fileName': src['fileName'],
+            'parentPath': src['parentPath']
+        }
+        attributes = []
+        for avu in src['metadataEntries']:
+            attribute = avu['attribute']
+            if attribute.startswith('YodaIndex'):
+                attributes.append({
+                    'name': attribute[9:],
+                    'value': avu['value']
+                })
+        match['attributes'] = attributes
+        matches.append(match)
+    result = {
+        'query': {
+            'name': name,
+            'value': value,
+            'from': start,
+            'size': size
+        },
+        'matches': matches,
+        'status': 'ok'
     }
     if sort is not None:
         result['query']['sort'] = sort
