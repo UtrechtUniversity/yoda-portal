@@ -482,8 +482,8 @@ $(function() {
                 var selectedGroup = this.groups[selectedGroupName];
                 var selectedUser = selectedGroup.members[userName];
 
-                var promoteTitle = 'Promote the selected user';
-                var demoteTitle  = 'Demote the selected user';
+                var promoteTitle = 'Promote the selected member';
+                var demoteTitle  = 'Demote the selected member';
 
                 var prevAccess = this.prevAccessLevel(selectedUser.access, selectedGroupName);
                 var nextAccess = this.nextAccessLevel(selectedUser.access, selectedGroupName);
@@ -517,8 +517,8 @@ $(function() {
             $userPanel.find('.update-button, .delete-button').addClass('disabled');
             var $promoteButton = $userPanel.find('.promote-button');
             var $demoteButton  = $userPanel.find('.demote-button');
-            $promoteButton.attr('title', 'Promote the selected user');
-            $demoteButton .attr('title', 'Demote the selected user');
+            $promoteButton.attr('title', 'Promote the selected member');
+            $demoteButton .attr('title', 'Demote the selected member');
             $promoteButton.removeAttr('data-target-role');
             $demoteButton .removeAttr('data-target-role');
             $promoteButton.find('i').removeClass();
@@ -1022,7 +1022,7 @@ $(function() {
                         alert(result.message);
                     else
                         alert(
-                              "Error: Could not add a user due to an internal error.\n"
+                              "Error: Could not add a member due to an internal error.\n"
                             + "Please contact a Yoda administrator"
                         );
                 }
@@ -1030,7 +1030,7 @@ $(function() {
 
             }).fail(function(result) {
                 that.ifRequestNotAborted(result, function() {
-                    alert("Error: Could not add a user due to an internal error.\nPlease contact a Yoda administrator");
+                    alert("Error: Could not add a member due to an internal error.\nPlease contact a Yoda administrator");
                     $(el).find('input[type="submit"]').removeClass('disabled').val('Add');
                 });
             });
@@ -1105,13 +1105,13 @@ $(function() {
                         alert(result.message);
                     else
                         alert(
-                              "Error: Could not change the role for the selected user due to an internal error.\n"
+                              "Error: Could not change the role for the selected member due to an internal error.\n"
                             + "Please contact a Yoda administrator"
                         );
                 }
             }).fail(function(result) {
                 that.ifRequestNotAborted(result, function() {
-                    alert("Error: Could not change the role for the selected user due to an internal error.\nPlease contact a Yoda administrator");
+                    alert("Error: Could not change the role for the selected member due to an internal error.\nPlease contact a Yoda administrator");
                 });
             });
         },
@@ -1166,13 +1166,13 @@ $(function() {
                         alert(result.message);
                     else
                         alert(
-                              "Error: Could not remove the selected user from the group due to an internal error.\n"
+                              "Error: Could not remove the selected member from the group due to an internal error.\n"
                             + "Please contact a Yoda administrator"
                         );
                 }
             }).fail(function(result) {
                 that.ifRequestNotAborted(result, function() {
-                    alert("Error: Could not remove the selected user from the group due to an internal error.\nPlease contact a Yoda administrator");
+                    alert("Error: Could not remove the selected member from the group due to an internal error.\nPlease contact a Yoda administrator");
                 });
             });
         },
