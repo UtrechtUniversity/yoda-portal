@@ -19,6 +19,7 @@ from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
 from research.research import research_bp
 from search.search import search_bp
+from open_search.open_search import open_search_bp
 from stats.stats import stats_bp
 from user.user import user_bp
 from vault.vault import vault_bp
@@ -88,6 +89,7 @@ with app.app_context():
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(vault_bp, url_prefix='/vault')
     app.register_blueprint(search_bp, url_prefix='/search')
+    app.register_blueprint(open_search_bp, url_prefix='/searchv2')
     app.register_blueprint(api_bp, url_prefix='/api/')
     app.register_blueprint(api_index_bp, url_prefix='/api_index/')
     if app.config.get('DEPOSIT_ENABLED'):
