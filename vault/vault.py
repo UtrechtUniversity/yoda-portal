@@ -95,7 +95,16 @@ def resolve(reference):
     # Find data package with provided reference.
     response = api.call('vault_get_package_by_reference',
                         {"reference": reference})
-    if response['status'] == 'ok':
-        return redirect(url_for('vault_bp.index', dir=response['data']))
-    else:
-        abort(404)
+
+    dir = response['data']
+    return render_template('vault/metadata.html',
+                           activeModule='vault',
+                           items=10,
+                           dir=dir,
+                           yoda_id=reference)
+
+#
+#    if response['status'] == 'ok':
+#        return redirect(url_for('vault_bp.index', dir=response['data']))
+#    else:
+#        abort(404)
