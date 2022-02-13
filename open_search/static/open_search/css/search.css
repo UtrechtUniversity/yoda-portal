@@ -1,0 +1,17 @@
+.title-text {
+    font-size: 1.25rem;
+}
+
+.btn:hover {
+    color: #fff
+}
+
+.search-2 input-text:focus {
+    box-shadow: 0px 0px 0px;
+    border-color: #f8c146;
+    outline: 0px
+}
+
+.search-2 .form-control {
+    border: 1px solid #f8c146;
+}
