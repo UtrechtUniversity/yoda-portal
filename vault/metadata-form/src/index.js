@@ -40,6 +40,8 @@ const enumWidget = (props) => {
         })
     };
 
+    let error = "should be equal to one of the allowed values";
+
     // Intervene handling of Required attribute as determined by React
     var list = props.id.replace('yoda_', '').split('_');
     var name_hierarchy = [], level_counter = 0, level_name = '', last_was_numeric = false;
@@ -72,7 +74,7 @@ const enumWidget = (props) => {
         props.required = formProperties.data.schema.required.includes(name_hierarchy[0]);
     }
 
-    if (props.required && props.value == null) {
+    if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) || (props.required && props.value == null)) {
         label = <label className="text-danger form-label select-required">{title}*</label>
         customStyles = {
             control: styles => ({
