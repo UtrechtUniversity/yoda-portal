@@ -74,7 +74,7 @@ const enumWidget = (props) => {
         props.required = formProperties.data.schema.required.includes(name_hierarchy[0]);
     }
 
-    if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) && (props.required && props.value == null)) {
+    if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) || (props.required && props.value == null)) {
         label = <label className="text-danger form-label select-required">{title}*</label>
         customStyles = {
             control: styles => ({
