@@ -140,7 +140,7 @@ let getFolderContents = (() => {
         } else {
             // Nope, load new data via the API.
             let j = ++i;
-            let result = await Yoda.call('browse_folder',
+            let result = await Yoda.call('browse_collections',
                                          {'coll':       Yoda.basePath + currentFolder,
                                           'offset':     args.start,
                                           'limit':      batchSize,

@@ -126,7 +126,7 @@
 		<div class="card users">
 			<div class="card-header">Group members
 				<div class="input-group-sm has-feedback pull-right">
-					<input class="form-control form-control-sm mt-1" id="user-list-search" type="text" placeholder="Search users" />
+					<input class="form-control form-control-sm mt-1" id="user-list-search" type="text" placeholder="Search members" />
 				</div>
 			</div>
 			<div class="card-body">
@@ -137,7 +137,7 @@
 			<div class="list-group" id="user-list">
 				<div class="list-group-item item-user-create" hidden>
 					<a class="user-create-text" href="#" onclick="return false;">
-						Click here to add a new user to this group
+						Click here to add a new member to this group
 					</a>
 					<form action="{{ url_for('group_manager_bp.user_create') }}" method="POST" class="form-inline" id="f-user-create" hidden>
 						<input name="group_name" id="f-user-create-group" type="hidden" />
@@ -153,16 +153,16 @@
 			<div class="card-footer">
 				<div class="input-group-sm pull-left">
 					Change role:
-                    <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Promote the selected user">&uarr;<i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
-                    <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Demote the selected user">&darr;<i class="fa fa-eye" aria-hidden="true"></i></a>
-					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected user from this group">Remove user</a>
+                    <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Promote the selected member">&uarr;<i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
+                    <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Demote the selected member">&darr;<i class="fa fa-eye" aria-hidden="true"></i></a>
+					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group">Remove member</a>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
-<div class="modal fade" id="modal-group-create" tabindex="-1" role="dialog">
+<div class="modal fade" id="modal-group-create" role="dialog">
 	<div class="modal-dialog">
 		<div class="modal-content">
             <div class="modal-header">
@@ -256,7 +256,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Confirm user removal</h5>
+              <h5 class="modal-title">Confirm member removal</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 			<div class="modal-body">
