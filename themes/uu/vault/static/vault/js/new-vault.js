@@ -17,7 +17,8 @@ $(function() {
     currentFolder = decodeURIComponent((/(?:\?|&)dir=([^&]*)/
                                         .exec(window.location.search) || [0,''])[1]);
 
-    currentFolder = browseStartDir;
+    currentFolder = browseStartDir //'/vault-pilot/deposit-pilot[1644396517][1644396567]'
+    console.log(currentFolder)
     // Canonicalize path somewhat, for convenience.
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
 
@@ -25,20 +26,143 @@ $(function() {
         startBrowsing(browsePageItems);
     }
 
+    $('.btn-show-file-browser').click(function(){
+        if ($('.breadcrumbs-browser').hasClass('hidden')) {
+            $('.breadcrumbs-browser').removeClass('hidden');
+            $('.metadata-details').addClass('hidden');
+            $(this).text('Details');
+        }
+        else {
+            $('.breadcrumbs-browser').addClass('hidden');
+            $('.metadata-details').removeClass('hidden');
+            $(this).text('Data access');
+        }
+    });
+
     $('.btn-copy-to-clipboard').click(function(){
+        alert('click');
         // var text = $('.metadata-identifier').val();
         textToClipboard($('.metadata-identifier').text());
         alert('Copied to clipboard: ' + $('.metadata-identifier').text());
     });
+
+
+    $("body").on("click", "a.view-video", function() {
+        let path = $(this).attr('data-path');
+        let viewerHtml = `<video width="570" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></video>`;
+        $('#viewer').html(viewerHtml);
+        $('#viewMedia').modal('show');
+    });
+
+    $("body").on("click", "a.view-audio", function() {
+        let path = $(this).attr('data-path');
+        let viewerHtml = `<audio width="570" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></audio>`;
+        $('#viewer').html(viewerHtml);
+        $('#viewMedia').modal('show');
+    });
+
+    $("body").on("click", "a.view-image", function() {
+        let path = $(this).attr('data-path');
+        let viewerHtml = `<img width="570" src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}" />`;
+        $('#viewer').html(viewerHtml);
+        $('#viewMedia').modal('show');
+    });
+
+    $("#viewMedia.modal").on("hidden.bs.modal", function() {
+        $("#viewer").html("");
+    });
+
+    $("body").on("click", "i.actionlog-icon", function() {
+        toggleActionLogList($(this).attr('data-folder'));
+    });
+
+    $("body").on("click", "i.system-metadata-icon", function() {
+        toggleSystemMetadata($(this).attr('data-folder'));
+    });
+
+    $("body").on("click", ".browse", function(e) {
+        browse($(this).attr('data-path'), true);
+        // Dismiss stale messages.
+        $('#messages .close').click();
+        e.preventDefault();
+    });
 });
+
+
+function toggleActionLogList(folder)
+{
+    let actionList = $('.actionlog');
+    let actionListItems = $('.actionlog-items');
+
+    let isVisible = actionList.is(":visible");
+
+    // toggle locks list
+    if (isVisible) {
+        actionList.hide();
+    } else {
+        Yoda.call('provenance_log', {coll: Yoda.basePath + folder}).then((data) => {
+            actionList.hide();
+            var html = '';
+            if (data.length) {
+                $.each(data, function (index, value) {
+                    html += '<a class="list-group-item list-group-item-action">'
+                         + htmlEncode(value[2])
+                         + ' - <strong>'
+                         + htmlEncode(value[1])
+                         + '</strong> - '
+                         + htmlEncode(value[0])
+                         + '</a>';
+                });
+            } else {
+                html += '<a class="list-group-item list-group-item-action">No provenance information present</a>';
+            }
+            actionListItems.html(html)
+            actionList.show();
+        });
+    }
+}
+
+
+function toggleSystemMetadata(folder)
+{
+    let systemMetadata = $('.system-metadata');
+    let systemMetadataItems = $('.system-metadata-items');
+
+    let isVisible = systemMetadata.is(":visible");
+
+    // Toggle system metadata.
+    if (isVisible) {
+        systemMetadata.hide();
+    } else {
+        Yoda.call('vault_system_metadata', {coll: Yoda.basePath + folder}).then((data) => {
+            systemMetadata.hide();
+            var html = '';
+            if (data) {
+                $.each(data, function(index, value) {
+                    html += '<span class="list-group-item list-group-item-action"><strong>' +
+                        htmlEncode(index) +
+                        '</strong>: ' +
+                        value +
+                        '</span>';
+                });
+            } else {
+                html += '<a class="list-group-item list-group-item-action">No system metadata present</a>';
+            }
+            systemMetadataItems.html(html);
+            systemMetadata.show();
+        });
+    }
+}
+
+
 
 function browse(dir = '', changeHistory = false)
 {
     currentFolder = dir;
-    // makeBreadcrumb(dir);
+    makeBreadcrumb(dir);
     metadataInfo(dir);
-    // topInformation(dir, true); //only here topInformation should show its alertMessage
-    // buildFileBrowser(dir);
+    topInformation(dir, true); //only here topInformation should show its alertMessage
+    buildFileBrowser(dir);
 }
 
 function makeBreadcrumb(dir)
@@ -55,7 +179,7 @@ function makeBreadcrumb(dir)
         if (i > 1) {
             let el = $('<li class="breadcrumb-item">');
             if (i == 2) { 
-                text = 'DAG Datapackage'; }
+                text = 'Datapackage'; }
             text = htmlEncode(text).replace(/ /g, '&nbsp;');
             if (i === crumbs.length-1)
                 el.addClass('active').html(text);
@@ -221,9 +345,6 @@ const tableRenderer = {
 
 function startBrowsing(items)
 {
-    browse(currentFolder);
-    return;
-
     $('#file-browser').DataTable({
         "bFilter": false,
         "bInfo": false,
@@ -282,14 +403,20 @@ function topInformation(dir, showAlert) {
             $('.top-information').hide();
             $('.top-info-buttons').hide();
 
-
             let folderName = htmlEncode(basename).replace(/ /g, "&nbsp;");
 
-            // Show top information and buttons.
-            if (typeof vaultStatus != 'undefined') {
-                $('.top-information').show();
-                $('.top-info-buttons').show();
-            }
+            $('.top-information').show();
+            $('.top-info-buttons').show();
+
+            $('.btn-group button.metadata-form').attr('data-path', dir);
+            $('.btn-group button.metadata-form').show();
+
+            $('.actionlog').hide();
+            let actionLogIcon = ` <i class="fa fa-book actionlog-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
+
+            $('.system-metadata').hide();
+            let systemMetadataIcon = ` <i class="fa fa-info-circle system-metadata-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
+
         });
     } else {
         $('.top-information').hide();

@@ -21,29 +21,26 @@
 
 {% block content %}
 
-
-<div class="modal" tabindex="-1" role="dialog" id="viewMedia">
-    <div class="modal-dialog mw-100 w-50">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div id="viewer"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<section class="metadata-info container hide">
+<nav aria-label="breadcrumb flex-column">
+    <ol class="breadcrumb"><li class="breadcrumb-item active">DAG Datapackage</li></ol>
+    <a class="btn btn-light pull-right mb-2" href="https://dag.sites.uu.nl/search/how-to-search/" target="_blank" title="Guidance"><i class="fa fa-info-circle"></i> Guidance</a>
+</nav>
+<section class="metadata-info container">
     <h5 class="metadata-creator mt-3">
 
     <h3 class="metadata-title"></h3>
-    <a class="btn btn-primary pull-right btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
+    <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary pull-right btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
 
-<div class="metadata-details">
-
-    <p class="metadata-description"></p>
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Description</strong>
+        </div>
+        <div class="col-lg-10">
+            <div class="metadata-description"></div>
+            <button class="btn read-more-button hide" role="button">Read full description...</button>
+            <button class="btn read-less-button hide" role="button">Collapse description...</button>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-lg-2">
@@ -152,31 +149,9 @@
             <span class="metadata-retention-period"></span>
         </div>
     </div>
-
-</div>
-<!---
-    <div class='row'><hr></div>
-
-    <div class="row">
-        <div class="col-lg-2">
-            <strong>Description <i class="fa fa-question-circle" aria-hidden="true" title="Description of this data package"></i></strong>
-        </div>
-        <div class="col-lg-10">
-            <div class="metadata-description"></div>
-            <button class="btn read-more-button hide" role="button">Read full description...</button>
-            <button class="btn read-less-button hide" role="button">Collapse description...</button>
-        </div>
-    </div>
---->
 </section>
 
-<div class='breadcrumbs-browser hidden'>
-    <nav aria-label="breadcrumb flex-column">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">Vault</li>
-        </ol>
-    </nav>
-
+<div class='breadcrumbs-browser hide'>
     <table id="file-browser" class="table yoda-table table-striped">
         <thead>
         <tr>
@@ -187,5 +162,8 @@
         </tr>
         </thead>
     </table>
+
 </div>
+
+
 {% endblock content %}

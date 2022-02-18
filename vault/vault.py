@@ -83,7 +83,7 @@ def access():
     return response
 
 
-@vault_bp.route('/yda/<reference>')
+@vault_bp.route('/yoda/<reference>')
 def resolve(reference):
     # Check if Data Package Reference is a valid UUID4.
     try:
@@ -97,6 +97,9 @@ def resolve(reference):
                         {"reference": reference})
 
     dir = response['data']
+
+    # To be added - check whether permissions for data!
+    # Is the datapackage and 'Open' package?
     return render_template('vault/metadata.html',
                            activeModule='vault',
                            items=10,

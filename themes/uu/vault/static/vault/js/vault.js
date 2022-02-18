@@ -17,7 +17,6 @@ $(function() {
     currentFolder = decodeURIComponent((/(?:\?|&)dir=([^&]*)/
                                         .exec(window.location.search) || [0,''])[1]);
 
-    currentFolder = browseStartDir;
     // Canonicalize path somewhat, for convenience.
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
 
@@ -25,20 +24,75 @@ $(function() {
         startBrowsing(browsePageItems);
     }
 
-    $('.btn-copy-to-clipboard').click(function(){
-        // var text = $('.metadata-identifier').val();
-        textToClipboard($('.metadata-identifier').text());
-        alert('Copied to clipboard: ' + $('.metadata-identifier').text());
+    $('.btn-group button.metadata-form').click(function(){
+        showMetadataForm($(this).attr('data-path'));
+    });
+
+    $("body").on("click", "a.view-video", function() {
+        let path = $(this).attr('data-path');
+        let viewerHtml = `<video width="570" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></video>`;
+        $('#viewer').html(viewerHtml);
+        $('#viewMedia').modal('show');
+    });
+
+    $("body").on("click", "a.view-audio", function() {
+        let path = $(this).attr('data-path');
+        let viewerHtml = `<audio width="570" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></audio>`;
+        $('#viewer').html(viewerHtml);
+        $('#viewMedia').modal('show');
+    });
+
+    $("body").on("click", "a.view-image", function() {
+        let path = $(this).attr('data-path');
+        let viewerHtml = `<img width="570" src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}" />`;
+        $('#viewer').html(viewerHtml);
+        $('#viewMedia').modal('show');
+    });
+
+    $("#viewMedia.modal").on("hidden.bs.modal", function() {
+        $("#viewer").html("");
+    });
+
+    // # preservable
+    // # file-format
+    // # grant revoke vault access
+    // .action-list
+
+    $("body").on("click", "i.actionlog-icon", function() {
+        toggleActionLogList($(this).attr('data-folder'));
+    });
+
+    $("body").on("click", "i.system-metadata-icon", function() {
+        toggleSystemMetadata($(this).attr('data-folder'));
+    });
+
+    $("body").on("click", ".browse", function(e) {
+        browse($(this).attr('data-path'), true);
+        // Dismiss stale messages.
+        $('#messages .close').click();
+        e.preventDefault();
     });
 });
+
+function changeBrowserUrl(path)
+{
+    let url = window.location.pathname;
+    if (typeof path != 'undefined') {
+        url += "?dir=" + encodeURIComponent(path);
+    }
+
+    history.pushState({} , {}, url);
+}
 
 function browse(dir = '', changeHistory = false)
 {
     currentFolder = dir;
-    // makeBreadcrumb(dir);
+    makeBreadcrumb(dir);
+    // if (changeHistory)
+    //    changeBrowserUrl(dir);
     metadataInfo(dir);
-    // topInformation(dir, true); //only here topInformation should show its alertMessage
-    // buildFileBrowser(dir);
+    topInformation(dir, true); //only here topInformation should show its alertMessage
+    buildFileBrowser(dir);
 }
 
 function makeBreadcrumb(dir)
@@ -46,7 +100,7 @@ function makeBreadcrumb(dir)
     let pathParts = dir.split('/').filter(x => x.length);
 
     // [[Crumb text, Path]] - e.g. [...['x', '/research-a/x']]
-    let crumbs = [['VaultHDR', ''],
+    let crumbs = [['Vault', ''],
                   ...Array.from(pathParts.entries())
                           .map(([i,x]) => [x, '/'+pathParts.slice(0, i+1).join('/')])];
 
@@ -54,7 +108,7 @@ function makeBreadcrumb(dir)
     for (let [i, [text, path]] of crumbs.entries()) {
         if (i > 1) {
             let el = $('<li class="breadcrumb-item">');
-            if (i == 2) { 
+            if (i == 2) {
                 text = 'DAG Datapackage'; }
             text = htmlEncode(text).replace(/ /g, '&nbsp;');
             if (i === crumbs.length-1)
@@ -221,9 +275,6 @@ const tableRenderer = {
 
 function startBrowsing(items)
 {
-    browse(currentFolder);
-    return;
-
     $('#file-browser').DataTable({
         "bFilter": false,
         "bInfo": false,
@@ -248,6 +299,72 @@ function startBrowsing(items)
         "pageLength": items
     });
     browse(currentFolder);
+}
+
+function toggleActionLogList(folder)
+{
+    let actionList = $('.actionlog');
+    let actionListItems = $('.actionlog-items');
+
+    let isVisible = actionList.is(":visible");
+
+    // toggle locks list
+    if (isVisible) {
+        actionList.hide();
+    } else {
+        // Get provenance information
+        Yoda.call('provenance_log', {coll: Yoda.basePath + folder}).then((data) => {
+            actionList.hide();
+            var html = '';
+            if (data.length) {
+                $.each(data, function (index, value) {
+                    html += '<a class="list-group-item list-group-item-action">'
+                         + htmlEncode(value[2])
+                         + ' - <strong>'
+                         + htmlEncode(value[1])
+                         + '</strong> - '
+                         + htmlEncode(value[0])
+                         + '</a>';
+                });
+            } else {
+                html += '<a class="list-group-item list-group-item-action">No provenance information present</a>';
+            }
+            actionListItems.html(html)
+            actionList.show();
+        });
+    }
+}
+
+function toggleSystemMetadata(folder)
+{
+    let systemMetadata = $('.system-metadata');
+    let systemMetadataItems = $('.system-metadata-items');
+
+    let isVisible = systemMetadata.is(":visible");
+
+    // Toggle system metadata.
+    if (isVisible) {
+        systemMetadata.hide();
+    } else {
+        // Retrieve system metadata of folder.
+        Yoda.call('vault_system_metadata', {coll: Yoda.basePath + folder}).then((data) => {
+            systemMetadata.hide();
+            var html = '';
+            if (data) {
+                $.each(data, function(index, value) {
+                    html += '<span class="list-group-item list-group-item-action"><strong>' +
+                        htmlEncode(index) +
+                        '</strong>: ' +
+                        value +
+                        '</span>';
+                });
+            } else {
+                html += '<a class="list-group-item list-group-item-action">No system metadata present</a>';
+            }
+            systemMetadataItems.html(html);
+            systemMetadata.show();
+        });
+    }
 }
 
 window.addEventListener('popstate', function(e) {
@@ -282,8 +399,38 @@ function topInformation(dir, showAlert) {
             $('.top-information').hide();
             $('.top-info-buttons').hide();
 
+            // is vault package
+            if (typeof vaultStatus != 'undefined') {
+                actions['copy-vault-package-to-research'] = 'Copy datapackage to research space';
+
+                // folder status (vault folder)
+                if (typeof vaultStatus != 'undefined' && typeof vaultActionPending != 'undefined') {
+                    $('.btn-group button.folder-status').attr('data-datamanager', isDatamanager);
+
+                    // Show metadata button.
+                    $('.btn-group button.metadata-form').attr('data-path', dir);
+                    $('.btn-group button.metadata-form').show();
+                }
+            }
+
+            // Provenance action log
+            $('.actionlog').hide();
+            let actionLogIcon = ` <i class="fa fa-book actionlog-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
+
+            // System metadata.
+            $('.system-metadata').hide();
+            let systemMetadataIcon = ` <i class="fa fa-info-circle system-metadata-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
+
+            $('.btn-group button.folder-status').attr('data-write', hasWriteRights);
 
             let folderName = htmlEncode(basename).replace(/ /g, "&nbsp;");
+            // let statusBadge = '<span id="statusBadge" class="ml-2 badge rounded-pill bg-primary">' + statusText + '</span>';
+
+            // Reset action dropdown.
+            // $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
+
+            // Folder buttons
+            $('.top-information h2').html(`${systemMetadataIcon}${actionLogIcon}`);
 
             // Show top information and buttons.
             if (typeof vaultStatus != 'undefined') {
@@ -296,17 +443,9 @@ function topInformation(dir, showAlert) {
     }
 }
 
-function vaultAccess(action, folder)
+function showMetadataForm(path)
 {
-    $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-    $.post("access", {"path" : decodeURIComponent(folder), "action" : action}, function(data) {
-        if (data.data.status != 'Success') {
-            Yoda.set_message('error', data.statusInfo);
-        }
-
-        topInformation(folder, false);
-    }, "json");
+    window.location.href = 'metadata/form?path=' + encodeURIComponent(path);
 }
 
 function metadataInfo(dir) {
@@ -331,23 +470,11 @@ function metadataInfo(dir) {
                 return console.info('No result data from meta_form_load');
 
             let metadata = result.data.metadata;
-            let date_deposit = result.data.deposit_date;
-            let date_end_preservation = result.data.deposit_end_preservation_date
             $('.metadata-info').show();
-
-            console.log(result.data)
-            console.log(metadata);
-
-            // Owner(s) - within yoda-metadata.json Creator
-            let creators = [];
-            for (let c in metadata.Creator){
-                let fullname = "".concat(metadata.Creator[c].Name.Given_Name, " ", metadata.Creator[c].Name.Family_Name);
-                fullname = fullname + ' (' + metadata.Creator[c].Owner_Role + ')'
-                creators.push(fullname);
-            }
-            $('.metadata-creator').text(creators.join(', '));
-
             $(".metadata-title").text(metadata.Title);
+            $(".metadata-access").text(metadata.Data_Access_Restriction);
+            $(".metadata-data-classification").text(metadata.Data_Classification);
+            $(".metadata-license").text(metadata.License);
 
             if (metadata.Description){
                 let description = metadata.Description;
@@ -370,64 +497,16 @@ function metadataInfo(dir) {
                 }
             }
 
-            // $('.metadata-identifier').text('BLABLA');
-
-            $('.metadata-keywords').text(metadata.Tag.toString());
-            $('.metadata-research-group').text(metadata.Research_Group);
-            $('.metadata-project').text(metadata.Collection_Name);
-
-            let owners = [];
+            let creators = [];
             for (let c in metadata.Creator){
-                let fullname = "".concat(metadata.Creator[c].Name.Given_Name, " ", metadata.Creator[c].Name.Family_Name);
-                fullname = fullname + ', ' + metadata.Creator[c].Affiliation + ', ' + metadata.Creator[c].Owner_Role
-                owners.push(fullname);
+                let fullname = "";
+                if(typeof metadata.Creator[c].Name == 'string')
+                    fullname = metadata.Creator[c].Name;
+                else if(typeof metadata.Creator[c].Name == 'object')
+                    fullname = "".concat(metadata.Creator[c].Name.Given_Name, " ", metadata.Creator[c].Name.Family_Name);
+                creators.push(fullname);
             }
-            $('.metadata-owners').text(owners.join('<br>'));
-
-            // Contact person is placed within contributors. Only 1
-            let contributors = [];
-            for (let c in metadata.Contributor){
-                let fullname = "".concat(metadata.Contributor[c].Name.Given_Name, " ", metadata.Contributor[c].Name.Family_Name);
-                contributors.push(fullname);
-            }
-
-            // Contact person - within yoda-metadata.json Contributor
-            $('.metadata-contact-person').text(contributors.join(', '));
-
-            $('.metadata-research-period').text(metadata.Collected.Start_Date + ' ' + metadata.Collected.End_Date);
-
-            let geolocations = [];
-            for (let c in metadata.GeoLocation){
-                let loc = metadata.GeoLocation[c];
-                let fullname = loc.Description_Spatial;
-                
-                fullname += loc.geoLocationBox.eastBoundLongitude.toString()
-                fullname += loc.geoLocationBox.northBoundLatitude.toString()
-                // loc.geoLocationBox.southBoundLatitude.toString()
-                // loc.geoLocationBox.westBoundLongitude.toString()
-
-                geolocations.push(fullname);
-            }
-            $('.metadata-geo-locations').text(geolocations.join(', '));
-
-            let references = [];
-            for (let c in metadata.Related_Datapackage){
-                let fullname = metadata.Related_Datapackage[c].Title;
-                fullname = fullname + ', ' + metadata.Related_Datapackage[c].Persistent_Identifier.Identifier_Scheme
-                fullname = fullname + ' ' +  metadata.Related_Datapackage[c].Persistent_Identifier.Identifier
-                references.push(fullname);
-            }
-            $('.metadata-references').text(references.join('<br>'));
-
-            $('.metadata-personal-data').text(metadata.Data_Classification);
-
-            $('.metadata-deposit-date').text(date_deposit);
-            $('.metadata-retention-period').text(date_end_preservation + " (" + metadata.End_Preservation + " years)");
-
-
-            // $(".metadata-access").text(metadata.Data_Access_Restriction);
-            // $(".metadata-data-classification").text(metadata.Data_Classification);
-            // $(".metadata-license").text(metadata.License);
+            $('.metadata-creator').text(creators.join(', '));
         });
     }
     catch (error) {
@@ -438,13 +517,4 @@ function metadataInfo(dir) {
 function truncate(str, nr_words) {
     // Truncate string on n number of words
     return str.split(" ").splice(0,nr_words).join(" ");
-}
-
-function textToClipboard (text) {
-    var dummy = document.createElement("textarea");
-    document.body.appendChild(dummy);
-    dummy.value = text;
-    dummy.select();
-    document.execCommand("copy");
-    document.body.removeChild(dummy);
 }

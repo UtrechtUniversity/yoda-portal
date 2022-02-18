@@ -131,7 +131,7 @@ def static_loader():
         else:
             # Module specific assets
             module = parts[1]
-            specific_file_location = asset_dir.replace(module + '/assets/', '')
+            specific_file_location = asset_dir.replace('/' + module + '/assets/', '')
             module_static_area = path.join(module, 'static', module)
             user_static_filename = path.join(user_static_area, module_static_area, specific_file_location, asset_name)
 
