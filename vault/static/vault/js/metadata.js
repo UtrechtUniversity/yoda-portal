@@ -30,6 +30,14 @@ $(function() {
         textToClipboard($('.metadata-identifier').text());
         alert('Copied to clipboard: ' + $('.metadata-identifier').text());
     });
+
+    $("body").on("click", ".show-map", function() {
+        // let path = $(this).attr('data-path');
+        // let viewerHtml = `<video width="570" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></video>`;
+        viewerHtml = 'HALLO';
+        $('#viewer').html(viewerHtml);
+        $('#viewMedia').modal('show');
+    });
 });
 
 function browse(dir = '', changeHistory = false)
@@ -335,14 +343,11 @@ function metadataInfo(dir) {
             let date_end_preservation = result.data.deposit_end_preservation_date
             $('.metadata-info').show();
 
-            console.log(result.data)
-            console.log(metadata);
-
             // Owner(s) - within yoda-metadata.json Creator
             let creators = [];
             for (let c in metadata.Creator){
                 let fullname = "".concat(metadata.Creator[c].Name.Given_Name, " ", metadata.Creator[c].Name.Family_Name);
-                fullname = fullname + ' (' + metadata.Creator[c].Owner_Role + ')'
+                fullname += ' (' + metadata.Creator[c].Owner_Role + ')'
                 creators.push(fullname);
             }
             $('.metadata-creator').text(creators.join(', '));
@@ -370,19 +375,17 @@ function metadataInfo(dir) {
                 }
             }
 
-            // $('.metadata-identifier').text('BLABLA');
-
-            $('.metadata-keywords').text(metadata.Tag.toString());
+            $('.metadata-keywords').text(metadata.Tag.join(', '));
             $('.metadata-research-group').text(metadata.Research_Group);
             $('.metadata-project').text(metadata.Collection_Name);
 
             let owners = [];
             for (let c in metadata.Creator){
                 let fullname = "".concat(metadata.Creator[c].Name.Given_Name, " ", metadata.Creator[c].Name.Family_Name);
-                fullname = fullname + ', ' + metadata.Creator[c].Affiliation + ', ' + metadata.Creator[c].Owner_Role
+                fullname += ', ' + metadata.Creator[c].Affiliation + ', ' + metadata.Creator[c].Owner_Role
                 owners.push(fullname);
             }
-            $('.metadata-owners').text(owners.join('<br>'));
+            $('.metadata-owners').text(owners.join(', '));
 
             // Contact person is placed within contributors. Only 1
             let contributors = [];
@@ -394,30 +397,39 @@ function metadataInfo(dir) {
             // Contact person - within yoda-metadata.json Contributor
             $('.metadata-contact-person').text(contributors.join(', '));
 
-            $('.metadata-research-period').text(metadata.Collected.Start_Date + ' ' + metadata.Collected.End_Date);
+            $('.metadata-research-period').text(metadata.Collected.Start_Date + ' - ' + metadata.Collected.End_Date);
 
             let geolocations = [];
             for (let c in metadata.GeoLocation){
                 let loc = metadata.GeoLocation[c];
                 let fullname = loc.Description_Spatial;
                 
-                fullname += loc.geoLocationBox.eastBoundLongitude.toString()
-                fullname += loc.geoLocationBox.northBoundLatitude.toString()
-                // loc.geoLocationBox.southBoundLatitude.toString()
-                // loc.geoLocationBox.westBoundLongitude.toString()
+                // let lon0 = loc.geoLocationBox.eastBoundLongitude.toString()
+                // let lat0 = loc.geoLocationBox.northBoundLatitude.toString()
+                // let lon1 = loc.geoLocationBox.westBoundLongitude.toString()
+                // let lat1 = loc.geoLocationBox.southBoundLatitude.toString()
+
+                fullname += ' <button class="btn btn-outline-secondary show-map"'; 
+                fullname += ' data-lon0="' + loc.geoLocationBox.eastBoundLongitude.toString() + '"';
+                fullname += ' data-lat0="' + loc.geoLocationBox.northBoundLatitude.toString() + '"';
+                fullname += ' data-lon1="' + loc.geoLocationBox.westBoundLongitude.toString() + '"';
+                fullname += ' data-lat1="' + loc.geoLocationBox.southBoundLatitude.toString() + '"';
+                fullname += ' data-spatial="' + loc.Description_Spatial + '"';
+                // fullname += ' data-temporal="' + loc.Description_Spatial + '"';
+                fullname += '>Show map</button>';
 
                 geolocations.push(fullname);
             }
-            $('.metadata-geo-locations').text(geolocations.join(', '));
+            $('.metadata-geo-locations').html(geolocations.join('<br>'));
 
             let references = [];
             for (let c in metadata.Related_Datapackage){
-                let fullname = metadata.Related_Datapackage[c].Title;
-                fullname = fullname + ', ' + metadata.Related_Datapackage[c].Persistent_Identifier.Identifier_Scheme
-                fullname = fullname + ' ' +  metadata.Related_Datapackage[c].Persistent_Identifier.Identifier
-                references.push(fullname);
+                let ref = metadata.Related_Datapackage[c]
+                let row = '<tr><td>' + ref.Title + '</td><td>' + ref.Persistent_Identifier.Identifier_Scheme + ': ';
+                row += '<a href="https://reference.com">' + metadata.Related_Datapackage[c].Persistent_Identifier.Identifier + '</a></td></tr>'
+                references.push(row);
             }
-            $('.metadata-references').text(references.join('<br>'));
+            $('.metadata-references').html('<table>' + references.join('') + '</table>');
 
             $('.metadata-personal-data').text(metadata.Data_Classification);
 
@@ -428,6 +440,32 @@ function metadataInfo(dir) {
             // $(".metadata-access").text(metadata.Data_Access_Restriction);
             // $(".metadata-data-classification").text(metadata.Data_Classification);
             // $(".metadata-license").text(metadata.License);
+            //
+            $('.show-map').click(function(){
+                let lon0 = parseFloat($(this).data('lon0')); 
+                let lat0 = parseFloat($(this).data('lat0'));
+                let lon1 = parseFloat($(this).data('lon1'));
+                let lat1 = parseFloat($(this).data('lat1'));
+                let descr_spatial = $(this).data('spatial');
+
+                $('.modal-map-title').html(descr_spatial);
+
+                // var mymap = L.map('map{{ loop.index }}').fitBounds(bounds, {'maxZoom': 5});
+
+                //  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                //        attribution: '&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+                //        maxZoom: 18
+                // }).addTo(mymap);
+
+                // # Point or rectangle
+                // if (lat0==lat1 && lon0==lon1) {
+                //     var marker = L.marker([lat0, lon0]).addTo(mymap);
+                // } else {
+                //     var rectangle = L.rectangle([[lat0, lon0],[lat1, lon1]]).addTo(mymap);
+                // }
+                
+                $('#viewMap').modal('show');
+            })
         });
     }
     catch (error) {
