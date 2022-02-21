@@ -2,23 +2,116 @@
 
 let OpenSearchApi = {};
 let currentSearchString;
+let currentFrom = 0;
+let currentSize = 3;
 
 $(function() {
     if ($("#search-filter").val().length > 0) {
-        currentSearchString = $("#search-filter").val();
-        OpenSearchApi.call(
-            {
-                name: 'Title',
-                value: currentSearchString,
-                from: 0,
-                size: 3
-            },
-            {'quiet': true, 'rawResult': true}
-        ).then((data) => {
-            console.log(data);
-        });
+        let filter = $("#search-filter").val();
+        search(filter, currentFrom, currentSize);
     }
+
+    $("#search-filter").on('keyup', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            let filter = $("#search-filter").val();
+            search(filter, currentFrom, currentSize);
+        }
+    });
+
+    $(".search-btn").click(function() {
+        let filter = $("#search-filter").val();
+        search(filter, currentFrom, currentSize);
+    });
 });
+
+
+function search(term, from, size)
+{
+    load(true);
+    //changeUrlParam(term);
+    currentSearchString = term;
+
+    OpenSearchApi.call(
+        {
+            name: 'Title',
+            value: term,
+            from: from,
+            size: size
+        },
+        {'quiet': true, 'rawResult': true}
+    ).then((data) => {
+        let html = '';
+        if (data.matches.length) {
+            html += '<p class="fs-6 fst-italic mb-2">' + data.matches.length + ' result(s)</p>'
+            $(data.matches).each(function(index, element ) {
+                let data = {};
+                $(element.attributes).each(function(index, attribute) {
+                    data[attribute.name] = attribute.value;
+                });
+                html += itemTemplate(data);
+            });
+        } else {
+            html = "<p>Your search '" + term + "' did not match any deposit.</p>";
+        }
+
+
+        $('#search-results').html(html);
+        load(false);
+    });
+}
+
+function load(loading = true)
+{
+    if (loading) {
+        $('.search-btn').html('<i class="fa-solid fa-spinner fa-spin-pulse"></i>');
+    } else {
+        $('.search-btn').html('<i class="fa fa-search"></i>');
+    }
+}
+
+function itemTemplate(data)
+{
+    let access;
+    if(data.DataAccessRestriction.substring(0, 4) == 'Open') {
+        access = `
+        <span class="badge rounded-pill bg-success">
+            <i class="fa-solid fa-lock-open"></i> Open
+        </span>`;
+    } else {
+        access = `
+        <span class="badge rounded-pill bg-warning">
+            <i class="fa-solid fa-lock"></i> Restricted
+        </span>`;
+    }
+
+    let description = truncate(data.Description, 265, '...');
+
+    let html = `
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="card-title">
+                <span class="title-text"><a href="#">${data.Title}</a></span>
+                ${access}
+            </div>
+            <h6 class="card-subtitle mb-2 text-muted">
+                <span>${data.Creator} (${data.OwnerRole})</span>
+                <span class="float-end">01-02-2022</span>
+            </h6>
+            <p class="card-text">
+                ${description}
+            </p>
+        </div>
+    </div>
+    `;
+    return html;
+}
+function truncate(str, max, suffix) {
+    if (str.length < max) {
+        return str;
+    } else {
+        return str.substring(0, max) + suffix;
+    }
+}
 
 OpenSearchApi.call = async function(data={}, options={}) {
     // Bare API call.
