@@ -426,7 +426,7 @@ function metadataInfo(dir) {
                 row += ' data-lon1="' + loc.geoLocationBox.westBoundLongitude.toString() + '"';
                 row += ' data-lat1="' + loc.geoLocationBox.southBoundLatitude.toString() + '"';
                 row += ' data-spatial="' + loc.Description_Spatial + '"';
-                row += '>Show map</button></td>';
+                row += '><i class="fa fa-map"></i> Show map</button></td>';
                 row += '</tr>'
 
                 geolocations.push(row);
