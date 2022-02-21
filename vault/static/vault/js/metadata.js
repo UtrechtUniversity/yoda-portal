@@ -11,6 +11,9 @@ $(document).ajaxSend(function(e, request, settings) {
 
 let preservableFormatsLists = null;
 let currentFolder;
+var bounds = [[1,1][1,1]]
+var mymap = null;
+var maplayer = null;
 
 $(function() {
     // Extract current location from query string (default to '').
@@ -31,12 +34,25 @@ $(function() {
         alert('Copied to clipboard: ' + $('.metadata-identifier').text());
     });
 
-    $("body").on("click", ".show-map", function() {
-        // let path = $(this).attr('data-path');
-        // let viewerHtml = `<video width="570" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></video>`;
-        viewerHtml = 'HALLO';
-        $('#viewer').html(viewerHtml);
-        $('#viewMedia').modal('show');
+    mymap = L.map('map1').fitBounds([[51.505, -0.09],[51.505, -0.09]], {'maxZoom': 5});
+    // mymap = L.map('map1').setView([51.505, -0.09], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 18
+    }).addTo(mymap);
+
+    // Trick to make leaflet work within a bootstrap modal
+    $('#viewMap').on('shown.bs.modal', function(){
+         setTimeout(function() {
+            mymap.invalidateSize();
+            if (bounds[0][0]==bounds[1][0] && bounds[0][1]==bounds[1][1]) {
+                mymap.fitBounds(bounds, {'maxZoom': 4});
+            }
+            else { 
+                mymap.fitBounds(bounds, {'maxZoom': 8});
+            }
+         }, 10);
     });
 });
 
@@ -402,31 +418,26 @@ function metadataInfo(dir) {
             let geolocations = [];
             for (let c in metadata.GeoLocation){
                 let loc = metadata.GeoLocation[c];
-                let fullname = loc.Description_Spatial;
-                
-                // let lon0 = loc.geoLocationBox.eastBoundLongitude.toString()
-                // let lat0 = loc.geoLocationBox.northBoundLatitude.toString()
-                // let lon1 = loc.geoLocationBox.westBoundLongitude.toString()
-                // let lat1 = loc.geoLocationBox.southBoundLatitude.toString()
+                let row = '<tr><td style="width:200px;">' + loc.Description_Spatial + '</td>';
 
-                fullname += ' <button class="btn btn-outline-secondary show-map"'; 
-                fullname += ' data-lon0="' + loc.geoLocationBox.eastBoundLongitude.toString() + '"';
-                fullname += ' data-lat0="' + loc.geoLocationBox.northBoundLatitude.toString() + '"';
-                fullname += ' data-lon1="' + loc.geoLocationBox.westBoundLongitude.toString() + '"';
-                fullname += ' data-lat1="' + loc.geoLocationBox.southBoundLatitude.toString() + '"';
-                fullname += ' data-spatial="' + loc.Description_Spatial + '"';
-                // fullname += ' data-temporal="' + loc.Description_Spatial + '"';
-                fullname += '>Show map</button>';
+                row += '<td><button class="btn btn-outline-secondary show-map"'; 
+                row += ' data-lon0="' + loc.geoLocationBox.eastBoundLongitude.toString() + '"';
+                row += ' data-lat0="' + loc.geoLocationBox.northBoundLatitude.toString() + '"';
+                row += ' data-lon1="' + loc.geoLocationBox.westBoundLongitude.toString() + '"';
+                row += ' data-lat1="' + loc.geoLocationBox.southBoundLatitude.toString() + '"';
+                row += ' data-spatial="' + loc.Description_Spatial + '"';
+                row += '>Show map</button></td>';
+                row += '</tr>'
 
-                geolocations.push(fullname);
+                geolocations.push(row);
             }
-            $('.metadata-geo-locations').html(geolocations.join('<br>'));
+            $('.metadata-geo-locations').html('<table>' + geolocations.join('') + '</table>');
 
             let references = [];
             for (let c in metadata.Related_Datapackage){
                 let ref = metadata.Related_Datapackage[c]
-                let row = '<tr><td>' + ref.Title + '</td><td>' + ref.Persistent_Identifier.Identifier_Scheme + ': ';
-                row += '<a href="https://reference.com">' + metadata.Related_Datapackage[c].Persistent_Identifier.Identifier + '</a></td></tr>'
+                let row = '<tr><td style="width:300px;">' + ref.Title + '</td><td style="width:50px;">' + ref.Persistent_Identifier.Identifier_Scheme + ': </td>';
+                row += '<td><a href="https://reference.com">' + metadata.Related_Datapackage[c].Persistent_Identifier.Identifier + '</a></td></tr>'
                 references.push(row);
             }
             $('.metadata-references').html('<table>' + references.join('') + '</table>');
@@ -436,11 +447,6 @@ function metadataInfo(dir) {
             $('.metadata-deposit-date').text(date_deposit);
             $('.metadata-retention-period').text(date_end_preservation + " (" + metadata.End_Preservation + " years)");
 
-
-            // $(".metadata-access").text(metadata.Data_Access_Restriction);
-            // $(".metadata-data-classification").text(metadata.Data_Classification);
-            // $(".metadata-license").text(metadata.License);
-            //
             $('.show-map').click(function(){
                 let lon0 = parseFloat($(this).data('lon0')); 
                 let lat0 = parseFloat($(this).data('lat0'));
@@ -450,20 +456,18 @@ function metadataInfo(dir) {
 
                 $('.modal-map-title').html(descr_spatial);
 
-                // var mymap = L.map('map{{ loop.index }}').fitBounds(bounds, {'maxZoom': 5});
+                bounds = [[lat0, lon0], [lat1, lon1]];
 
-                //  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                //        attribution: '&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-                //        maxZoom: 18
-                // }).addTo(mymap);
-
-                // # Point or rectangle
-                // if (lat0==lat1 && lon0==lon1) {
-                //     var marker = L.marker([lat0, lon0]).addTo(mymap);
-                // } else {
-                //     var rectangle = L.rectangle([[lat0, lon0],[lat1, lon1]]).addTo(mymap);
-                // }
-                
+                // Point or rectangle
+                if (maplayer){
+                    mymap.removeLayer(maplayer);
+                }
+                if (lat0==lat1 && lon0==lon1) {
+                    maplayer = L.marker([lat0, lon0]).addTo(mymap);
+                } else {
+                    maplayer = L.rectangle([[lat0, lon0],[lat1, lon1]]).addTo(mymap);
+                }
+ 
                 $('#viewMap').modal('show');
             })
         });
