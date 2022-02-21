@@ -44,16 +44,15 @@ function search(term, from, size)
         if (data.matches.length) {
             html += '<p class="fs-6 fst-italic mb-2">' + data.matches.length + ' result(s)</p>'
             $(data.matches).each(function(index, element ) {
-                let data = {};
+                let attr = {};
                 $(element.attributes).each(function(index, attribute) {
-                    data[attribute.name] = attribute.value;
+                    attr[attribute.name] = attribute.value;
                 });
-                html += itemTemplate(data);
+                html += itemTemplate(attr);
             });
         } else {
-            html = "<p>Your search '" + term + "' did not match any deposit.</p>";
+            html = "<p>Your search '" + Yoda.escapeEntities(term) + "' did not match any deposit.</p>";
         }
-
 
         $('#search-results').html(html);
         load(false);
@@ -83,8 +82,12 @@ function itemTemplate(data)
             <i class="fa-solid fa-lock"></i> Restricted
         </span>`;
     }
-
     let description = truncate(data.Description, 265, '...');
+
+    let date = '';
+    if ('CreationTime' in data) {
+        date = formatDate(data.CreationTime * 1000);
+    }
 
     let html = `
     <div class="card mb-3">
@@ -95,7 +98,7 @@ function itemTemplate(data)
             </div>
             <h6 class="card-subtitle mb-2 text-muted">
                 <span>${data.Creator} (${data.OwnerRole})</span>
-                <span class="float-end">01-02-2022</span>
+                <span class="float-end">${date}</span>
             </h6>
             <p class="card-text">
                 ${description}
@@ -111,6 +114,20 @@ function truncate(str, max, suffix) {
     } else {
         return str.substring(0, max) + suffix;
     }
+}
+
+function formatDate(timestamp) {
+    let d = new Date(timestamp);
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    let year = d.getFullYear();
+
+    if (month.length < 2)
+        month = '0' + month;
+    if (day.length < 2)
+        day = '0' + day;
+
+    return [year, month, day].join('-');
 }
 
 OpenSearchApi.call = async function(data={}, options={}) {
