@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__copyright__ = 'Copyright (c) 2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 from flask import Blueprint, render_template, request
 
 open_search_bp = Blueprint('open_search_bp', __name__,
-                      template_folder='templates',
-                      static_folder='static/open_search',
-                      static_url_path='/assets')
+                           template_folder='templates',
+                           static_folder='static/open_search',
+                           static_url_path='/assets')
 
 
 @open_search_bp.route('/')

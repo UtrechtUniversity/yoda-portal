@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 from os import path
@@ -17,9 +17,9 @@ from deposit.deposit import deposit_bp
 from general.general import general_bp
 from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
+from open_search.open_search import open_search_bp
 from research.research import research_bp
 from search.search import search_bp
-from open_search.open_search import open_search_bp
 from stats.stats import stats_bp
 from user.user import user_bp
 from vault.vault import vault_bp
