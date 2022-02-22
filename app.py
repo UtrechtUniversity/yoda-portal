@@ -135,7 +135,7 @@ def static_loader():
         else:
             # Module specific assets
             module = parts[1]
-            specific_file_location = asset_dir.replace(module + '/assets/', '')
+            specific_file_location = asset_dir.replace('/' + module + '/assets/', '')
             module_static_area = path.join(module, 'static', module)
             user_static_filename = path.join(user_static_area, module_static_area, specific_file_location, asset_name)
 
@@ -166,7 +166,7 @@ def protect_pages():
 @app.after_request
 def content_security_policy(response):
     """Add Content-Security-Policy headers."""
-    if request.endpoint in ['deposit_bp.metadata', 'research_bp.form', 'vault_bp.form']:
+    if request.endpoint in ['research_bp.form', 'vault_bp.form', 'deposit_bp.metadata', 'vault_bp.metadata']:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: *.openstreetmap.org; frame-ancestors 'self'; form-action 'self'; object-src 'none'"  # noqa: E501
     elif request.endpoint in ['user_bp.gate']:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'self'; form-action 'self' https:; object-src 'none'"  # noqa: E501
