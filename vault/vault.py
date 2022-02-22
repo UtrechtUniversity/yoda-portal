@@ -84,7 +84,7 @@ def access():
 
 
 @vault_bp.route('/yoda/<reference>')
-def resolve(reference):
+def metadata(reference):
     # Check if Data Package Reference is a valid UUID4.
     try:
         if UUID(reference).version != 4:
