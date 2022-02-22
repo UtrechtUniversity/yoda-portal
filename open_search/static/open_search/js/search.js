@@ -93,7 +93,7 @@ function itemTemplate(data)
     <div class="card mb-3">
         <div class="card-body">
             <div class="card-title">
-                <span class="title-text"><a href="#">${data.Title}</a></span>
+                <span class="title-text"><a href="/vault/${data.DataPackage}">${data.Title}</a></span>
                 ${access}
             </div>
             <h6 class="card-subtitle mb-2 text-muted">
