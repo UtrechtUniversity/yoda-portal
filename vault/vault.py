@@ -6,7 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 import io
 from uuid import UUID
 
-from flask import abort, Blueprint, g, redirect, render_template, request, Response, stream_with_context, url_for
+from flask import abort, Blueprint, g, render_template, request, Response, stream_with_context
 
 import api
 
