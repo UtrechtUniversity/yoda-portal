@@ -51,7 +51,7 @@ function search(term, from, size)
                 html += itemTemplate(attr);
             });
         } else {
-            html = "<p>Your search '" + Yoda.escapeEntities(term) + "' did not match any deposit.</p>";
+            html = "<p>Your search '" + Yoda.escapeEntities(term) + "' did not match any data package.</p>";
         }
 
         $('#search-results').html(html);
