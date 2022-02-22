@@ -99,15 +99,9 @@ def resolve(reference):
     dir = response['data']
 
     # To be added - check whether permissions for data!
-    # Is the datapackage and 'Open' package?
+    # Is the datapackage an 'Open' package?
     return render_template('vault/metadata.html',
                            activeModule='vault',
                            items=10,
                            dir=dir,
                            yoda_id=reference)
-
-#
-#    if response['status'] == 'ok':
-#        return redirect(url_for('vault_bp.index', dir=response['data']))
-#    else:
-#        abort(404)
