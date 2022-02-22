@@ -162,7 +162,6 @@ def protect_pages():
 @app.after_request
 def content_security_policy(response):
     """Add Content-Security-Policy headers."""
-    # Perhaps vault_bp.resolve has to be differentiated so it gets its own header.
     if request.endpoint in ['research_bp.form', 'vault_bp.form', 'deposit_bp.metadata', 'vault_bp.metadata']:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: *.openstreetmap.org; frame-ancestors 'self'; form-action 'self'; object-src 'none'" # noqa: E501
     elif request.endpoint in ['user_bp.gate']:
