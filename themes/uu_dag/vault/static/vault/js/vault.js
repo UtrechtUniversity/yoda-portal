@@ -53,106 +53,10 @@ $(function() {
         $("#viewer").html("");
     });
 
-    $("body").on("click", "a.action-check-for-unpreservable-files", function() {
-        // Check for unpreservable file formats.
-        // If present, show extensions to user.
-        let folder = $(this).attr('data-folder');
-        $("#file-formats-list").val('');
-
-        $('#showUnpreservableFiles .help').hide();
-        $('#showUnpreservableFiles .preservable').hide();
-        $('#showUnpreservableFiles .advice').hide();
-        $('#showUnpreservableFiles .unpreservable').hide();
-        $('#showUnpreservableFiles .checking').hide();
-
-        if (preservableFormatsLists === null) {
-            // Retrieve preservable file format lists.
-            Yoda.call('vault_preservable_formats_lists').then((data) => {
-                preservableFormatsLists = data;
-
-                $('#file-formats-list').html("<option value='' disabled selected>Select a file format list</option>");
-                for (let list in data) {
-                    if (data.hasOwnProperty(list)) {
-                        $("#file-formats-list").append(new Option(data[list]['name'], list));
-                    }
-                }
-                $('#showUnpreservableFiles').modal('show');
-            });
-        } else {
-            $('#showUnpreservableFiles').modal('show');
-        }
-    });
-
-    $("#file-formats-list").change(function() {
-        let folder = $('a.action-check-for-unpreservable-files').attr('data-folder');
-        let list   = $('#file-formats-list option:selected').val();
-        if (!(list in preservableFormatsLists))
-            return;
-
-        $('#showUnpreservableFiles .checking').show();
-        $('#showUnpreservableFiles .unpreservable').hide();
-        $('#showUnpreservableFiles .preservable').hide();
-        $('#showUnpreservableFiles .advice').hide();
-        $('#showUnpreservableFiles .help'  ).hide();
-
-        $('#showUnpreservableFiles .help'  ).text(preservableFormatsLists[list]["help"]);
-        $('#showUnpreservableFiles .advice').text(preservableFormatsLists[list]["advice"]);
-
-        // Retrieve unpreservable files in folder.
-        Yoda.call('vault_unpreservable_files',
-                  {coll: Yoda.basePath + folder, list_name: list}).then((data) => {
-            $('#showUnpreservableFiles .checking').hide();
-            $('#showUnpreservableFiles .help').show();
-            if (data.length > 0) {
-                $('#showUnpreservableFiles .list-unpreservable-formats').html('');
-                for (let ext of data)
-                    $('#showUnpreservableFiles .list-unpreservable-formats').append(`<li>${htmlEncode(ext)}</li>`);
-                $('#showUnpreservableFiles .advice').show();
-                $('#showUnpreservableFiles .unpreservable').show();
-            } else {
-                $('#showUnpreservableFiles .preservable').show();
-            }
-            $('#showUnpreservableFiles').modal('show');
-        });
-    });
-
-    $("body").on("click", "a.action-submit-for-publication", function() {
-        $('#confirmAgreementConditions .modal-body').text(''); // clear it first
-
-        $('.action-confirm-submit-for-publication').attr( 'data-folder', $(this).attr('data-folder') );
-
-        Yoda.call('vault_get_publication_terms', {}).then((data) => {
-            $('#confirmAgreementConditions .modal-body').html(data);
-
-            // Set default status and show dialog.
-            $(".action-confirm-submit-for-publication").prop('disabled', true);
-            $("#confirmAgreementConditions .confirm-conditions").prop('checked', false);
-
-            $('#confirmAgreementConditions').modal('show');
-        });
-    });
-
-    $("#confirmAgreementConditions").on("click", '.confirm-conditions', function() {
-        if ($(this).prop('checked')) {
-            $("#confirmAgreementConditions .action-confirm-submit-for-publication").prop('disabled', false);;
-        }
-        else {
-            $("#confirmAgreementConditions .action-confirm-submit-for-publication").prop('disabled', true);
-        }
-    });
-
-    $("#confirmAgreementConditions").on("click", ".action-confirm-submit-for-publication", function() {
-        $('#confirmAgreementConditions').modal('hide');
-        vaultSubmitForPublication($(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "a.action-approve-for-publication", function() {
-        vaultApproveForPublication($(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "a.action-cancel-publication", function() {
-        vaultCancelPublication($(this).attr('data-folder'));
-    });
+    // # preservable
+    // # file-format
+    // # grant revoke vault access
+    // .action-list
 
     $("body").on("click", "i.actionlog-icon", function() {
         toggleActionLogList($(this).attr('data-folder'));
@@ -167,42 +71,6 @@ $(function() {
         // Dismiss stale messages.
         $('#messages .close').click();
         e.preventDefault();
-    });
-
-    $("body").on("click", "a.action-grant-vault-access", function() {
-        vaultAccess('grant', $(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "a.action-revoke-vault-access", function() {
-        vaultAccess('revoke', $(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "a.action-depublish-publication", function() {
-        // Set the current folder.
-        $('.action-confirm-depublish-publication').attr( 'data-folder', $(this).attr('data-folder') );
-        // Show depublish modal.
-        $('#confirmDepublish').modal('show');
-    });
-
-    $("#confirmDepublish").on("click", ".action-confirm-depublish-publication", function() {
-        $('#confirmDepublish').modal('hide');
-        vaultDepublishPublication($(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "a.action-republish-publication", function() {
-        // Set the current folder.
-        $('.action-confirm-republish-publication').attr( 'data-folder', $(this).attr('data-folder') );
-        // Show depublish modal.
-        $('#confirmRepublish').modal('show');
-    });
-
-    $("#confirmRepublish").on("click", ".action-confirm-republish-publication", function() {
-        $('#confirmRepublish').modal('hide');
-        vaultRepublishPublication($(this).attr('data-folder'));
-    });
-
-    $("body").on("click", "a.action-go-to-research", function() {
-        window.location.href = '/research/?dir=' + encodeURIComponent('/'+$(this).attr('research-path'));
     });
 });
 
@@ -220,8 +88,8 @@ function browse(dir = '', changeHistory = false)
 {
     currentFolder = dir;
     makeBreadcrumb(dir);
-    if (changeHistory)
-        changeBrowserUrl(dir);
+    // if (changeHistory)
+    //    changeBrowserUrl(dir);
     metadataInfo(dir);
     topInformation(dir, true); //only here topInformation should show its alertMessage
     buildFileBrowser(dir);
@@ -238,14 +106,18 @@ function makeBreadcrumb(dir)
 
     let html = '';
     for (let [i, [text, path]] of crumbs.entries()) {
-        let el = $('<li class="breadcrumb-item">');
-        text = htmlEncode(text).replace(/ /g, '&nbsp;');
-        if (i === crumbs.length-1)
-             el.addClass('active').html(text);
-        else el.html(`<a class="browse" data-path="${htmlEncode(path)}"
-                         href="?dir=${encodeURIComponent(path)}">${text}</a>`);
+        if (i > 1) {
+            let el = $('<li class="breadcrumb-item">');
+            if (i == 2) {
+                text = 'DAG Datapackage'; }
+            text = htmlEncode(text).replace(/ /g, '&nbsp;');
+            if (i === crumbs.length-1)
+                el.addClass('active').html(text);
+            else el.html(`<a class="browse" data-path="${htmlEncode(path)}"
+                             href="?dir=${encodeURIComponent(path)}">${text}</a>`);
 
-        html += el[0].outerHTML;
+            html += el[0].outerHTML;
+        }
     }
 
     $('ol.breadcrumb').html(html);
@@ -535,58 +407,9 @@ function topInformation(dir, showAlert) {
                 if (typeof vaultStatus != 'undefined' && typeof vaultActionPending != 'undefined') {
                     $('.btn-group button.folder-status').attr('data-datamanager', isDatamanager);
 
-                    // Set status badge.
-                    if (vaultStatus == 'SUBMITTED_FOR_PUBLICATION') {
-                        statusText = "Submitted for publication";
-                    } else if (vaultStatus == 'APPROVED_FOR_PUBLICATION') {
-                        statusText = "Approved for publication";
-                    } else if (vaultStatus == 'PUBLISHED') {
-                        statusText = "Published";
-                    } else if (vaultStatus == 'DEPUBLISHED') {
-                        statusText = "Depublished";
-                    } else if (vaultStatus == 'PENDING_DEPUBLICATION') {
-                        statusText = "Depublication pending";
-                    } else if (vaultStatus == 'PENDING_REPUBLICATION') {
-                        statusText = "Republication pending";
-                    } else {
-                        statusText = "Unpublished";
-                    }
-
-                    // Set actions for datamanager and researcher.
-                    if (!vaultActionPending) {
-                        if (isDatamanager) {
-                            if (vaultStatus == 'SUBMITTED_FOR_PUBLICATION') {
-                                actions['cancel-publication'] = 'Cancel publication';
-                                actions['approve-for-publication'] = 'Approve for publication';
-                            } else if (vaultStatus == 'UNPUBLISHED') {
-                                actions['submit-for-publication'] = 'Submit for publication';
-                            } else if (vaultStatus == 'PUBLISHED') {
-                                actions['depublish-publication'] = 'Depublish publication';
-                            } else if (vaultStatus == 'DEPUBLISHED') {
-                                actions['republish-publication'] = 'Republish publication';
-                            }
-                        } else if (hasDatamanager) {
-                            if (vaultStatus == 'UNPUBLISHED') {
-                                actions['submit-for-publication'] = 'Submit for publication';
-                            } else if (vaultStatus == 'SUBMITTED_FOR_PUBLICATION') {
-                                actions['cancel-publication'] = 'Cancel publication';
-                            }
-                        }
-                    }
-
                     // Show metadata button.
                     $('.btn-group button.metadata-form').attr('data-path', dir);
                     $('.btn-group button.metadata-form').show();
-                }
-
-                // Datamanager sees access buttons in vault.
-                $('.top-info-buttons').show();
-                if (isDatamanager) {
-                    if (researchGroupAccess) {
-                        actions['revoke-vault-access'] = 'Revoke read access to research group';
-                    } else {
-                        actions['grant-vault-access'] = 'Grant read access to research group';
-                    }
                 }
             }
 
@@ -600,30 +423,14 @@ function topInformation(dir, showAlert) {
 
             $('.btn-group button.folder-status').attr('data-write', hasWriteRights);
 
-            // Add unpreservable files check to actions.
-            actions['check-for-unpreservable-files'] = 'Check for compliance with policy';
-
-            // Add go to research to actions.
-            if (typeof researchPath != 'undefined') {
-                actions['go-to-research'] = 'Go to research';
-            }
-
-            // Handle actions
-            handleActionsList(actions, dir);
-
-            // Set research path.
-            if (typeof researchPath != 'undefined') {
-                $('a.action-go-to-research').attr('research-path', researchPath);
-            }
-
             let folderName = htmlEncode(basename).replace(/ /g, "&nbsp;");
-            let statusBadge = '<span id="statusBadge" class="ml-2 badge rounded-pill bg-primary">' + statusText + '</span>';
+            // let statusBadge = '<span id="statusBadge" class="ml-2 badge rounded-pill bg-primary">' + statusText + '</span>';
 
             // Reset action dropdown.
-            $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
+            // $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
 
             // Folder buttons
-            $('.top-information h2').html(`${statusBadge}${systemMetadataIcon}${actionLogIcon}`);
+            $('.top-information h2').html(`${systemMetadataIcon}${actionLogIcon}`);
 
             // Show top information and buttons.
             if (typeof vaultStatus != 'undefined') {
@@ -636,136 +443,9 @@ function topInformation(dir, showAlert) {
     }
 }
 
-function handleActionsList(actions, folder)
-{
-    var html = '';
-    var vaultHtml = '';
-    var possibleActions = ['submit-for-publication', 'cancel-publication',
-                           'approve-for-publication', 'depublish-publication',
-                           'republish-publication'];
-
-    var possibleVaultActions = ['grant-vault-access', 'revoke-vault-access',
-                                'copy-vault-package-to-research',
-                                'check-for-unpreservable-files',
-                                'go-to-research'];
-
-    $.each(possibleActions, function( index, value ) {
-        if (actions.hasOwnProperty(value)) {
-            html += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>';
-        }
-    });
-
-    $.each(possibleVaultActions, function( index, value ) {
-        if (actions.hasOwnProperty(value)) {
-            vaultHtml += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>';
-        }
-    });
-
-    if (html != '' && vaultHtml != '') {
-        html += '<div class="dropdown-divider"></div>' + vaultHtml;
-    } else if (vaultHtml != '') {
-        html += vaultHtml;
-    }
-
-    $('.action-list').html(html);
-}
-
 function showMetadataForm(path)
 {
     window.location.href = 'metadata/form?path=' + encodeURIComponent(path);
-}
-
-async function vaultSubmitForPublication(folder)
-{
-    var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Submit for publication <i class="fa fa-spinner fa-spin fa-fw"></i>');
-    $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-    try {
-        let status = await Yoda.call('vault_submit',
-                                     {'coll': Yoda.basePath + folder})
-        $('#statusBadge').html('');
-    } catch(e) {
-        $('#statusBadge').html(btnText);
-    }
-    topInformation(folder, false);
-}
-
-async function vaultApproveForPublication(folder)
-{
-    var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Approve for publication <i class="fa fa-spinner fa-spin fa-fw"></i>');
-    $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-    try {
-        let status = await Yoda.call('vault_approve',
-                                     {'coll': Yoda.basePath + folder})
-        $('#statusBadge').html('');
-    } catch(e) {
-        $('#statusBadge').html(btnText);
-    }
-    topInformation(folder, false);
-}
-
-async function vaultCancelPublication(folder)
-{
-    var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Cancel publication <i class="fa fa-spinner fa-spin fa-fw"></i>');
-    $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-    try {
-        let status = await Yoda.call('vault_cancel',
-                                     {'coll': Yoda.basePath + folder})
-        $('#statusBadge').html('');
-    } catch(e) {
-        $('#statusBadge').html(btnText);
-    }
-    topInformation(folder, false);
-}
-
-async function vaultDepublishPublication(folder)
-{
-    var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Depublish publication <i class="fa fa-spinner fa-spin fa-fw"></i>');
-    $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-    try {
-        let status = await Yoda.call('vault_depublish',
-                                     {'coll': Yoda.basePath + folder})
-        $('#statusBadge').html('');
-    } catch(e) {
-        $('#statusBadge').html(btnText);
-    }
-    topInformation(folder, false);
-}
-
-async function vaultRepublishPublication(folder)
-{
-    var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Republish publication <i class="fa fa-spinner fa-spin fa-fw"></i>');
-    $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-    try {
-        let status = await Yoda.call('vault_republish',
-                                     {'coll': Yoda.basePath + folder})
-        $('#statusBadge').html('');
-    } catch(e) {
-        $('#statusBadge').html(btnText);
-    }
-    topInformation(folder, false);
-}
-
-function vaultAccess(action, folder)
-{
-    $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
-
-    $.post("access", {"path" : decodeURIComponent(folder), "action" : action}, function(data) {
-        if (data.data.status != 'Success') {
-            Yoda.set_message('error', data.statusInfo);
-        }
-
-        topInformation(folder, false);
-    }, "json");
 }
 
 function metadataInfo(dir) {

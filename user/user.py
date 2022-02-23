@@ -113,11 +113,6 @@ def logout():
     return redirect(url_for('general_bp.index'))
 
 
-@user_bp.route('/forgot-password')
-def forgot_password():
-    return render_template('user/login.html')
-
-
 @user_bp.route('/notifications')
 def notifications():
     sort_order = request.args.get('sort_order', 'desc')
@@ -315,8 +310,8 @@ def callback():
 
 
 def should_redirect_to_oidc(username):
-    domain = app.config.get('OIDC_DOMAIN')
-    if app.config.get('OIDC_ENABLED') and username.endswith(domain):
+    domains = app.config.get('OIDC_DOMAINS')
+    if app.config.get('OIDC_ENABLED') and username.endswith(tuple(domains)):
         return True
     else:
         return False

@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; DAG Datapackage{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/vault.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='lib/leaflet/leaflet.css') }}">
+<style>
+    .map {height: 450px; width: 600px;}
+    a.leaflet-control-zoom-in, a.leaflet-control-zoom-out {text-decoration: none ! important;}
+    .indented {padding-left: 10px;}
+</style>
+
+
+{% endblock style %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
+<script src="{{ url_for('vault_bp.static', filename='js/metadata.js') }}"></script>
+<script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
+<script src="{{ url_for('vault_bp.static', filename='lib/leaflet/leaflet.js') }}"></script>
+<script>
+        var browsePageItems = {{ items }};
+        var browseStartDir = {{ dir | tojson }};
+        var browseDlgPageItems = {{ items }};
+        var view = 'browse';
+</script>
+{% endblock scripts %}
+
+{% block content %}
+
+<div class="modal" tabindex="-1" role="dialog" id="viewMap">
+    <div class="modal-dialog mw-100 w-50">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title modal-map-title">Modal title</h5>
+            </div>
+
+            <div class="modal-body text-center">
+                <div class='map' id='map1'></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb flex-column">
+    <ol class="breadcrumb"><li class="breadcrumb-item active">DAG Datapackage</li></ol>
+    <a class="btn btn-light pull-right mb-2" href="https://dag.sites.uu.nl/search/how-to-search/" target="_blank" title="Guidance"><i class="fa fa-info-circle"></i> Guidance</a>
+</nav>
+<section class="metadata-info container">
+    <h5 class="metadata-creator mt-3">
+
+    <h3 class="metadata-title"></h3>
+    <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary pull-right btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Description</strong>
+        </div>
+        <div class="col-lg-10">
+            <div class="metadata-description"></div>
+            <button class="btn read-more-button hide" role="button">Read full description...</button>
+            <button class="btn read-less-button hide" role="button">Collapse description...</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Identifier</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-identifier">{{ url_for('vault_bp.metadata', _external=True, reference=yoda_id) }}</span>
+            <button class="btn btn-secondary btn-copy-to-clipboard"><i class="fa fa-copy"></i> Copy to clipboard</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Keywords</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-keywords"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Research Group</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-research-group"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Project</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-project"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Owners</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-owners"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Contact person</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-contact-person"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Research period</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-research-period"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Geo Locations</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-geo-locations"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>References</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-references"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Personal data</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-personal-data"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Deposit date</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-deposit-date"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <strong>Retention period</strong>
+        </div>
+        <div class="col-lg-10">
+            <span class="metadata-retention-period"></span>
+        </div>
+    </div>
+</section>
+
+<div class='breadcrumbs-browser hide'>
+    <table id="file-browser" class="table yoda-table table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Modified date</th>
+            <th></th>
+        </tr>
+        </thead>
+    </table>
+
+</div>
+
+
+{% endblock content %}
