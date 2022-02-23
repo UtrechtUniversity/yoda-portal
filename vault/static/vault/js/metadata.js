@@ -49,7 +49,7 @@ $(function() {
             if (bounds[0][0]==bounds[1][0] && bounds[0][1]==bounds[1][1]) {
                 mymap.fitBounds(bounds, {'maxZoom': 4});
             }
-            else { 
+            else {
                 mymap.fitBounds(bounds, {'maxZoom': 8});
             }
          }, 10);
@@ -78,7 +78,7 @@ function makeBreadcrumb(dir)
     for (let [i, [text, path]] of crumbs.entries()) {
         if (i > 1) {
             let el = $('<li class="breadcrumb-item">');
-            if (i == 2) { 
+            if (i == 2) {
                 text = 'DAG Datapackage'; }
             text = htmlEncode(text).replace(/ /g, '&nbsp;');
             if (i === crumbs.length-1)
@@ -355,8 +355,6 @@ function metadataInfo(dir) {
                 return console.info('No result data from meta_form_load');
 
             let metadata = result.data.metadata;
-            let date_deposit = result.data.deposit_date;
-            let date_end_preservation = result.data.deposit_end_preservation_date
             $('.metadata-info').show();
 
             // Owner(s) - within yoda-metadata.json Creator
@@ -420,7 +418,7 @@ function metadataInfo(dir) {
                 let loc = metadata.GeoLocation[c];
                 let row = '<tr><td style="width:200px;">' + loc.Description_Spatial + '</td>';
 
-                row += '<td><button class="btn btn-outline-secondary show-map"'; 
+                row += '<td><button class="btn btn-outline-secondary show-map"';
                 row += ' data-lon0="' + loc.geoLocationBox.eastBoundLongitude.toString() + '"';
                 row += ' data-lat0="' + loc.geoLocationBox.northBoundLatitude.toString() + '"';
                 row += ' data-lon1="' + loc.geoLocationBox.westBoundLongitude.toString() + '"';
@@ -443,12 +441,10 @@ function metadataInfo(dir) {
             $('.metadata-references').html('<table>' + references.join('') + '</table>');
 
             $('.metadata-personal-data').text(metadata.Data_Classification);
-
-            $('.metadata-deposit-date').text(date_deposit);
-            $('.metadata-retention-period').text(date_end_preservation + " (" + metadata.End_Preservation + " years)");
+            $('.metadata-retention-period').text(metadata.End_Preservation + " years");
 
             $('.show-map').click(function(){
-                let lon0 = parseFloat($(this).data('lon0')); 
+                let lon0 = parseFloat($(this).data('lon0'));
                 let lat0 = parseFloat($(this).data('lat0'));
                 let lon1 = parseFloat($(this).data('lon1'));
                 let lat1 = parseFloat($(this).data('lat1'));
@@ -467,9 +463,26 @@ function metadataInfo(dir) {
                 } else {
                     maplayer = L.rectangle([[lat0, lon0],[lat1, lon1]]).addTo(mymap);
                 }
- 
+
                 $('#viewMap').modal('show');
             })
+        });
+    }
+    catch (error) {
+        console.error(error);
+    }
+
+    try {
+        Yoda.call('vault_get_deposit_data',
+            {coll: Yoda.basePath + dir},
+            {rawResult: true})
+        .then((result) => {
+            if (!result || jQuery.isEmptyObject(result.data))
+                return console.info('No result data from vault_get_deposit_data');
+
+            let date_deposit = result.data.deposit_date;
+            $('.metadata-info').show();
+            $('.metadata-deposit-date').text(date_deposit);
         });
     }
     catch (error) {
