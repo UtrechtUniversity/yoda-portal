@@ -100,7 +100,7 @@ def metadata(reference):
 
     # To be added - check whether permissions for data!
     # Is the datapackage an 'Open' package?
-    return render_template('vault/metadata.html',
+    return render_template('vault/datapackage.html',
                            activeModule='vault',
                            items=10,
                            dir=dir,
