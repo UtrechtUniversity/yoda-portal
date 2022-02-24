@@ -89,9 +89,11 @@ def group_create():
 def group_update():
     properties = ['description', 'data_classification', 'category', 'subcategory']
 
+    property_updated = False
     for property in properties:
         property_name = "group_{}".format(property)
         if property_name in request.form:
+            property_updated = True
             value = request.form[property_name]
             response = api.call('group_update', data={'group_name': request.form['group_name'],
                                                       'property_name': property,
@@ -99,6 +101,9 @@ def group_update():
 
             if response['status'] != 'ok':
                 break
+
+    if not property_updated:
+        response = {'status': 'ok', 'status_info': 'Nothing changed'}
 
     output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
     output.headers["Content-type"] = "application/json"
