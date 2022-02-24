@@ -25,9 +25,8 @@ $(function() {
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
 
     $('.btn-copy-to-clipboard').click(function(){
-        // var text = $('.metadata-identifier').val();
         textToClipboard($('.metadata-identifier').text());
-        alert('Copied to clipboard: ' + $('.metadata-identifier').text());
+        Yoda.set_message('success', 'DAG permalink identifier has been copied to the clipboard');
     });
 
     mymap = L.map('map1').fitBounds([[51.505, -0.09],[51.505, -0.09]], {'maxZoom': 5});
