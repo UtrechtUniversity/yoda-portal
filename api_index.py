@@ -47,6 +47,39 @@ def _query():
     return response
 
 
+@api_index_bp.route('/metadata', methods=['POST'])
+def _metadata():
+    data = json.loads(request.form['data'])
+    uuid = data['uuid']
+
+    # Query data package on UUID.
+    res = query('DataPackage', uuid, size=1)
+    code = 200
+
+    if res['status'] != 'ok':
+        code = 400
+
+    # Transform search result into data package metadata.
+    metadata = {}
+    if res['total_matches'] == 1:
+        data_package = res['matches'][0]
+
+        for attribute in data_package['attributes']:
+            name = attribute['name']
+            value = attribute['value']
+            if name in ['Title', 'Description']:
+                metadata[name] = value
+            elif name == 'DataAccessRestriction':
+                metadata['Data_Access_Restriction'] = value
+    else:
+        code = 400
+
+    response = jsonify({"metadata": metadata})
+    response.status_code = code
+
+    return response
+
+
 def query(name, value, start=0, size=500, sort=None, reverse=False):
     client = OpenSearch(
         hosts=[{
