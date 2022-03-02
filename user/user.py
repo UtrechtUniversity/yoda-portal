@@ -310,11 +310,14 @@ def callback():
 
 
 def should_redirect_to_oidc(username):
-    domains = app.config.get('OIDC_DOMAINS')
-    if app.config.get('OIDC_ENABLED') and username.endswith(tuple(domains)):
-        return True
-    else:
-        return False
+    """Check if user should be redirected to OIDC based on domain."""
+    if '@' in username:
+        domains = app.config.get('OIDC_DOMAINS')
+        user_domain = username.split('@')[1]
+        if app.config.get('OIDC_ENABLED') and user_domain in domains:
+            return True
+
+    return False
 
 
 def oidc_authorize_url(username):
