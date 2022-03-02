@@ -59,6 +59,7 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
     query = {
         'from': start,
         'size': size,
+        'track_total_hits': True,
         'query': {
             'nested': {
                 'path': 'metadataEntries',
@@ -128,6 +129,7 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
             'size': size
         },
         'matches': matches,
+        'total_matches': response['hits']['total']['value'],
         'status': 'ok'
     }
     if sort is not None:
