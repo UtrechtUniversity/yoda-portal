@@ -67,8 +67,8 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
                     'bool': {
                         'must': [
                             {
-                                'match': {
-                                    'metadataEntries.attribute': 'YodaIndex' + name
+                                'term': {
+                                    'metadataEntries.attribute.raw': 'YodaIndex' + name
                                 }
                             }, {
                                 'match': {
