@@ -174,3 +174,10 @@ def content_security_policy(response):
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'self'; form-action 'self'; object-src 'none'"  # noqa: E501
 
     return response
+
+
+@app.url_defaults
+def add_cache_buster(endpoint, values):
+    """Add cache buster to asset (static) URLs."""
+    if endpoint.endswith("static"):
+        values['q'] = app.config.get('YODA_COMMIT')
