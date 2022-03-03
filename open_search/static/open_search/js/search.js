@@ -86,7 +86,7 @@ function itemTemplate(data)
 
     let date = '';
     if ('CreationTime' in data) {
-        date = formatDate(data.CreationTime * 1000);
+        date = formatDate(data.Creation_Time * 1000);
     }
 
     let html = `
@@ -97,7 +97,7 @@ function itemTemplate(data)
                 ${access}
             </div>
             <h6 class="card-subtitle mb-2 text-muted">
-                <span>${data.Creator} (${data.OwnerRole})</span>
+                <span>${data.Creator} (${data.Owner_Role})</span>
                 <span class="float-end">${date}</span>
             </h6>
             <p class="card-text">
