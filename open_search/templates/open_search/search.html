@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Open Search{% endblock title %}
+
+{% block scripts %}
+<script src="{{ url_for('open_search_bp.static', filename='js/search.js') }}"></script>
+{% endblock scripts %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('open_search_bp.static', filename='lib/fontawesome-free-6.0.0/css/fontawesome.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('open_search_bp.static', filename='lib/fontawesome-free-6.0.0/css/all.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('open_search_bp.static', filename='css/search.css') }}">
+{% endblock style %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <div class="row">
+                <div class="search-2 input-group mb-3">
+                    <input id="search-filter" type="text" class="form-control input-text" placeholder="Search ...." value="{{ searchTerm|safe }}" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-warning btn-lg search-btn" type="button">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="search-results">
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

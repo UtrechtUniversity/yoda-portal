@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 from os import path
@@ -11,11 +11,13 @@ from flask_wtf.csrf import CSRFProtect
 from jinja2 import ChoiceLoader, FileSystemLoader
 
 from api import api_bp
+from api_index import api_index_bp
 from datarequest.datarequest import datarequest_bp
 from deposit.deposit import deposit_bp
 from general.general import general_bp
 from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
+from open_search.open_search import open_search_bp
 from research.research import research_bp
 from search.search import search_bp
 from stats.stats import stats_bp
@@ -87,7 +89,9 @@ with app.app_context():
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(vault_bp, url_prefix='/vault')
     app.register_blueprint(search_bp, url_prefix='/search')
+    app.register_blueprint(open_search_bp, url_prefix='/open_search')
     app.register_blueprint(api_bp, url_prefix='/api/')
+    app.register_blueprint(api_index_bp, url_prefix='/api_index/')
     if app.config.get('DEPOSIT_ENABLED'):
         app.register_blueprint(deposit_bp, url_prefix='/deposit')
     if app.config.get('INTAKE_ENABLED'):
@@ -164,9 +168,16 @@ def content_security_policy(response):
     """Add Content-Security-Policy headers."""
     if request.endpoint in ['research_bp.form', 'vault_bp.form', 'deposit_bp.metadata', 'vault_bp.metadata']:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: *.openstreetmap.org; frame-ancestors 'self'; form-action 'self'; object-src 'none'"  # noqa: E501
-    elif request.endpoint in ['user_bp.gate']:
+    elif request.endpoint in ['user_bp.gate', 'user_bp.login']:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'self'; form-action 'self' https:; object-src 'none'"  # noqa: E501
     else:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'self'; form-action 'self'; object-src 'none'"  # noqa: E501
 
     return response
+
+
+@app.url_defaults
+def add_cache_buster(endpoint, values):
+    """Add cache buster to asset (static) URLs."""
+    if endpoint.endswith("static"):
+        values['q'] = app.config.get('YODA_COMMIT')
