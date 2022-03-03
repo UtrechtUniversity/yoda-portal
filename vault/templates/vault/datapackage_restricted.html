@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; DAG Datapackage{% endblock title %}
+{% block title %}{{ super() }} &dash; RESTRICTED DAG Datapackage{% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/vault.css') }}">
@@ -17,7 +17,7 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
-<script src="{{ url_for('vault_bp.static', filename='js/datapackage.js') }}"></script>
+<script src="{{ url_for('vault_bp.static', filename='js/datapackage_restricted.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='lib/leaflet/leaflet.js') }}"></script>
 <script>
@@ -49,15 +49,14 @@
 
 <nav aria-label="breadcrumb flex-column">
     <ol class="breadcrumb"><li class="breadcrumb-item active">DAG Datapackage</li></ol>
-    <a class="btn btn-light pull-right mb-2" href="https://dag.sites.uu.nl/search/how-to-search/" target="_blank" title="Guidance"><i class="fa fa-info-circle"></i> Guidance</a>
+    <a class="btn btn-light pull-right mb-2" href="https://dag.sites.uu.nl/search/datapackage-request-access/" target="_blank" title="Guidance"><i class="fa fa-info-circle"></i> Request access</a>
 </nav>
 <section class="metadata-info container">
     <h5 class="metadata-creator mt-3"></h5>
     <h3 class="metadata-title"></h3>
     <span class="badge rounded-pill bg-success pull-right">
-        <i class="fa-solid fa-lock-open"></i> Open
+        <i class="fa-solid fa-lock-open"></i> RESTRICTED
     </span>
-    <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary pull-right btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
     <div class="row">
         <div class="col-lg-2">
             <strong>Description</strong>
@@ -79,30 +78,30 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row hidden">
         <div class="col-lg-2">
             <strong>Keywords</strong>
         </div>
         <div class="col-lg-10">
-            <span class="metadata-keywords"></span>
+            <span class="metadata" data-dp-attr="Tag"></span>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row hidden">
         <div class="col-lg-2">
             <strong>Research Group</strong>
         </div>
         <div class="col-lg-10">
-            <span class="metadata-research-group"></span>
+            <span class="metadata" data-dp-attr="Research_Group"></span>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row hidden">
         <div class="col-lg-2">
             <strong>Project</strong>
         </div>
         <div class="col-lg-10">
-            <span class="metadata-project"></span>
+            <span class="metadata" data-dp-attr="Collection_Name"></span>
         </div>
     </div>
 
@@ -111,7 +110,7 @@
             <strong>Owners</strong>
         </div>
         <div class="col-lg-10">
-            <span class="metadata-owners"></span>
+            <span class="metadata" data-dp-attr="Creator"></span>
         </div>
     </div>
     <div class="row">
@@ -119,7 +118,7 @@
             <strong>Contact person</strong>
         </div>
         <div class="col-lg-10">
-            <span class="metadata-contact-person"></span>
+            <span class="metadata" data-dp-attr="Contributor"></span>
         </div>
     </div>
 
@@ -128,7 +127,7 @@
             <strong>Research period</strong>
         </div>
         <div class="col-lg-10">
-            <span class="metadata-research-period"></span>
+            <span class="metadata" data-dp-attr="research_period"></span>
         </div>
     </div>
 
@@ -137,7 +136,7 @@
             <strong>Geo Locations</strong>
         </div>
         <div class="col-lg-10">
-            <span class="metadata-geo-locations"></span>
+            <span class="metadata" data-dp-attr="GeoLocation"></span>
         </div>
     </div>
 
@@ -146,34 +145,34 @@
             <strong>References</strong>
         </div>
         <div class="col-lg-10">
-            <span class="metadata-references"></span>
+            <span class="metadata" data-dp-attr="Related_Datapackage"></span>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row hidden">
         <div class="col-lg-2">
             <strong>Personal data</strong>
         </div>
         <div class="col-lg-10">
-            <span class="metadata-personal-data"></span>
+            <span class="metadata" data-dp-attr="Data_Classification"></span>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row hidden">
         <div class="col-lg-2">
             <strong>Deposit date</strong>
         </div>
         <div class="col-lg-10">
-            <span class="metadata-deposit-date"></span>
+            <span class="metadata" data-dp-attr="Date_Deposit"></span>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row hidden">
         <div class="col-lg-2">
             <strong>Retention period</strong>
         </div>
         <div class="col-lg-10">
-            <span class="metadata-retention-period"></span>
+            <span class="metadata" data-dp-attr="End_Preservation"></span>
         </div>
     </div>
 </section>
