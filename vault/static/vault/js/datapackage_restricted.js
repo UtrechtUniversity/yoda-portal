@@ -19,16 +19,30 @@ var metadata; // Make it global so functions on different levels can access it w
 // mfunction contains specific presentation functions that are initiated from the template on the base of dp_attr (datapackage attribute) 
 var mfunction = {};
 
-mfunction['Tag'] = function(a){ return a.join(', ');}
-mfunction['End_Preservation'] = function(retention_period) {
-    let end_date = new Date(metadata['Date_Deposit']);
-    let ret_per = parseInt(retention_period);
-    // Determine end date by adding retention period to the deposit date
-    end_date.setFullYear(end_date.getFullYear() + ret_per);
-    return end_date.toJSON().substring(0,10) + ' (' + ret_per.toString() + ' years)';
+mfunction['Tag'] = function(a){ 
+    if (a) {
+        return a.join(', ');
+    }
+    return '';
 }
 
-mfunction['research_period'] = function(){ return metadata.Collected.Start_Date + ' - ' + metadata.Collected.End_Date;}
+mfunction['End_Preservation'] = function(retention_period) {
+    if (retention_period) {
+        let end_date = new Date(metadata['Date_Deposit']);
+        let ret_per = parseInt(retention_period);
+        // Determine end date by adding retention period to the deposit date
+        end_date.setFullYear(end_date.getFullYear() + ret_per);
+        return end_date.toJSON().substring(0,10) + ' (' + ret_per.toString() + ' years)';
+    }
+    return '';
+}
+
+mfunction['Collected'] = function(Collected){ 
+    if (Collected) {
+        return metadata.Collected.Start_Date + ' - ' + metadata.Collected.End_Date;
+    }
+    return '';
+}
 
 // Contact person is placed within Contributor in yoda-metadata.json. There's Only 1
 mfunction['Contributor'] = function(Contributor) {
@@ -58,7 +72,10 @@ mfunction['Related_Datapackage'] = function(Related_Datapackage) {
         row += '<td><a href="https://reference.com">' + Related_Datapackage[c].Persistent_Identifier.Identifier + '</a></td></tr>'
         references.push(row);
     }
-    return '<table>' + references.join('') + '</table>';
+    if (references.length) {
+        return '<table>' + references.join('') + '</table>';
+    }
+    return '';
 }
 
 mfunction['GeoLocation'] = function(GeoLocation) {
@@ -78,17 +95,22 @@ mfunction['GeoLocation'] = function(GeoLocation) {
 
         geolocations.push(row);
     }
-    return '<table>' + geolocations.join('') + '</table>';
+    if (geolocations.length) {
+        return '<table>' + geolocations.join('') + '</table>';
+    }
+    return '';
 }
 
 $(function() {
     // Extract current location from query string (default to '').
-    currentFolder = decodeURIComponent((/(?:\?|&)dir=([^&]*)/
-                                        .exec(window.location.search) || [0,''])[1]);
+    if (!dp_is_restricted) {
+        currentFolder = decodeURIComponent((/(?:\?|&)dir=([^&]*)/
+                                            .exec(window.location.search) || [0,''])[1]);
 
-    currentFolder = browseStartDir;
-    // Canonicalize path somewhat, for convenience.
-    currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
+        currentFolder = browseStartDir;
+        // Canonicalize path somewhat, for convenience.
+        currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
+    }
 
     $('.btn-copy-to-clipboard').click(function(){
         textToClipboard($('.metadata-identifier').text());
@@ -116,13 +138,45 @@ $(function() {
          }, 10);
     });
 
-    // First collect the information, then present it
-    metadataInfo(currentFolder);
+    if (dp_is_restricted) {
+        handleRestrictedMetadataInfo();
+    }
+    else {
+       // First collect the information, then present it
+        handleOpenMetadataInfo(currentFolder);
+    }
 });
 
+async function handleRestrictedMetadataInfo() {
+    /* Collect and present restricted datapackage metadata through the search api based upon a uuid of 1 single datapackage. */
+        let data = {};
+        data['uuid'] = dp_reference;
+        let formData = new FormData();
+        formData.append(Yoda.csrf.tokenName, Yoda.csrf.tokenValue);
+        formData.append('data', JSON.stringify(data));
 
-function metadataInfo(dir) {
-    /* Loads metadata of the vault packages */
+        try {
+            var r = await fetch('/api_index/metadata', {
+                'method':      'POST',
+                'body':        formData,
+                'credentials': 'same-origin',
+            });
+        } catch (error) {
+            // Network failure / abort.
+            console.error(`API Error: ${error}`);
+            return errorResult('Your request could not be completed due to a network connection issue.'
+                +' Please try again in a few minutes.');
+        }
+        var j = await r.json();
+        
+        metadata = j.metadata;
+
+        // Show the collected metadata
+        metadataShow();
+}
+
+function handleOpenMetadataInfo(dir) {
+    /* Collect and present OPEN datapackage metadata through the irods-api based upon a collection */
     let pathParts = dir.split('/');
 
     // Do not show metadata outside data package.
@@ -135,7 +189,7 @@ function metadataInfo(dir) {
     }
 
     try {
-        Yoda.call('meta_form_load',
+        Yoda.call('vault_get_landingpage_data',
             {coll: Yoda.basePath + dir},
             {rawResult: true})
         .then((result) => {
@@ -143,25 +197,11 @@ function metadataInfo(dir) {
                 return console.info('No result data from meta_form_load');
 
             metadata = result.data.metadata;
-            console.log('1')
-        });
-    }
-    catch (error) {
-        console.error(error);
-    }
-
-    try {
-        Yoda.call('vault_get_deposit_data',
-            {coll: Yoda.basePath + dir},
-            {rawResult: true})
-        .then((result) => {
-            if (!result || jQuery.isEmptyObject(result.data))
-                return console.info('No result data from vault_get_deposit_data');
-
+            console.log('1');
             let date_deposit = result.data.deposit_date;
             metadata['Date_Deposit'] = date_deposit;
-            console.log('2');
 
+            // Show the collected metadata
             metadataShow();
         });
     }
@@ -171,21 +211,19 @@ function metadataInfo(dir) {
 }
 
 function metadataShow() {
-    console.log('SHOW');
-    console.log(metadata);
+     /* Shows the collected metadata (either open or restricted) */
+//    let creators = [];
+//    for (let c in metadata.Creator){
+//                let fullname = "".concat(metadata.Creator[c].Name.Given_Name, " ", metadata.Creator[c].Name.Family_Name);
+//                fullname += ' (' + metadata.Creator[c].Owner_Role + ')'
+//                creators.push(fullname);
+//    }
+//    $('.metadata-creator').text(creators.join(', '));
 
-    let creators = [];
-    for (let c in metadata.Creator){
-                let fullname = "".concat(metadata.Creator[c].Name.Given_Name, " ", metadata.Creator[c].Name.Family_Name);
-                fullname += ' (' + metadata.Creator[c].Owner_Role + ')'
-                creators.push(fullname);
-    }
     $('.metadata-title').text(metadata['Title']);
-    $('.metadata-creator').text(creators.join(', '));
 
     let description = metadata['Description'];
     let wordCount = description.match(/(\w+)/g). length;
-    console.log(wordCount);
     if (wordCount < 50 ){
                 $(".metadata-description").text(description);
     } else {
@@ -209,23 +247,34 @@ function metadataShow() {
 
         let data = metadata[dp_attr];
         let func = mfunction[dp_attr];
+        let result = '';
 
         if (dp_attr == 'Related_Datapackage' || dp_attr == 'GeoLocation') {
-            $(this).html( func (data) );
+            result = func(data);
+            console.log(result);
+            if (result.length>0) {
+                $(this).html( func (data) );
+                $(this).closest('.row').removeClass('hidden');
+            }
         }
-        else if (data || func) {
+        else {
             if (func) {
-                if (data) {
-                    $(this).text( func( data ) );
-                }
-                else {
-                    $(this).text( func() );
-                }
+                result = func(data);
             }
             else {
-                $(this).text(data);
+                if (data) {
+                    result = data;
+                }
             }
-            $(this).closest('.row').removeClass('hidden');
+            console.log('result: ' + dp_attr);
+            console.log('result: ' + result);
+            console.log(result.length);
+
+            if (result.length>0) {
+                console.log('IN!: ' + dp_attr);
+                $(this).text(result);
+                $(this).closest('.row').removeClass('hidden');
+            }
         }
     });
 
