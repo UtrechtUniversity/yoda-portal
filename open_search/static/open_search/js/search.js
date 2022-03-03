@@ -71,7 +71,7 @@ function load(loading = true)
 function itemTemplate(data)
 {
     let access;
-    if(data.DataAccessRestriction.substring(0, 4) == 'Open') {
+    if(data.Data_Access_Restriction.substring(0, 4) == 'Open') {
         access = `
         <span class="badge rounded-pill bg-success">
             <i class="fa-solid fa-lock-open"></i> Open
