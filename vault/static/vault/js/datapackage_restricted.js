@@ -9,15 +9,14 @@ $(document).ajaxSend(function(e, request, settings) {
     }
 });
 
-let preservableFormatsLists = null;
+//let preservableFormatsLists = null;
 let currentFolder;
 var bounds = [[1,1][1,1]]
 var mymap = null;
 var maplayer = null;
 
-//var mdata = {};
-
 var metadata; // Make it global so functions on different levels can access it without having to pass it as a parameter entirely
+// mfunction contains specific presentation functions that are initiated from the template on the base of dp_attr (datapackage attribute) 
 var mfunction = {};
 
 mfunction['Tag'] = function(a){ return a.join(', ');}
@@ -26,9 +25,7 @@ mfunction['End_Preservation'] = function(retention_period) {
     let ret_per = parseInt(retention_period);
     // Determine end date by adding retention period to the deposit date
     end_date.setFullYear(end_date.getFullYear() + ret_per);
-    console.log(end_date.toJSON().substring(0,10));
     return end_date.toJSON().substring(0,10) + ' (' + ret_per.toString() + ' years)';
-    // return retention_period;
 }
 
 mfunction['research_period'] = function(){ return metadata.Collected.Start_Date + ' - ' + metadata.Collected.End_Date;}
@@ -147,7 +144,6 @@ function metadataInfo(dir) {
 
             metadata = result.data.metadata;
             console.log('1')
-            //console.log(metadata);
         });
     }
     catch (error) {
@@ -167,24 +163,11 @@ function metadataInfo(dir) {
             console.log('2');
 
             metadataShow();
-
-            //console.log(metadata);
-
-            // $('.metadata-info').show();
-            //let end_date = new Date(date_deposit);
-            // let retention_period = parseInt($('.metadata-retention-period').text());
-            // end_date.setFullYear(end_date.getFullYear() + retention_period);
-
-            // end_date.setFullYear(end_date.getFullYear() + retention_period);
-           
         });
     }
     catch (error) {
         console.error(error);
     }
-    // console.log('THIS IS IT');
-    // console.log(metadata);
-
 }
 
 function metadataShow() {
