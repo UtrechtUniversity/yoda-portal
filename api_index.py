@@ -101,7 +101,11 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
                         'must': [
                             {
                                 'term': {
-                                    'metadataEntries.attribute.raw': 'YodaIndex' + name
+                                    'metadataEntries.attribute.raw': name
+                                }
+                            }, {
+                                'term': {
+                                    'metadataEntries.unit.raw': 'FlatIndex'
                                 }
                             }, {
                                 'match': {
@@ -128,7 +132,7 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
                         'path': 'metadataEntries',
                         'filter': {
                             'term': {
-                                'metadataEntries.attribute.raw': 'YodaIndex' + sort
+                                'metadataEntries.attribute.raw': sort
                             }
                         }
                     }
@@ -146,10 +150,9 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
         }
         attributes = []
         for avu in src['metadataEntries']:
-            attribute = avu['attribute']
-            if attribute.startswith('YodaIndex'):
+            if avu['unit'] == 'FlatIndex':
                 attributes.append({
-                    'name': attribute[9:],
+                    'name': avu['attribute'],
                     'value': avu['value']
                 })
         match['attributes'] = attributes
