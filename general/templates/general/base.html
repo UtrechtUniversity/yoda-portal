@@ -36,9 +36,15 @@
                     <img class="logo" src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo">
                 </a>
                 {% if g.user %}
-                <form class="col-lg-4 mt-2 mb-lg-0 me-3" action="{{ url_for('search_bp.index') }}" method="get">
-                    <input type="search" name="q" class="search form-control" placeholder="Search..." aria-label="Search">
-                </form>
+                    {% if config.get('OPEN_SEARCH_ENABLED') %}
+                    <form class="col-lg-4 mt-2 mb-lg-0 me-3" action="{{ url_for('open_search_bp.index') }}" method="get">
+                        <input type="search" name="q" class="search form-control" placeholder="Search..." aria-label="Search">
+                    </form>
+                    {% else %}
+                    <form class="col-lg-4 mt-2 mb-lg-0 me-3" action="{{ url_for('search_bp.index') }}" method="get">
+                        <input type="search" name="q" class="search form-control" placeholder="Search..." aria-label="Search">
+                    </form>
+                    {% endif %}
                 {% endif %}
                 <div class="mt-2 text-end">
                     {% if g.user %}
