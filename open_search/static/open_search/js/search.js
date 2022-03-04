@@ -85,7 +85,7 @@ function itemTemplate(data)
     let description = truncate(data.Description, 265, '...');
 
     let date = '';
-    if ('CreationTime' in data) {
+    if ('Creation_Time' in data) {
         date = formatDate(data.Creation_Time * 1000);
     }
 
