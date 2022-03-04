@@ -4,6 +4,7 @@ __copyright__ = 'Copyright (c) 2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
+from datetime import datetime
 
 import jsonavu
 from flask import Blueprint, jsonify, render_template, request
@@ -62,10 +63,7 @@ def _query():
 
 def query(name, value, start=0, size=500, sort=None, reverse=False):
     client = OpenSearch(
-        hosts=[{
-            'host': open_search_host,
-            'port': open_search_port
-        }],
+        hosts=[{'host': open_search_host, 'port': open_search_port}],
         http_compress=True
     )
 
@@ -158,11 +156,10 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
 def _metadata():
     data = json.loads(request.form['data'])
     uuid = data['uuid']
-
-    # Query data package on UUID.
-    res = metadata(uuid)
     code = 200
 
+    # Query data package metadata on UUID.
+    res = metadata(uuid)
     if res['status'] != 'ok':
         code = 400
 
@@ -172,7 +169,25 @@ def _metadata():
     else:
         code = 400
 
-    response = jsonify({"metadata": metadata_json})
+    # Query data package on UUID.
+    res = query('Data_Package_Reference', uuid, size=1)
+    if res['status'] != 'ok':
+        code = 400
+
+    # Transform search result into data package metadata.
+    deposit_date = ""
+    if res['total_matches'] == 1:
+        data_package = res['matches'][0]
+
+        for attribute in data_package['attributes']:
+            name = attribute['name']
+            value = attribute['value']
+            if name == 'Creation_Time':
+                deposit_date = datetime.utcfromtimestamp(value).strftime('%Y-%m-%d')
+    else:
+        code = 400
+
+    response = jsonify({"metadata": metadata_json, "deposit_date": deposit_date})
     response.status_code = code
 
     return response
@@ -180,10 +195,7 @@ def _metadata():
 
 def metadata(value):
     client = OpenSearch(
-        hosts=[{
-            'host': open_search_host,
-            'port': open_search_port
-        }],
+        hosts=[{'host': open_search_host, 'port': open_search_port}],
         http_compress=True
     )
 
