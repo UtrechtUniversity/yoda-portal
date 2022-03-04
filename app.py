@@ -88,10 +88,11 @@ with app.app_context():
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(vault_bp, url_prefix='/vault')
     app.register_blueprint(search_bp, url_prefix='/search')
-    app.register_blueprint(open_search_bp, url_prefix='/open_search')
     app.register_blueprint(api_bp, url_prefix='/api/')
     if app.config.get('DEPOSIT_ENABLED'):
         app.register_blueprint(deposit_bp, url_prefix='/deposit')
+    if app.config.get('OPEN_SEARCH_ENABLED'):
+        app.register_blueprint(open_search_bp, url_prefix='/open_search')
     if app.config.get('INTAKE_ENABLED'):
         app.register_blueprint(intake_bp, url_prefix='/intake')
     if app.config.get('DATAREQUEST_ENABLED'):
