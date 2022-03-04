@@ -183,7 +183,7 @@ def _metadata():
             name = attribute['name']
             value = attribute['value']
             if name == 'Creation_Time':
-                deposit_date = datetime.utcfromtimestamp(value).strftime('%Y-%m-%d')
+                deposit_date = datetime.utcfromtimestamp(int(value)).strftime('%Y-%m-%d')
     else:
         code = 400
 
