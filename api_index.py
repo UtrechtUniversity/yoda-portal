@@ -6,6 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 import json
 from traceback import print_exc
 
+import jsonavu
 from flask import Blueprint, g, jsonify, request
 from opensearchpy import OpenSearch
 
@@ -47,39 +48,6 @@ def _query():
     return response
 
 
-@api_index_bp.route('/metadata', methods=['POST'])
-def _metadata():
-    data = json.loads(request.form['data'])
-    uuid = data['uuid']
-
-    # Query data package on UUID.
-    res = query('DataPackage', uuid, size=1)
-    code = 200
-
-    if res['status'] != 'ok':
-        code = 400
-
-    # Transform search result into data package metadata.
-    metadata = {}
-    if res['total_matches'] == 1:
-        data_package = res['matches'][0]
-
-        for attribute in data_package['attributes']:
-            name = attribute['name']
-            value = attribute['value']
-            if name in ['Title', 'Description']:
-                metadata[name] = value
-            elif name == 'DataAccessRestriction':
-                metadata['Data_Access_Restriction'] = value
-    else:
-        code = 400
-
-    response = jsonify({"metadata": metadata})
-    response.status_code = code
-
-    return response
-
-
 def query(name, value, start=0, size=500, sort=None, reverse=False):
     client = OpenSearch(
         hosts=[{
@@ -101,7 +69,11 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
                         'must': [
                             {
                                 'term': {
-                                    'metadataEntries.attribute.raw': 'YodaIndex' + name
+                                    'metadataEntries.attribute.raw': name
+                                }
+                            }, {
+                                'term': {
+                                    'metadataEntries.unit.raw': 'FlatIndex'
                                 }
                             }, {
                                 'match': {
@@ -128,7 +100,7 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
                         'path': 'metadataEntries',
                         'filter': {
                             'term': {
-                                'metadataEntries.attribute.raw': 'YodaIndex' + sort
+                                'metadataEntries.attribute.raw': sort
                             }
                         }
                     }
@@ -146,10 +118,9 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
         }
         attributes = []
         for avu in src['metadataEntries']:
-            attribute = avu['attribute']
-            if attribute.startswith('YodaIndex'):
+            if avu['unit'] == 'FlatIndex':
                 attributes.append({
-                    'name': attribute[9:],
+                    'name': avu['attribute'],
                     'value': avu['value']
                 })
         match['attributes'] = attributes
@@ -168,6 +139,92 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
     if sort is not None:
         result['query']['sort'] = sort
         result['query']['reverse'] = reverse
+    return result
+
+
+@api_index_bp.route('/metadata', methods=['POST'])
+def _metadata():
+    data = json.loads(request.form['data'])
+    uuid = data['uuid']
+
+    # Query data package on UUID.
+    res = metadata(uuid)
+    code = 200
+
+    if res['status'] != 'ok':
+        code = 400
+
+    if res['total_matches'] == 1:
+        avus = res['matches'][0]
+        metadata_json = jsonavu.avu2json(avus['attributes'], 'usr')
+    else:
+        code = 400
+
+    response = jsonify({"metadata": metadata_json})
+    response.status_code = code
+
+    return response
+
+
+def metadata(value):
+    client = OpenSearch(
+        hosts=[{
+            'host': host,
+            'port': port
+        }],
+        http_compress=True
+    )
+
+    query = {
+        'from': 0,
+        'size': 1,
+        'track_total_hits': True,
+        'query': {
+            'nested': {
+                'path': 'metadataEntries',
+                'query': {
+                    'bool': {
+                        'must': [
+                            {
+                                'term': {
+                                    'metadataEntries.attribute.raw': 'org_data_package_reference'
+                                }
+                            }, {
+                                'match': {
+                                    'metadataEntries.value': value
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+
+    response = client.search(body=query, index='yoda')
+    matches = []
+    for hit in response['hits']['hits']:
+        attributes = []
+        match = {}
+        src = hit['_source']
+        for avu in src['metadataEntries']:
+            if avu['unit'].startswith('usr_'):
+                attributes.append({
+                    'a': avu['attribute'],
+                    'v': avu['value'],
+                    'u': avu['unit'],
+                })
+        match['attributes'] = attributes
+        matches.append(match)
+    result = {
+        'query': {
+            'value': value,
+        },
+        'matches': matches,
+        'total_matches': response['hits']['total']['value'],
+        'status': 'ok'
+    }
+
     return result
 
 

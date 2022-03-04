@@ -6,3 +6,4 @@ mod-wsgi==4.7.1
 pyjwt[crypto]==2.1.0
 requests==2.25.1
 opensearch-py==1.0.0
+irods-avu-json==2.2.0

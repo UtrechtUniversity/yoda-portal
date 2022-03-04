@@ -71,7 +71,7 @@ function load(loading = true)
 function itemTemplate(data)
 {
     let access;
-    if(data.DataAccessRestriction.substring(0, 4) == 'Open') {
+    if(data.Data_Access_Restriction.substring(0, 4) == 'Open') {
         access = `
         <span class="badge rounded-pill bg-success">
             <i class="fa-solid fa-lock-open"></i> Open
@@ -86,18 +86,18 @@ function itemTemplate(data)
 
     let date = '';
     if ('CreationTime' in data) {
-        date = formatDate(data.CreationTime * 1000);
+        date = formatDate(data.Creation_Time * 1000);
     }
 
     let html = `
     <div class="card mb-3">
         <div class="card-body">
             <div class="card-title">
-                <span class="title-text"><a href="/vault/yoda/${data.DataPackage}">${data.Title}</a></span>
+                <span class="title-text"><a href="/vault/yoda/${data.Data_Package_Reference}">${data.Title}</a></span>
                 ${access}
             </div>
             <h6 class="card-subtitle mb-2 text-muted">
-                <span>${data.Creator} (${data.OwnerRole})</span>
+                <span>${data.Creator} (${data.Owner_Role})</span>
                 <span class="float-end">${date}</span>
             </h6>
             <p class="card-text">
