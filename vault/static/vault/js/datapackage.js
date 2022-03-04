@@ -9,7 +9,6 @@ $(document).ajaxSend(function(e, request, settings) {
     }
 });
 
-//let preservableFormatsLists = null;
 let currentFolder;
 var bounds = [[1,1][1,1]]
 var mymap = null;
@@ -27,7 +26,7 @@ mfunction['Tag'] = function(a){
 }
 
 mfunction['End_Preservation'] = function(retention_period) {
-    if (retention_period) {
+    if (retention_period && metadata['Date_Deposit']) {
         let end_date = new Date(metadata['Date_Deposit']);
         let ret_per = parseInt(retention_period);
         // Determine end date by adding retention period to the deposit date
