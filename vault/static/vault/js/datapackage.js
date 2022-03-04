@@ -15,10 +15,10 @@ var mymap = null;
 var maplayer = null;
 
 var metadata; // Make it global so functions on different levels can access it without having to pass it as a parameter entirely
-// mfunction contains specific presentation functions that are initiated from the template on the base of dp_attr (datapackage attribute) 
+// mfunction contains specific presentation functions that are initiated from the template on the base of dp_attr (datapackage attribute)
 var mfunction = {};
 
-mfunction['Tag'] = function(a){ 
+mfunction['Tag'] = function(a){
     if (a) {
         return a.join(', ');
     }
@@ -36,7 +36,7 @@ mfunction['End_Preservation'] = function(retention_period) {
     return '';
 }
 
-mfunction['Collected'] = function(Collected){ 
+mfunction['Collected'] = function(Collected){
     if (Collected) {
         return metadata.Collected.Start_Date + ' - ' + metadata.Collected.End_Date;
     }
@@ -168,7 +168,7 @@ async function handleRestrictedMetadataInfo() {
                 +' Please try again in a few minutes.');
         }
         var j = await r.json();
-        
+
         metadata = j.metadata;
 
         // Show the collected metadata
@@ -197,7 +197,6 @@ function handleOpenMetadataInfo(dir) {
                 return console.info('No result data from meta_form_load');
 
             metadata = result.data.metadata;
-            console.log('1');
             let date_deposit = result.data.deposit_date;
             metadata['Date_Deposit'] = date_deposit;
 
@@ -243,7 +242,7 @@ function metadataShow() {
     }
 
     // Step through all rows each containing fields with class 'metadata'.
-    // Only present the row when there is data. Otherwise, keep the row hidden. 
+    // Only present the row when there is data. Otherwise, keep the row hidden.
     $('.metadata').each(function(){
         let dp_attr = $(this).data('dp-attr');
 
