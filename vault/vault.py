@@ -102,7 +102,7 @@ def metadata(reference):
         dir = response['data']
         dp_is_restricted = False
 
-    return render_template('vault/datapackage_restricted.html',
+    return render_template('vault/datapackage.html',
                            activeModule='vault',
                            dir=dir,
                            reference=reference,
