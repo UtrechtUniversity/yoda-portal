@@ -156,7 +156,7 @@ async function handleRestrictedMetadataInfo() {
         formData.append('data', JSON.stringify(data));
 
         try {
-            var r = await fetch('/api_index/metadata', {
+            var r = await fetch('/open_search/metadata', {
                 'method':      'POST',
                 'body':        formData,
                 'credentials': 'same-origin',
