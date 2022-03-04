@@ -103,6 +103,7 @@ mfunction['GeoLocation'] = function(GeoLocation) {
 
 $(function() {
     // Extract current location from query string (default to '').
+    // Only do this with an open package
     if (!dp_is_restricted) {
         currentFolder = decodeURIComponent((/(?:\?|&)dir=([^&]*)/
                                             .exec(window.location.search) || [0,''])[1]);
@@ -211,14 +212,15 @@ function handleOpenMetadataInfo(dir) {
 }
 
 function metadataShow() {
-     /* Shows the collected metadata (either open or restricted) */
-//    let creators = [];
-//    for (let c in metadata.Creator){
-//                let fullname = "".concat(metadata.Creator[c].Name.Given_Name, " ", metadata.Creator[c].Name.Family_Name);
-//                fullname += ' (' + metadata.Creator[c].Owner_Role + ')'
-//                creators.push(fullname);
-//    }
-//    $('.metadata-creator').text(creators.join(', '));
+    /* Shows the collected metadata (either open or restricted) */
+    // Creator, Title and Description are 3 fields that are always present.
+    let creators = [];
+    for (let c in metadata.Creator){
+                let fullname = "".concat(metadata.Creator[c].Name.Given_Name, " ", metadata.Creator[c].Name.Family_Name);
+                fullname += ' (' + metadata.Creator[c].Owner_Role + ')'
+                creators.push(fullname);
+    }
+    $('.metadata-creator').text(creators.join(', '));
 
     $('.metadata-title').text(metadata['Title']);
 
@@ -241,40 +243,31 @@ function metadataShow() {
         })
     }
 
+    // Step through all rows each containing fields with class 'metadata'.
+    // Only present the row when there is data. Otherwise, keep the row hidden. 
     $('.metadata').each(function(){
         let dp_attr = $(this).data('dp-attr');
-        console.log(dp_attr);
 
         let data = metadata[dp_attr];
         let func = mfunction[dp_attr];
         let result = '';
 
-        if (dp_attr == 'Related_Datapackage' || dp_attr == 'GeoLocation') {
+        if (func) {
             result = func(data);
-            console.log(result);
-            if (result.length>0) {
-                $(this).html( func (data) );
-                $(this).closest('.row').removeClass('hidden');
-            }
         }
-        else {
-            if (func) {
-                result = func(data);
+        else if (data) {
+            result = data;
+        }
+
+        if (result.length>0) {
+            if (result.startsWith('<table>')) {
+                $(this).html(result);
             }
             else {
-                if (data) {
-                    result = data;
-                }
-            }
-            console.log('result: ' + dp_attr);
-            console.log('result: ' + result);
-            console.log(result.length);
-
-            if (result.length>0) {
-                console.log('IN!: ' + dp_attr);
                 $(this).text(result);
-                $(this).closest('.row').removeClass('hidden');
             }
+            // Only show row when data is present
+            $(this).closest('.row').removeClass('hidden');
         }
     });
 

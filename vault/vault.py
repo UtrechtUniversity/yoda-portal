@@ -92,10 +92,10 @@ def metadata(reference):
     except ValueError:
         abort(404)
 
-    dir = '';
+    dir = ''
     # Find data package with provided reference.
     response = api.call('vault_get_package_by_reference',
-                            {"reference": reference})
+                        {"reference": reference})
 
     dp_is_restricted = True
     if response['status'] == 'ok':
@@ -104,7 +104,6 @@ def metadata(reference):
 
     return render_template('vault/datapackage_restricted.html',
                            activeModule='vault',
-                           # items=10,
                            dir=dir,
                            reference=reference,
                            dp_is_restricted=dp_is_restricted)
