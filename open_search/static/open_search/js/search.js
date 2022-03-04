@@ -143,7 +143,7 @@ OpenSearchApi.call = async function(data={}, options={}) {
             Promise.reject({'data': null, 'status': 'error_internal'});
 
         try {
-            var r = await fetch('/api_index/query', {
+            var r = await fetch('/open_search/query', {
                 'method':      'POST',
                 'body':        formData,
                 'credentials': 'same-origin',
