@@ -83,7 +83,7 @@ mfunction['GeoLocation'] = function(GeoLocation) {
         let loc = GeoLocation[c];
         let row = '<tr><td style="width:200px;">' + loc.Description_Spatial + '</td>';
 
-        row += '<td><button class="btn btn-outline-secondary show-map"';
+        row += '<td><button class="btn btn-outline-secondary btn-sm show-map"';
         row += ' data-lon0="' + loc.geoLocationBox.eastBoundLongitude.toString() + '"';
         row += ' data-lat0="' + loc.geoLocationBox.northBoundLatitude.toString() + '"';
         row += ' data-lon1="' + loc.geoLocationBox.westBoundLongitude.toString() + '"';
