@@ -153,7 +153,9 @@ def protect_pages():
                                                     'user_bp.login',
                                                     'user_bp.gate',
                                                     'user_bp.callback',
-                                                    'api_bp.call',
+                                                    'api_bp._call',
+                                                    'open_search_bp._query',
+                                                    'open_search_bp._metadata',
                                                     'static']:
         return
     elif g.get('user', None) is not None:
