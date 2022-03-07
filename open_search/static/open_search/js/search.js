@@ -2,47 +2,53 @@
 
 let OpenSearchApi = {};
 let currentSearchString;
-let currentFrom = 0;
-let currentSize = 3;
+let itemsPerPage = 3;
+let currentPage = 1;
 
 $(function() {
     if ($("#search-filter").val().length > 0) {
         let filter = $("#search-filter").val();
-        search(filter, currentFrom, currentSize);
+        search(filter, 1, itemsPerPage);
     }
 
     $("#search-filter").on('keyup', function (e) {
         if (e.key === 'Enter' || e.keyCode === 13) {
             let filter = $("#search-filter").val();
-            search(filter, currentFrom, currentSize);
+            search(filter, 1, itemsPerPage);
         }
     });
 
     $(".search-btn").click(function() {
         let filter = $("#search-filter").val();
-        search(filter, currentFrom, currentSize);
+        search(filter, 1, itemsPerPage);
+    });
+
+    $(".search-pagination .next, .search-pagination .previous").click(function() {
+        let page = $(this).attr('data-page');
+        search(currentSearchString, page, itemsPerPage);
     });
 });
 
 
-function search(term, from, size)
+function search(term, page, itemsPerPage)
 {
     load(true);
-    //changeUrlParam(term);
     currentSearchString = term;
+    currentPage = parseInt(page);
 
     OpenSearchApi.call(
         {
             name: 'Title',
             value: term,
-            from: from,
-            size: size
+            from: ((page -1) * itemsPerPage),
+            size: itemsPerPage
         },
         {'quiet': true, 'rawResult': true}
     ).then((data) => {
         let html = '';
+        let pagination = false;
         if (data.matches.length) {
-            html += '<p class="fs-6 fst-italic mb-2">' + data.matches.length + ' result(s)</p>'
+            html += '<p class="fs-6 fst-italic mb-2">' + data.total_matches + ' result(s)</p>'
             $(data.matches).each(function(index, element ) {
                 let attr = {};
                 $(element.attributes).each(function(index, attribute) {
@@ -50,21 +56,30 @@ function search(term, from, size)
                 });
                 html += itemTemplate(attr);
             });
+
+            pagination = true;
+            buildPagination(data.total_matches);
         } else {
             html = "<p>Your search '" + Yoda.escapeEntities(term) + "' did not match any data package.</p>";
+            pagination = false;
         }
 
         $('#search-results').html(html);
-        load(false);
+        load(false, pagination);
     });
 }
 
-function load(loading = true)
+function load(loading = true, pagination = true)
 {
     if (loading) {
         $('.search-btn').html('<i class="fa-solid fa-spinner fa-spin-pulse"></i>');
     } else {
         $('.search-btn').html('<i class="fa fa-search"></i>');
+        if (pagination) {
+            $('.search-pagination').removeClass('hide');
+        } else {
+            $('.search-pagination').addClass('hide');
+        }
     }
 }
 
@@ -128,6 +143,27 @@ function formatDate(timestamp) {
         day = '0' + day;
 
     return [year, month, day].join('-');
+}
+
+function buildPagination(totalItems)
+{
+    let totalPages = Math.ceil((totalItems / itemsPerPage));
+
+    // previous button
+    if (currentPage == 1) {
+        $('.search-pagination .previous').addClass('disabled');
+    } else {
+        $('.search-pagination .previous').attr('data-page', (currentPage - 1));
+        $('.search-pagination .previous').removeClass('disabled');
+    }
+
+    // next button
+    if (currentPage >= totalPages) {
+        $('.search-pagination .next').addClass('disabled');
+    } else {
+        $('.search-pagination .next').attr('data-page', (currentPage + 1));
+        $('.search-pagination .next').removeClass('disabled');
+    }
 }
 
 OpenSearchApi.call = async function(data={}, options={}) {
