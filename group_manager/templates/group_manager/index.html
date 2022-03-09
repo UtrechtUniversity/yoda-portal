@@ -26,7 +26,7 @@
 		<div class="card groups">
 			<div class="card-header">
 				Yoda groups
-				<div class="input-group-sm has-feedback pull-right hidden">
+				<div class="input-group-sm has-feedback float-end hidden">
 					<!-- TODO: Search groups. -->
 					<input class="form-control form-control-sm" id="group-list-search" type="text" placeholder="Search groups" />
 				</div>
@@ -57,10 +57,10 @@
                 {% endfor %}
 			</div>
 			<div class="card-footer">
-				<div class="input-group-sm pull-left">
+				<div class="input-group-sm float-start">
 					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.group_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-group-delete">Remove group</a>
 				</div>
-				<div class="input-group-sm pull-right">
+				<div class="input-group-sm float-end">
 					<a class="btn btn-sm btn-primary create-button disabled" data-bs-toggle="modal" data-bs-target="#modal-group-create">Add group</a>
 				</div>
 			</div>
@@ -125,7 +125,7 @@
 		</div>
 		<div class="card users">
 			<div class="card-header">Group members
-				<div class="input-group-sm has-feedback pull-right">
+				<div class="input-group-sm has-feedback float-end">
 					<input class="form-control form-control-sm mt-1" id="user-list-search" type="text" placeholder="Search members" />
 				</div>
 			</div>
@@ -151,7 +151,7 @@
 				</div>
 			</div>
 			<div class="card-footer">
-				<div class="input-group-sm pull-left">
+				<div class="input-group-sm float-start">
 					Change role:
                     <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Promote the selected member">&uarr;<i class="fa-solid fa-user-circle" aria-hidden="true"></i></a>
                     <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Demote the selected member">&darr;<i class="fa-solid fa-eye" aria-hidden="true"></i></a>
@@ -263,7 +263,7 @@
 				<p>Are you sure you want to remove <strong class="user"></strong> from group <strong class="group"></strong>?</p>
 			</div>
 			<div class="modal-footer">
-				<div class="input-group pull-left">
+				<div class="input-group float-start">
 					<div class="checkbox">
 						<label for="f-user-delete-no-confirm">
 							<input id="f-user-delete-no-confirm" type="checkbox" /> Don't ask again during this session.

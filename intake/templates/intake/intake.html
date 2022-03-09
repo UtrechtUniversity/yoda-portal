@@ -78,7 +78,7 @@
                 </div>
                 <div class="modal-body">
                     <span class="fa-solid fa-circle-info"></span>
-                    <div class="col-sm-10 pull-right">
+                    <div class="col-sm-10 float-end">
                         <span class="item"></span>
                     </div>
                 </div>
@@ -103,10 +103,10 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="progress_indicator" style="display:none;">
-                <h1 class="pull-right">
+                <h1 class="float-end">
                     Scanning process in progress...
                 </h1>
-                <img class="h1 pull-right" src="{{ url_for('intake_bp.static', filename='images/ajax-loader.gif') }}" style="height:30px;">
+                <img class="h1 float-end" src="{{ url_for('intake_bp.static', filename='images/ajax-loader.gif') }}" style="height:30px;">
             </div>
         </div>
     </div>
@@ -152,7 +152,7 @@
                         <table class="table table-striped hover" id="select-study-folder">
                             <tr data-study-folder-url="{{ url_for('intake_bp.index', studyID=study) }}">
                                 <td style="width:10px;">
-                                    <span class="fa-solid fa-folder-open pull-left"></span>
+                                    <span class="fa-solid fa-folder-open float-start"></span>
                                 </td>
                                 <td colspan="2">
                                     <strong>
@@ -171,7 +171,7 @@
                                     <td>
                                     </td>
                                     <td style="width:10px;">
-                                        <span class="fa-solid fa-folder-open pull-left"></span>
+                                        <span class="fa-solid fa-folder-open float-start"></span>
                                     </td>
                                     <td>
                                         <span>

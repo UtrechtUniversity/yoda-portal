@@ -19,10 +19,10 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header clearfix">
-                <h3 class="card-title pull-left">
+                <h3 class="card-title float-start">
                     Metadata form - {{ path | trim | safe }}
                 </h3>
-                <div class="input-group-sm has-feedback pull-right">
+                <div class="input-group-sm has-feedback float-end">
                     <a class="btn btn-secondary" href="/vault/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
                 </div>
             </div>
@@ -44,10 +44,10 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title pull-left">
+                <h5 class="card-title float-start">
                     Metadata form - {{ path | trim | safe }}
                 </h5>
-                <div class="input-group-sm has-feedback pull-right close-button">
+                <div class="input-group-sm has-feedback float-end close-button">
                     <a class="btn btn-light btn-sm" href="/vault/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
                 </div>
             </div>

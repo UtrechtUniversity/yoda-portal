@@ -21,10 +21,10 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header clearfix">
-                <h5 class="card-title pull-left">
+                <h5 class="card-title float-start">
                     Metadata form - {{ path | trim | safe }}
                 </h5>
-                <div class="input-group-sm has-feedback pull-right">
+                <div class="input-group-sm has-feedback float-end">
                     <a class="btn btn-secondary" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
                 </div>
             </div>
@@ -39,7 +39,7 @@
                 <ul class="error-fields"></ul>
                 <p>
                     When using the 'Delete all metadata' button beware that you will lose all data!
-                    <button type="button" class="btn btn-danger delete-all-metadata-btn pull-right">Delete all metadata</button>
+                    <button type="button" class="btn btn-danger delete-all-metadata-btn float-end">Delete all metadata</button>
                 </p>
             </div>
         </div>
@@ -50,18 +50,18 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header clearfix">
-                <h5 class="card-title pull-left">
+                <h5 class="card-title float-start">
                     Metadata form - {{ path | trim | safe }}
                 </h5>
-                <div class="input-group-sm has-feedback pull-right close-button hide">
+                <div class="input-group-sm has-feedback float-end close-button hide">
                     <a class="btn btn-secondary" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
                 </div>
             </div>
             <div class="card-body">
                 <div id="transformation-text"></div>
                 <div id="transformation-buttons" class="hide">
-                    <a class="transformation-reject btn btn-danger pull-right" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Postpone transformation</a>
-                    <button class="transformation-accept btn btn-success pull-right">Accept transformation</button>
+                    <a class="transformation-reject btn btn-danger float-end" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Postpone transformation</a>
+                    <button class="transformation-accept btn btn-success float-end">Accept transformation</button>
                 </div>
             </div>
         </div>
@@ -72,10 +72,10 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title pull-left">
+                <h5 class="card-title float-start">
                     Metadata form - {{ path | trim | replace(" ", "&nbsp;") | safe }}
                 </h5>
-                <div class="input-group-sm has-feedback pull-right close-button">
+                <div class="input-group-sm has-feedback float-end close-button">
                     <a class="btn btn-light btn-sm" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
                 </div>
             </div>
