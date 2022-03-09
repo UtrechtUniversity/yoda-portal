@@ -19,3 +19,7 @@
 .hide {
     display: none;
 }
+
+.page-items-label {
+    font-size: 14px;
+}
