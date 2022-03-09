@@ -6,7 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 import io
 from uuid import UUID
 
-from flask import abort, Blueprint, g, redirect, render_template, request, Response, stream_with_context, url_for
+from flask import abort, Blueprint, g, render_template, request, Response, stream_with_context
 
 import api
 
@@ -83,8 +83,8 @@ def access():
     return response
 
 
-@vault_bp.route('/yda/<reference>')
-def resolve(reference):
+@vault_bp.route('/yoda/<reference>')
+def metadata(reference):
     # Check if Data Package Reference is a valid UUID4.
     try:
         if UUID(reference).version != 4:
@@ -95,7 +95,13 @@ def resolve(reference):
     # Find data package with provided reference.
     response = api.call('vault_get_package_by_reference',
                         {"reference": reference})
-    if response['status'] == 'ok':
-        return redirect(url_for('vault_bp.index', dir=response['data']))
-    else:
-        abort(404)
+
+    dir = response['data']
+
+    # To be added - check whether permissions for data!
+    # Is the datapackage an 'Open' package?
+    return render_template('vault/metadata.html',
+                           activeModule='vault',
+                           items=10,
+                           dir=dir,
+                           yoda_id=reference)
