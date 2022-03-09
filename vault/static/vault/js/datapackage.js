@@ -225,7 +225,7 @@ function metadataShow() {
     let description = metadata['Description'];
     let wordCount = description.match(/(\w+)/g). length;
     if (wordCount < 50 ){
-                $(".metadata-description").text(description);
+        $(".metadata-description").text(description);
     } else {
         $(".metadata-description").text(truncate(description, 50));
         $('.read-more-button').show();
@@ -239,6 +239,12 @@ function metadataShow() {
             $('.read-more-button').show();
             $('.read-less-button').hide();
         })
+    }
+
+    if (metadata['Data_Access_Restriction'] == "Open - freely retrievable") {
+        $(".metadata-access").html('<span class="badge rounded-pill bg-success me-2 mt-1 float-end"><i class="fa-solid fa-lock-open"></i> Open</span>');
+    } else {
+        $(".metadata-access").html('<span class="badge rounded-pill bg-warning me-2 mt-1 float-end"><i class="fa-solid fa-lock"></i> Restricted</span>');
     }
 
     // Step through all rows each containing fields with class 'metadata'.

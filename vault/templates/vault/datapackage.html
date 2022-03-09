@@ -67,15 +67,7 @@
             <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary float-end btn-sm btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
             {% endif %}
 
-            {% if dp_is_restricted %}
-            <span class="badge rounded-pill bg-warning me-2 mt-1 float-end">
-            <i class="fa-solid fa-lock"></i> restricted
-            </span>
-            {% else %}
-            <span class="badge rounded-pill bg-success me-2 mt-1 float-end">
-            <i class="fa-solid fa-lock-open"></i> Open
-            </span>
-            {% endif %}
+            <span class="metadata-access"></span>
         </div>
     </div>
 
@@ -213,8 +205,5 @@
         </tr>
         </thead>
     </table>
-
 </div>
-
-
 {% endblock content %}
