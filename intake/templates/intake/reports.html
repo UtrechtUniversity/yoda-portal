@@ -4,7 +4,6 @@
 
 {% block style %}
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/intake.css') }}">
-    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
 {% endblock style %}
 
 {% block scripts %}
@@ -24,7 +23,7 @@
                     <br>
                     Please click <a href="{{ url_for('intake_bp.index') }}">here</a> to go to an area that is accessible for you.
                     <div class="btn-group">
-                        <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info btn-goto-intake"><span class="fa fa-chevron-right"></span> Intake</a>
+                        <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info btn-goto-intake"><span class="fa-solid fa-chevron-right"></span> Intake</a>
                     </div>
                 </div>
             </div>
@@ -36,7 +35,7 @@
     <div class="row page-header">
         <div class="col-sm-12">
             <h1>
-                <span class="fa fa-folder-open"></span>
+                <span class="fa-solid fa-folder-open"></span>
                 {{ title }}
             </h1>
         </div>
@@ -46,7 +45,7 @@
      <div class="col-sm-12">
         <div class="btn-group">
             <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
+                <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
             </button>
 
             <div class="dropdown-menu" style="width:300px;padding:5px;">
@@ -57,7 +56,7 @@
                     {% for study in studies %}
                         <tr data-study-url="{{ url_for('intake_bp.reports', studyID=study) }}">
                             <td >
-                                <span class="fa fa-graduation-cap"></span>
+                                <span class="fa-solid fa-graduation-cap"></span>
                             </td>
                             <td>
                                     <span>
@@ -66,7 +65,7 @@
                             </td>
                             <td style="width:10px;">
                                 {% if study==study_id %}
-                                    <span class="fa fa-check"></span>
+                                    <span class="fa-solid fa-check"></span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -76,11 +75,11 @@
         </div>
         <div class="btn-group">
             <a class="btn  btn-outline-secondary btn-export-data" href="{{ url_for('intake_bp.export', studyID=study_id) }}" target="_blank">
-                <span class="fa fa-download"></span> Export data</span>
+                <span class="fa-solid fa-download"></span> Export data
             </a>
         </div>
         <div class="btn-group">
-            <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info btn-goto-intake"><span class="fa fa-chevron-right"></span> Intake</a>
+            <a href="{{ url_for('intake_bp.index') }}" class="btn btn-info btn-goto-intake"><span class="fa-solid fa-chevron-right"></span> Intake</a>
         </div>
       </div>
     </div>

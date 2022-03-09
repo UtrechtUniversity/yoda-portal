@@ -171,7 +171,7 @@ async function clickFileForRevisionDetails(obj, dtTable) {
     hmltDetailView = '<div class="col-md-12"><div class="row">';
 
     if (collection_exists=='false')
-        htmlDetailView += '<i class="fa fa-exclamation-circle"></i> This collection no longer exists.';
+        htmlDetailView += '<i class="fa-solid fa-exclamation-circle"></i> This collection no longer exists.';
 
     htmlDetailView += '<table id="" class="table" ><thead><tr><th>Revision date</th><th>Owner</th><th>Size</th><th></th></tr></thead>';
     htmlDetailView += '<tbody>';
@@ -189,7 +189,7 @@ async function clickFileForRevisionDetails(obj, dtTable) {
             //'data-toggle="modal" data-target="#select-folder" ' +
             'data-orgfilename="' + rawurlencode(result.revisions[i].org_original_data_name) + '" ' +
             'data-objectid="' + result.revisions[i].data_id + '"' +
-            'data-path="' + rawurlencode(result.revisions[i].dezoned_coll_name) + '"><i class="fa fa-magic" aria-hidden="true"></i> Restore</button>';
+            'data-path="' + rawurlencode(result.revisions[i].dezoned_coll_name) + '"><i class="fa-solid fa-magic" aria-hidden="true"></i> Restore</button>';
         htmlDetailView += '</div></td>';
         htmlDetailView += '</tr>';
     }
@@ -357,9 +357,9 @@ const tableRenderer2 = {
     name: (name, _, row) => {
         let tgt = `${dlgCurrentFolder}/${name}`;
         if (row.type === 'coll')
-            return `<a class="coll dlg-browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
+            return `<a class="coll dlg-browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
         else
-            return `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
+            return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}`;
         },
         size: (size, _, row) => {
             if (row.type === 'coll') {

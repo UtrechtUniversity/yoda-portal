@@ -29,7 +29,7 @@
                 <li><a class="dropdown-item" data-type="revision">Search revision by name</a></li>
             </ul>
             <input type="text" class="form-control search-term" id="search-filter" placeholder="Search term..." value="{{ searchTerm|safe }}" maxlength="255">
-            <button class="btn btn-outline-secondary search-term" type="button" data-items-per-page="25"><i class="fa fa-search" aria-hidden="true"></i></button>
+            <button class="btn btn-outline-secondary search-term" type="button" data-items-per-page="25"><i class="fa-solid fa-search" aria-hidden="true"></i></button>
 
             <select name="status" class="form-control search-status hide">
                 <option disabled selected value>Select status...</option>
@@ -63,7 +63,7 @@
 
         <div class="revision-results">
             <p class="alert-card-main hide">
-                <i class="fa fa-check"></i> Your file was successfully restored!
+                <i class="fa-solid fa-check"></i> Your file was successfully restored!
             </p>
 
             <table id="file-browser" class="table yoda-table table-bordered" role="grid">
@@ -113,7 +113,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-primary" id="btn-restore"><i class="fa fa-magic" aria-hidden="true"></i> Restore</button>
+                <button class="btn btn-primary" id="btn-restore"><i class="fa-solid fa-magic" aria-hidden="true"></i> Restore</button>
             </div>
 
             <!--- CoverALL Second dialog for handling of duplicate situations -->

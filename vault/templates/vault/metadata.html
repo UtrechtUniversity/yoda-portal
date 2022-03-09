@@ -49,13 +49,13 @@
 
 <nav aria-label="breadcrumb flex-column">
     <ol class="breadcrumb"><li class="breadcrumb-item active">DAG Datapackage</li></ol>
-    <a class="btn btn-light pull-right mb-2" href="https://dag.sites.uu.nl/search/how-to-search/" target="_blank" title="Guidance"><i class="fa fa-info-circle"></i> Guidance</a>
+    <a class="btn btn-light pull-right mb-2" href="https://dag.sites.uu.nl/search/how-to-search/" target="_blank" title="Guidance"><i class="fa-solid fa-circle-info"></i> Guidance</a>
 </nav>
 <section class="metadata-info container">
     <h5 class="metadata-creator mt-3">
 
     <h3 class="metadata-title"></h3>
-    <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary pull-right btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
+    <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary pull-right btn-show-file-browser"><i class="fa-solid fa-folder-open"></i> Access data</a>
 
     <div class="row">
         <div class="col-lg-2">
@@ -74,7 +74,7 @@
         </div>
         <div class="col-lg-10">
             <span class="metadata-identifier">{{ url_for('vault_bp.metadata', _external=True, reference=yoda_id) }}</span>
-            <button class="btn btn-secondary btn-copy-to-clipboard"><i class="fa fa-copy"></i> Copy to clipboard</button>
+            <button class="btn btn-secondary btn-copy-to-clipboard"><i class="fa-solid fa-copy"></i> Copy to clipboard</button>
         </div>
     </div>
 

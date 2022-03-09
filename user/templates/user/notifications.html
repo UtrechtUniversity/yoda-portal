@@ -13,7 +13,7 @@
         </div>
         <div class="col-md-4">
             {% if notifications %}
-            <a href="#" id="notifications_dismiss_all" title="Mark all done" class="btn btn-primary pull-right mt-2">Mark all done <i class="fa fa-check" aria-hidden="true"></i></a>
+            <a href="#" id="notifications_dismiss_all" title="Mark all done" class="btn btn-primary pull-right mt-2">Mark all done <i class="fa-solid fa-check" aria-hidden="true"></i></a>
 
             <div class="dropdown show pull-right mt-2 me-2">
                 <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="sortMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -35,9 +35,9 @@
                 <p class="mb-1">{{ notification.message }}</p>
                 <small class="text-muted">{{ notification.datetime }}</small>
             </div>
-            {% if notification.actor %}<small class="pull-left me-2"><i class="fa fa-user" aria-hidden="true"></i> {{ notification.actor }}</small>{% endif %}
-            {% if notification.data_package %}<small class="pull-left"><i class="fa fa-archive" aria-hidden="true"></i> {{ notification.data_package }}</small>{% endif %}
-            <h5 class="dismiss-notification pull-right" data-id="{{ notification.timestamp }}" title="Done"><i class="fa fa-check" aria-hidden="true"></i></h5>
+            {% if notification.actor %}<small class="pull-left me-2"><i class="fa-solid fa-user" aria-hidden="true"></i> {{ notification.actor }}</small>{% endif %}
+            {% if notification.data_package %}<small class="pull-left"><i class="fa-solid fa-box-archive" aria-hidden="true"></i> {{ notification.data_package }}</small>{% endif %}
+            <h5 class="dismiss-notification pull-right" data-id="{{ notification.timestamp }}" title="Done"><i class="fa-solid fa-check" aria-hidden="true"></i></h5>
         </a>
         {% endfor %}
     </div>

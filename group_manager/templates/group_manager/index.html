@@ -35,13 +35,13 @@
                 {% for category, subcategories in group_hierarchy.items() %}
                 <div class="list-group-item category" id="category-{{ loop.index }}" data-name="{{ category }}">
                     <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-{{ loop.index }}" href="#category-{{ loop.index }}-ul">
-                        <i class="fa fa-caret-right triangle" aria-hidden="true"></i> {{ category }}
+                        <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> {{ category }}
                     </a>
                     <div class="list-group collapse category-ul" id="category-{{ loop.index }}-ul">
                     {% for subcategory, groups in subcategories.items() %}
                     <div class="list-group-item subcategory" data-name="{{ subcategory }}">
                         <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-{{ loop.index }}" href="#subcategory-{{ loop.index }}-ul">
-                                <i class="fa fa-caret-right triangle" aria-hidden="true"></i> {{ subcategory }}
+                                <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> {{ subcategory }}
                         </a>
                         <div class="list-group collapse subcategory-ul" id="subcategory-{{ loop.index }}-ul">
                         {% for group, properties in groups.items() %}
@@ -153,8 +153,8 @@
 			<div class="card-footer">
 				<div class="input-group-sm pull-left">
 					Change role:
-                    <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Promote the selected member">&uarr;<i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
-                    <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Demote the selected member">&darr;<i class="fa fa-eye" aria-hidden="true"></i></a>
+                    <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Promote the selected member">&uarr;<i class="fa-solid fa-user-circle" aria-hidden="true"></i></a>
+                    <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Demote the selected member">&darr;<i class="fa-solid fa-eye" aria-hidden="true"></i></a>
 					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group">Remove member</a>
 				</div>
 			</div>
