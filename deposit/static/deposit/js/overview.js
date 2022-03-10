@@ -202,8 +202,8 @@ const tableRenderer = {
     name: (name, _, row) => {
          let tgt = `${currentFolder}/${name}`;
          if (row.type === 'coll')
-              return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
-         else return `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
+              return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
+         else return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}`;
     },
     size: (size, _, row) => {
         if (row.type === 'coll') {
@@ -237,7 +237,7 @@ const tableRenderer = {
                 return '';
             }
 
-            actions.append(`<a href="#" class="deposit-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this deposit"><i class="fa fa-trash"></a>`);
+            actions.append(`<a href="#" class="deposit-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this deposit"><i class="fa-solid fa-trash"></a>`);
         }
 
         return actions[0].innerHTML;

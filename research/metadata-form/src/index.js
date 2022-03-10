@@ -219,19 +219,19 @@ class YodaButtons extends React.Component {
     }
 
     renderSaveButton() {
-        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary pull-left">Save</button>);
+        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary float-start">Save</button>);
     }
 
     renderDeleteButton() {
-        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn pull-right">Delete all metadata </button>);
+        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn float-end">Delete all metadata </button>);
     }
 
     renderCloneButton() {
-        return (<button onClick={this.props.cloneMetadata} type="button" className="btn btn-primary clone-metadata-btn pull-right">Clone from parent folder</button>);
+        return (<button onClick={this.props.cloneMetadata} type="button" className="btn btn-primary clone-metadata-btn float-end">Clone from parent folder</button>);
     }
 
     renderFormCompleteness() {
-        return (<div><span className="text-sm pull-left text-muted text-center ms-3 mt-1">Required for the vault:</span><div className="form-completeness progress pull-left ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
+        return (<div><span className="text-sm float-start text-muted text-center ms-3 mt-1">Required for the vault:</span><div className="form-completeness progress float-start ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
     }
 
     renderButtons() {
@@ -590,7 +590,7 @@ function ArrayFieldTemplate(props) {
                     {(!readonly && props.canAdd) && (
                         <p className={buttonClass}>
                             <button className="btn btn-outline-secondary btn-sm" onClick={props.onAddClick} type="button">
-                                <i className="fa fa-plus" aria-hidden="true"></i>
+                                <i className="fa-solid fa-plus" aria-hidden="true"></i>
                             </button>
                         </p>
                     )}
@@ -612,7 +612,7 @@ function ArrayFieldTemplate(props) {
                                                         el.index,
                                                         el.index - 1
                                                     )}>
-                                                <i className="fa fa-arrow-up" aria-hidden="true"></i>
+                                                <i className="fa-solid fa-arrow-up" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     )}
@@ -624,7 +624,7 @@ function ArrayFieldTemplate(props) {
                                                         el.index,
                                                         el.index + 1
                                                     )}>
-                                                <i className="fa fa-arrow-down" aria-hidden="true"></i>
+                                                <i className="fa-solid fa-arrow-down" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     )}
@@ -633,7 +633,7 @@ function ArrayFieldTemplate(props) {
                                         <div className="m-0 p-0">
                                             <button className="btn btn-light btn-sm"
                                                     onClick={el.onDropIndexClick(el.index)}>
-                                                <i className="fa fa-trash" aria-hidden="true"></i>
+                                                <i className="fa-solid fa-trash" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     )}

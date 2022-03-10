@@ -218,11 +218,11 @@ class YodaButtons extends React.Component {
     }
 
     renderBackButton() {
-        return (<button onClick={this.props.backButton} type="submit" className="btn btn-secondary pull-left">Deposit data</button>);
+        return (<button onClick={this.props.backButton} type="submit" className="btn btn-secondary float-start">Deposit data</button>);
     }
 
     renderSubmitButton() {
-        return (<button onClick={this.props.submitButton} type="submit" className="btn btn-primary pull-right">Submit data</button>);
+        return (<button onClick={this.props.submitButton} type="submit" className="btn btn-primary float-end">Submit data</button>);
     }
 
     renderDeleteButton() {
@@ -561,7 +561,7 @@ function ArrayFieldTemplate(props) {
                     {(!readonly && props.canAdd) && (
                         <p className={buttonClass}>
                             <button className="btn btn-outline-secondary btn-sm" onClick={props.onAddClick} type="button">
-                                <i className="fa fa-plus" aria-hidden="true"></i>
+                                <i className="fa-solid fa-plus" aria-hidden="true"></i>
                             </button>
                         </p>
                     )}
@@ -583,7 +583,7 @@ function ArrayFieldTemplate(props) {
                                                         el.index,
                                                         el.index - 1
                                                     )}>
-                                                <i className="fa fa-arrow-up" aria-hidden="true"></i>
+                                                <i className="fa-solid fa-arrow-up" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     )}
@@ -595,7 +595,7 @@ function ArrayFieldTemplate(props) {
                                                         el.index,
                                                         el.index + 1
                                                     )}>
-                                                <i className="fa fa-arrow-down" aria-hidden="true"></i>
+                                                <i className="fa-solid fa-arrow-down" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     )}
@@ -604,7 +604,7 @@ function ArrayFieldTemplate(props) {
                                         <div className="m-0 p-0">
                                             <button className="btn btn-light btn-sm"
                                                     onClick={el.onDropIndexClick(el.index)}>
-                                                <i className="fa fa-trash" aria-hidden="true"></i>
+                                                <i className="fa-solid fa-trash" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     )}
