@@ -27,15 +27,15 @@
         <h2>Document data</h2>
     </div>
     <div class="col-3">
-        <a class="btn btn-light pull-right" href="https://dag.sites.uu.nl/deposit/metadata/" target="_blank" title="Guidance"><i class="fa fa-info-circle"></i> Guidance</a>
+        <a class="btn btn-light float-end" href="https://dag.sites.uu.nl/deposit/metadata/" target="_blank" title="Guidance"><i class="fa-solid fa-info-circle"></i> Guidance</a>
     </div>
 </div>
 <div id="form-errors" class="row hide">
     <div class="col-md-12">
         <div class="card">
             <div class="card-header clearfix">
-                <h5 class="card-title pull-left">Metadata form has errors</h5>
-                <div class="input-group-sm has-feedback pull-right"><a class="btn btn-secondary" href="/deposit/metadata/" title="Close modal">Close</a></div>
+                <h5 class="card-title float-start">Metadata form has errors</h5>
+                <div class="input-group-sm has-feedback float-end"><a class="btn btn-secondary" href="/deposit/metadata/" title="Close modal">Close</a></div>
             </div>
             <div class="card-body">
                 <p>It is not possible to load this form as the yoda-metadata.json file is not in accordance with the form definition.</p>
@@ -43,7 +43,7 @@
                 <ul class="error-fields"></ul>
                 <p>
                     When using the 'Delete all metadata' button beware that you will lose all metadata!
-                    <button type="button" class="btn btn-small btn-danger delete-all-metadata-btn pull-right" title="Delete all metadata">Delete all metadata</button>
+                    <button type="button" class="btn btn-small btn-danger delete-all-metadata-btn float-end" title="Delete all metadata">Delete all metadata</button>
                 </p>
             </div>
         </div>
@@ -59,7 +59,7 @@
                 </div>
                 <div id="form"
                      data-path="{{ path | safe }}">
-                    <p>Loading metadata <i class="fa fa-spinner fa-spin fa-fw"></i></p>
+                    <p>Loading metadata <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
                 </div>
             </div>
         </div>
