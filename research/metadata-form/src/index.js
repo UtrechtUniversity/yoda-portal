@@ -219,19 +219,19 @@ class YodaButtons extends React.Component {
     }
 
     renderSaveButton() {
-        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary pull-left">Save</button>);
+        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary float-start">Save</button>);
     }
 
     renderDeleteButton() {
-        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn pull-right">Delete all metadata </button>);
+        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn float-end">Delete all metadata </button>);
     }
 
     renderCloneButton() {
-        return (<button onClick={this.props.cloneMetadata} type="button" className="btn btn-primary clone-metadata-btn pull-right">Clone from parent folder</button>);
+        return (<button onClick={this.props.cloneMetadata} type="button" className="btn btn-primary clone-metadata-btn float-end">Clone from parent folder</button>);
     }
 
     renderFormCompleteness() {
-        return (<div><span className="text-sm pull-left text-muted text-center ms-3 mt-1">Required for the vault:</span><div className="form-completeness progress pull-left ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
+        return (<div><span className="text-sm float-start text-muted text-center ms-3 mt-1">Required for the vault:</span><div className="form-completeness progress float-start ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
     }
 
     renderButtons() {

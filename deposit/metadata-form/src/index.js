@@ -218,11 +218,11 @@ class YodaButtons extends React.Component {
     }
 
     renderBackButton() {
-        return (<button onClick={this.props.backButton} type="submit" className="btn btn-secondary pull-left">Deposit data</button>);
+        return (<button onClick={this.props.backButton} type="submit" className="btn btn-secondary float-start">Deposit data</button>);
     }
 
     renderSubmitButton() {
-        return (<button onClick={this.props.submitButton} type="submit" className="btn btn-primary pull-right">Submit data</button>);
+        return (<button onClick={this.props.submitButton} type="submit" className="btn btn-primary float-end">Submit data</button>);
     }
 
     renderDeleteButton() {
