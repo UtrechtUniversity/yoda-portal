@@ -67,9 +67,11 @@ mfunction['Related_Datapackage'] = function(Related_Datapackage) {
     let references = [];
     for (let c in Related_Datapackage){
         let ref = Related_Datapackage[c]
-        let row = '<tr><td style="width:300px;">' + ref.Title + '</td><td style="width:50px;">' + ref.Persistent_Identifier.Identifier_Scheme + ': </td>';
-        row += '<td><a href="https://reference.com">' + Related_Datapackage[c].Persistent_Identifier.Identifier + '</a></td></tr>'
-        references.push(row);
+        if (ref.Title !== undefined) {
+            let row = '<tr><td style="width:300px;">' + ref.Title + '</td><td style="width:50px;">' + ref.Persistent_Identifier.Identifier_Scheme + ': </td>';
+            row += '<td><a href="https://reference.com">' + Related_Datapackage[c].Persistent_Identifier.Identifier + '</a></td></tr>'
+            references.push(row);
+        }
     }
     if (references.length) {
         return '<table>' + references.join('') + '</table>';
