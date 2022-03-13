@@ -118,9 +118,9 @@ const resultsRenderer = {
         }
 
         if (row.type === 'coll') {
-            return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
+            return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
         } else {
-            return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa fa-file-o"></i> ${htmlEncode(name)}</a>`;
+            return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa-regular fa-file"></i> ${htmlEncode(name)}</a>`;
         }
     },
     size: (size, _, row) => {

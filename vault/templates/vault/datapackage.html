@@ -6,8 +6,6 @@
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/vault.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='lib/leaflet/leaflet.css') }}">
-<link rel="stylesheet" href="{{ url_for('open_search_bp.static', filename='lib/fontawesome-free-6.0.0/css/fontawesome.min.css') }}">
-<link rel="stylesheet" href="{{ url_for('open_search_bp.static', filename='lib/fontawesome-free-6.0.0/css/all.min.css') }}">
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/datapackage.css') }}">
 {% endblock style %}
 
@@ -67,15 +65,7 @@
             <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary float-end btn-sm btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
             {% endif %}
 
-            {% if dp_is_restricted %}
-            <span class="badge rounded-pill bg-warning me-2 mt-1 float-end">
-            <i class="fa-solid fa-lock"></i> restricted
-            </span>
-            {% else %}
-            <span class="badge rounded-pill bg-success me-2 mt-1 float-end">
-            <i class="fa-solid fa-lock-open"></i> Open
-            </span>
-            {% endif %}
+            <span class="metadata-access"></span>
         </div>
     </div>
 
@@ -213,8 +203,5 @@
         </tr>
         </thead>
     </table>
-
 </div>
-
-
 {% endblock content %}

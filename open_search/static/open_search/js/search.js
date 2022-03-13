@@ -2,83 +2,105 @@
 
 let OpenSearchApi = {};
 let currentSearchString;
-let itemsPerPage = 3;
+let itemsPerPage;
 let currentPage = 1;
+let sort;
+let sortOrder;
 
 $(function() {
+    itemsPerPage = $('#items-count').val();
+    sort = $('#sort').val();
+    sortOrder = $("select option:selected").attr('data-order');
+
     if ($("#search-filter").val().length > 0) {
         let filter = $("#search-filter").val();
-        search(filter, 1, itemsPerPage);
+        search(filter, 1, itemsPerPage, sort, sortOrder);
     }
 
     $("#search-filter").on('keyup', function (e) {
         if (e.key === 'Enter' || e.keyCode === 13) {
             let filter = $("#search-filter").val();
-            search(filter, 1, itemsPerPage);
+            search(filter, 1, itemsPerPage, sort, sortOrder);
         }
     });
 
     $(".search-btn").click(function() {
         let filter = $("#search-filter").val();
-        search(filter, 1, itemsPerPage);
+        search(filter, 1, itemsPerPage, sort, sortOrder);
     });
 
     $(".search-pagination .next, .search-pagination .previous").click(function() {
         let page = $(this).attr('data-page');
-        search(currentSearchString, page, itemsPerPage);
+        search(currentSearchString, page, itemsPerPage, sort, sortOrder);
+    });
+
+    $('#items-count').on('change', function() {
+        itemsPerPage = $(this).val();
+        search(currentSearchString, 1, itemsPerPage, sort, sortOrder);
+    });
+
+    $('#sort').on('change', function() {
+        sort = $(this).val();
+        sortOrder = $(this).find(":selected").attr('data-order');
+        search(currentSearchString, 1, itemsPerPage, sort, sortOrder);
     });
 });
 
 
-function search(term, page, itemsPerPage)
+function search(term, page, itemsPerPage, sort, sortOrder)
 {
     load(true);
     currentSearchString = term;
     currentPage = parseInt(page);
+
+    let reverse = false;
+    if (sortOrder == 'desc') {
+        reverse = true;
+    }
 
     OpenSearchApi.call(
         {
             name: 'Title',
             value: term,
             from: ((page -1) * itemsPerPage),
-            size: itemsPerPage
+            size: itemsPerPage,
+            sort: sort,
+            reverse: reverse
         },
         {'quiet': true, 'rawResult': true}
     ).then((data) => {
         let html = '';
-        let pagination = false;
-        if (data.matches.length) {
-            html += '<p class="fs-6 fst-italic mb-2">' + data.total_matches + ' result(s)</p>'
-            $(data.matches).each(function(index, element ) {
+        let results = data.total_matches;
+        if (results) {
+            $(data.matches).each(function(index, element) {
                 let attr = {};
                 $(element.attributes).each(function(index, attribute) {
                     attr[attribute.name] = attribute.value;
                 });
                 html += itemTemplate(attr);
             });
-
-            pagination = true;
-            buildPagination(data.total_matches);
         } else {
-            html = "<p>Your search '" + Yoda.escapeEntities(term) + "' did not match any data package.</p>";
-            pagination = false;
+            $('.no-results .search-term').text(term);
         }
-
+        buildPagination(results);
         $('#search-results').html(html);
-        load(false, pagination);
+        load(false, results);
     });
 }
 
-function load(loading = true, pagination = true)
+function load(loading = true, results = true)
 {
     if (loading) {
         $('.search-btn').html('<i class="fa-solid fa-spinner fa-spin-pulse"></i>');
     } else {
         $('.search-btn').html('<i class="fa fa-search"></i>');
-        if (pagination) {
-            $('.search-pagination').removeClass('hide');
+
+        if (results) {
+            $('.no-results').addClass('hide');
+            $('.content, .search-pagination').removeClass('hide');
         } else {
-            $('.search-pagination').addClass('hide');
+            $('.content, .search-pagination').addClass('hide');
+            $('.no-results').removeClass('hide');
         }
     }
 }
@@ -147,23 +169,27 @@ function formatDate(timestamp) {
 
 function buildPagination(totalItems)
 {
-    let totalPages = Math.ceil((totalItems / itemsPerPage));
+    if (totalItems) {
+        let totalPages = Math.ceil((totalItems / itemsPerPage));
 
-    // previous button
-    if (currentPage == 1) {
-        $('.search-pagination .previous').addClass('disabled');
-    } else {
-        $('.search-pagination .previous').attr('data-page', (currentPage - 1));
-        $('.search-pagination .previous').removeClass('disabled');
+        // previous button
+        if (currentPage == 1) {
+            $('.search-pagination .previous').addClass('disabled');
+        } else {
+            $('.search-pagination .previous').attr('data-page', (currentPage - 1));
+            $('.search-pagination .previous').removeClass('disabled');
+        }
+
+        // next button
+        if (currentPage >= totalPages) {
+            $('.search-pagination .next').addClass('disabled');
+        } else {
+            $('.search-pagination .next').attr('data-page', (currentPage + 1));
+            $('.search-pagination .next').removeClass('disabled');
+        }
     }
 
-    // next button
-    if (currentPage >= totalPages) {
-        $('.search-pagination .next').addClass('disabled');
-    } else {
-        $('.search-pagination .next').attr('data-page', (currentPage + 1));
-        $('.search-pagination .next').removeClass('disabled');
-    }
+    $('.paging-info').text(totalItems + ' result(s)');
 }
 
 OpenSearchApi.call = async function(data={}, options={}) {

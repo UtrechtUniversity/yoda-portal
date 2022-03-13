@@ -127,9 +127,9 @@ $( document ).ready(function() {
                 let name = $(this).attr('data-name');
                 let icon;
                 if (type == 'coll') {
-                    icon = '<i class="fa fa-folder-o"></i>';
+                    icon = '<i class="fa-regular fa-folder"></i>';
                 } else {
-                    icon = '<i class="fa fa-file-o"></i>';
+                    icon = '<i class="fa-regular fa-file"></i>';
                 }
 
                 let row = `<tr class="row-${index}">
@@ -194,7 +194,7 @@ $( document ).ready(function() {
 async function copyFile(filepath, newFilepath, multiple, multipleIndex = null)
 {
     if (multiple) {
-        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     } else {
         dlgSelectAlertHide();
     }
@@ -236,7 +236,7 @@ async function copyFile(filepath, newFilepath, multiple, multipleIndex = null)
 async function moveFile(filepath, newFilepath, multiple, multipleIndex = null)
 {
     if (multiple) {
-        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     } else {
         dlgSelectAlertHide();
     }
@@ -280,7 +280,7 @@ async function moveFile(filepath, newFilepath, multiple, multipleIndex = null)
 async function copyFolder(folderPath, newFolderpath, multiple, multipleIndex = null)
 {
     if (multiple) {
-        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     } else {
         dlgSelectAlertHide();
     }
@@ -322,7 +322,7 @@ async function copyFolder(folderPath, newFolderpath, multiple, multipleIndex = n
 async function moveFolder(folderPath, newFolderpath, multiple, multipleIndex = null)
 {
     if (multiple) {
-        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+        $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     } else {
         dlgSelectAlertHide();
     }
@@ -364,7 +364,7 @@ async function moveFolder(folderPath, newFolderpath, multiple, multipleIndex = n
 }
 async function deleteFolder(collection, folderName, multipleIndex = null)
 {
-    $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+    $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
 
     try {
         let result = await Yoda.call('research_folder_delete',
@@ -388,7 +388,7 @@ async function deleteFolder(collection, folderName, multipleIndex = null)
 
 async function deleteFile(collection, fileName, multipleIndex = null)
 {
-    $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+    $('.multi-select-table tr.row-'+multipleIndex+ ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
 
     try {
         let result = await Yoda.call('research_file_delete',
@@ -532,9 +532,9 @@ const tableRenderer2 = {
     name: (name, _, row) => {
         let tgt = `${dlgCurrentFolder}/${name}`;
         if (row.type === 'coll')
-            return `<a class="coll dlg-browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
+            return `<a class="coll dlg-browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
         else
-            return `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
+            return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}`;
     },
 //    size: (size, _, row) => {
 //        if (row.type === 'coll') {
