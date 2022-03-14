@@ -70,6 +70,10 @@ def call(fn, data=None):
         params={},
         output='ruleExecOut')
 
+    # Cleanup session for vault actions calling msiExecCmd.
+    if fn in ['vault_submit', 'vault_approve', 'vault_cancel', 'vault_depublish', 'vault_republish']:
+        g.irods.cleanup()
+
     x = x.execute(session_cleanup=False)
     x = bytesbuf_to_str(x._values['MsParam_PI'][0]._values['inOutStruct']._values['stdoutBuf'])
 
