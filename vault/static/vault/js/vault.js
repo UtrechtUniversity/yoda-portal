@@ -351,8 +351,8 @@ const tableRenderer = {
     name: (name, _, row) => {
          let tgt = `${currentFolder}/${name}`;
          if (row.type === 'coll')
-              return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
-         else return `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
+              return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
+         else return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}`;
     },
     size: (size, _, row) => {
         if (row.type === 'coll') {
@@ -390,11 +390,11 @@ const tableRenderer = {
         };
         let ext = row.name.replace(/.*\./, '').toLowerCase();
 
-        actions.append(`<a href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file"><i class="fa fa-download"></a>`);
+        actions.append(`<a href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file"><i class="fa-solid fa-download"></a>`);
 
         // Generate dropdown "view" actions for different media types.
         for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-            actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file"><i class="fa fa-eye"></a>`);
+            actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file"><i class="fa-solid fa-eye"></a>`);
         }
 
         return actions[0].innerHTML;
@@ -592,11 +592,11 @@ function topInformation(dir, showAlert) {
 
             // Provenance action log
             $('.actionlog').hide();
-            let actionLogIcon = ` <i class="fa fa-book actionlog-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
+            let actionLogIcon = ` <i class="fa-solid fa-book actionlog-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
 
             // System metadata.
             $('.system-metadata').hide();
-            let systemMetadataIcon = ` <i class="fa fa-info-circle system-metadata-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
+            let systemMetadataIcon = ` <i class="fa-solid fa-info-circle system-metadata-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
 
             $('.btn-group button.folder-status').attr('data-write', hasWriteRights);
 
@@ -678,7 +678,7 @@ function showMetadataForm(path)
 async function vaultSubmitForPublication(folder)
 {
     var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Submit for publication <i class="fa fa-spinner fa-spin fa-fw"></i>');
+    $('#statusBadge').html('Submit for publication <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     try {
@@ -694,7 +694,7 @@ async function vaultSubmitForPublication(folder)
 async function vaultApproveForPublication(folder)
 {
     var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Approve for publication <i class="fa fa-spinner fa-spin fa-fw"></i>');
+    $('#statusBadge').html('Approve for publication <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     try {
@@ -710,7 +710,7 @@ async function vaultApproveForPublication(folder)
 async function vaultCancelPublication(folder)
 {
     var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Cancel publication <i class="fa fa-spinner fa-spin fa-fw"></i>');
+    $('#statusBadge').html('Cancel publication <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     try {
@@ -726,7 +726,7 @@ async function vaultCancelPublication(folder)
 async function vaultDepublishPublication(folder)
 {
     var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Depublish publication <i class="fa fa-spinner fa-spin fa-fw"></i>');
+    $('#statusBadge').html('Depublish publication <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     try {
@@ -742,7 +742,7 @@ async function vaultDepublishPublication(folder)
 async function vaultRepublishPublication(folder)
 {
     var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Republish publication <i class="fa fa-spinner fa-spin fa-fw"></i>');
+    $('#statusBadge').html('Republish publication <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     try {

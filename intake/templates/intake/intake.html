@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/intake.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/treetable/jquery.treetable.css') }}">
     <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='css/treetable/jquery.treetable.theme.default.css') }}">
-    <link rel="stylesheet" href="{{ url_for('intake_bp.static', filename='lib/font-awesome/css/font-awesome.css') }}">
 {% endblock style %}
 
 {% block scripts %}
@@ -40,7 +39,7 @@
             <p>You have no access to the selected study. Please select another. </p>
             <div class="btn-group">
                 <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                    <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
+                    <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
                     Please select a study:
@@ -49,7 +48,7 @@
                         {% for study in studies %}
                             <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}">
                                 <td>
-                                    <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
                                 </td>
                                 <td>
                                     <span>
@@ -58,7 +57,7 @@
                                 </td>
                                 <td style="width:10px;">
                                     {% if study==study_id %}
-                                        <span class="fa fa-check"></span>
+                                        <span class="fa-solid fa-check"></span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -78,14 +77,14 @@
                     <h3 class="no-offset"></h3>
                 </div>
                 <div class="modal-body">
-                    <span class="glyphicon glyphicon-info-sign"></span>
-                    <div class="col-sm-10 pull-right">
+                    <span class="fa-solid fa-circle-info"></span>
+                    <div class="col-sm-10 float-end">
                         <span class="item"></span>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-                        <span class="glyphicon glyphicon-ok"></span> OK
+                        <span class="fa-solid fa-check"></span> OK
                     </button>
                 </div>
             </div>
@@ -95,7 +94,7 @@
     <div class="row page-header" style="margin-top:0px;">
         <div class="col-sm-12">
                 <h1>
-                    <i class="fa fa-folder-open" aria-hidden="true"></i>
+                    <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
                     {{ title }}
                 </h1>
                 <p>{{ full_path }}</p>
@@ -104,10 +103,10 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="progress_indicator" style="display:none;">
-                <h1 class="pull-right">
+                <h1 class="float-end">
                     Scanning process in progress...
                 </h1>
-                <img class="h1 pull-right" src="{{ url_for('intake_bp.static', filename='images/ajax-loader.gif') }}" style="height:30px;">
+                <img class="h1 float-end" src="{{ url_for('intake_bp.static', filename='images/ajax-loader.gif') }}" style="height:30px;">
             </div>
         </div>
     </div>
@@ -116,7 +115,7 @@
         <div class="col-sm-12">
             <div class="btn-group">
                 <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" id="dropdown-select-study">
-                    <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
+                    <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
                     Please select a study:
@@ -125,7 +124,7 @@
                         {% for study in studies %}
                             <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}" class="ta-{{ study }}">
                                 <td>
-                                    <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
                                 </td>
                                 <td>
                                     <span>
@@ -134,7 +133,7 @@
                                 </td>
                                 <td style="width:10px;">
                                     {% if study==study_id %}
-                                        <span class="fa fa-check"></span>
+                                        <span class="fa-solid fa-check"></span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -145,7 +144,7 @@
             {% if selectableScanFolders %}
                 <div class="btn-group">
                     <button class="btn  btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                        <i class="fa fa-folder-open" aria-hidden="true"></i> Change folder <span class="caret"></span>
+                        <i class="fa-solid fa-folder-open" aria-hidden="true"></i> Change folder <span class="caret"></span>
                     </button>
                     <div class="dropdown-menu" style="width:300px;padding:5px;">
                         Please select a folder:
@@ -153,7 +152,7 @@
                         <table class="table table-striped hover" id="select-study-folder">
                             <tr data-study-folder-url="{{ url_for('intake_bp.index', studyID=study) }}">
                                 <td style="width:10px;">
-                                    <span class="glyphicon glyphicon-folder-open pull-left"></span>
+                                    <span class="fa-solid fa-folder-open float-start"></span>
                                 </td>
                                 <td colspan="2">
                                     <strong>
@@ -162,7 +161,7 @@
                                 </td>
                                 <td style="width:10px;">
                                     {% if not study_folder %}
-                                        <span class="glyphicon glyphicon-ok"></span>
+                                        <span class="fa-solid fa-check"></span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -172,7 +171,7 @@
                                     <td>
                                     </td>
                                     <td style="width:10px;">
-                                        <span class="glyphicon glyphicon-folder-open pull-left"></span>
+                                        <span class="fa-solid fa-folder-open float-start"></span>
                                     </td>
                                     <td>
                                         <span>
@@ -181,7 +180,7 @@
                                     </td>
                                     <td style="width:10px;">
                                         {% if folder==study_folder %}
-                                            <span class="glyphicon glyphicon-ok"></span>
+                                            <span class="fa-solid fa-check"></span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -192,18 +191,18 @@
             {% endif %}
 
             <div class="btn-group">
-                <button class="btn btn-outline-secondary" id="btn-start-scan"><i class="fa fa-search-plus" aria-hidden="true"></i> Scan all files</button>
+                <button class="btn btn-outline-secondary" id="btn-start-scan"><i class="fa-solid fa-search-plus" aria-hidden="true"></i> Scan all files</button>
             </div>
 
             {% if permissions.manager %}
                 <div class="btn-group">
-                    <button class="btn btn-outline-secondary" id="btn-lock"><span class="glyphicon glyphicon-check"></span> Lock datasets</button>
+                    <button class="btn btn-outline-secondary" id="btn-lock"><span class="fa-solid fa-check"></span> Lock datasets</button>
                 </div>
                 <div class="btn-group">
-                        <button class="btn btn-outline-secondary" id="btn-unlock"><span class="glyphicon glyphicon-check"></span> Unlock datasets</button>
+                        <button class="btn btn-outline-secondary" id="btn-unlock"><span class="fa-solid fa-check"></span> Unlock datasets</button>
                 </div>
                 <div class="btn-group">
-                    <a href="reports" class="btn btn-info btn-goto-reports"><span class="glyphicon glyphicon-signal"></span> Reports</a>
+                    <a href="reports" class="btn btn-info btn-goto-reports"><span class="fa-solid fa-signal"></span> Reports</a>
                 </div>
             {% endif %}
 

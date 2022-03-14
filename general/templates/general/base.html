@@ -9,7 +9,8 @@
 
             <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 
-            <link rel="stylesheet" href="{{ url_for('static', filename='lib/font-awesome-4.7.0/css/font-awesome.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.0.0/css/fontawesome.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.0.0/css/all.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
             {% block style %}{% endblock style %}
 
@@ -44,7 +45,7 @@
                     {% if g.user %}
                         <div class="dropdown">
                             <button type="button" class="btn btn-primary dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ g.user }} {% if g.notifications %}<i class="fa fa-bell" aria-hidden="true"></i>{% endif %}
+                            {{ g.user }} {% if g.notifications %}<i class="fa-solid fa-bell" aria-hidden="true"></i>{% endif %}
                             </button>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="{{ url_for('user_bp.notifications') }}">

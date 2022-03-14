@@ -159,7 +159,7 @@ $(function() {
                     file.resume();
                     $self.find('.upload-pause').show();
                     $self.find('.upload-resume').hide();
-                    $self.find('.msg').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+                    $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
                 });
                 // Cancel btn
                 $self.find('.upload-cancel').on('click', function () {
@@ -539,8 +539,8 @@ const tableRenderer = {
     name: (name, _, row) => {
          let tgt = `${currentFolder}/${name}`;
          if (row.type === 'coll')
-              return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
-         else return `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
+              return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
+         else return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}`;
     },
     size: (size, _, row) => {
         if (row.type === 'coll') {
@@ -587,7 +587,7 @@ const tableRenderer = {
         }
         let dropdown = $(`<div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                              <i class="fa-solid fa-ellipsis-h" aria-hidden="true"></i>
                             </button>`);
         dropdown.append(actions);
 
@@ -650,7 +650,7 @@ function logUpload(id, file) {
                     </div>
                   </div>
                   <div class="col-md-3"><div class="progress"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>
-                  <div class="col-md-3 msg"><i class="fa fa-spinner fa-spin fa-fw"></i></div>
+                  <div class="col-md-3 msg"><i class="fa-solid fa-spinner fa-spin fa-fw"></i></div>
                </div>`;
     $('#files').append(log);
 }

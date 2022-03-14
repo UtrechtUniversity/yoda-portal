@@ -227,7 +227,7 @@ class Geolocation extends React.Component {
                     <label>NorthWest: {northBoundLatitude}, {westBoundLongitude}</label>
                     <br />
                     <label>SouthEast: {southBoundLatitude}, {eastBoundLongitude}</label>
-                    <button className='btn btn-outline-secondary pull-right' onClick={(e) => {this.openModal(e); }}>Open Map</button>
+                    <button className='btn btn-outline-secondary float-end' onClick={(e) => {this.openModal(e); }}>Open Map</button>
                 </div>
 
                 <Modal
@@ -270,7 +270,7 @@ class Geolocation extends React.Component {
                             <label>West:</label> <input type='text' className='geoInputCoords geoLng0 me-1' boxid={this.geoBoxID} disabled={this.props.readonly}></input>
                             <label>South:</label> <input type='text' className='geoInputCoords geoLat1' boxid={this.geoBoxID} disabled={this.props.readonly}></input>
                             <label>East:</label> <input type='text' className='geoInputCoords geoLng1 me-1' boxid={this.geoBoxID} disabled={this.props.readonly}></input>
-                            <button className='btn btn-outline-secondary pull-right' onClick={(e) => {this.closeModal(e); }}>Close</button>
+                            <button className='btn btn-outline-secondary float-end' onClick={(e) => {this.closeModal(e); }}>Close</button>
                         </div>
                     </div>
                     <div className='geoAlert' boxid={this.geoBoxID}></div>

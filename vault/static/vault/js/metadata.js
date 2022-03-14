@@ -193,8 +193,8 @@ const tableRenderer = {
     name: (name, _, row) => {
          let tgt = `${currentFolder}/${name}`;
          if (row.type === 'coll')
-              return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
-         else return `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
+              return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
+         else return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}`;
     },
     size: (size, _, row) => {
         if (row.type === 'coll') {
@@ -232,11 +232,11 @@ const tableRenderer = {
         };
         let ext = row.name.replace(/.*\./, '').toLowerCase();
 
-        actions.append(`<a href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file"><i class="fa fa-download"></a>`);
+        actions.append(`<a href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file"><i class="fa-solid fa-download"></a>`);
 
         // Generate dropdown "view" actions for different media types.
         for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-            actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file"><i class="fa fa-eye"></a>`);
+            actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file"><i class="fa-solid fa-eye"></a>`);
         }
 
         return actions[0].innerHTML;
@@ -424,7 +424,7 @@ function metadataInfo(dir) {
                 row += ' data-lon1="' + loc.geoLocationBox.westBoundLongitude.toString() + '"';
                 row += ' data-lat1="' + loc.geoLocationBox.southBoundLatitude.toString() + '"';
                 row += ' data-spatial="' + loc.Description_Spatial + '"';
-                row += '><i class="fa fa-map"></i> Show map</button></td>';
+                row += '><i class="fa-regular fa-map-location"></i> Show map</button></td>';
                 row += '</tr>'
 
                 geolocations.push(row);

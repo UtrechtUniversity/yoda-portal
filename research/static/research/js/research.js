@@ -164,7 +164,7 @@ $(function() {
                     file.resume();
                     $self.find('.upload-pause').show();
                     $self.find('.upload-resume').hide();
-                    $self.find('.msg').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+                    $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
                 });
                 // Cancel btn
                 $self.find('.upload-cancel').on('click', function () {
@@ -176,7 +176,7 @@ $(function() {
                     file.retry();
                     $self.find('.upload-pause').show();
                     $self.find('.upload-retry').hide();
-                    $self.find('.msg').html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+                    $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
                 });
             });
         }
@@ -652,8 +652,8 @@ const tableRenderer = {
     name: (name, _, row) => {
         let tgt = `${currentFolder}/${name}`;
         if (row.type === 'coll')
-            return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa fa-folder-o"></i> ${htmlEncode(name)}</a>`;
-        else return `<i class="fa fa-file-o"></i> ${htmlEncode(name)}`;
+            return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
+        else return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}`;
     },
     size: (size, _, row) => {
         if (row.type === 'coll') {
@@ -713,7 +713,7 @@ const tableRenderer = {
         }
         let dropdown = $(`<div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                              <i class="fa-solid fa-ellipsis-h" aria-hidden="true"></i>
                             </button>`);
         dropdown.append(actions);
 
@@ -960,16 +960,16 @@ function topInformation(dir, showAlert)
             $('.lock').hide();
             var lockIcon = '';
             if (lockCount != '0' && typeof lockCount != 'undefined') {
-                lockIcon = `<i class="fa fa-lock lock-icon" data-folder="${htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`;
+                lockIcon = `<i class="fa-solid fa-lock lock-icon" data-folder="${htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`;
             }
 
             // Provenance action log
             $('.actionlog').hide();
-            let actionLogIcon = ` <i class="fa fa-book actionlog-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
+            let actionLogIcon = ` <i class="fa-solid fa-book actionlog-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`;
 
             // System metadata.
             $('.system-metadata').hide();
-            let systemMetadataIcon = ` <i class="fa fa-info-circle system-metadata-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
+            let systemMetadataIcon = ` <i class="fa-solid fa-info-circle system-metadata-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`;
 
             $('.btn-group button.folder-status').attr('data-write', hasWriteRights);
 
@@ -995,7 +995,7 @@ function topInformation(dir, showAlert)
             // Reset action dropdown.
             $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
 
-            var icon = '<i class="fa fa-folder-open-o" aria-hidden="true"></i>';
+            var icon = '<i class="fa-regular fa-folder-open" aria-hidden="true"></i>';
             $('.top-information h2').html(`<span class="icon">${icon}</span> ${folderName}${lockIcon}${systemMetadataIcon}${actionLogIcon}${statusBadge}`);
 
             // Show top information and buttons.
@@ -1050,7 +1050,7 @@ async function lockFolder(folder)
 {
     // Get current button text
     var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Lock <i class="fa fa-spinner fa-spin fa-fw"></i>');
+    $('#statusBadge').html('Lock <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     // Change folder status call
@@ -1067,7 +1067,7 @@ async function unlockFolder(folder)
 {
     // Get current button text
     let btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Unlock <i class="fa fa-spinner fa-spin fa-fw"></i>');
+    $('#statusBadge').html('Unlock <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     try {
@@ -1089,7 +1089,7 @@ async function submitToVault(folder)
     if (typeof folder != 'undefined') {
         // Set spinner & disable button
         let btnText = $('#statusBadge').html();
-        $('#statusBadge').html('Submit <i class="fa fa-spinner fa-spin fa-fw"></i>');
+        $('#statusBadge').html('Submit <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
         $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
         try {
@@ -1111,7 +1111,7 @@ async function submitToVault(folder)
 async function unsubmitToVault(folder) {
     if (typeof folder != 'undefined') {
         var btnText = $('#statusBadge').html();
-        $('#statusBadge').html('Unsubmit <i class="fa fa-spinner fa-spin fa-fw"></i>');
+        $('#statusBadge').html('Unsubmit <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
         $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
         try {
@@ -1127,7 +1127,7 @@ async function unsubmitToVault(folder) {
 async function acceptFolder(folder)
 {
     var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Accept <i class="fa fa-spinner fa-spin fa-fw"></i>');
+    $('#statusBadge').html('Accept <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     try {
@@ -1142,7 +1142,7 @@ async function acceptFolder(folder)
 async function rejectFolder(folder)
 {
     var btnText = $('#statusBadge').html();
-    $('#statusBadge').html('Reject <i class="fa fa-spinner fa-spin fa-fw"></i>');
+    $('#statusBadge').html('Reject <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     try {
@@ -1175,7 +1175,7 @@ function logUpload(id, file) {
                     </div>
                   </div>
                   <div class="col-md-3"><div class="progress mt-1"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>
-                  <div class="col-md-3 msg"><i class="fa fa-spinner fa-spin fa-fw"></i></div>
+                  <div class="col-md-3 msg"><i class="fa-solid fa-spinner fa-spin fa-fw"></i></div>
                </div>`;
     $('#files').append(log);
 }
