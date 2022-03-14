@@ -192,6 +192,9 @@ def callback():
     class UserinfoSubMismatchError(Exception):
         pass
 
+    class UserinfoEmailMismatchError(Exception):
+        pass
+
     token_response = None
     userinfo_response = None
     exception_occurred = True  # To identify exception in finally-clause
@@ -220,11 +223,21 @@ def callback():
         userinfo_response = userinfo_request(access_token)
         userinfo_payload = userinfo_response.json()
 
+        # Check if payload subject matches with user info subject.
         if payload['sub'] != userinfo_payload['sub']:
             raise UserinfoSubMismatchError
 
+        # Check if login email matches with user info email.
         email_identifier = app.config.get('OIDC_EMAIL_FIELD')
-        email = userinfo_payload[email_identifier].lower()
+        email = g.login_username.lower()
+
+        userinfo_email = userinfo_payload[email_identifier]
+        if not isinstance(userinfo_email, list):
+            userinfo_email = [userinfo_email]
+        userinfo_email = [x.lower() for x in userinfo_email]
+
+        if email not in userinfo_email:
+            raise UserinfoEmailMismatchError
 
         # Add a prefix to consume in the PAM stack
         access_token = '++oidc_token++' + payload['sub'] + 'end_sub' + access_token
@@ -293,6 +306,16 @@ def callback():
             .format(
                 payload['sub'],
                 userinfo_response['sub']),
+            file=sys.stderr)
+
+    except UserinfoEmailMismatchError:
+        # Mismatch between email and user info email.
+        print_exc()
+        print(
+            'Mismatch between email and user info email: {} is not in {}'
+            .format(
+                email,
+                str(userinfo_email)),
             file=sys.stderr)
 
     finally:
