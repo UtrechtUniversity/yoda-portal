@@ -26,8 +26,8 @@ mfunction['Tag'] = function(a){
 }
 
 mfunction['End_Preservation'] = function(retention_period) {
-    if (retention_period && metadata['Date_Deposit']) {
-        let end_date = new Date(metadata['Date_Deposit']);
+    if (retention_period && metadata['deposit_date']) {
+        let end_date = new Date(metadata['deposit_date']);
         let ret_per = parseInt(retention_period);
         // Determine end date by adding retention period to the deposit date
         end_date.setFullYear(end_date.getFullYear() + ret_per);
@@ -172,6 +172,9 @@ async function handleRestrictedMetadataInfo() {
         var j = await r.json();
 
         metadata = j.metadata;
+        // bring separately delivered deposit_date into the metadata dict for ease of reference
+        metadata['deposit_date'] = j.deposit_date;
+
 
         // Show the collected metadata
         metadataShow();
@@ -199,8 +202,8 @@ function handleOpenMetadataInfo(dir) {
                 return console.info('No result data from meta_form_load');
 
             metadata = result.data.metadata;
-            let date_deposit = result.data.deposit_date;
-            metadata['Date_Deposit'] = date_deposit;
+            // bring separately delivered deposit_date into the metadata dict for ease of reference
+            metadata['deposit_date'] = result.data.deposit_date;
 
             // Show the collected metadata
             metadataShow();
