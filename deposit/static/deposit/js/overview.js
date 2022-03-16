@@ -194,12 +194,6 @@ let getFolderContents = (() => {
 const tableRenderer = {
     multiselect: (name, _, row) => {
         return '';
-//        let tgt = `${currentFolder}/${name}`;
-//        let checkbox = '';
-//        if (currentFolder) {
-//            checkbox = `<input class="form-check-input ms-1" type="checkbox" name="multiSelect[]" value="${htmlEncode(tgt)}" data-name="${htmlEncode(name)}" data-type="${row.type}">`;
-//        }
-//        return checkbox;
     },
     name: (name, _, row) => {
         let tgt = `${currentFolder}/${name}`;
