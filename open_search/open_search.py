@@ -152,6 +152,38 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
     return result
 
 
+@open_search_bp.route('/faceted_query', methods=['POST'])
+def _faceted_query():
+    data = json.loads(request.form['data'])
+    value = data['value']
+    facets = data['facets']
+    filters = data['filters']
+    if 'from' in data:
+        start = data['from']
+        size = data['size']
+    else:
+        start = 0
+        size = 500
+    if 'sort' in data:
+        sort = data['sort']
+    else:
+        sort = None
+    if 'reverse' in data:
+        reverse = data['reverse']
+    else:
+        reverse = False
+
+    res = faceted_query(value, facets, filters, start=start, size=size, sort=sort, reverse=reverse)
+    code = 200
+
+    if res['status'] != 'ok':
+        code = 400
+
+    response = jsonify(res)
+    response.status_code = code
+    return response
+
+
 def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=False):
     client = OpenSearch(
         hosts=[{'host': open_search_host, 'port': open_search_port}],
