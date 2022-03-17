@@ -152,6 +152,167 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
     return result
 
 
+def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=False):
+    client = OpenSearch(
+        hosts=[{'host': open_search_host, 'port': open_search_port}],
+        http_compress=True
+    )
+
+    searchQuery = {
+        'nested': {
+            'path': 'metadataEntries',
+            'query': {
+                'bool': {
+                    'must': [
+                        {
+                            'term': {
+                                'metadataEntries.unit.raw': 'FlatIndex'
+                            }
+                        }, {
+                            'match': {
+                                'metadataEntries.value': value
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+
+    if len(filters) is not 0:
+        queryList = [ searchQuery ]
+        for attribute, value in filters.items():
+            queryList.append({
+                'nested': {
+                    'path': 'metadataEntries',
+                    'query': {
+                        'bool': {
+                            'must': [
+                                {
+                                    'term': {
+                                        'metadataEntries.attribute.raw': attribute
+                                    }
+                                }, {
+                                    'term': {
+                                        'metadataEntries.unit.raw': 'FlatIndex'
+                                    }
+                                }, {
+                                    'term': {
+                                        'metadataEntries.value.raw': value
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            })
+        searchQuery = {
+            'bool': {
+                'must': queryList
+            }
+        }
+
+    query = {
+        'from': start,
+        'size': size,
+        'track_total_hits': True,
+        'query': searchQuery
+    }
+
+    if len(facets) is not 0:
+        facetList = {}
+        for facet in facets:
+            facetList[facet] = {
+                'filter': {
+                    'term': {
+                        'metadataEntries.attribute.raw' : facet
+                    }
+                },
+                'aggregations': {
+                    'value': {
+                        'terms': {
+                            'field': 'metadataEntries.value.raw'
+                        }
+                    }
+                }
+            }
+        query['aggregations'] = {
+            'metadataEntries': {
+                'nested': {
+                    'path': 'metadataEntries'
+                },
+                'aggregations': facetList
+            }
+        }
+
+    if sort is not None:
+        if reverse:
+            order = 'desc'
+        else:
+            order = 'asc'
+        query['sort'] = [
+            {
+                'metadataEntries.value.raw': {
+                    'order': order,
+                    'nested': {
+                        'path': 'metadataEntries',
+                        'filter': {
+                            'term': {
+                                'metadataEntries.attribute.raw': sort
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+
+    response = client.search(body=query, index='yoda')
+    matches = []
+    for hit in response['hits']['hits']:
+        src = hit['_source']
+        match = {
+            'fileName': src['fileName'],
+            'parentPath': src['parentPath']
+        }
+        attributes = []
+        for avu in src['metadataEntries']:
+            if avu['unit'] == 'FlatIndex':
+                attributes.append({
+                    'name': avu['attribute'],
+                    'value': avu['value']
+                })
+        match['attributes'] = attributes
+        matches.append(match)
+    aggregations = response['aggregations']['metadataEntries']
+    facetList = {}
+    for facet, buckets in aggregations.items():
+        if not isinstance(buckets, int):
+            bucketList = []
+            for bucket in buckets['value']['buckets']:
+                bucketList.append({
+                    'value': bucket['key'],
+                    'count': bucket['doc_count']
+                })
+            facetList[facet] = bucketList
+    result = {
+        'query': {
+            'value': value,
+            'facets': facets,
+            'filters': filters,
+            'from': start,
+            'size': size
+        },
+        'matches': matches,
+        'total_matches': response['hits']['total']['value'],
+        'facets': facetList,
+        'status': 'ok'
+    }
+    if sort is not None:
+        result['query']['sort'] = sort
+        result['query']['reverse'] = reverse
+    return result
+
+
 @open_search_bp.route('/metadata', methods=['POST'])
 def _metadata():
     data = json.loads(request.form['data'])
