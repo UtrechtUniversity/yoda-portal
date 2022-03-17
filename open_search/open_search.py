@@ -211,8 +211,8 @@ def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=
         }
     }
 
-    if len(filters) is not 0:
-        queryList = [ searchQuery ]
+    if len(filters) != 0:
+        queryList = [searchQuery]
         for attribute, value in filters.items():
             queryList.append({
                 'nested': {
@@ -251,13 +251,13 @@ def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=
         'query': searchQuery
     }
 
-    if len(facets) is not 0:
+    if len(facets) != 0:
         facetList = {}
         for facet in facets:
             facetList[facet] = {
                 'filter': {
                     'term': {
-                        'metadataEntries.attribute.raw' : facet
+                        'metadataEntries.attribute.raw': facet
                     }
                 },
                 'aggregations': {
