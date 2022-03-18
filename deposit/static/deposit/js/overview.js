@@ -200,6 +200,9 @@ const tableRenderer = {
         let tgt = `${currentFolder}/${name}`;
         return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}">${htmlEncode(row.deposit_title)}</a>`;
     },
+    access: (name, _, row) => {
+        return `${htmlEncode(row.deposit_access)}`;
+    },
     size: (deposit_size, _, row) => {
         let szs = ['B', 'kiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'];
         let szi = 0;
@@ -245,6 +248,7 @@ function startBrowsing(items)
         "dom": '<"top">frt<"bottom"lp><"clear">',
         'columns': [{render: tableRenderer.name, orderable: true, data: 'name'},
                     {render: tableRenderer.title, orderable: false, data: 'name'},
+                    {render: tableRenderer.access, orderable: false, data: 'name'},
                     // Size and date should be orderable, but limitations
                     // on how queries work prevent us from doing this
                     // correctly without significant overhead.
