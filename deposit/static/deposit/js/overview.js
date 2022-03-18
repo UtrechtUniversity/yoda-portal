@@ -192,15 +192,13 @@ let getFolderContents = (() => {
 
 // Functions for rendering table cells, per column.
 const tableRenderer = {
-    multiselect: (name, _, row) => {
-        return '';
-    },
     name: (name, _, row) => {
         let tgt = `${currentFolder}/${name}`;
-        return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(row.deposit_title)}</a>`;
+        return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
     },
-    count: (deposit_count, _, row) => {
-        return row.deposit_count.toString();
+    title: (name, _, row) => {
+        let tgt = `${currentFolder}/${name}`;
+        return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}">${htmlEncode(row.deposit_title)}</a>`;
     },
     size: (deposit_size, _, row) => {
         let szs = ['B', 'kiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'];
@@ -245,13 +243,12 @@ function startBrowsing(items)
             "lengthMenu": "_MENU_"
         },
         "dom": '<"top">frt<"bottom"lp><"clear">',
-        'columns': [{render: tableRenderer.multiselect, orderable: false, data: 'name'},
-                    {render: tableRenderer.name, orderable: true, data: 'name'},
+        'columns': [{render: tableRenderer.name, orderable: true, data: 'name'},
+                    {render: tableRenderer.title, orderable: false, data: 'name'},
                     // Size and date should be orderable, but limitations
                     // on how queries work prevent us from doing this
                     // correctly without significant overhead.
                     // (enabling this as is may result in duplicated results for data objects)
-                    {render: tableRenderer.count,   orderable: false, data: 'count'},
                     {render: tableRenderer.size,    orderable: false, data: 'size'},
                     {render: tableRenderer.date,    orderable: true, data: 'modify_time'},
                     {render: tableRenderer.context, orderable: false }],
