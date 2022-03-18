@@ -140,13 +140,13 @@ let getFolderContents = (() => {
         } else {
             // Nope, load new data via the API.
             let j = ++i;
-            let result = await Yoda.call('deposit_browse_collections',
+            let result = await Yoda.call('deposit_overview',
                                          {'coll':       Yoda.basePath + currentFolder,
                                           'offset':     args.start,
                                           'limit':      batchSize,
                                           'sort_order': args.order[0].dir,
                                           'sort_on':    ['name','size','modified'][args.order[0].column],
-                                          'space':      'Space.RESEARCH'});
+                                          'space':      'Space.DEPOSIT'});
 
             // If another requests has come while we were waiting, simply drop this one.
             if (i !== j) return null;
