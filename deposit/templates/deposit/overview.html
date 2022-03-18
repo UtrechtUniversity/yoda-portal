@@ -4,7 +4,7 @@
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
-<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/deposit.css') }}">
+<link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='css/overview.css') }}">
 {% endblock style %}
 
 {% block scripts %}
@@ -33,6 +33,7 @@
             <tr>
                 <th>Name</th>
                 <th>Title</th>
+                <th>Access</th>
                 <th>Size</th>
                 <th>Modified date</th>
                 <th></th>
