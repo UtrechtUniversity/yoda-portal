@@ -99,6 +99,14 @@ def login():
 
             log_error("iRODSException for login of user " + str(username), True)
             return render_template('user/login.html')
+
+        except Exception:
+            flash(
+                'An error occurred while connecting to iRODs. '
+                'If the issue persists, please contact the '
+                'system administrator',
+                'danger')
+            log_error("Unexpected exception for login of user " + str(username), True)
             return render_template('user/login.html')
 
         return redirect(original_destination())
@@ -306,6 +314,10 @@ def callback():
                 email,
                 str(userinfo_email)),
             True)
+
+    except Exception:
+        log_error("Unexpected exception during callback for username " + str(email),
+                  True)
 
     finally:
         if exception_occurred:
