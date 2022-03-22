@@ -68,8 +68,16 @@ mfunction['Related_Datapackage'] = function(Related_Datapackage) {
     for (let c in Related_Datapackage){
         let ref = Related_Datapackage[c]
         if (ref.Title !== undefined) {
-            let row = '<tr><td style="width:300px;">' + ref.Title + '</td><td style="width:50px;">' + ref.Persistent_Identifier.Identifier_Scheme + ': </td>';
-            row += '<td><a href="https://reference.com">' + Related_Datapackage[c].Persistent_Identifier.Identifier + '</a></td></tr>'
+            let scheme = ref.Persistent_Identifier.Identifier_Scheme;
+            let identifier = ref.Persistent_Identifier.Identifier;
+            let row = '<tr><td style="width:300px;">' + ref.Title + '</td><td style="width:50px;">' + scheme + ': </td>';
+            if (scheme == 'DOI') {
+                row += '<td><a href="https://doi.org/' + identifier + '">' + identifier + '</a></td></tr>';
+            } else if (scheme == 'Handle') {
+                row += '<td><a href="https://hdl.handle.net/' + identifier + '">' + identifier + '</a></td></tr>';
+            } else {
+                row += '<td>' + identifier + '</td></tr>';
+            }
             references.push(row);
         }
     }
