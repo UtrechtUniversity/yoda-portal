@@ -47,7 +47,7 @@ $(function() {
         accessIcons: {
             'reader':  'fa-eye',
             'normal':  'fa-user',
-            'manager': 'fa-user-circle-o',
+            'manager': 'fa-user-circle',
         },
 
         /// Human-readable descriptions of access levels.
@@ -390,7 +390,7 @@ $(function() {
                     if (nameAndZone[1] == that.zone)
                         displayName = nameAndZone[0];
 
-                    $user.html('<i class="fa '
+                    $user.html('<i class="fa-solid '
                                + that.accessIcons[user.access]
                                + '" aria-hidden="true" title="'
                                + that.accessNames[user.access]
@@ -489,13 +489,13 @@ $(function() {
                 var nextAccess = this.nextAccessLevel(selectedUser.access, selectedGroupName);
 
                 if (prevAccess) {
-                    $demoteButton.find('i').addClass('fa ' + this.accessIcons[prevAccess]);
+                    $demoteButton.find('i').addClass('fa-solid ' + this.accessIcons[prevAccess]);
                     $demoteButton.removeClass('disabled');
                     $demoteButton.attr('data-target-role', prevAccess);
                     demoteTitle += ' to ' + this.accessNames[prevAccess].toLowerCase();
                 }
                 if (nextAccess) {
-                    $promoteButton.find('i').addClass('fa ' + this.accessIcons[nextAccess]);
+                    $promoteButton.find('i').addClass('fa-solid ' + this.accessIcons[nextAccess]);
                     $promoteButton.removeClass('disabled');
                     $promoteButton.attr('data-target-role', nextAccess);
                     promoteTitle += ' to ' + this.accessNames[nextAccess].toLowerCase();
