@@ -10,7 +10,7 @@ $(document).ready(function() {
             (error) => {
                  Yoda.set_message(
                     'error',
-                    `An error occurred while creating the token, please try another label. If the issue persists, contact your administrator`);
+                    `An error occurred while deleting the data access password. If the issue persists, contact your administrator.`);
             });
     });
 
@@ -27,9 +27,18 @@ $(document).ready(function() {
                 p.removeAttribute("hidden");
             },
             (error) => {
-                let p = document.getElementById('passwordError');
+                let error_id = "passwordGenerateError";
+                if (error.status === "error_TokenExistsError") {
+                    error_id = "passwordLabelError";
+                }
+                let p = document.getElementById(error_id);
                 p.removeAttribute("hidden");
                 button.removeAttribute("hidden");
             });
+    });
+
+    var passwordModal = document.getElementById('dataAccessPassword');
+    passwordModal.addEventListener('hidden.bs.modal', function (event) {
+        window.location.reload();
     });
 });
