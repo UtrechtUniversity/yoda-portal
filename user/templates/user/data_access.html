@@ -75,8 +75,11 @@
                           disabled/>
                   </div>
               </div>
-              <div id="passwordError" class="alert alert-danger mt-3" role="alert" hidden>
-                  An error occurred while creating the token, please try another label. If the issue persists, contact your administrator
+              <div id="passwordGenerateError" class="alert alert-danger mt-3" role="alert" hidden>
+                  An error occurred while generating the data access password, please try another label. If the issue persists, contact your administrator.
+              </div>
+              <div id="passwordLabelError" class="alert alert-danger mt-3" role="alert" hidden>
+                  A data access password with this label already exists, please try another label.
               </div>
               <a id="generateButton" class="btn btn-primary mt-3">Generate data access password</a>
               <div id="passwordOk" class="alert alert-success mt-3" role="alert" hidden>
