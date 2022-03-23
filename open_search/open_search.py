@@ -155,7 +155,10 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
 @open_search_bp.route('/faceted_query', methods=['POST'])
 def _faceted_query():
     data = json.loads(request.form['data'])
-    value = data['value']
+    if 'value' in data:
+        value = data['value']
+    else:
+        value = None
     facets = data['facets']
     filters = data['filters']
     if 'from' in data:
@@ -190,26 +193,38 @@ def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=
         http_compress=True
     )
 
-    searchQuery = {
-        'nested': {
-            'path': 'metadataEntries',
-            'query': {
-                'bool': {
-                    'must': [
-                        {
-                            'term': {
-                                'metadataEntries.unit.raw': 'FlatIndex'
+    if value is not None:
+        searchQuery = {
+            'nested': {
+                'path': 'metadataEntries',
+                'query': {
+                    'bool': {
+                        'must': [
+                            {
+                                'term': {
+                                    'metadataEntries.unit.raw': 'FlatIndex'
+                                }
+                            }, {
+                                'match': {
+                                    'metadataEntries.value': value
+                                }
                             }
-                        }, {
-                            'match': {
-                                'metadataEntries.value': value
-                            }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
         }
-    }
+    else:
+        searchQuery = {
+            'nested': {
+                'path': 'metadataEntries',
+                'query': {
+                    'term': {
+                        'metadataEntries.unit.raw': 'FlatIndex'
+                    }
+                }
+            }
+        }
 
     if len(filters) != 0:
         queryList = [searchQuery]
@@ -328,7 +343,6 @@ def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=
             facetList[facet] = bucketList
     result = {
         'query': {
-            'value': value,
             'facets': facets,
             'filters': filters,
             'from': start,
@@ -339,6 +353,8 @@ def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=
         'facets': facetList,
         'status': 'ok'
     }
+    if value is not None:
+        result['query']['value'] = value
     if sort is not None:
         result['query']['sort'] = sort
         result['query']['reverse'] = reverse
