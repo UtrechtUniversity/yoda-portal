@@ -330,17 +330,18 @@ def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=
                 })
         match['attributes'] = attributes
         matches.append(match)
-    aggregations = response['aggregations']['metadataEntries']
     facetList = {}
-    for facet, buckets in aggregations.items():
-        if not isinstance(buckets, int):
-            bucketList = []
-            for bucket in buckets['value']['buckets']:
-                bucketList.append({
-                    'value': bucket['key'],
-                    'count': bucket['doc_count']
-                })
-            facetList[facet] = bucketList
+    if 'aggregations' in response:
+        aggregations = response['aggregations']['metadataEntries']
+        for facet, buckets in aggregations.items():
+            if not isinstance(buckets, int):
+                bucketList = []
+                for bucket in buckets['value']['buckets']:
+                    bucketList.append({
+                        'value': bucket['key'],
+                        'count': bucket['doc_count']
+                    })
+                facetList[facet] = bucketList
     result = {
         'query': {
             'facets': facets,
