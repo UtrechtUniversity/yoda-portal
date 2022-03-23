@@ -8,12 +8,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/preset-react": "^7.14.5",
     "@react-leaflet/core": "^1.0.2",
     "@rjsf/bootstrap-4": "^3.1.0",
     "@rjsf/core": "^3.1.0",
-    "@babel/core": "^7.15.5",
     "babel-loader": "^8.2.2",
-    "@babel/preset-react": "^7.14.5",
     "leaflet": "^1.6.0",
     "leaflet-draw": "^1.0.4",
     "react": "^16.13.0",
