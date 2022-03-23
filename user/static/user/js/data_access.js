@@ -39,6 +39,7 @@ $(document).ready(function() {
 
     var passwordModal = document.getElementById('dataAccessPassword');
     passwordModal.addEventListener('hidden.bs.modal', function (event) {
+        $(this).find('form').trigger('reset');
         window.location.reload();
     });
 });
