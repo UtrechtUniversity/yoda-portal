@@ -37,9 +37,22 @@ $(document).ready(function() {
             });
     });
 
+    $('.btn-copy-to-clipboard').click(function(){
+        textToClipboard($('#f-token').text());
+    });
+
     var passwordModal = document.getElementById('dataAccessPassword');
     passwordModal.addEventListener('hidden.bs.modal', function (event) {
         $(this).find('form').trigger('reset');
         window.location.reload();
     });
 });
+
+function textToClipboard (text) {
+    var dummy = document.createElement("textarea");
+    document.body.appendChild(dummy);
+    dummy.value = text;
+    dummy.select();
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
+}
