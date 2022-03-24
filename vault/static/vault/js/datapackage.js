@@ -70,7 +70,7 @@ mfunction['Related_Datapackage'] = function(Related_Datapackage) {
         if (ref.Title !== undefined) {
             let scheme = ref.Persistent_Identifier.Identifier_Scheme;
             let identifier = ref.Persistent_Identifier.Identifier;
-            let row = '<tr><td style="width:300px;">' + ref.Title + '</td><td style="width:50px;">' + scheme + ': </td>';
+            let row = '<tr><td style="width:300px;">' + ref.Title + '</td>';
             if (scheme == 'DOI') {
                 row += '<td><a href="https://doi.org/' + identifier + '">' + identifier + '</a></td></tr>';
             } else if (scheme == 'Handle') {
