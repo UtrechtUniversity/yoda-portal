@@ -37,8 +37,10 @@ $(document).ready(function() {
             });
     });
 
-    $('.btn-copy-to-clipboard').click(function(){
-        textToClipboard($('#f-token').text());
+    $('.btn-copy-to-clipboard').click(function(event){
+        $('#f-token').select();
+        document.execCommand("copy");
+        event.preventDefault();
     });
 
     var passwordModal = document.getElementById('dataAccessPassword');
@@ -47,12 +49,3 @@ $(document).ready(function() {
         window.location.reload();
     });
 });
-
-function textToClipboard (text) {
-    var dummy = document.createElement("textarea");
-    document.body.appendChild(dummy);
-    dummy.value = text;
-    dummy.select();
-    document.execCommand("copy");
-    document.body.removeChild(dummy);
-}
