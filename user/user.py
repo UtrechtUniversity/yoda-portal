@@ -25,9 +25,9 @@ user_bp = Blueprint('user_bp', __name__,
 @user_bp.route('/gate', methods=['GET', 'POST'])
 def gate():
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form.get('username', '').lower().strip()
 
-        if username is None:
+        if username == '':
             flash('Missing username', 'danger')
             return render_template('user/gate.html')
 
@@ -55,10 +55,10 @@ def gate():
 def login():
     if request.method == 'POST':
 
-        username = request.form['username']
+        username = request.form.get('username', '').lower().strip()
         password = request.form['password']
 
-        if username is None:
+        if username == '':
             flash('Missing username', 'danger')
             return render_template('user/login.html')
 
