@@ -160,6 +160,7 @@ def _faceted_query():
     else:
         value = None
     facets = data['facets']
+    ranges = data['ranges']
     filters = data['filters']
     if 'from' in data:
         start = data['from']
@@ -176,7 +177,7 @@ def _faceted_query():
     else:
         reverse = False
 
-    res = faceted_query(value, facets, filters, start=start, size=size, sort=sort, reverse=reverse)
+    res = faceted_query(value, facets, ranges, filters, start=start, size=size, sort=sort, reverse=reverse)
     code = 200
 
     if res['status'] != 'ok':
@@ -187,7 +188,7 @@ def _faceted_query():
     return response
 
 
-def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=False):
+def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, reverse=False):
     client = OpenSearch(
         hosts=[{'host': open_search_host, 'port': open_search_port}],
         http_compress=True
@@ -266,8 +267,8 @@ def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=
         'query': searchQuery
     }
 
+    facetList = {}
     if len(facets) != 0:
-        facetList = {}
         for facet in facets:
             facetList[facet] = {
                 'filter': {
@@ -283,6 +284,24 @@ def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=
                     }
                 }
             }
+    if len(ranges) != 0:
+        for facet, range in ranges.items():
+            facetList[facet] = {
+                'filter': {
+                    'term': {
+                        'metadataEntries.attribute.raw' : facet
+                    }
+                },
+                'aggregations': {
+                    'value': {
+                        'range': {
+                            'field': 'metadataEntries.value.number',
+                            'ranges': range
+                        }
+                    }
+                }
+            }
+    if len(facetList) != 0:
         query['aggregations'] = {
             'metadataEntries': {
                 'nested': {
@@ -337,10 +356,17 @@ def faceted_query(value, facets, filters, start=0, size=500, sort=None, reverse=
             if not isinstance(buckets, int):
                 bucketList = []
                 for bucket in buckets['value']['buckets']:
-                    bucketList.append({
-                        'value': bucket['key'],
-                        'count': bucket['doc_count']
-                    })
+                    if 'from' in bucket:
+                        bucketList.append({
+                            'from': int(bucket['from']),
+                            'to': int(bucket['to']),
+                            'count': bucket['doc_count']
+                        })
+                    else:
+                        bucketList.append({
+                            'value': bucket['key'],
+                            'count': bucket['doc_count']
+                        })
                 facetList[facet] = bucketList
     result = {
         'query': {
