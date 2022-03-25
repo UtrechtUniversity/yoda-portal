@@ -229,7 +229,26 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
 
     if len(filters) != 0:
         queryList = [searchQuery]
-        for attribute, value in filters.items():
+        for attribute, filter in filters.items():
+            if isinstance(filter, str):
+                should = [
+                    {
+                        'term': {
+                            'metadataEntries.value.raw': filter
+                        }
+                    }
+                ]
+            else:
+                should = []
+                for subrange in filter:
+                    should.append({
+                        'range': {
+                            'metadataEntries.value.number': {
+                                'gte': subrange['from'],
+                                'lte': subrange['to']
+                            }
+                        }
+                    })
             queryList.append({
                 'nested': {
                     'path': 'metadataEntries',
@@ -244,12 +263,10 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                                     'term': {
                                         'metadataEntries.unit.raw': 'FlatIndex'
                                     }
-                                }, {
-                                    'term': {
-                                        'metadataEntries.value.raw': value
-                                    }
                                 }
-                            ]
+                            ],
+                            'should': should,
+                            'minimum_should_match': 1
                         }
                     }
                 }
