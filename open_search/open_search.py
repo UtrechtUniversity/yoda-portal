@@ -286,17 +286,23 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
             }
     if len(ranges) != 0:
         for facet, range in ranges.items():
+            subranges = []
+            for subrange in range:
+                subranges.append({
+                    'from': subrange['from'],
+                    'to': subrange['to'] + 1
+                })
             facetList[facet] = {
                 'filter': {
                     'term': {
-                        'metadataEntries.attribute.raw' : facet
+                        'metadataEntries.attribute.raw': facet
                     }
                 },
                 'aggregations': {
                     'value': {
                         'range': {
                             'field': 'metadataEntries.value.number',
-                            'ranges': range
+                            'ranges': subranges
                         }
                     }
                 }
@@ -359,7 +365,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                     if 'from' in bucket:
                         bucketList.append({
                             'from': int(bucket['from']),
-                            'to': int(bucket['to']),
+                            'to': int(bucket['to']) - 1,
                             'count': bucket['doc_count']
                         })
                     else:
