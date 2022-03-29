@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; DAG Datapackage{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/vault.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='lib/leaflet/leaflet.css') }}">
+<link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/datapackage.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
+<script src="{{ url_for('vault_bp.static', filename='js/datapackage.js') }}"></script>
+<script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
+<script src="{{ url_for('vault_bp.static', filename='lib/leaflet/leaflet.js') }}"></script>
+<script>
+        var browseStartDir = {{ dir | tojson }};
+        var view = 'browse';
+        var dp_is_restricted = {{ dp_is_restricted | tojson }};
+        var dp_reference = {{ reference | tojson }};
+</script>
+{% endblock scripts %}
+
+{% block content %}
+
+<div class="modal" tabindex="-1" role="dialog" id="viewMap">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title modal-map-title">Modal title</h5>
+            </div>
+
+            <div class="modal-body text-center">
+                <div class='map' id='map1'></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-between bg-gray pt-2 pb-2">
+        <div class="col-4">
+            DAG Datapackage
+        </div>
+        <div class="col-4">
+            {% if dp_is_restricted %}
+            <a class="btn btn-light float-end" href="https://dag.sites.uu.nl/search/datapackage-request-access/" target="_blank" title="How to request for access for this restricted datapackage"><i class="fa fa-info-circle"></i> Request access</a>
+            {% else %}
+            <a class="btn btn-light float-end" href="https://dag.sites.uu.nl/search/guidance/" target="_blank" title="Guidance"><i class="fa fa-info-circle"></i> Guidance</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<section class="metadata-info container mt-4">
+    <div class="row justify-content-between">
+        <div class="col-8 fw-bold metadata-creator">
+        </div>
+        <div class="col-4">
+            {% if not dp_is_restricted %}
+            <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary float-end btn-sm btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
+            {% endif %}
+
+            <span class="metadata-access"></span>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col fw-bold metadata-title">
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <div class="metadata-description"></div>
+            <button class="btn read-more-button p-0 hide" role="button">Read full description...</button>
+            <button class="btn read-less-button p-0 hide" role="button">Collapse description...</button>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-2">
+            <strong>Identifier</strong>
+        </div>
+        <div class="col">
+            <span class="metadata-identifier">{{ url_for('vault_bp.metadata', _external=True, reference=reference) }}</span>
+            <button class="btn btn-secondary btn-sm float-end btn-copy-to-clipboard"><i class="fa fa-copy"></i> Copy to clipboard</button>
+        </div>
+    </div>
+
+    <div class="row mt-2 hidden">
+        <div class="col-2">
+            <strong>Keywords</strong>
+        </div>
+        <div class="col">
+            <span class="metadata" data-dp-attr="Tag"></span>
+        </div>
+    </div>
+
+    <div class="row mt-2 hidden">
+        <div class="col-2">
+            <strong>Research Group</strong>
+        </div>
+        <div class="col">
+            <span class="metadata" data-dp-attr="Research_Group"></span>
+        </div>
+    </div>
+
+    <div class="row mt-2 hidden">
+        <div class="col-2">
+            <strong>Project</strong>
+        </div>
+        <div class="col">
+            <span class="metadata" data-dp-attr="Collection_Name"></span>
+        </div>
+    </div>
+
+    <div class="row mt-2 hidden">
+        <div class="col-2">
+            <strong>Owners</strong>
+        </div>
+        <div class="col">
+            <span class="metadata" data-dp-attr="Creator"></span>
+        </div>
+    </div>
+
+    <div class="row mt-2 hidden">
+        <div class="col-2">
+            <strong>Contact person</strong>
+        </div>
+        <div class="col">
+            <span class="metadata" data-dp-attr="Contributor"></span>
+        </div>
+    </div>
+
+    <div class="row mt-2 hidden">
+        <div class="col-2">
+            <strong>Research period</strong>
+        </div>
+        <div class="col">
+            <span class="metadata" data-dp-attr="Collected"></span>
+        </div>
+    </div>
+
+    <div class="row mt-2 hidden">
+        <div class="col-2">
+            <strong>Geo Locations</strong>
+        </div>
+        <div class="col">
+            <span class="metadata" data-dp-attr="GeoLocation"></span>
+        </div>
+    </div>
+
+    <div class="row mt-2 hidden">
+        <div class="col-2">
+            <strong>References</strong>
+        </div>
+        <div class="col">
+            <span class="metadata" data-dp-attr="Related_Datapackage"></span>
+        </div>
+    </div>
+
+    <div class="row mt-2 hidden">
+        <div class="col-2">
+            <strong>Personal data</strong>
+        </div>
+        <div class="col">
+            <span class="metadata" data-dp-attr="Data_Classification"></span>
+        </div>
+    </div>
+
+    <div class="row mt-2 hidden">
+        <div class="col-2">
+            <strong>Deposit date</strong>
+        </div>
+        <div class="col">
+            <span class="metadata" data-dp-attr="deposit_date"></span>
+        </div>
+    </div>
+
+    <div class="row mt-2 hidden">
+        <div class="col-2">
+            <strong>Retention period</strong>
+        </div>
+        <div class="col">
+            <span class="metadata" data-dp-attr="End_Preservation"></span>
+        </div>
+    </div>
+</section>
+
+<div class='breadcrumbs-browser hide'>
+    <table id="file-browser" class="table yoda-table table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Modified date</th>
+            <th></th>
+        </tr>
+        </thead>
+    </table>
+</div>
+{% endblock content %}

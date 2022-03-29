@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Open Search{% endblock title %}
+
+{% block scripts %}
+<script src="{{ url_for('open_search_bp.static', filename='js/search.js') }}"></script>
+{% endblock scripts %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('open_search_bp.static', filename='css/search.css') }}">
+{% endblock style %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="row">
+                <div class="search-2 input-group mb-3">
+                    <input id="search-filter" type="text" class="form-control input-text" placeholder="Search ...." value="{{ searchTerm|safe }}" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-warning btn-lg search-btn" type="button">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-results hide">
+        <p>Your search '<span class="search-term"></span>' did not match any data package.</p>
+    </div>
+    <div class="row content hide">
+        <div class="col-2">
+            <label for="sort" class="form-label">Sort by</label>
+            <select class="form-select" id="sort">
+                <option value="Creation_Time" data-order="desc" selected>Deposit date</option>
+                <option value="Title" data-order="asc">Title</option>
+                <option value="None" data-order="asc">Relevance</option>
+            </select>
+        </div>
+        <div class="col-10">
+            <div class="row justify-content-between mb-2">
+                <div class="col-4 paging-info">
+                </div>
+                <div class="col-2 results-per-page">
+                    <div class="float-end row row-cols-auto">
+                        <div class="col pe-0">
+                            <span class="page-items-label">Show</span>
+                        </div>
+                        <div class="col">
+                            <select class="form-select form-select-sm float-end" id="items-count">
+                                <option value="5" selected>5</option>
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="search-results"></div>
+
+            <div class="search-pagination hide">
+                <button type="button" class="btn btn-outline-secondary previous">
+                    <i class="fa-solid fa-angles-left"></i>
+                    Previous
+                </button>
+                <button type="button" class="btn btn-outline-secondary float-end next">
+                    <i class="fa-solid fa-angles-right"></i>
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
