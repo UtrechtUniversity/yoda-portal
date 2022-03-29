@@ -981,7 +981,7 @@ $(function() {
                 return;
 
             var groupName = $(el).find('#f-user-create-group').val();
-            var  userName = $(el).find('#f-user-create-name' ).val();
+            var  userName = $(el).find('#f-user-create-name' ).val().trim();
 
             if (!userName.match(/^([a-z.]+|[a-z0-9_.-]+@[a-z0-9_.-]+)(#[a-zA-Z0-9_-]+)?$/)) {
                 alert('Please enter either an e-mail address or a name consisting only of lowercase chars and dots.');
