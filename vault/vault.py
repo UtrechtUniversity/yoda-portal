@@ -92,16 +92,18 @@ def metadata(reference):
     except ValueError:
         abort(404)
 
+    dir = ''
     # Find data package with provided reference.
     response = api.call('vault_get_package_by_reference',
                         {"reference": reference})
 
-    dir = response['data']
+    dp_is_restricted = True
+    if response['status'] == 'ok':
+        dir = response['data']
+        dp_is_restricted = False
 
-    # To be added - check whether permissions for data!
-    # Is the datapackage an 'Open' package?
-    return render_template('vault/metadata.html',
+    return render_template('vault/datapackage.html',
                            activeModule='vault',
-                           items=10,
                            dir=dir,
-                           yoda_id=reference)
+                           reference=reference,
+                           dp_is_restricted=dp_is_restricted)

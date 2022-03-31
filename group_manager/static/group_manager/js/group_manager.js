@@ -47,7 +47,7 @@ $(function() {
         accessIcons: {
             'reader':  'fa-eye',
             'normal':  'fa-user',
-            'manager': 'fa-user-circle-o',
+            'manager': 'fa-user-circle',
         },
 
         /// Human-readable descriptions of access levels.
@@ -390,7 +390,7 @@ $(function() {
                     if (nameAndZone[1] == that.zone)
                         displayName = nameAndZone[0];
 
-                    $user.html('<i class="fa '
+                    $user.html('<i class="fa-solid '
                                + that.accessIcons[user.access]
                                + '" aria-hidden="true" title="'
                                + that.accessNames[user.access]
@@ -489,13 +489,13 @@ $(function() {
                 var nextAccess = this.nextAccessLevel(selectedUser.access, selectedGroupName);
 
                 if (prevAccess) {
-                    $demoteButton.find('i').addClass('fa ' + this.accessIcons[prevAccess]);
+                    $demoteButton.find('i').addClass('fa-solid ' + this.accessIcons[prevAccess]);
                     $demoteButton.removeClass('disabled');
                     $demoteButton.attr('data-target-role', prevAccess);
                     demoteTitle += ' to ' + this.accessNames[prevAccess].toLowerCase();
                 }
                 if (nextAccess) {
-                    $promoteButton.find('i').addClass('fa ' + this.accessIcons[nextAccess]);
+                    $promoteButton.find('i').addClass('fa-solid ' + this.accessIcons[nextAccess]);
                     $promoteButton.removeClass('disabled');
                     $promoteButton.attr('data-target-role', nextAccess);
                     promoteTitle += ' to ' + this.accessNames[nextAccess].toLowerCase();
@@ -981,7 +981,7 @@ $(function() {
                 return;
 
             var groupName = $(el).find('#f-user-create-group').val();
-            var  userName = $(el).find('#f-user-create-name' ).val();
+            var  userName = $(el).find('#f-user-create-name' ).val().trim();
 
             if (!userName.match(/^([a-z.]+|[a-z0-9_.-]+@[a-z0-9_.-]+)(#[a-zA-Z0-9_-]+)?$/)) {
                 alert('Please enter either an e-mail address or a name consisting only of lowercase chars and dots.');
@@ -998,7 +998,7 @@ $(function() {
                 dataType: 'json',
                 data: {
                     group_name: groupName,
-                     user_name: userName,
+                    user_name: userName,
                 },
             }).done(function(result) {
                 if ('status' in result)
@@ -1421,14 +1421,14 @@ $(function() {
                 // Show the user add form.
                 that.deselectUser();
                 $(this).find('.user-create-text').attr('hidden', '');
-                $(this).find('form').removeAttr('hidden');
+                $(this).find('form').removeClass('hidden');
                 $(this).find('form').find('#f-user-create-name').select2('open');
             });
 
             $('#f-user-create-name').on('select2-close', function() {
                 // Remove the new user name input on unfocus if nothing was entered.
                 if ($(this).val().length === 0) {
-                    $(this).parents('form').attr('hidden', 'true');
+                    // $(this).parents('form').attr('hidden', 'true');
                     $(this).parents('.list-group-item').find('.user-create-text').removeAttr('hidden');
                 }
             });

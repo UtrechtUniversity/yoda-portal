@@ -1,7 +1,9 @@
-python-irodsclient==1.1.1
+python-irodsclient==1.1.2
 Flask==1.1.2
 flask_session==0.3.2
 flask_wtf==0.14.3
 mod-wsgi==4.7.1
 pyjwt[crypto]==2.1.0
 requests==2.25.1
+opensearch-py==1.0.0
+irods-avu-json==2.2.0

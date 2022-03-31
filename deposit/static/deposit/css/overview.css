@@ -1,0 +1,38 @@
+/* Data table */
+#file-browser .dataTables_empty {
+    padding: 40px 0 !important;
+}
+#file-browser tr > :nth-child(1) {
+    min-width: 20%;
+    word-break:break-all;
+}
+#file-browser tr > :nth-child(2) {
+    min-width: 50%;
+    word-break:break-all;
+}
+#file-browser tr > :nth-child(3) {
+}
+#file-browser tr > :nth-child(4) {
+}
+#file-browser tr > :nth-child(5) {
+    max-width: 90px;
+    text-align: right;
+}
+#file-browser > tbody > tr > td {
+    padding: 5px;
+    vertical-align: baseline;
+}
+#file-browser > tbody > tr > td i {
+    vertical-align: bottom;
+}
+#file-browser th {
+    background-color: #dcdcdc;
+    border-color: #ddd;
+    border-bottom: 1px solid transparent!important;
+    color: #333;
+    font-family: inherit;
+    font-weight: 500;
+}
+#file-browser tr.odd {
+    background-color: transparent !important;
+}

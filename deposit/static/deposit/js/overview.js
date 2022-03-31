@@ -140,13 +140,13 @@ let getFolderContents = (() => {
         } else {
             // Nope, load new data via the API.
             let j = ++i;
-            let result = await Yoda.call('browse_collections',
+            let result = await Yoda.call('deposit_overview',
                                          {'coll':       Yoda.basePath + currentFolder,
                                           'offset':     args.start,
                                           'limit':      batchSize,
                                           'sort_order': args.order[0].dir,
                                           'sort_on':    ['name','size','modified'][args.order[0].column],
-                                          'space':      'Space.RESEARCH'});
+                                          'space':      'Space.DEPOSIT'});
 
             // If another requests has come while we were waiting, simply drop this one.
             if (i !== j) return null;
@@ -179,6 +179,7 @@ let getFolderContents = (() => {
         if (data === null)
             return;
 
+        console.log(data);
         cb({'data':            data,
             'recordsTotal':    total,
             'recordsFiltered': total });
@@ -191,32 +192,25 @@ let getFolderContents = (() => {
 
 // Functions for rendering table cells, per column.
 const tableRenderer = {
-    multiselect: (name, _, row) => {
-        let tgt = `${currentFolder}/${name}`;
-        let checkbox = '';
-//        if (currentFolder) {
-//            checkbox = `<input class="form-check-input ms-1" type="checkbox" name="multiSelect[]" value="${htmlEncode(tgt)}" data-name="${htmlEncode(name)}" data-type="${row.type}">`;
-//        }
-        return checkbox;
-    },
     name: (name, _, row) => {
-         let tgt = `${currentFolder}/${name}`;
-         if (row.type === 'coll')
-              return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
-         else return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}`;
+        let tgt = `${currentFolder}/${name}`;
+        return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
     },
-    size: (size, _, row) => {
-        if (row.type === 'coll') {
-            return '';
-        } else {
-            let szs = ['B', 'kiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'];
-            let szi = 0;
-            while (size >= 1024 && szi < szs.length-1) {
-                size /= 1024;
-                szi++;
-            }
-            return (Math.floor(size*10)/10+'') + '&nbsp;' + szs[szi];
+    title: (name, _, row) => {
+        let tgt = `${currentFolder}/${name}`;
+        return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}">${htmlEncode(row.deposit_title)}</a>`;
+    },
+    access: (name, _, row) => {
+        return `${htmlEncode(row.deposit_access)}`;
+    },
+    size: (deposit_size, _, row) => {
+        let szs = ['B', 'kiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'];
+        let szi = 0;
+        while (row.deposit_size >= 1024 && szi < szs.length-1) {
+            row.deposit_size /= 1024;
+            szi++;
         }
+        return (Math.floor(row.deposit_size*10)/10+'') + '&nbsp;' + szs[szi];
     },
     date: ts => {
          let date = new Date(ts*1000);
@@ -230,15 +224,12 @@ const tableRenderer = {
     context: (_, __, row) => {
         let actions = $('<span>');
 
-        if (row.type === 'coll') {
-
-            // no context menu for toplevel group-collections - these cannot be altered or deleted
-            if (currentFolder.length==0) {
-                return '';
-            }
-
-            actions.append(`<a href="#" class="deposit-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this deposit"><i class="fa-solid fa-trash"></a>`);
+        // no context menu for toplevel group-collections - these cannot be altered or deleted
+        if (currentFolder.length==0) {
+            return '';
         }
+
+        actions.append(`<a href="#" class="deposit-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this deposit"><i class="fa-solid fa-trash"></a>`);
 
         return actions[0].innerHTML;
     }
@@ -255,8 +246,9 @@ function startBrowsing(items)
             "lengthMenu": "_MENU_"
         },
         "dom": '<"top">frt<"bottom"lp><"clear">',
-        'columns': [ {render: tableRenderer.multiselect, orderable: false, data: 'name'},
-                    {render: tableRenderer.name, orderable: true, data: 'name'},
+        'columns': [{render: tableRenderer.name, orderable: true, data: 'name'},
+                    {render: tableRenderer.title, orderable: false, data: 'name'},
+                    {render: tableRenderer.access, orderable: false, data: 'name'},
                     // Size and date should be orderable, but limitations
                     // on how queries work prevent us from doing this
                     // correctly without significant overhead.
