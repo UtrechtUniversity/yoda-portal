@@ -998,7 +998,7 @@ $(function() {
                 dataType: 'json',
                 data: {
                     group_name: groupName,
-                     user_name: userName,
+                    user_name: userName,
                 },
             }).done(function(result) {
                 if ('status' in result)
@@ -1421,14 +1421,14 @@ $(function() {
                 // Show the user add form.
                 that.deselectUser();
                 $(this).find('.user-create-text').attr('hidden', '');
-                $(this).find('form').removeAttr('hidden');
+                $(this).find('form').removeClass('hidden');
                 $(this).find('form').find('#f-user-create-name').select2('open');
             });
 
             $('#f-user-create-name').on('select2-close', function() {
                 // Remove the new user name input on unfocus if nothing was entered.
                 if ($(this).val().length === 0) {
-                    $(this).parents('form').attr('hidden', 'true');
+                    // $(this).parents('form').attr('hidden', 'true');
                     $(this).parents('.list-group-item').find('.user-create-text').removeAttr('hidden');
                 }
             });
