@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
@@ -54,7 +54,6 @@ def gate():
 @user_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-
         username = request.form.get('username', '').lower().strip()
         password = request.form['password']
 
@@ -119,6 +118,7 @@ def login():
 
 @user_bp.route('/logout')
 def logout():
+    """Logout user and redirect to index."""
     connman.clean(session.sid)
     session.clear()
     return redirect(url_for('general_bp.index'))
@@ -126,6 +126,7 @@ def logout():
 
 @user_bp.route('/notifications')
 def notifications():
+    """Notifications page."""
     sort_order = request.args.get('sort_order', 'desc')
     response = api.call('notifications_load', data={'sort_order': sort_order})
     session['notifications'] = len(response['data'])
@@ -134,6 +135,7 @@ def notifications():
 
 @user_bp.route('/settings', methods=['GET', 'POST'])
 def settings():
+    """User settings page."""
     if request.method == 'POST':
         # Build user settings dict.
         settings = {}
@@ -160,13 +162,14 @@ def settings():
 
 @user_bp.route('/data_access')
 def data_access():
-    # Load tokens.
+    """Data Access Passwords overview"""
     response = api.call('token_load')
     return render_template('user/data_access.html', tokens=response['data'])
 
 
 @user_bp.route('/callback')
 def callback():
+    """OpenID Connect callback."""
     def token_request():
         code = request.args.get('code')
         data = {
@@ -354,8 +357,7 @@ def oidc_authorize_url(username):
 
 
 def irods_login(username, password):
-    # Add a prefix to username to consume in the PAM stack.
-    # username = f"++portal++{username}"
+    """Start session with iRODS."""
     password = escape_irods_pam_password(password)
 
     irods = iRODSSession(
