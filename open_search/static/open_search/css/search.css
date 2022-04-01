@@ -23,3 +23,7 @@
 .page-items-label {
     font-size: 14px;
 }
+
+.search-result:last-child {
+    border: none!important;
+}

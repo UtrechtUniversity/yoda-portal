@@ -127,8 +127,8 @@ function itemTemplate(data)
     }
 
     let html = `
-    <div class="card mb-3">
-        <div class="card-body">
+    <div class="card mb-3 search-result border-0 border-bottom rounded-0">
+        <div class="card-body p-0 pb-3">
             <div class="card-title">
                 <span class="title-text"><a href="/vault/yoda/${data.Data_Package_Reference}">${data.Title}</a></span>
                 ${access}
