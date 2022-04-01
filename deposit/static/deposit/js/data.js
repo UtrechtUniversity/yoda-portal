@@ -138,6 +138,12 @@ $(function() {
     r.assignBrowse($('.upload')[0]);
     r.assignBrowse($('.upload-folder')[0], true);
 
+    // when chosing to close overview of uploading/uploaded files then all incomplete file uploads will be canceled.
+    $('.btn-close-uploads-overview').click(function() {
+        r.cancel()
+        $('#uploads').addClass('hidden');
+    });
+
     // Flow.js handle events
     r.on('filesAdded', function(files){
         if (files.length) {
@@ -166,10 +172,9 @@ $(function() {
                     file.cancel();
                     $self.remove();
                 });
-
             });
         }
-        $('#uploads').modal('show');
+        $('#uploads').removeClass('hidden');
     });
     r.on('filesSubmitted', function() {
         let path = $('.upload').attr('data-path');
