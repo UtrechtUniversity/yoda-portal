@@ -140,14 +140,14 @@ $(function() {
 
     // when chosing to close overview of uploading/uploaded files then all incomplete file uploads will be canceled.
     $('.btn-close-uploads-overview').click(function() {
-        r.cancel()
+        r.cancel();
+        $('#files').html("");
         $('#uploads').addClass('hidden');
     });
 
     // Flow.js handle events
     r.on('filesAdded', function(files){
         if (files.length) {
-            $('#files').html("");
             $.each(files, function(key, file) {
                 logUpload(file.uniqueIdentifier, file);
 
