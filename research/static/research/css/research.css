@@ -82,14 +82,13 @@ ol.breadcrumb li.active {
     float: left;
     padding-top: 2px;
 }
+
 #file-browser tr > :nth-child(1) {
     max-width: 2px;
 }
-
 #file-browser tr > :nth-child(2) {
     min-width: 40%;
 }
-
 #file-browser tr > :nth-child(3) {
     max-width: 30px;
     text-align: right;
@@ -98,6 +97,9 @@ ol.breadcrumb li.active {
     max-width: 40px;
 }
 #file-browser tr > :nth-child(5) {
+    max-width: 40px;
+}
+#file-browser tr > :nth-child(6) {
     max-width: 10px;
     text-align: right;
 }
