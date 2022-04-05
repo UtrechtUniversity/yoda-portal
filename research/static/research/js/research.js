@@ -195,18 +195,18 @@ $(function() {
         $('#uploads').removeClass('hidden');
     });
     r.on('filesSubmitted', function() {
-        let path = $('button.upload').attr('data-path');
+        let path = $('.upload').attr('data-path');
         r.opts.query.filepath = path;
         r.upload();
     });
     r.on('complete', function(){
-        let path = $('button.upload').attr('data-path');
+        let path = $('.upload').attr('data-path');
         browse(path);
     });
     r.on('fileSuccess', function(file,message){
-        $("#" + file.uniqueIdentifier + " .msg").html("Upload completed");
+        $("#" + file.uniqueIdentifier + " .msg").html("<span class='text-success'>Upload complete</span>");
         let $self = $('#'+file.uniqueIdentifier);
-        $self.find('.upload-bttns').hide();
+        $self.find('.upload-btns').hide();
 
     });
     r.on('fileError', function(file, message){
@@ -214,7 +214,6 @@ $(function() {
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', '0%');
         let $self = $('#'+file.uniqueIdentifier);
         $self.find('.upload-pause').hide();
-        $self.find('.upload-retry').show();
     });
     r.on('fileProgress', function(file){
         var percent = Math.floor(file.progress()*100);
