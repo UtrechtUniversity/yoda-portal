@@ -164,7 +164,7 @@ function itemTemplate(data)
     return html;
 }
 
-function radioItem(label, value, checked = false) {
+function radioItem(value, count, checked = false) {
     let checkedHtml = '';
     if (checked) {
         checkedHtml = 'checked';
@@ -174,7 +174,7 @@ function radioItem(label, value, checked = false) {
     <div class="form-check">
         <input class="form-check-input" type="radio" value="${value}"  name="filters['Data_Access_Restriction']" id="Data_Access_Restriction" ${checkedHtml}>
         <label class="form-check-label" for="Data_Access_Restriction">
-          ${label}
+          ${value} (${count})
         </label>
     </div>
     `;
@@ -244,7 +244,7 @@ function buildFacets(facets)
             if (filterValue == element.value) {
                 checked = true;
             }
-            html += radioItem(element.value, element.value, checked);
+            html += radioItem(element.value, element.count, checked);
         });
 
         $('.data-access-options').html(html);
