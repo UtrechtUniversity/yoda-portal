@@ -6,48 +6,63 @@ let itemsPerPage;
 let currentPage = 1;
 let sort;
 let sortOrder;
+let facets = ['Data_Access_Restriction'];
+let filters = {};
+let ranges = {};
 
 $(function() {
     itemsPerPage = $('#items-count').val();
     sort = $('#sort').val();
     sortOrder = $("select option:selected").attr('data-order');
 
+    let filter = null;
     if ($("#search-filter").val().length > 0) {
-        let filter = $("#search-filter").val();
-        search(filter, 1, itemsPerPage, sort, sortOrder);
+        filter = $("#search-filter").val();
+        search(filter, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     }
 
     $("#search-filter").on('keyup', function (e) {
         if (e.key === 'Enter' || e.keyCode === 13) {
             let filter = $("#search-filter").val();
-            search(filter, 1, itemsPerPage, sort, sortOrder);
+            search(filter, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
         }
     });
 
     $(".search-btn").click(function() {
         let filter = $("#search-filter").val();
-        search(filter, 1, itemsPerPage, sort, sortOrder);
+        search(filter, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
 
     $(".search-pagination .next, .search-pagination .previous").click(function() {
         let page = $(this).attr('data-page');
-        search(currentSearchString, page, itemsPerPage, sort, sortOrder);
+        search(currentSearchString, page, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
 
     $('#items-count').on('change', function() {
         itemsPerPage = $(this).val();
-        search(currentSearchString, 1, itemsPerPage, sort, sortOrder);
+        search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
 
     $('#sort').on('change', function() {
         sort = $(this).val();
         sortOrder = $(this).find(":selected").attr('data-order');
-        search(currentSearchString, 1, itemsPerPage, sort, sortOrder);
+        search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
+    });
+
+    $("body").on("change", "input:radio[id=Data_Access_Restriction]", function() {
+        if ($(this).val() == '') {
+            filters = {};
+        } else {
+            filters["Data_Access_Restriction"] = $(this).val();
+        }
+        console.log(filters);
+
+        search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
 });
 
 
-function search(term, page, itemsPerPage, sort, sortOrder)
+function search(term, page, itemsPerPage, sort, sortOrder, facets = [], filters=[], ranges = [])
 {
     load(true);
     currentSearchString = term;
@@ -60,18 +75,21 @@ function search(term, page, itemsPerPage, sort, sortOrder)
 
     OpenSearchApi.call(
         {
-            name: 'Title',
             value: term,
             from: ((page -1) * itemsPerPage),
             size: itemsPerPage,
             sort: sort,
-            reverse: reverse
+            reverse: reverse,
+            facets: facets,
+            filters: filters,
+            ranges: ranges
         },
         {'quiet': true, 'rawResult': true}
     ).then((data) => {
         let html = '';
         let results = data.total_matches;
         if (results) {
+            buildFacets(data.facets);
             $(data.matches).each(function(index, element) {
                 let attr = {};
                 $(element.attributes).each(function(index, attribute) {
@@ -145,6 +163,24 @@ function itemTemplate(data)
     `;
     return html;
 }
+
+function radioItem(label, value, checked = false) {
+    let checkedHtml = '';
+    if (checked) {
+        checkedHtml = 'checked';
+    }
+
+    let html = `    
+    <div class="form-check">
+        <input class="form-check-input" type="radio" value="${value}"  name="filters['Data_Access_Restriction']" id="Data_Access_Restriction" ${checkedHtml}>
+        <label class="form-check-label" for="Data_Access_Restriction">
+          ${label}
+        </label>
+    </div>
+    `;
+    return html;
+}
+
 function truncate(str, max, suffix) {
     if (str.length < max) {
         return str;
@@ -192,6 +228,29 @@ function buildPagination(totalItems)
     $('.paging-info').text(totalItems + ' result(s)');
 }
 
+function buildFacets(facets)
+{
+    let html = '';
+    let checked = false;
+    var filterValue = '';
+
+    if (filters.hasOwnProperty("Data_Access_Restriction")) {
+        filterValue = filters.Data_Access_Restriction;
+    }
+
+    $(facets.Data_Access_Restriction).each(function(index, facet) {
+        $(facet).each(function(index, element) {
+            checked = false;
+            if (filterValue == element.value) {
+                checked = true;
+            }
+            html += radioItem(element.value, element.value, checked);
+        });
+
+        $('.data-access-options').html(html);
+    });
+}
+
 OpenSearchApi.call = async function(data={}, options={}) {
     // Bare API call.
     let call_ = async (data={}, options={}) => {
@@ -205,7 +264,7 @@ OpenSearchApi.call = async function(data={}, options={}) {
             Promise.reject({'data': null, 'status': 'error_internal'});
 
         try {
-            var r = await fetch('/open_search/query', {
+            var r = await fetch('/open_search/faceted_query', {
                 'method':      'POST',
                 'body':        formData,
                 'credentials': 'same-origin',
