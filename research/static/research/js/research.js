@@ -149,6 +149,13 @@ $(function() {
     r.assignBrowse($('.upload-file')[0]);
     r.assignBrowse($('.upload-folder')[0], true);
 
+    // When chosing to close overview of upload overview then all incomplete file uploads will be canceled.
+    $('.btn-close-uploads-overview').click(function() {
+        r.cancel();
+        $('#files').html("");
+        $('#uploads').addClass('hidden');
+    });
+
     // Flow.js handle events
     r.on('filesAdded', function(files){
         if (files.length) {
@@ -185,7 +192,7 @@ $(function() {
                 });
             });
         }
-        $('#uploads').modal('show');
+        $('#uploads').removeClass('hidden');
     });
     r.on('filesSubmitted', function() {
         let path = $('button.upload').attr('data-path');
@@ -378,8 +385,44 @@ $(function() {
             $('#multiSelect').addClass('hide');
         }
     });
+
+    dragElement(document.getElementById("uploads"));
 });
 
+// draggability of the upload overview div
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById("uploads_header")) {
+    document.getElementById("uploads_header").onmousedown = dragMouseDown;
+  } else {
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
 
 async function handleFolderAdd(new_folder, collection) {
     if (!new_folder.length) {

@@ -138,7 +138,7 @@ $(function() {
     r.assignBrowse($('.upload')[0]);
     r.assignBrowse($('.upload-folder')[0], true);
 
-    // when chosing to close overview of uploading/uploaded files then all incomplete file uploads will be canceled.
+    // When chosing to close overview of upload overview then all incomplete file uploads will be canceled.
     $('.btn-close-uploads-overview').click(function() {
         r.cancel();
         $('#files').html("");
