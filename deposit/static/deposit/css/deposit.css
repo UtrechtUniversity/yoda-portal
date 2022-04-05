@@ -66,3 +66,7 @@ a.dropdown-item:hover, a.dropdown-item:focus
     border-style: dashed;
     border-width: 5px;
 }
+
+#uploads .modal-dialog {
+    margin: 0;
+}
