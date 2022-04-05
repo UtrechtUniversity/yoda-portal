@@ -26,25 +26,16 @@
 {% include 'deposit/workflow.html' %}
 {% endwith %}
 
-<div class="row mt-2 mb-1">
-    <div class="col-9">
-        <h2>Upload data</h2>
-    </div>
-    <div class="col-3">
-        <a class="btn btn-light float-end" href="https://dag.sites.uu.nl/deposit/upload-data/" target="_blank" title="Guidance"><i class="fa-solid fa-info-circle"></i> Guidance</a>
-    </div>
-</div>
 
-<div class="row">
-<div id="uploads" class="hidden">
+<div id="uploads" class="hidden w-75" style="z-index: 10; position: absolute; left: 0px; top: 0px;">
     <div class="modal-dialog mw-100 w-75">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Uploads</h5>
+            <div class="modal-header" id="uploads_header" style="cursor: move; z-index:11">
+                <h5 class="modal-title" >Uploads</h5>
                 <button type="button" class="btn-close btn-close-uploads-overview" data-bs-dismiss="modal" aria-label="Close" title="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="files"></div>
+                <div id="files" style="height: 200px; overflow-x: hidden; overflow-y: scroll;"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary btn-close-uploads-overview" data-bs-dismiss="modal" title="Close">Close</button>
@@ -52,6 +43,14 @@
         </div>
     </div>
 </div>
+
+<div class="row mt-2 mb-1">
+    <div class="col-9">
+        <h2>Upload data</h2>
+    </div>
+    <div class="col-3">
+        <a class="btn btn-light float-end" href="https://dag.sites.uu.nl/deposit/upload-data/" target="_blank" title="Guidance"><i class="fa-solid fa-info-circle"></i> Guidance</a>
+    </div>
 </div>
 
 <div class="row">
