@@ -63,3 +63,18 @@ a.dropdown-item:hover, a.dropdown-item:focus
     border-style: dashed;
     border-width: 5px;
 }
+
+#uploads {
+    left: 20%;
+}
+#uploads .modal-header {
+    cursor: move;
+}
+#uploads .modal-dialog {
+    margin: 0;
+}
+#uploads #files {
+    height: 220px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
