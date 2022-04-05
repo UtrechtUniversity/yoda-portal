@@ -75,6 +75,8 @@ mfunction['Related_Datapackage'] = function(Related_Datapackage) {
                 row += '<td><a href="https://doi.org/' + identifier + '">' + identifier + '</a></td></tr>';
             } else if (scheme == 'Handle') {
                 row += '<td><a href="https://hdl.handle.net/' + identifier + '">' + identifier + '</a></td></tr>';
+            } else if (scheme == 'URL') {
+                row += '<td><a href="' + identifier + '">' + identifier + '</a></td></tr>';
             } else {
                 row += '<td>' + identifier + '</td></tr>';
             }
