@@ -71,15 +71,20 @@ mfunction['Related_Datapackage'] = function(Related_Datapackage) {
             let scheme = ref.Persistent_Identifier.Identifier_Scheme;
             let identifier = ref.Persistent_Identifier.Identifier;
             let row = '<tr><td style="width:300px;">' + ref.Title + '</td>';
-            if (scheme == 'DOI') {
-                row += '<td><a href="https://doi.org/' + identifier + '">' + identifier + '</a></td></tr>';
-            } else if (scheme == 'Handle') {
-                row += '<td><a href="https://hdl.handle.net/' + identifier + '">' + identifier + '</a></td></tr>';
-            } else if (scheme == 'URL') {
-                row += '<td><a href="' + identifier + '">' + identifier + '</a></td></tr>';
-            } else {
-                row += '<td>' + identifier + '</td></tr>';
+
+            if (identifier !== undefined) {
+                if (scheme == 'DOI') {
+                    row += '<td><a href="https://doi.org/' + identifier + '">' + identifier + '</a></td></tr>';
+                } else if (scheme == 'Handle') {
+                    row += '<td><a href="https://hdl.handle.net/' + identifier + '">' + identifier + '</a></td></tr>';
+                } else if (scheme == 'URL') {
+                    row += '<td><a href="' + identifier + '">' + identifier + '</a></td></tr>';
+                } else {
+                    row += '<td>' + identifier + '</td>';
+                }
             }
+
+            row += '</tr>';
             references.push(row);
         }
     }
@@ -93,18 +98,28 @@ mfunction['GeoLocation'] = function(GeoLocation) {
     let geolocations = [];
     for (let c in GeoLocation){
         let loc = GeoLocation[c];
-        let row = '<tr><td style="width:200px;">' + loc.Description_Spatial + '</td>';
+        let empty_row = true;
+        let row = ""
+        if (loc.Description_Spatial !== undefined) {
+            row += '<tr><td style="width:200px;">' + loc.Description_Spatial + '</td>';
+            empty_row = false;
+        }
 
-        row += '<td><button class="btn btn-outline-secondary btn-sm show-map"';
-        row += ' data-lon0="' + loc.geoLocationBox.eastBoundLongitude.toString() + '"';
-        row += ' data-lat0="' + loc.geoLocationBox.northBoundLatitude.toString() + '"';
-        row += ' data-lon1="' + loc.geoLocationBox.westBoundLongitude.toString() + '"';
-        row += ' data-lat1="' + loc.geoLocationBox.southBoundLatitude.toString() + '"';
-        row += ' data-spatial="' + loc.Description_Spatial + '"';
-        row += '><i class="fa fa-map"></i> Show map</button></td>';
+        if (Object.entries(loc.geoLocationBox).length !== 0) {
+            row += '<td><button class="btn btn-outline-secondary btn-sm show-map"';
+            row += ' data-lon0="' + loc.geoLocationBox.eastBoundLongitude.toString() + '"';
+            row += ' data-lat0="' + loc.geoLocationBox.northBoundLatitude.toString() + '"';
+            row += ' data-lon1="' + loc.geoLocationBox.westBoundLongitude.toString() + '"';
+            row += ' data-lat1="' + loc.geoLocationBox.southBoundLatitude.toString() + '"';
+            row += ' data-spatial="' + loc.Description_Spatial + '"';
+            row += '><i class="fa fa-map"></i> Show map</button></td>';
+            empty_row = false;
+        }
         row += '</tr>'
 
-        geolocations.push(row);
+        if (!empty_row) {
+            geolocations.push(row);
+        }
     }
     if (geolocations.length) {
         return '<table>' + geolocations.join('') + '</table>';
