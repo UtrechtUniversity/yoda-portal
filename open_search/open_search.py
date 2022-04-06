@@ -230,6 +230,30 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
     if len(filters) != 0:
         queryList = [searchQuery]
         for attribute, filter in filters.items():
+            if attribute == 'Person':
+                match = {
+                    'bool': {
+                        'should': [
+                            {
+                                'term': {
+                                    'metadataEntries.attribute.raw': 'Creator'
+                                }
+                            }, {
+                                'term': {
+                                    'metadataEntries.attribute.raw': 'Contributo
+r'
+                                }
+                            }
+                        ],
+                        'minimum_should_match': 1
+                    }
+                }
+            else:
+                match = {
+                    'term': {
+                        'metadataEntries.attribute.raw': attribute
+                    }
+                }
             if isinstance(filter, str):
                 should = [
                     {
@@ -255,11 +279,8 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                     'query': {
                         'bool': {
                             'must': [
+                                match,
                                 {
-                                    'term': {
-                                        'metadataEntries.attribute.raw': attribute
-                                    }
-                                }, {
                                     'term': {
                                         'metadataEntries.unit.raw': 'FlatIndex'
                                     }
