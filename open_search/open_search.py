@@ -287,12 +287,31 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
     facetList = {}
     if len(facets) != 0:
         for facet in facets:
-            facetList[facet] = {
-                'filter': {
+            if facet == 'Person':
+                filter = {
+                    'bool': {
+                        'should': [
+                            {
+                                'term': {
+                                    'metadataEntries.attribute.raw': 'Creator'
+                                }
+                            }, {
+                                'term': {
+                                    'metadataEntries.attribute.raw': 'Contributor'
+                                }
+                            }
+                        ],
+                        'minimum_should_match': 1
+                    }
+                }
+            else:
+                filter = {
                     'term': {
                         'metadataEntries.attribute.raw': facet
                     }
-                },
+                }
+            facetList[facet] = {
+                'filter': filter,
                 'aggregations': {
                     'value': {
                         'terms': {
