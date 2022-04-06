@@ -240,8 +240,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                                 }
                             }, {
                                 'term': {
-                                    'metadataEntries.attribute.raw': 'Contributo
-r'
+                                    'metadataEntries.attribute.raw': 'Contributor'
                                 }
                             }
                         ],
