@@ -1,0 +1,18 @@
+.bg-gray {
+    background: #e9ecef;
+}
+
+.badge {
+    font-size: 13px;
+}
+
+/* Leaflet */
+.map {
+    height: 450px; width: 765px;
+}
+a.leaflet-control-zoom-in, a.leaflet-control-zoom-out {
+    text-decoration: none ! important;
+}
+.indented {
+    padding-left: 10px;
+}

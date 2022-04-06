@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 from os import path
@@ -16,6 +16,7 @@ from deposit.deposit import deposit_bp
 from general.general import general_bp
 from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
+from open_search.open_search import open_search_bp
 from research.research import research_bp
 from search.search import search_bp
 from stats.stats import stats_bp
@@ -90,6 +91,8 @@ with app.app_context():
     app.register_blueprint(api_bp, url_prefix='/api/')
     if app.config.get('DEPOSIT_ENABLED'):
         app.register_blueprint(deposit_bp, url_prefix='/deposit')
+    if app.config.get('OPEN_SEARCH_ENABLED'):
+        app.register_blueprint(open_search_bp, url_prefix='/open_search')
     if app.config.get('INTAKE_ENABLED'):
         app.register_blueprint(intake_bp, url_prefix='/intake')
     if app.config.get('DATAREQUEST_ENABLED'):

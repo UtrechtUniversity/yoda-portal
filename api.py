@@ -4,12 +4,12 @@ __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
-from traceback import print_exc
 
 from flask import Blueprint, g, jsonify, request
 from irods import rule
 
 from errors import UnauthorizedAPIAccessError
+from util import log_error
 
 api_bp = Blueprint('api_bp', __name__)
 
@@ -88,8 +88,7 @@ def authenticated():
 
 @api_bp.errorhandler(Exception)
 def api_error_handler(error):
-    print_exc()
-    print('API Error: {}'.format(error))
+    log_error('API Error: {}'.format(error), True)
     status = "internal_error"
     status_info = "Something went wrong"
     data = {}

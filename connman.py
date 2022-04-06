@@ -68,7 +68,7 @@ def add(sid, irods):
     sessions[sid] = s
     s.time = time.time()
     s.lock.acquire()
-    print('[login]: Succesfully connected to iRODS for session {}'.format(sid))
+    print('[login]: Successfully connected to iRODS for session {}'.format(sid))
 
 
 def release(sid):

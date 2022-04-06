@@ -1,4 +1,3 @@
-
 .tab-content {
     margin-top:10px;
 }
@@ -82,14 +81,13 @@ ol.breadcrumb li.active {
     float: left;
     padding-top: 2px;
 }
+
 #file-browser tr > :nth-child(1) {
     max-width: 2px;
 }
-
 #file-browser tr > :nth-child(2) {
     min-width: 40%;
 }
-
 #file-browser tr > :nth-child(3) {
     max-width: 30px;
     text-align: right;
@@ -98,6 +96,9 @@ ol.breadcrumb li.active {
     max-width: 40px;
 }
 #file-browser tr > :nth-child(5) {
+    max-width: 40px;
+}
+#file-browser tr > :nth-child(6) {
     max-width: 10px;
     text-align: right;
 }
@@ -119,9 +120,6 @@ table.dataTable > tbody > tr > td {
     padding: 5px;
     vertical-align: baseline;
 }
-table.dataTable > tbody > tr > td i {
-    vertical-align: bottom;
-}
 
 /* Table */
 .yoda-table th {
@@ -138,16 +136,25 @@ table.dataTable > tbody > tr > td i {
 }
 
 /* Upload */
-.upload-row {
-    margin-bottom: 5px;
+#uploads {
+    left: 20%;
 }
-
+#uploads .modal-header {
+    cursor: move;
+}
+#uploads .modal-dialog {
+    margin: 0;
+}
+#uploads #files {
+    height: 220px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
 .upload-filename {
-    word-wrap: break-word;
+    word-break: break-all;
     display: inline-block;
-}
-
+ }
 .drag-upload {
     border-style: dashed;
-    border-width: 4px;
+    border-width: 5px;
 }

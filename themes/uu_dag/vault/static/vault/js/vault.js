@@ -53,11 +53,6 @@ $(function() {
         $("#viewer").html("");
     });
 
-    // # preservable
-    // # file-format
-    // # grant revoke vault access
-    // .action-list
-
     $("body").on("click", "i.actionlog-icon", function() {
         toggleActionLogList($(this).attr('data-folder'));
     });
@@ -74,22 +69,10 @@ $(function() {
     });
 });
 
-function changeBrowserUrl(path)
-{
-    let url = window.location.pathname;
-    if (typeof path != 'undefined') {
-        url += "?dir=" + encodeURIComponent(path);
-    }
-
-    history.pushState({} , {}, url);
-}
-
 function browse(dir = '', changeHistory = false)
 {
     currentFolder = dir;
     makeBreadcrumb(dir);
-    // if (changeHistory)
-    //    changeBrowserUrl(dir);
     metadataInfo(dir);
     topInformation(dir, true); //only here topInformation should show its alertMessage
     buildFileBrowser(dir);

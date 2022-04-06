@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
-import sys
-from traceback import print_exc
 
 import jwt
 import requests
@@ -15,7 +13,7 @@ from irods.session import iRODSSession
 
 import api
 import connman
-
+from util import log_error
 
 # Blueprint creation
 user_bp = Blueprint('user_bp', __name__,
@@ -27,9 +25,9 @@ user_bp = Blueprint('user_bp', __name__,
 @user_bp.route('/gate', methods=['GET', 'POST'])
 def gate():
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form.get('username', '').lower().strip()
 
-        if username is None:
+        if username == '':
             flash('Missing username', 'danger')
             return render_template('user/gate.html')
 
@@ -56,11 +54,10 @@ def gate():
 @user_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-
-        username = request.form['username']
+        username = request.form.get('username', '').lower().strip()
         password = request.form['password']
 
-        if username is None:
+        if username == '':
             flash('Missing username', 'danger')
             return render_template('user/login.html')
 
@@ -83,19 +80,32 @@ def login():
 
         try:
             irods_login(username, password)
+
         except PAM_AUTH_PASSWORD_FAILED:
             flash(
                 'Username/password was incorrect',
                 'danger'
             )
+            log_error("iRODS authentication failed for user " + username)
             return render_template('user/login.html')
+
         except iRODSException:
             flash(
                 'An error occurred while connecting to iRODs. '
                 'If the issue persists, please contact the '
                 'system administrator',
                 'danger')
-            print_exc()
+
+            log_error("iRODSException for login of user " + str(username), True)
+            return render_template('user/login.html')
+
+        except Exception:
+            flash(
+                'An error occurred while connecting to iRODs. '
+                'If the issue persists, please contact the '
+                'system administrator',
+                'danger')
+            log_error("Unexpected exception for login of user " + str(username), True)
             return render_template('user/login.html')
 
         return redirect(original_destination())
@@ -108,6 +118,7 @@ def login():
 
 @user_bp.route('/logout')
 def logout():
+    """Logout user and redirect to index."""
     connman.clean(session.sid)
     session.clear()
     return redirect(url_for('general_bp.index'))
@@ -115,6 +126,7 @@ def logout():
 
 @user_bp.route('/notifications')
 def notifications():
+    """Notifications page."""
     sort_order = request.args.get('sort_order', 'desc')
     response = api.call('notifications_load', data={'sort_order': sort_order})
     session['notifications'] = len(response['data'])
@@ -123,6 +135,7 @@ def notifications():
 
 @user_bp.route('/settings', methods=['GET', 'POST'])
 def settings():
+    """User settings page."""
     if request.method == 'POST':
         # Build user settings dict.
         settings = {}
@@ -149,13 +162,14 @@ def settings():
 
 @user_bp.route('/data_access')
 def data_access():
-    # Load tokens.
+    """Data Access Passwords overview"""
     response = api.call('token_load')
     return render_template('user/data_access.html', tokens=response['data'])
 
 
 @user_bp.route('/callback')
 def callback():
+    """OpenID Connect callback."""
     def token_request():
         code = request.args.get('code')
         data = {
@@ -248,75 +262,65 @@ def callback():
     except jwt.PyJWTError:
         # Error occurred during steps for verification,
         # configurations used can be found in flask.cfg
-        print_exc()
-        print(
-            'Id Token:\n{}'
-            .format(str(id_token)),
-            file=sys.stderr)
+        log_error("PyJWTError during callback for token " + str(id_token), True)
 
     except json.decoder.JSONDecodeError:
         # Either token response or userinfo response decoding failed
-        print_exc()
-        print(
-            'token_response + headers:\n{}\n\n{}'
+        log_error(
+            'JSON decode error during callback. token_response + headers:\n{}\n\n{}'
             .format(
                 token_response.headers,
-                token_response.text),
-            file=sys.stderr)
+                token_response.text), True)
 
         if userinfo_response is not None:
-            print(
+            log_error(
                 'userinfo_response + headers:\n{}\n\n{}'
                 .format(
                     userinfo_response.headers,
-                    userinfo_response.text),
-                file=sys.stderr)
+                    userinfo_response.text))
 
     except iRODSException:
-        print_exc()
-        print(
-            'username: {}'
-            .format(email),
-            file=sys.stderr)
+        log_error('iRODSException for user {} during callback'.format(email), True)
 
     except KeyError:
         # Missing key in token or userinfo response.
         # The only one of interest is the latest response
-        print_exc()
         if userinfo_response is not None:
-            print(
-                'userinfo_response + headers:\n{}\n{}'
+            log_error(
+                'KeyError in callback for userinfo_response + headers:\n{}\n{}'
                 .format(
                     userinfo_response.headers,
                     userinfo_response.text),
-                file=sys.stderr)
+                True)
         else:
-            print(
-                'token_response + headers:\n{}\n{}'
+            log_error(
+                'KeyError in callback for token_response + headers:\n{}\n{}'
                 .format(
                     token_response.headers,
                     token_response.text),
-                file=sys.stderr)
+                True)
 
     except UserinfoSubMismatchError:
         # Possible Token substitution attack
-        print_exc()
-        print(
+        log_error(
             'Possible token substitution attack: {} is not {}'
             .format(
                 payload['sub'],
                 userinfo_response['sub']),
-            file=sys.stderr)
+            True)
 
     except UserinfoEmailMismatchError:
         # Mismatch between email and user info email.
-        print_exc()
-        print(
+        log_error(
             'Mismatch between email and user info email: {} is not in {}'
             .format(
                 email,
                 str(userinfo_email)),
-            file=sys.stderr)
+            True)
+
+    except Exception:
+        log_error("Unexpected exception during callback for username " + str(email),
+                  True)
 
     finally:
         if exception_occurred:
@@ -353,8 +357,7 @@ def oidc_authorize_url(username):
 
 
 def irods_login(username, password):
-    # Add a prefix to username to consume in the PAM stack.
-    # username = f"++portal++{username}"
+    """Start session with iRODS."""
     password = escape_irods_pam_password(password)
 
     irods = iRODSSession(

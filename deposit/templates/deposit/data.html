@@ -26,6 +26,24 @@
 {% include 'deposit/workflow.html' %}
 {% endwith %}
 
+
+<div id="uploads" class="hidden fixed-bottom w-75">
+    <div class="modal-dialog mw-100 w-75">
+        <div class="modal-content">
+            <div class="modal-header" id="uploads_header">
+                <h5 class="modal-title">Uploads</h5>
+                <button type="button" class="btn-close btn-close-uploads-overview" data-bs-dismiss="modal" aria-label="Close" title="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="files"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-close-uploads-overview" data-bs-dismiss="modal" title="Close">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mt-2 mb-1">
     <div class="col-9">
         <h2>Upload data</h2>
@@ -34,6 +52,7 @@
         <a class="btn btn-light float-end" href="https://dag.sites.uu.nl/deposit/upload-data/" target="_blank" title="Guidance"><i class="fa-solid fa-info-circle"></i> Guidance</a>
     </div>
 </div>
+
 <div class="row">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -292,24 +311,6 @@
 
             <div class="modal-footer">
                 <button id="finishMultiSelect" class="btn btn-secondary" data-bs-dismiss="modal" title="Close">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal" tabindex="-1" role="dialog" id="uploads">
-    <div class="modal-dialog mw-100 w-75">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Uploads</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="files"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal" title="Close">Close</button>
             </div>
         </div>
     </div>
