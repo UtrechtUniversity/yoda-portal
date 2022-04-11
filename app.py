@@ -166,7 +166,7 @@ def protect_pages() -> Optional[Response]:
 @app.after_request
 def content_security_policy(response: Response) -> Response:
     """Add Content-Security-Policy headers."""
-    if request.endpoint in ['research_bp.form', 'vault_bp.form', 'deposit_bp.metadata', 'vault_bp.metadata']:
+    if request.endpoint in ['research_bp.form', 'vault_bp.form', 'deposit_bp.metadata', 'vault_bp.metadata', 'datarequest_bp.add', 'datarequest_bp.add_from_draft', 'datarequest_bp.view', 'datarequest_bp.preliminary_review', 'datarequest_bp.datamanager_review', 'datarequest_bp.assign', 'datarequest_bp.review', 'datarequest_bp.evaluate', 'datarequest_bp.dao_evaluate', 'datarequest_bp.preregister', 'datarequest_bp.preregistration_confirm']:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: *.openstreetmap.org; frame-ancestors 'self'; form-action 'self'; object-src 'none'"  # noqa: E501
     elif request.endpoint in ['user_bp.gate', 'user_bp.login']:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'self'; form-action 'self' https:; object-src 'none'"  # noqa: E501

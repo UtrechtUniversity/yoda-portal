@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Datarequest{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('datarequest_bp.static', filename='css/forms.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+<script type="text/javascript"> window.config = {
+  request_id: '{{ request_id }}',
+}
+</script>
+<script src="{{ url_for('datarequest_bp.static', filename='js/preregister.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+{% if approval_conditions %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="border border-danger">
+            <h5 class="text-danger">Caution: approval conditions apply!</h5>
+            <p>The YOUth project manager has approved your data request, but has added one or more approval conditions. Please note that by proceeding, you will consent to these conditions.</p>
+            <p class="font-weight-bold">Approval conditions:</p>
+            <p>{{ approval_conditions.replace('\n', '<br>')|safe }}</p>
+        </div>
+    </div>
+</div>
+<br/>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div id="preregister" class="metadata-form">
+            <p>Loading metadata <i class="fa fa-spinner fa-spin fa-fw"></i></p>
+        </div>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {% include 'datarequest/partials/datarequest.html' %}
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Datarequest{% endblock title %}
+
+{% block scripts %}
+<script type="text/javascript"> window.config = {
+  request_id: '{{ request_id }}'
+}
+</script>
+<script src="{{ url_for('datarequest_bp.static', filename='js/add_attachments.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+<div class="row metadata-form">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header clearfix">
+                <h5 class="card-header float-left">Attachments</h5>
+            </div>
+            <div class="card-body collapse show">
+                <div>Please upload each file that should be attached to your data request here and click the Submit button to confirm your file attachments.</div>
+                <div>The maximum file size per file is <strong>100 MiB</strong>.</div>
+                <hr class="border-0 bg-secondary" style="height: 1px;">
+                <div class="form-group">
+                    <form id="attachment" enctype="multipart/form-data">
+                        <label for="file">Select a file to upload:</label><br />
+                        <input type="file" name="file" id="file" />
+                    </form>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary upload_attachment">Upload</button>
+                </div>
+                <hr class="border-0 bg-secondary" style="height: 1px;">
+                <div class="form-group">
+                    <p>Currently attached files</p>
+                    <ul>
+                        {% for attachment in attachments %}
+                            <li><a href="/datarequest/download_attachment/{{ request_id }}?file={{ loop.index - 1 }}">{{ attachment }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <hr class="border-0 bg-secondary" style="height: 1px;">
+                <div class="form-group">
+                <a href="/datarequest/submit_attachments/{% print request_id %}" class="btn btn-primary mb-3 mr-1 float-start {% if attachments|length < 1 %} {{ 'disabled' }} {% endif %}" role="button">Submit attachments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
