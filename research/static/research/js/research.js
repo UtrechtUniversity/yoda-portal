@@ -83,6 +83,59 @@ $(function() {
         handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
+    // COLLECTION cleanup
+    $("body").on("click", "a.action-cleanup", function() {
+        fileMgmtDialogAlert('cleanup-collection', '');
+
+        let folder = $(this).attr('data-folder'); 
+        $('#cleanup-collection #collection').html($(this).attr('data-folder'));
+        $('.btn-confirm-cleanup-collection').attr('data-collection', $(this).attr('data-folder'));
+
+        $('#cleanup-files').html("");
+        Yoda.call('research_cleanup_get_files',
+                  {coll: Yoda.basePath + folder}).then((data) => {
+            let full_path = Yoda.basePath + folder;
+            let length = full_path.length + 1;
+
+            if (data.length==0){
+                $('#cleanup-files').html("No files found requiring cleanup action.");
+                return;
+            }
+            $.each(data, function(index, file_data) {
+                let file = file_data[0] + '/' + file_data[1]
+                let file_relative = file.substring(length);
+                addCleanupFile(file_data, file_relative, index);
+            });
+            console.log(data.length);
+            $('.cleanup-single-file').click(function() {
+                let coll_name = $(this).attr("coll-name");
+                let data_name = $(this).attr("data-name");
+                let row_id = $(this).attr("row-id")
+                if (confirm("Are you sure you want to delete '" + coll_name + '/' + data_name + "'?") == true) {
+                    // fileMgmtDialogAlert('cleanup-collection', 'Successfully deleted ' + $(this).attr("data-name"));
+                    handleCleanupFileDelete(coll_name, data_name);
+                    // Remove deleted file from active view
+                    $('#row-id-' + row_id).remove();
+                    if ($('#cleanup-files').html() == '') {
+                        $('#cleanup-files').html("No files found requiring cleanup action.");
+                    }
+                    // Synchronise browse view with deleted file
+                    browse(folder);
+                }
+            });
+        });
+
+        $('#cleanup-collection').modal('show');
+    });
+
+    $('.btn-confirm-cleanup-collection').click(function() {
+        console.log($(this).attr('data-collection'));
+        if (confirm("Are you sure you want to delete all files?") == true) {
+            handleCollectionCleanup($(this).attr('data-collection'));
+            browse($(this).attr('data-collection'));
+        }
+    });
+
     // FILE rename
     $("body").on("click", "a.file-rename", function() {
         // Destroy earlier alerts
@@ -490,6 +543,52 @@ async function handleFolderDelete(collection, folder_name) {
         fileMgmtDialogAlert('folder-delete', result.status_info);
     }
 }
+
+
+async function handleCollectionCleanup(collection) {
+    let result = await Yoda.call('research_cleanup_folder',
+        {
+            coll: Yoda.basePath +  collection,
+        },
+        {'quiet': true, 'rawResult': true}
+    );
+
+    if (result.status == 'ok') {
+        Yoda.set_message('success', 'Successfully cleaned up folder ' + collection);
+        browse(collection, true);
+        $('#cleanup-collection').modal('hide');
+    }
+    else {
+        fileMgmtDialogAlert('cleanup-collection', result.status_info);
+    }
+}
+
+
+function addCleanupFile(file, file_relative, index) {
+    let cfile = `<div class="col-md-12" id="${'row-id-' + index}">
+                     <i class="fa-solid fa-trash-can cleanup-single-file" data-name="${file[1]}" coll-name="${file[0]}" row-id="${index}"></i> ${htmlEncode(file_relative)}
+                 </div>`;
+    $('#cleanup-files').append(cfile);
+}
+
+
+async function handleCleanupFileDelete(collection, file_name) {
+    let result = await Yoda.call('research_file_delete',
+        {
+            coll: collection,
+            file_name: file_name
+        },
+        {'quiet': true, 'rawResult': true}
+    );
+
+    if (result.status == 'ok') {
+        fileMgmtDialogAlert('cleanup-collection', 'Successfully deleted ' + file_name);
+    }
+    else {
+        fileMgmtDialogAlert('cleanup-collection', result.status_info);
+    }
+}
+
 
 async function handleFileRename(new_file_name, collection, org_file_name) {
     if (!new_file_name.length) {
@@ -974,6 +1073,7 @@ function topInformation(dir, showAlert)
                     statusText = "";
                     actions['lock'] = 'Lock';
                     actions['submit'] = 'Submit';
+                    actions['cleanup'] = 'Cleanup';
                 } else if (status == 'LOCKED') {
                     statusText = "Locked";
                     actions['unlock'] = 'Unlock';
@@ -991,6 +1091,7 @@ function topInformation(dir, showAlert)
                     statusText = "Rejected";
                     actions['lock'] = 'Lock';
                     actions['submit'] = 'Submit';
+                    actions['cleanup'] = 'Cleanup';
                 }
 
                 // Show metadata button.
@@ -1102,7 +1203,8 @@ function handleActionsList(actions, folder)
     var vaultHtml = '';
     var possibleActions = ['lock', 'unlock',
                            'submit', 'unsubmit',
-                           'accept', 'reject'];
+                           'accept', 'reject',
+                           'cleanup'];
 
     var possibleVaultActions = ['check-for-unpreservable-files',
                                 'go-to-vault'];
