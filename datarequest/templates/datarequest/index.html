@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Datarequest{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.0.0/css/fontawesome.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('datarequest_bp.static', filename='css/index.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+<script type="text/javascript"> window.config = {
+  items: '{{ items }}',
+  archived: '{{ archived }}',
+  dacrequests: '{{ dacrequests }}'
+}
+</script>
+<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
+<script src="{{ url_for('datarequest_bp.static', filename='js/index.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        {% if submission_allowed %}
+        <a href="/datarequest/add" class="btn btn-primary mb-3 float-end" role="button">Submit data request</a>
+        {% endif %}
+
+        {% if not is_dac_member and not archived %}
+        <a href="/datarequest/archive" class="btn btn-primary mb-3 me-1 float-end" role="button">View archived requests</a>
+        {% endif %}
+        {% if not is_dac_member and archived %}
+        <a href="/datarequest" class="btn btn-primary mb-3 me-1 float-end" role="button">View active requests</a>
+        {% endif %}
+
+{{ is_dac_member }} 
+        {% if is_dac_member and not dacrequests %}
+        <a href="/datarequest/dacrequests" class="btn btn-primary mb-3 me-1 float-end" role="button">View own requests</a>
+        {% endif %}
+        {% if is_dac_member and not archived %}
+        <a href="/datarequest/archive" class="btn btn-primary mb-3 me-1 float-end" role="button">View archived reviews</a>
+        {% endif %}
+        {% if is_dac_member and (dacrequests or archived) %}
+        <a href="/datarequest" class="btn btn-primary mb-3 me-1 float-end" role="button">View reviewable requests</a>
+        {% endif %}
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <table id="file-browser" class="table yoda-table table-striped">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Request ID</th>
+                    <th>Research proposal</th>
+                    <th>Submission date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<hr>
+
+<h4 class="text-center">What are the steps to receiving YOUth data?</h4>
+
+<div class="row bs-wizard" style="border-bottom:0;">
+    <div class="col-md-3 bs-wizard-step disabled">
+        <div class="text-md-center bs-wizard-stepnum">1. Submission</div>
+        <div class="progress"><div class="progress-bar"></div></div>
+        <a href="#" class="bs-wizard-dot"></a>
+    </div>
+
+    <div class="col-md-3 bs-wizard-step disabled">
+        <div class="text-md-center bs-wizard-stepnum">2. Under review</div>
+        <div class="progress"><div class="progress-bar"></div></div>
+        <a href="#" class="bs-wizard-dot"></a>
+    </div>
+
+    <div class="col-md-3 bs-wizard-step disabled">
+        <div class="text-md-center bs-wizard-stepnum">3. Reviewed</div>
+        <div class="progress"><div class="progress-bar"></div></div>
+        <a href="#" class="bs-wizard-dot"></a>
+    </div>
+
+    <div class="col-md-3 bs-wizard-step disabled">
+        <div class="text-md-center bs-wizard-stepnum">4. Approved</div>
+        <div class="progress"><div class="progress-bar"></div></div>
+        <a href="#" class="bs-wizard-dot"></a>
+    </div>
+</div>
+<div class="row bs-wizard" style="border-bottom:0;">
+    <div class="col-md-3 bs-wizard-step disabled">
+        <div class="text-md-center bs-wizard-stepnum">5. Preregistration</div>
+        <div class="progress"><div class="progress-bar"></div></div>
+        <a href="#" class="bs-wizard-dot"></a>
+    </div>
+
+    <div class="col-md-3 bs-wizard-step disabled">
+        <div class="text-md-center bs-wizard-stepnum">6. DTA ready</div>
+        <div class="progress"><div class="progress-bar"></div></div>
+        <a href="#" class="bs-wizard-dot"></a>
+    </div>
+
+    <div class="col-md-3 bs-wizard-step disabled">
+        <div class="text-md-center bs-wizard-stepnum">7. DTA signed</div>
+        <div class="progress"><div class="progress-bar"></div></div>
+        <a href="#" class="bs-wizard-dot"></a>
+    </div>
+
+    <div class="col-md-3 bs-wizard-step disabled">
+        <div class="text-md-center bs-wizard-stepnum">8. Data ready</div>
+        <div class="progress"><div class="progress-bar"></div></div>
+        <a href="#" class="bs-wizard-dot"></a>
+    </div>
+</div>
+
+
+<hr />
+
+<h4 class="text-center">What happens at each step?</h4>
+
+<table class="process-table">
+    <tr>
+        <td><img src="{{ url_for('datarequest_bp.static', filename='images/button.png') }}"></img></td>
+        <td>Submission</td>
+        <td>The researcher submits the data request.</td>
+    </tr>
+    <tr>
+        <td><img src="{{ url_for('datarequest_bp.static', filename='images/button.png') }}"></img></td>
+        <td>Under review</td>
+        <td>The YOUth data manager has assigned the data request for review to one or more members of the YOUth Data Access Committee</td>
+    </tr>
+    <tr>
+        <td><img src="{{ url_for('datarequest_bp.static', filename='images/button.png') }}"></img></td>
+        <td>Reviewed</td>
+        <td>The data request has been reviewed by the YOUth Data Access Committee</td>
+    </tr>
+    <tr>
+        <td><img src="{{ url_for('datarequest_bp.static', filename='images/button.png') }}"></img></td>
+        <td>Approved</td>
+        <td>The YOUth project manager has approved the proposal.</td>
+    </tr>
+    <tr>
+        <td><img src="{{ url_for('datarequest_bp.static', filename='images/button.png') }}"></img></td>
+        <td>Preregistration</td>
+        <td>The researcher preregisters the study in the YOUth Open Science Framework preregistry. The YOUth project manager has confirmed the preregistration.</td>
+    </tr>
+    <tr>
+        <td><img src="{{ url_for('datarequest_bp.static', filename='images/button.png') }}"></img></td>
+        <td>DTA ready</td>
+        <td>The YOUth data manager has created a Data Transfer Agreement, stipulating the terms and conditions under which the researcher is allowed to use the data.</td>
+    </tr>
+    <tr>
+        <td><img src="{{ url_for('datarequest_bp.static', filename='images/button.png') }}"></img></td>
+        <td>DTA signed</td>
+        <td>The researcher has submitted a signed copy of the DTA.</td>
+    </tr>
+    <tr>
+        <td><img src="{{ url_for('datarequest_bp.static', filename='images/button.png') }}"></img></td>
+        <td>Data ready</td>
+        <td>The researcher may now download the requested data.</td>
+    </tr>
+</table>
+
+<hr />
+
+<h4 class="text-center">Need help?</h4>
+<p class="text-center">Send an email to DM_NAME at <a href=mailto:DM_EMAIL>DM_EMAIL</a>.</p>
+
+{% endblock content %}

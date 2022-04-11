@@ -1,0 +1,18 @@
+<div class="card">
+    <div class="card-header clearfix">
+        <div class="input-group-sm has-feedback float-start">
+        <a class="btn btn-secondary collapse-buttons" data-bs-toggle="collapse" href="#attachmentsDiv" role="button" aria-expanded="false">
+            <span class="text-collapsed">Show</span>
+            <span class="text-expanded">Hide</span>
+        </a>
+        </div>
+        <h5 class="card-header float-left">Attachments ({{ attachments|length }})</h5>
+    </div>
+    <div id="attachmentsDiv" class="card-body collapse">
+        <ul>
+            {% for attachment in attachments %}
+            <li><a href='/datarequest/download_attachment/{{ request_id }}?file={{ loop.index0 }}'>{{ attachment }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

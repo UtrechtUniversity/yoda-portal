@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Datarequest{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('datarequest_bp.static', filename='css/forms.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+<script type="text/javascript"> window.config = {
+  request_id: '{{ request_id }}',
+  username: '{{ username }}'
+}
+</script>
+<script src="{{ url_for('datarequest_bp.static', filename='js/review.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        {% include 'datarequest/partials/assign.html' %}
+        {% include 'datarequest/partials/datamanager_review.html' %}
+        {% include 'datarequest/partials/preliminary_review.html' %}
+    </div>
+    <div class="col-md-6">
+        {% include 'datarequest/partials/datarequest.html' %}
+        {% if attachments|length > 0 %} 
+        {% include 'datarequest/partials/attachments.html' %}
+        {% endif %}
+    </div>
+    <div class=col-md-6>
+        <div class="card">
+            <div class="card-header clearfix">
+                <h5 class="card-header float-left">
+                    Data request review form
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="form" class="metadata-form"
+                     data-csrf_token_name="<?php echo rawurlencode($tokenName); ?>"
+                     data-csrf_token_hash="<?php echo rawurlencode($tokenHash); ?>">
+                    <p>Loading metadata <i class="fa fa-spinner fa-spin fa-fw"></i></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

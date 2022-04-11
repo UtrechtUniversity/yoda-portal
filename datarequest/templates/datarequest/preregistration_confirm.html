@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Datarequest{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('datarequest_bp.static', filename='css/forms.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+<script type="text/javascript"> window.config = {
+  request_id: '{{ request_id }}',
+}
+</script>
+<script src="{{ url_for('datarequest_bp.static', filename='js/preregistration_confirm.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <a id="confirmPreregistration" href="/datarequest/confirm_preregistration/{{ request_id }}" class="disabled btn btn-primary mb-3 float-end">Confirm preregistration</a>
+        <a id="visitPreregistration" target="_blank" href="{{ osf_url }}" class="btn btn-primary mb-3 me-1 float-end">Visit OSF preregistration</a>
+    </div>
+    <div class="col-md-12">
+        {% include 'datarequest/partials/preregistration.html' %}
+        {% include 'datarequest/partials/datarequest.html' %}
+    </div>
+</div>
+{% endblock content %}
