@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
+from typing import Dict, Optional
 
 from flask import Blueprint, g, jsonify, request
 from irods import rule
@@ -15,17 +16,16 @@ api_bp = Blueprint('api_bp', __name__)
 
 
 @api_bp.route('/<fn>', methods=['POST'])
-def _call(fn):
+def _call(fn: str):
     if not authenticated():
         raise UnauthorizedAPIAccessError
 
+    data: Dict = {}
     if 'data' in request.form:
         data = json.loads(request.form['data'])
-    else:
-        data = {}
 
-    result = call(fn, data)
-    code = 200
+    result: Dict = call(fn, data)
+    code: int = 200
 
     if result['status'] == 'error_internal':
         code = 500
@@ -37,7 +37,7 @@ def _call(fn):
     return response
 
 
-def call(fn, data=None):
+def call(fn: str, data: Optional[Dict] = None) -> Dict:
     def bytesbuf_to_str(s):
         s = s.buf[:s.buflen]
         i = s.find(b'\x00')
@@ -82,7 +82,7 @@ def call(fn, data=None):
     return json.loads(result)
 
 
-def authenticated():
+def authenticated() -> bool:
     return g.get('user') is not None and g.get('irods') is not None
 
 

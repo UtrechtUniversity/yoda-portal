@@ -4,6 +4,7 @@ __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
+from typing import List
 
 import jwt
 import requests
@@ -25,7 +26,7 @@ user_bp = Blueprint('user_bp', __name__,
 @user_bp.route('/gate', methods=['GET', 'POST'])
 def gate():
     if request.method == 'POST':
-        username = request.form.get('username', '').lower().strip()
+        username: str = request.form.get('username', '').lower().strip()
 
         if username == '':
             flash('Missing username', 'danger')
@@ -54,8 +55,8 @@ def gate():
 @user_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username', '').lower().strip()
-        password = request.form['password']
+        username: str = request.form.get('username', '').lower().strip()
+        password: str = request.form['password']
 
         if username == '':
             flash('Missing username', 'danger')
@@ -336,10 +337,10 @@ def callback():
     return redirect(original_destination())
 
 
-def should_redirect_to_oidc(username):
+def should_redirect_to_oidc(username: str):
     """Check if user should be redirected to OIDC based on domain."""
     if '@' in username:
-        domains = app.config.get('OIDC_DOMAINS')
+        domains: List[str] = app.config.get('OIDC_DOMAINS')
         user_domain = username.split('@')[1]
         if app.config.get('OIDC_ENABLED') and user_domain in domains:
             return True
@@ -347,8 +348,8 @@ def should_redirect_to_oidc(username):
     return False
 
 
-def oidc_authorize_url(username):
-    authorize_url = app.config.get('OIDC_AUTH_URI')
+def oidc_authorize_url(username: str):
+    authorize_url: str = app.config.get('OIDC_AUTH_URI')
 
     if username:
         authorize_url += '&login_hint=' + username
@@ -356,7 +357,7 @@ def oidc_authorize_url(username):
     return authorize_url
 
 
-def irods_login(username, password):
+def irods_login(username: str, password: str):
     """Start session with iRODS."""
     password = escape_irods_pam_password(password)
 
@@ -376,7 +377,7 @@ def irods_login(username, password):
     connman.add(session.sid, irods)
 
 
-def escape_irods_pam_password(password):
+def escape_irods_pam_password(password: str):
     translation = str.maketrans({
         "@": r"\@",
         "=": r"\=",
