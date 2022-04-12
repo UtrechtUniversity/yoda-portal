@@ -413,7 +413,7 @@ def prepare_user():
         g.irods = irods
 
         # Check for notifications.
-        endpoints = ["static", "call"]
+        endpoints = ["static", "call", "upload_get", "upload_post"]
         if not request.endpoint.endswith(tuple(endpoints)):
             response = api.call('notifications_load', data={})
             g.notifications = len(response['data'])
