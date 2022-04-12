@@ -56,7 +56,7 @@ def gate():
 def login():
     if request.method == 'POST':
         username: str = request.form.get('username', '').lower().strip()
-        password: str = request.form['password']
+        password: str = request.form.get('password', '')
 
         if username == '':
             flash('Missing username', 'danger')
@@ -69,24 +69,19 @@ def login():
         session['login_username'] = username
         g.login_username = username
 
-        # Check if someone isn't trying to sneak past OIDC login
+        # Check if someone isn't trying to sneak past OIDC login.
         if should_redirect_to_oidc(username):
             return redirect(oidc_authorize_url(username))
 
-        if password is None:
-            flash(
-                'Password missing',
-                'danger')
+        if password == '':
+            flash('Password missing', 'danger')
             return render_template('user/login.html')
 
         try:
             irods_login(username, password)
 
         except PAM_AUTH_PASSWORD_FAILED:
-            flash(
-                'Username/password was incorrect',
-                'danger'
-            )
+            flash('Username/password was incorrect', 'danger')
             log_error("iRODS authentication failed for user " + username)
             return render_template('user/login.html')
 
