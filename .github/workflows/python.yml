@@ -3,7 +3,7 @@ name: "Python lint"
 on: [push, pull_request]
 
 jobs:
-  flake8:
+  lint:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
