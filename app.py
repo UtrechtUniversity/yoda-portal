@@ -4,8 +4,9 @@ __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 from os import path
+from typing import Dict, Optional
 
-from flask import Flask, g, redirect, request, send_from_directory, url_for
+from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 from jinja2 import ChoiceLoader, FileSystemLoader
@@ -103,7 +104,7 @@ csrf = CSRFProtect(app)
 
 
 @app.before_request
-def static_loader():
+def static_loader() -> Response:
     """
     Static files handling - recognisable through '/assets/'
     Override requested static file if present in user_static_area
@@ -147,7 +148,7 @@ def static_loader():
 
 
 @app.before_request
-def protect_pages():
+def protect_pages() -> Optional[Response]:
     """Restricted pages access protection."""
     if not request.endpoint or request.endpoint in ['general_bp.index',
                                                     'user_bp.login',
@@ -155,15 +156,15 @@ def protect_pages():
                                                     'user_bp.callback',
                                                     'api_bp._call',
                                                     'static']:
-        return
+        return None
     elif g.get('user', None) is not None:
-        return
+        return None
     else:
         return redirect(url_for('user_bp.gate', redirect_target=request.full_path))
 
 
 @app.after_request
-def content_security_policy(response):
+def content_security_policy(response: Response) -> Response:
     """Add Content-Security-Policy headers."""
     if request.endpoint in ['research_bp.form', 'vault_bp.form', 'deposit_bp.metadata', 'vault_bp.metadata']:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: *.openstreetmap.org; frame-ancestors 'self'; form-action 'self'; object-src 'none'"  # noqa: E501
@@ -176,7 +177,7 @@ def content_security_policy(response):
 
 
 @app.url_defaults
-def add_cache_buster(endpoint, values):
+def add_cache_buster(endpoint: str, values: Dict[str,str]) -> None:
     """Add cache buster to asset (static) URLs."""
     if endpoint.endswith("static"):
         values['q'] = app.config.get('YODA_COMMIT')
