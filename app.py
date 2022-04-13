@@ -177,7 +177,7 @@ def content_security_policy(response: Response) -> Response:
 
 
 @app.url_defaults
-def add_cache_buster(endpoint: str, values: Dict[str,str]) -> None:
+def add_cache_buster(endpoint: str, values: Dict[str, str]) -> None:
     """Add cache buster to asset (static) URLs."""
     if endpoint.endswith("static"):
         values['q'] = app.config.get('YODA_COMMIT')
