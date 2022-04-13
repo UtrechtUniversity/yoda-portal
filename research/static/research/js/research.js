@@ -101,18 +101,22 @@ $(function() {
                 $('#cleanup-files').html("No files found requiring cleanup action.");
                 return;
             }
+            // `<div class="col-md-12"><input type="checkbox" class="form-check-input ms-1"></div>`
+            $('#cleanup-files').html(`<div class="col-md-12"><input type="checkbox" class="form-check-input ms-1 cleanup-check-all"> Select all files</div>`);
             $.each(data, function(index, file_data) {
                 let file = file_data[0] + '/' + file_data[1]
                 let file_relative = file.substring(length);
                 addCleanupFile(file_data, file_relative, index);
             });
-            console.log(data.length);
+            $('.cleanup-check-all').click(function() {
+                // "cleanup-select-file"
+                $(".cleanup-select-file").prop('checked', $(this).is(":checked"));
+            });
             $('.cleanup-single-file').click(function() {
                 let coll_name = $(this).attr("coll-name");
                 let data_name = $(this).attr("data-name");
                 let row_id = $(this).attr("row-id")
                 if (confirm("Are you sure you want to delete '" + coll_name + '/' + data_name + "'?") == true) {
-                    // fileMgmtDialogAlert('cleanup-collection', 'Successfully deleted ' + $(this).attr("data-name"));
                     handleCleanupFileDelete(coll_name, data_name);
                     // Remove deleted file from active view
                     $('#row-id-' + row_id).remove();
@@ -129,7 +133,26 @@ $(function() {
     });
 
     $('.btn-confirm-cleanup-collection').click(function() {
-        console.log($(this).attr('data-collection'));
+        // console.log($(this).attr('data-collection'));
+        $(".cleanup-select-file").each(function(index,item){
+            if ($(item).is(":checked")) {
+                let coll_name = $(this).attr("coll-name");
+                let data_name = $(this).attr("data-name");
+                let row_id = $(item).attr("row-id");
+                handleCleanupFileDelete(coll_name, data_name);
+                $('#row-id-' + row_id).remove();
+                if ($('#cleanup-files').html() == '') {
+                    $('#cleanup-files').html("No files found requiring cleanup action.");
+                }
+            }
+        });
+        browse($(this).attr('data-collection'));
+        Yoda.set_message('success', 'Successfully cleaned up folder ' + collection);
+        // browse(collection, true);
+        $('#cleanup-collection').modal('hide');
+
+        return;
+
         if (confirm("Are you sure you want to delete all files?") == true) {
             handleCollectionCleanup($(this).attr('data-collection'));
             browse($(this).attr('data-collection'));
@@ -566,6 +589,7 @@ async function handleCollectionCleanup(collection) {
 
 function addCleanupFile(file, file_relative, index) {
     let cfile = `<div class="col-md-12" id="${'row-id-' + index}">
+                     <input type="checkbox" class="form-check-input ms-1 cleanup-select-file" data-name="${file[1]}" coll-name="${file[0]}" row-id="${index}"> 
                      <i class="fa-solid fa-trash-can cleanup-single-file" data-name="${file[1]}" coll-name="${file[0]}" row-id="${index}"></i> ${htmlEncode(file_relative)}
                  </div>`;
     $('#cleanup-files').append(cfile);
@@ -1073,7 +1097,7 @@ function topInformation(dir, showAlert)
                     statusText = "";
                     actions['lock'] = 'Lock';
                     actions['submit'] = 'Submit';
-                    actions['cleanup'] = 'Cleanup';
+                    actions['cleanup'] = 'Cleanup temporary files';
                 } else if (status == 'LOCKED') {
                     statusText = "Locked";
                     actions['unlock'] = 'Unlock';
@@ -1091,7 +1115,7 @@ function topInformation(dir, showAlert)
                     statusText = "Rejected";
                     actions['lock'] = 'Lock';
                     actions['submit'] = 'Submit';
-                    actions['cleanup'] = 'Cleanup';
+                    actions['cleanup'] = 'Cleanup temporary files';
                 }
 
                 // Show metadata button.
@@ -1203,10 +1227,10 @@ function handleActionsList(actions, folder)
     var vaultHtml = '';
     var possibleActions = ['lock', 'unlock',
                            'submit', 'unsubmit',
-                           'accept', 'reject',
-                           'cleanup'];
+                           'accept', 'reject'];
 
-    var possibleVaultActions = ['check-for-unpreservable-files',
+    var possibleVaultActions = ['cleanup',
+                                'check-for-unpreservable-files',
                                 'go-to-vault'];
 
     $.each(possibleActions, function( index, value ) {
