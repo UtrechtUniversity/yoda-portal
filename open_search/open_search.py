@@ -5,9 +5,10 @@ __license__   = 'GPLv3, see LICENSE'
 
 import json
 from datetime import datetime
+from typing import Any, Dict, Optional
 
 import jsonavu
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, render_template, request, Response
 from opensearchpy import OpenSearch
 
 open_search_bp = Blueprint('open_search_bp', __name__,
@@ -20,7 +21,7 @@ open_search_port = 9200
 
 
 @open_search_bp.route('/')
-def index():
+def index() -> Response:
     searchTerm = request.args.get('q', None)
 
     if searchTerm is None:
@@ -31,7 +32,7 @@ def index():
 
 
 @open_search_bp.route('/query', methods=['POST'])
-def _query():
+def _query() -> Response:
     data = json.loads(request.form['data'])
     name = data['name']
     value = data['value']
@@ -61,7 +62,10 @@ def _query():
     return response
 
 
-def query(name, value, start=0, size=500, sort=None, reverse=False):
+def query(name: str, value: str,
+          start: int = 0, size: int = 500,
+          sort: Optional[str] = None,
+          reverse: bool = False) -> Dict[str, Any]:
     client = OpenSearch(
         hosts=[{'host': open_search_host, 'port': open_search_port}],
         http_compress=True
@@ -153,7 +157,7 @@ def query(name, value, start=0, size=500, sort=None, reverse=False):
 
 
 @open_search_bp.route('/faceted_query', methods=['POST'])
-def _faceted_query():
+def _faceted_query() -> Response:
     data = json.loads(request.form['data'])
     if 'value' in data:
         value = data['value']
@@ -194,7 +198,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
         http_compress=True
     )
 
-    if value is not None:
+    if value != "":
         searchQuery = {
             'nested': {
                 'path': 'metadataEntries',
@@ -451,7 +455,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
 
 
 @open_search_bp.route('/metadata', methods=['POST'])
-def _metadata():
+def _metadata() -> Response:
     data = json.loads(request.form['data'])
     uuid = data['uuid']
     code = 200
@@ -491,7 +495,7 @@ def _metadata():
     return response
 
 
-def metadata(value):
+def metadata(value: str) -> Dict[str, Any]:
     client = OpenSearch(
         hosts=[{'host': open_search_host, 'port': open_search_port}],
         http_compress=True
