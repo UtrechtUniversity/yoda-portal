@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
 import os
+from typing import Iterator
 
 from flask import abort, Blueprint, g, jsonify, make_response, render_template, request, Response, stream_with_context
 from irods.exception import CAT_NO_ACCESS_PERMISSION
@@ -19,7 +20,7 @@ research_bp = Blueprint('research_bp', __name__,
 
 @research_bp.route('/')
 @research_bp.route('/browse')
-def index():
+def index() -> Response:
     items = 10
     dir = request.args.get('dir')
 
@@ -33,14 +34,14 @@ def index():
 
 
 @research_bp.route('/browse/download')
-def download():
+def download() -> Response:
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
     session = g.irods
 
     READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
 
-    def read_file_chunks(path):
+    def read_file_chunks(path: str) -> Iterator[bytes]:
         obj = session.data_objects.get(path)
         try:
             with obj.open('r') as fd:
@@ -67,7 +68,7 @@ def download():
         abort(404)
 
 
-def build_object_path(path, relative_path, filename):
+def build_object_path(path: str, relative_path: str, filename: str) -> str:
     relative_path = os.path.dirname(relative_path)
     path = path.lstrip("/")
 
@@ -85,7 +86,7 @@ def build_object_path(path, relative_path, filename):
 
 
 @research_bp.route('/upload', methods=['GET'])
-def upload_get():
+def upload_get() -> Response:
     flow_identifier = request.args.get('flowIdentifier', type=str)
     flow_filename = secure_filename(request.args.get('flowFilename', type=str))
     flow_chunk_number = request.args.get('flowChunkNumber', type=int)
@@ -127,7 +128,7 @@ def upload_get():
 
 
 @research_bp.route('/upload', methods=['POST'])
-def upload_post():
+def upload_post() -> Response:
     flow_identifier = request.form.get('flowIdentifier', type=str)
     flow_filename = secure_filename(request.form.get('flowFilename', type=str))
     flow_chunk_number = request.form.get('flowChunkNumber', type=int)
@@ -183,7 +184,7 @@ def upload_post():
 
 
 @research_bp.route('/metadata/form')
-def form():
+def form() -> Response:
     path = request.args.get('path')
 
     return render_template('research/metadata-form.html', path=path)

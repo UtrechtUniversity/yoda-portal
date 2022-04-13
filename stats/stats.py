@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 from datetime import datetime
 
-from flask import Blueprint, jsonify, make_response, render_template, request
+from flask import Blueprint, jsonify, make_response, render_template, request, Response
 
 import api
 
@@ -16,7 +16,7 @@ stats_bp = Blueprint('stats_bp', __name__,
 
 
 @stats_bp.route('/')
-def index():
+def index() -> Response:
     resource_tiers_response = api.call('resource_resource_and_tier_data', data={})
     group_response = api.call('resource_list_groups', data={})
     category_response = api.call('resource_category_stats', data={})
@@ -33,13 +33,13 @@ def index():
 
 
 @stats_bp.route('get_tiers', methods=['GET'])
-def get_tiers():
+def get_tiers() -> Response:
     result = api.call('resource_get_tiers', data={})
     return jsonify(result['data'])
 
 
 @stats_bp.route('resource_details', methods=['GET'])
-def get_resource_details():
+def get_resource_details() -> Response:
     resource = request.args.get('resource')
     result = api.call('resource_tier', {'res_name': resource})
     html = render_template('stats/resource_tier_mgmt.html',
@@ -49,7 +49,7 @@ def get_resource_details():
 
 
 @stats_bp.route('/export')
-def export():
+def export() -> Response:
     response = api.call('resource_monthly_category_stats', data={})
 
     csv = "category;subcategory;groupname;tier;"
