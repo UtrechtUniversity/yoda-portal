@@ -3,7 +3,7 @@
 __copyright__ = 'Copyright (c) 2021, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, redirect, render_template, url_for
+from flask import Blueprint, redirect, render_template, Response, url_for
 from flask_wtf.csrf import CSRFError
 
 general_bp = Blueprint('general_bp', __name__,
@@ -13,25 +13,25 @@ general_bp = Blueprint('general_bp', __name__,
 
 
 @general_bp.route('/')
-def index():
+def index() -> Response:
     return render_template('index.html')
 
 
 @general_bp.app_errorhandler(CSRFError)
-def csrf_error(e):
+def csrf_error(e: Exception) -> Response:
     return redirect(url_for('user_bp.login'))
 
 
 @general_bp.app_errorhandler(403)
-def access_forbidden(e):
+def access_forbidden(e: Exception) -> Response:
     return render_template('403.html'), 403
 
 
 @general_bp.app_errorhandler(404)
-def page_not_found(e):
+def page_not_found(e: Exception) -> Response:
     return render_template('404.html'), 404
 
 
 @general_bp.app_errorhandler(500)
-def internal_error(e):
+def internal_error(e: Exception) -> Response:
     return render_template('500.html'), 500
