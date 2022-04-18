@@ -126,6 +126,11 @@ $(function() {
         handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
+    // FILE stage
+    $("body").on("click", "a.file-stage", function() {
+        handleFileStage($(this).attr('data-collection'), $(this).attr('data-name'));
+    });
+
     // Flow.js upload handler
     var r = new Flow({
         target: '/research/upload',
@@ -143,6 +148,13 @@ $(function() {
     r.assignDrop($('.upload-drop')[0]);
     r.assignBrowse($('.upload-file')[0]);
     r.assignBrowse($('.upload-folder')[0], true);
+
+    // When chosing to close overview of upload overview then all incomplete file uploads will be canceled.
+    $('.btn-close-uploads-overview').click(function() {
+        r.cancel();
+        $('#files').html("");
+        $('#uploads').addClass('hidden');
+    });
 
     // Flow.js handle events
     r.on('filesAdded', function(files){
@@ -180,21 +192,21 @@ $(function() {
                 });
             });
         }
-        $('#uploads').modal('show');
+        $('#uploads').removeClass('hidden');
     });
     r.on('filesSubmitted', function() {
-        let path = $('button.upload').attr('data-path');
+        let path = $('.upload').attr('data-path');
         r.opts.query.filepath = path;
         r.upload();
     });
     r.on('complete', function(){
-        let path = $('button.upload').attr('data-path');
+        let path = $('.upload').attr('data-path');
         browse(path);
     });
     r.on('fileSuccess', function(file,message){
-        $("#" + file.uniqueIdentifier + " .msg").html("Upload completed");
+        $("#" + file.uniqueIdentifier + " .msg").html("<span class='text-success'>Upload complete</span>");
         let $self = $('#'+file.uniqueIdentifier);
-        $self.find('.upload-bttns').hide();
+        $self.find('.upload-btns').hide();
 
     });
     r.on('fileError', function(file, message){
@@ -202,7 +214,6 @@ $(function() {
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', '0%');
         let $self = $('#'+file.uniqueIdentifier);
         $self.find('.upload-pause').hide();
-        $self.find('.upload-retry').show();
     });
     r.on('fileProgress', function(file){
         var percent = Math.floor(file.progress()*100);
@@ -373,8 +384,44 @@ $(function() {
             $('#multiSelect').addClass('hide');
         }
     });
+
+    dragElement(document.getElementById("uploads"));
 });
 
+// draggability of the upload overview div
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById("uploads_header")) {
+    document.getElementById("uploads_header").onmousedown = dragMouseDown;
+  } else {
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
 
 async function handleFolderAdd(new_folder, collection) {
     if (!new_folder.length) {
@@ -484,6 +531,21 @@ async function handleFileDelete(collection, file_name) {
     }
     else {
         fileMgmtDialogAlert('file-delete', result.status_info);
+    }
+}
+
+
+async function handleFileStage(collection, file_name) {
+    let result = await Yoda.call('tape_archive_stage',
+        {path: Yoda.basePath +  collection + "/" + file_name},
+        {'quiet': true, 'rawResult': true}
+    );
+
+    if (result.status == 'ok') {
+        Yoda.set_message('success', 'Successfully requested to bring file <' + file_name + '> online');
+    }
+    else {
+        Yoda.set_message('error', 'Failed to request to bring file <' + file_name + '> online');
     }
 }
 
@@ -669,14 +731,25 @@ const tableRenderer = {
         }
     },
     date: ts => {
-         let date = new Date(ts*1000);
-         let pad = n => n < 10 ? '0'+n : ''+n;
-         let elem = $('<span>');
-         elem.text(`${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
+        let date = new Date(ts*1000);
+        let pad = n => n < 10 ? '0'+n : ''+n;
+        let elem = $('<span>');
+        elem.text(`${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
                  + ` ${pad(date.getHours())}:${pad(date.getMinutes())}`);
-         elem.attr('title', date.toString()); // (should include seconds and TZ info)
-         return elem[0].outerHTML;
-     },
+        elem.attr('title', date.toString()); // (should include seconds and TZ info)
+        return elem[0].outerHTML;
+    },
+    state: (_, __, row) => {
+        let state = $('<span>');
+        if (row.type === 'data' && row.state === 'OFL') {
+            state = $('<span class="badge bg-secondary" title="Stored offline on tape archive">Offline</span>');
+        } else if (row.type === 'data' && row.state === 'UNM') {
+            state = $('<span class="badge bg-secondary" title="Migrating from tape archive to disk">Bringing online</span>');
+        } else if (row.type === 'data' && row.state === 'MIG') {
+            state = $('<span class="badge bg-secondary" title="Migrating from disk to tape archive">Storing offline</span>');
+        }
+        return state[0].outerHTML;
+    },
     context: (_, __, row) => {
         let actions = $('<div class="dropdown-menu">');
 
@@ -691,26 +764,34 @@ const tableRenderer = {
             actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
         }
         else {
-            // Render context menu for files.
-            const viewExts = {
-                image: ['jpg', 'jpeg', 'gif', 'png'],
-                audio: ['mp3', 'ogg', 'wav'],
-                video: ['mp4', 'ogg', 'webm']
-            };
-            let ext = row.name.replace(/.*\./, '').toLowerCase();
+            if (row.state === 'OFL') {
+                actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`);
+            } else if (row.state === 'MIG' || row.state === 'UNM') {
+                // no context menu for data objects migrating from or to tape archive
+                return ''
+            } else {
+                // Render context menu for files.
+                const viewExts = {
+                    image: ['jpg', 'jpeg', 'gif', 'png'],
+                    audio: ['mp3', 'ogg', 'wav'],
+                    video: ['mp4', 'ogg', 'webm']
+                };
+                let ext = row.name.replace(/.*\./, '').toLowerCase();
 
-            actions.append(`<a class="dropdown-item" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file">Download</a>`);
+                actions.append(`<a class="dropdown-item" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file">Download</a>`);
 
-            // Generate dropdown "view" actions for different media types.
-            for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-                actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`);
+                // Generate dropdown "view" actions for different media types.
+                for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
+                    actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`);
+                }
+
+                actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this file">Rename</a>`);
+                actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Copy this file">Copy</a>`);
+                actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this file">Move</a>`);
+                actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
             }
-
-            actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this file">Rename</a>`);
-            actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Copy this file">Copy</a>`);
-            actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this file">Move</a>`);
-            actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
         }
+
         let dropdown = $(`<div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               <i class="fa-solid fa-ellipsis-h" aria-hidden="true"></i>
@@ -740,6 +821,7 @@ function startBrowsing(items)
                     // (enabling this as is may result in duplicated results for data objects)
                     {render: tableRenderer.size,    orderable: false, data: 'size'},
                     {render: tableRenderer.date,    orderable: false, data: 'modify_time'},
+                    {render: tableRenderer.state,   orderable: false},
                     {render: tableRenderer.context, orderable: false }],
         "ajax": getFolderContents,
         "processing": true,

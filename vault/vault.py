@@ -4,6 +4,7 @@ __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
+from typing import Iterator
 from uuid import UUID
 
 from flask import abort, Blueprint, g, render_template, request, Response, stream_with_context
@@ -18,7 +19,7 @@ vault_bp = Blueprint('vault_bp', __name__,
 
 @vault_bp.route('/')
 @vault_bp.route('/browse')
-def index():
+def index() -> Response:
     items = 10
     dir = request.args.get('dir')
 
@@ -32,14 +33,14 @@ def index():
 
 
 @vault_bp.route('/browse/download')
-def download():
+def download() -> Response:
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
     session = g.irods
 
     READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
 
-    def read_file_chunks(path):
+    def read_file_chunks(path: str) -> Iterator[bytes]:
         obj = session.data_objects.get(path)
         with obj.open('r') as fd:
             while True:
@@ -62,14 +63,14 @@ def download():
 
 
 @vault_bp.route('/metadata/form')
-def form():
+def form() -> Response:
     path = request.args.get('path')
 
     return render_template('vault/metadata-form.html', path=path)
 
 
 @vault_bp.route('/access', methods=['POST'])
-def access():
+def access() -> Response:
     path = request.form.get('path')
     action = request.form.get('action')
 
@@ -84,7 +85,7 @@ def access():
 
 
 @vault_bp.route('/yoda/<reference>')
-def metadata(reference):
+def metadata(reference: str) -> Response:
     # Check if Data Package Reference is a valid UUID4.
     try:
         if UUID(reference).version != 4:

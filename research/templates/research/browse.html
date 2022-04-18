@@ -251,15 +251,18 @@
     </div>
 </div>
 
-<div class="modal" tabindex="-1" role="dialog" id="uploads">
-    <div class="modal-dialog mw-100 w-50">
+<div id="uploads" class="hidden fixed-bottom w-75">
+    <div class="modal-dialog mw-100 w-75">
         <div class="modal-content">
-            <div class="modal-body">
+            <div class="modal-header" id="uploads_header">
                 <h5 class="modal-title">Uploads</h5>
+                <button type="button" class="btn-close btn-close-uploads-overview" data-bs-dismiss="modal" aria-label="Close" title="Close"></button>
+            </div>
+            <div class="modal-body">
                 <div id="files"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-secondary btn-close-uploads-overview" data-bs-dismiss="modal" title="Close">Close</button>
             </div>
         </div>
     </div>
@@ -356,6 +359,7 @@
                     <th>Name</th>
                     <th>Size</th>
                     <th>Modified date</th>
+                    <th></th>
                     <th></th>
                 </tr>
                 </thead>

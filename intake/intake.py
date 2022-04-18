@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 
 import time
+from typing import Dict
 
-from flask import Blueprint, g, make_response, render_template, request, session
+from flask import Blueprint, g, make_response, render_template, request, Response, session
 
 import api
 
@@ -17,7 +18,7 @@ intake_bp = Blueprint('intake_bp', __name__,
 
 
 @intake_bp.route('/', methods=['GET'])
-def index():
+def index() -> Response:
     study_id = request.args.get('studyID')
     study_folder = request.args.get('studyFolder')
     alert_nr = request.args.get('alertNr')
@@ -116,7 +117,7 @@ def index():
                            title='Study ' + study_title)
 
 
-def get_intake_study_permissions(study_id):
+def get_intake_study_permissions(study_id: str) -> Dict[str, str]:
     return {'assistant': api.call('group_user_is_member',
                                   {'username': g.user, 'group_name': 'grp-intake-' + study_id})['data'],
             'manager': api.call('group_user_is_member',
@@ -124,7 +125,7 @@ def get_intake_study_permissions(study_id):
 
 
 @intake_bp.route('getDatasetDetailView', methods=['POST'])
-def get_dataset_detail_view():
+def get_dataset_detail_view() -> Response:
     path = request.form.get('path')
     tbl_id = request.form.get('tbl_id')
     dataset_id = request.form.get('datasetID')
@@ -164,7 +165,7 @@ def get_dataset_detail_view():
 
 
 @intake_bp.route('download', methods=['GET'])
-def export():
+def export() -> Response:
     # Datamanager only!
     study_id = request.args.get('studyID')
 
@@ -230,7 +231,7 @@ def export():
 #     public function index($studyID=null)
 @intake_bp.route('reports')
 @intake_bp.route('/reports/')
-def reports():
+def reports() -> Response:
     access_denied = True
     study_id = request.args.get('studyID')
 

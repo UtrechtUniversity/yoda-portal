@@ -93,9 +93,6 @@ table.dataTable > tbody > tr > td {
     padding: 5px;
     vertical-align: baseline;
 }
-table.dataTable > tbody > tr > td i {
-    vertical-align: bottom;
-}
 
 /* Table */
 .yoda-table th {

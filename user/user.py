@@ -4,10 +4,11 @@ __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
+from typing import List
 
 import jwt
 import requests
-from flask import Blueprint, current_app as app, flash, g, redirect, render_template, request, session, url_for
+from flask import Blueprint, current_app as app, flash, g, redirect, render_template, request, Response, session, url_for
 from irods.exception import iRODSException, PAM_AUTH_PASSWORD_FAILED
 from irods.session import iRODSSession
 
@@ -23,9 +24,9 @@ user_bp = Blueprint('user_bp', __name__,
 
 
 @user_bp.route('/gate', methods=['GET', 'POST'])
-def gate():
+def gate() -> Response:
     if request.method == 'POST':
-        username = request.form.get('username', '').lower().strip()
+        username: str = request.form.get('username', '').lower().strip()
 
         if username == '':
             flash('Missing username', 'danger')
@@ -52,10 +53,10 @@ def gate():
 
 
 @user_bp.route('/login', methods=['GET', 'POST'])
-def login():
+def login() -> Response:
     if request.method == 'POST':
-        username = request.form.get('username', '').lower().strip()
-        password = request.form['password']
+        username: str = request.form.get('username', '').lower().strip()
+        password: str = request.form.get('password', '')
 
         if username == '':
             flash('Missing username', 'danger')
@@ -68,24 +69,19 @@ def login():
         session['login_username'] = username
         g.login_username = username
 
-        # Check if someone isn't trying to sneak past OIDC login
+        # Check if someone isn't trying to sneak past OIDC login.
         if should_redirect_to_oidc(username):
             return redirect(oidc_authorize_url(username))
 
-        if password is None:
-            flash(
-                'Password missing',
-                'danger')
+        if password == '':
+            flash('Password missing', 'danger')
             return render_template('user/login.html')
 
         try:
             irods_login(username, password)
 
         except PAM_AUTH_PASSWORD_FAILED:
-            flash(
-                'Username/password was incorrect',
-                'danger'
-            )
+            flash('Username/password was incorrect', 'danger')
             log_error("iRODS authentication failed for user " + username)
             return render_template('user/login.html')
 
@@ -117,7 +113,7 @@ def login():
 
 
 @user_bp.route('/logout')
-def logout():
+def logout() -> Response:
     """Logout user and redirect to index."""
     connman.clean(session.sid)
     session.clear()
@@ -125,7 +121,7 @@ def logout():
 
 
 @user_bp.route('/notifications')
-def notifications():
+def notifications() -> Response:
     """Notifications page."""
     sort_order = request.args.get('sort_order', 'desc')
     response = api.call('notifications_load', data={'sort_order': sort_order})
@@ -134,7 +130,7 @@ def notifications():
 
 
 @user_bp.route('/settings', methods=['GET', 'POST'])
-def settings():
+def settings() -> Response:
     """User settings page."""
     if request.method == 'POST':
         # Build user settings dict.
@@ -161,16 +157,16 @@ def settings():
 
 
 @user_bp.route('/data_access')
-def data_access():
+def data_access() -> Response:
     """Data Access Passwords overview"""
     response = api.call('token_load')
     return render_template('user/data_access.html', tokens=response['data'])
 
 
 @user_bp.route('/callback')
-def callback():
+def callback() -> Response:
     """OpenID Connect callback."""
-    def token_request():
+    def token_request() -> requests.Response:
         code = request.args.get('code')
         data = {
             'grant_type': 'authorization_code',
@@ -192,7 +188,7 @@ def callback():
 
         return response
 
-    def userinfo_request(token):
+    def userinfo_request(token: str) -> requests.Response:
         userinfo_uri = app.config.get('OIDC_USERINFO_URI')
         response = requests.get(
             userinfo_uri,
@@ -266,11 +262,14 @@ def callback():
 
     except json.decoder.JSONDecodeError:
         # Either token response or userinfo response decoding failed
-        log_error(
-            'JSON decode error during callback. token_response + headers:\n{}\n\n{}'
-            .format(
-                token_response.headers,
-                token_response.text), True)
+        log_error('JSON decode error during callback.', True)
+
+        if token_response is not None:
+            log_error(
+                'token_response + headers:\n{}\n\n{}'
+                .format(
+                    token_response.headers,
+                    token_response.text))
 
         if userinfo_response is not None:
             log_error(
@@ -284,7 +283,7 @@ def callback():
 
     except KeyError:
         # Missing key in token or userinfo response.
-        # The only one of interest is the latest response
+        # The only one of interest is the latest response.
         if userinfo_response is not None:
             log_error(
                 'KeyError in callback for userinfo_response + headers:\n{}\n{}'
@@ -292,7 +291,7 @@ def callback():
                     userinfo_response.headers,
                     userinfo_response.text),
                 True)
-        else:
+        elif token_response is not None:
             log_error(
                 'KeyError in callback for token_response + headers:\n{}\n{}'
                 .format(
@@ -301,12 +300,12 @@ def callback():
                 True)
 
     except UserinfoSubMismatchError:
-        # Possible Token substitution attack
+        # Possible Token substitution attack.
         log_error(
             'Possible token substitution attack: {} is not {}'
             .format(
                 payload['sub'],
-                userinfo_response['sub']),
+                userinfo_payload['sub']),
             True)
 
     except UserinfoEmailMismatchError:
@@ -336,10 +335,10 @@ def callback():
     return redirect(original_destination())
 
 
-def should_redirect_to_oidc(username):
+def should_redirect_to_oidc(username: str) -> bool:
     """Check if user should be redirected to OIDC based on domain."""
     if '@' in username:
-        domains = app.config.get('OIDC_DOMAINS')
+        domains: List[str] = app.config.get('OIDC_DOMAINS')
         user_domain = username.split('@')[1]
         if app.config.get('OIDC_ENABLED') and user_domain in domains:
             return True
@@ -347,8 +346,8 @@ def should_redirect_to_oidc(username):
     return False
 
 
-def oidc_authorize_url(username):
-    authorize_url = app.config.get('OIDC_AUTH_URI')
+def oidc_authorize_url(username: str) -> str:
+    authorize_url: str = app.config.get('OIDC_AUTH_URI')
 
     if username:
         authorize_url += '&login_hint=' + username
@@ -356,7 +355,7 @@ def oidc_authorize_url(username):
     return authorize_url
 
 
-def irods_login(username, password):
+def irods_login(username: str, password: str) -> None:
     """Start session with iRODS."""
     password = escape_irods_pam_password(password)
 
@@ -376,7 +375,7 @@ def irods_login(username, password):
     connman.add(session.sid, irods)
 
 
-def escape_irods_pam_password(password):
+def escape_irods_pam_password(password: str) -> str:
     translation = str.maketrans({
         "@": r"\@",
         "=": r"\=",
@@ -387,7 +386,7 @@ def escape_irods_pam_password(password):
     return password.translate(translation)
 
 
-def original_destination():
+def original_destination() -> str:
     target = session.get('redirect_target')
     if target is not None:
         session['redirect_target'] = None
@@ -397,7 +396,7 @@ def original_destination():
 
 
 @user_bp.before_app_request
-def prepare_user():
+def prepare_user() -> None:
     user_id = session.get('user_id', None)
     irods = connman.get(session.sid)
     login_username = session.get('login_username')
@@ -412,7 +411,7 @@ def prepare_user():
         g.irods = irods
 
         # Check for notifications.
-        endpoints = ["static", "call"]
+        endpoints = ["static", "call", "upload_get", "upload_post"]
         if not request.endpoint.endswith(tuple(endpoints)):
             response = api.call('notifications_load', data={})
             g.notifications = len(response['data'])
@@ -421,6 +420,6 @@ def prepare_user():
 
 
 @user_bp.after_app_request
-def release_session(response):
+def release_session(response: Response) -> Response:
     connman.release(session.sid)
     return response
