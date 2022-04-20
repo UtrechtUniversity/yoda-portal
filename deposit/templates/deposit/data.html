@@ -101,25 +101,34 @@
     </div>
 </div>
 
-<div class="card upload-large-files mt-4">
-    <div class="card-header">
-        Alternative upload methods
+<div class="row">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Yoda iCommands</h5>
+        <p class="card-text">
+            For frequent large uploads (bigger than 5GB) we recommend using the iCommands.
+            The iCommands allows you to interact with the iRODS backend of Yoda directly.
+            Therefore, it is possible to transfer data to and from Yoda using the iRODS communication protocol.
+            You need to configure the iCommands to connect to this Yoda environment.
+        </p>
+        <a href="#" title="iCommands configuration" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#aboutModal">iCommands Configuration</a>
+        <a href="https://www.uu.nl/en/research/yoda/guide-to-yoda/i-am-using-yoda/using-icommands-for-large-datasets" title="Using iCommands for large datasets" class="btn btn-secondary" target="_blank">More information</a>
+      </div>
     </div>
-    <div class="card-body">
-        <p>For frequent large uploads (bigger than 5GB) we recommend using one of the following:</p>
-        <ul>
-            <li>
-                <a href="https://www.uu.nl/en/research/yoda/guide-to-yoda/i-am-using-yoda/using-icommands-for-large-datasets" title="Using iCommands for large datasets" target="_blank">iCommands</a><br>
-                Best option for large uploads. Requires familiarity with using the commandline.<br>
-                (iRODS host: '{{ config.get('IRODS_ICAT_HOSTNAME') }}', iRODS zone: '{{ config.get('IRODS_DEFAULT_ZONE') }}', iRODS home: '/{{ config.get('IRODS_DEFAULT_ZONE') }}/home)
-            </li>
-            <li>
-                <a href="https://www.uu.nl/en/research/yoda/guide-to-yoda/i-want-to-start-using-yoda/connecting-to-the-yoda-network-disk-on-windows" title="Yoda network disk / WebDAV" target="_blank">Yoda network disk / WebDAV</a><br>
-                Useful for large files and when you need to be able to connect to multiple Yoda environments simultaneously.<br>
-                See the menu links on the left for Windows, MacOS and Linux software.
-            </li>
-        </ul>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Yoda network disk / WebDAV</h5>
+        <p class="card-text">
+          Useful for large files and when you need to be able to connect to multiple Yoda environments simultaneously.<br>
+          See the menu links on the left for Windows, MacOS and Linux software.
+        </p>
+        <a href="https://www.uu.nl/en/research/yoda/guide-to-yoda/i-want-to-start-using-yoda/connecting-to-the-yoda-network-disk-on-windows" title="Yoda network disk / WebDAV" class="btn btn-secondary" target="_blank">More information</a>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Modals -->
