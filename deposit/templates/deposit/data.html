@@ -106,11 +106,11 @@
         Alternative upload methods
     </div>
     <div class="card-body">
-        <p>For frequent large uploads (bigger than 1GB) we recommend using one of the following:</p>
+        <p>For frequent large uploads (bigger than 5GB) we recommend using one of the following:</p>
         <ul>
             <li>
                 <a href="https://www.uu.nl/en/research/yoda/guide-to-yoda/i-am-using-yoda/using-icommands-for-large-datasets" title="Using iCommands for large datasets" target="_blank">iCommands</a><br>
-                Requires familiarity with using the commandline. (iRODS host: {{ config.get('IRODS_ICAT_HOSTNAME') }}, iRODS zone: {{ config.get('IRODS_DEFAULT_ZONE') }})
+                Best option for large uploads. Requires familiarity with using the commandline. (iRODS host: '{{ config.get('IRODS_ICAT_HOSTNAME') }}', iRODS zone: '{{ config.get('IRODS_DEFAULT_ZONE') }}', iRODS home: '/{{ config.get('IRODS_DEFAULT_ZONE') }}/home)
             </li>
             <li>
                 <a href="https://www.uu.nl/en/research/yoda/guide-to-yoda/i-want-to-start-using-yoda/connecting-to-the-yoda-network-disk-on-windows" title="Yoda drive" target="_blank">Yoda network disk / WebDAV</a><br>
