@@ -133,7 +133,6 @@ $(function() {
     });
 
     $('.btn-confirm-cleanup-collection').click(function() {
-        // console.log($(this).attr('data-collection'));
         $(".cleanup-select-file").each(function(index,item){
             if ($(item).is(":checked")) {
                 let coll_name = $(this).attr("coll-name");
@@ -147,16 +146,8 @@ $(function() {
             }
         });
         browse($(this).attr('data-collection'));
-        Yoda.set_message('success', 'Successfully cleaned up folder ' + collection);
-        // browse(collection, true);
+        Yoda.set_message('success', 'Successfully cleaned up folder ' + $(this).attr('data-collection'));
         $('#cleanup-collection').modal('hide');
-
-        return;
-
-        if (confirm("Are you sure you want to delete all files?") == true) {
-            handleCollectionCleanup($(this).attr('data-collection'));
-            browse($(this).attr('data-collection'));
-        }
     });
 
     // FILE rename
@@ -1111,6 +1102,7 @@ function topInformation(dir, showAlert)
                     statusText = "Secured";
                     actions['lock'] = 'Lock';
                     actions['submit'] = 'Submit';
+                    actions['cleanup'] = 'Cleanup temporary files';
                 } else if (status == 'REJECTED') {
                     statusText = "Rejected";
                     actions['lock'] = 'Lock';
