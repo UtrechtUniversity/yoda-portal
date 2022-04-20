@@ -260,8 +260,8 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
             if isinstance(filter, str):
                 should = [
                     {
-                        'match': {
-                            'metadataEntries.value.raw': filter
+                        'prefix': {
+                            'metadataEntries.value': filter
                         }
                     }
                 ]
