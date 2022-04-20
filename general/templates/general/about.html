@@ -1,5 +1,5 @@
 <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModal" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">About</h5>
@@ -24,7 +24,7 @@
           You need to configure the iCommands to connect to this Yoda environment.
           Copy and paste this configuration into your ~/.irods/irods_environment.json configuration file.
         </p>
-        <code>
+        <pre><code>
         {
             "irods_host": "{{ config.get('IRODS_ICAT_HOSTNAME') }}",
             "irods_port": 1247,
@@ -38,7 +38,7 @@
             "irods_encryption_salt_size": 8,
             "irods_client_server_negotiation": "request_server_negotiation"
         }
-        </code>
+        </code></pre>
       </div>
     </div>
   </div>
