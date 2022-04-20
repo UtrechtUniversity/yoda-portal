@@ -91,7 +91,7 @@ def group_update() -> Response:
 
     property_updated = False
     for property in properties:
-        property_name = "group_{}".format(property)
+        property_name = f"group_{property}"
         if property_name in request.form:
             property_updated = True
             value = request.form[property_name]

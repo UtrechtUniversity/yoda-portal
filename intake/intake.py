@@ -175,7 +175,7 @@ def export() -> Response:
         output = make_response(content)
         size = 0
 
-        output.headers['Content-Disposition'] = 'attachment; filename="{}.csv"'.format('no_access_to_study')
+        output.headers['Content-Disposition'] = 'attachment; filename="no_access_to_study.csv"'
         output.headers['Content-Type'] = 'application/octet'
         output.headers['Content-Length'] = size
 
@@ -221,7 +221,7 @@ def export() -> Response:
     output = make_response(content)
     size = len(content)
 
-    output.headers['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(study_id)
+    output.headers['Content-Disposition'] = f'attachment; filename="{study_id}.csv"'
     output.headers['Content-Type'] = 'application/octet'
     output.headers['Content-Length'] = size
 
