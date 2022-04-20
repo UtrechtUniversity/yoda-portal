@@ -108,7 +108,7 @@ def upload_get() -> Response:
 
     # Partial file name for chunked uploads.
     if flow_total_chunks > 1:
-        object_path = "{}.part".format(object_path)
+        object_path = f"{object_path}.part"
 
     try:
         obj = session.data_objects.get(object_path)
@@ -150,7 +150,7 @@ def upload_post() -> Response:
 
     # Partial file name for chunked uploads.
     if flow_total_chunks > 1:
-        object_path = "{}.part".format(object_path)
+        object_path = f"{object_path}.part"
 
     # Get the chunk data.
     chunk_data = request.files['file']

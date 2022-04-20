@@ -193,7 +193,7 @@ def callback() -> Response:
         response = requests.get(
             userinfo_uri,
             headers={
-                'Authorization': 'Bearer {}'.format(token)
+                'Authorization': 'Bearer {token}'
             }
         )
 
@@ -266,60 +266,48 @@ def callback() -> Response:
 
         if token_response is not None:
             log_error(
-                'token_response + headers:\n{}\n\n{}'
-                .format(
-                    token_response.headers,
-                    token_response.text))
+                f'token_response + headers:\n{token_response.headers}\n\n{token_response.text}'
+            )
 
         if userinfo_response is not None:
             log_error(
-                'userinfo_response + headers:\n{}\n\n{}'
-                .format(
-                    userinfo_response.headers,
-                    userinfo_response.text))
+                f'userinfo_response + headers:\n{userinfo_response.headers}\n\n{userinfo_response.text}'
+            )
 
     except iRODSException:
-        log_error('iRODSException for user {} during callback'.format(email), True)
+        log_error(f'iRODSException for user {email} during callback', True)
 
     except KeyError:
         # Missing key in token or userinfo response.
         # The only one of interest is the latest response.
         if userinfo_response is not None:
             log_error(
-                'KeyError in callback for userinfo_response + headers:\n{}\n{}'
-                .format(
-                    userinfo_response.headers,
-                    userinfo_response.text),
-                True)
+                f'KeyError in callback for userinfo_response + headers:'
+                f'\n{userinfo_response.headers}\n{userinfo_response.text}',
+                True
+            )
         elif token_response is not None:
             log_error(
-                'KeyError in callback for token_response + headers:\n{}\n{}'
-                .format(
-                    token_response.headers,
-                    token_response.text),
-                True)
+                f'KeyError in callback for token_response + headers:\n{token_response.headers}\n{token_response.text}',
+                True
+            )
 
     except UserinfoSubMismatchError:
         # Possible Token substitution attack.
         log_error(
-            'Possible token substitution attack: {} is not {}'
-            .format(
-                payload['sub'],
-                userinfo_payload['sub']),
-            True)
+            f"Possible token substitution attack: {payload['sub']} is not {userinfo_payload['sub']}",
+            True
+        )
 
     except UserinfoEmailMismatchError:
         # Mismatch between email and user info email.
         log_error(
-            'Mismatch between email and user info email: {} is not in {}'
-            .format(
-                email,
-                str(userinfo_email)),
-            True)
+            f'Mismatch between email and user info email: {email} is not in {userinfo_email}',
+            True
+        )
 
     except Exception:
-        log_error("Unexpected exception during callback for username " + str(email),
-                  True)
+        log_error(f"Unexpected exception during callback for username {email}", True)
 
     finally:
         if exception_occurred:
