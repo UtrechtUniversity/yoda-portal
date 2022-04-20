@@ -113,8 +113,12 @@
         <footer class="footer">
             {% block footer %}
             <div class="container">
-                <p class="text-muted">Yoda {{ config.YODA_VERSION }}</p>
-                <!-- {{ config.YODA_COMMIT }} -->
+                {% if g.user %}
+                    {% include 'about.html' %}
+                    <p class="text-muted" data-bs-toggle="modal" data-bs-target="#aboutModal">Yoda {{ config.YODA_VERSION }}</p>
+                {% else %}
+                    <p class="text-muted">Yoda {{ config.YODA_VERSION }}</p>
+                {% endif %}
             </div>
             {% endblock footer %}
         </footer>
