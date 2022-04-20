@@ -210,7 +210,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                                     'metadataEntries.unit.raw': 'FlatIndex'
                                 }
                             }, {
-                                'match': {
+                                'prefix': {
                                     'metadataEntries.value': value
                                 }
                             }
@@ -260,8 +260,8 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
             if isinstance(filter, str):
                 should = [
                     {
-                        'prefix': {
-                            'metadataEntries.value': filter
+                        'term': {
+                            'metadataEntries.value.raw': filter
                         }
                     }
                 ]
