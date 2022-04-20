@@ -210,7 +210,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                                     'metadataEntries.unit.raw': 'FlatIndex'
                                 }
                             }, {
-                                'match': {
+                                'prefix': {
                                     'metadataEntries.value': value
                                 }
                             }
