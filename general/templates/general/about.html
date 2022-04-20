@@ -2,11 +2,11 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">About</h5>
+        <h5 class="modal-title" id="exampleModalLabel">About {{ config.get('PORTAL_TITLE_TEXT') }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <h6>What is Yoda?</h6>
+        <strong>What is Yoda?</strong>
         <p>
           Yoda is a research data management service that enables researchers from Utrecht University,
           their partners and researchers from other institutes to securely deposit, share, publish and
@@ -16,7 +16,8 @@
           The software has been developed at Utrecht University and is used by multiple organisations,
           both in the Netherlands and abroad.
         </p>
-        <h6>iCommands Connection Information</h6>
+
+        <strong>iCommands Connection Information</strong>
         <p>
           Yoda is based on iRODS technology.
           iCommands allows you to interact with the iRODS backend of Yoda directly.
