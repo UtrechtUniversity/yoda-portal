@@ -88,11 +88,16 @@ def build_object_path(path: str, relative_path: str, filename: str) -> str:
 @research_bp.route('/upload', methods=['GET'])
 def upload_get() -> Response:
     flow_identifier = request.args.get('flowIdentifier', type=str)
-    flow_filename = secure_filename(request.args.get('flowFilename', type=str))
     flow_chunk_number = request.args.get('flowChunkNumber', type=int)
     flow_total_chunks = request.args.get('flowTotalChunks', type=int)
     flow_chunk_size = request.args.get('flowChunkSize', type=int)
     flow_relative_path = request.args.get('flowRelativePath', type=str)
+
+    flow_filename = request.args.get('flowFilename', type=str)
+    has_dot = flow_filename.startswith('.')
+    flow_filename = secure_filename(flow_filename)
+    if has_dot:
+        flow_filename = f'.{flow_filename}'
 
     filepath = request.args.get('filepath', type=str)
 
@@ -130,11 +135,16 @@ def upload_get() -> Response:
 @research_bp.route('/upload', methods=['POST'])
 def upload_post() -> Response:
     flow_identifier = request.form.get('flowIdentifier', type=str)
-    flow_filename = secure_filename(request.form.get('flowFilename', type=str))
     flow_chunk_number = request.form.get('flowChunkNumber', type=int)
     flow_total_chunks = request.form.get('flowTotalChunks', type=int)
     flow_chunk_size = request.form.get('flowChunkSize', type=int)
     flow_relative_path = request.form.get('flowRelativePath', type=str)
+
+    flow_filename = request.form.get('flowFilename', type=str)
+    has_dot = flow_filename.startswith('.')
+    flow_filename = secure_filename(flow_filename)
+    if has_dot:
+        flow_filename = f'.{flow_filename}'
 
     filepath = request.form.get('filepath', type=str)
 
