@@ -83,16 +83,16 @@ $(function() {
         handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
-    // COLLECTION cleanup
+    // Cleanup temporary files.
     $("body").on("click", "a.action-cleanup", function() {
         fileMgmtDialogAlert('cleanup-collection', '');
 
-        let folder = $(this).attr('data-folder'); 
+        let folder = $(this).attr('data-folder');
         $('#cleanup-collection #collection').html($(this).attr('data-folder'));
         $('.btn-confirm-cleanup-collection').attr('data-collection', $(this).attr('data-folder'));
 
         $('#cleanup-files').html("");
-        Yoda.call('research_cleanup_get_files',
+        Yoda.call('research_list_temporary_files',
                   {coll: Yoda.basePath + folder}).then((data) => {
             let full_path = Yoda.basePath + folder;
             let length = full_path.length + 1;
@@ -101,7 +101,7 @@ $(function() {
                 $('#cleanup-files').html("No files found requiring cleanup action.");
                 return;
             }
-            // `<div class="col-md-12"><input type="checkbox" class="form-check-input ms-1"></div>`
+
             $('#cleanup-files').html(`<div class="col-md-12"><input type="checkbox" class="form-check-input ms-1 cleanup-check-all"> Select all files</div>`);
             $.each(data, function(index, file_data) {
                 let file = file_data[0] + '/' + file_data[1]
@@ -559,28 +559,9 @@ async function handleFolderDelete(collection, folder_name) {
 }
 
 
-async function handleCollectionCleanup(collection) {
-    let result = await Yoda.call('research_cleanup_folder',
-        {
-            coll: Yoda.basePath +  collection,
-        },
-        {'quiet': true, 'rawResult': true}
-    );
-
-    if (result.status == 'ok') {
-        Yoda.set_message('success', 'Successfully cleaned up folder ' + collection);
-        browse(collection, true);
-        $('#cleanup-collection').modal('hide');
-    }
-    else {
-        fileMgmtDialogAlert('cleanup-collection', result.status_info);
-    }
-}
-
-
 function addCleanupFile(file, file_relative, index) {
     let cfile = `<div class="col-md-12" id="${'row-id-' + index}">
-                     <input type="checkbox" class="form-check-input ms-1 cleanup-select-file" data-name="${file[1]}" coll-name="${file[0]}" row-id="${index}"> 
+                     <input type="checkbox" class="form-check-input ms-1 cleanup-select-file" data-name="${file[1]}" coll-name="${file[0]}" row-id="${index}">
                      <i class="fa-solid fa-trash-can cleanup-single-file" data-name="${file[1]}" coll-name="${file[0]}" row-id="${index}"></i> ${htmlEncode(file_relative)}
                  </div>`;
     $('#cleanup-files').append(cfile);
