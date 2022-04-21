@@ -198,6 +198,110 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
         http_compress=True
     )
 
+    facetList = {}
+    if len(facets) != 0:
+        for facet in facets:
+            if facet == 'Person':
+                filter = {
+                    'bool': {
+                        'should': [
+                            {
+                                'term': {
+                                    'metadataEntries.attribute.raw': 'Creator'
+                                }
+                            }, {
+                                'term': {
+                                    'metadataEntries.attribute.raw': 'Contributor'
+                                }
+                            }
+                        ],
+                        'minimum_should_match': 1
+                    }
+                }
+            else:
+                filter = {
+                    'term': {
+                        'metadataEntries.attribute.raw': facet
+                    }
+                }
+            facetList[facet] = {
+                'filter': filter,
+                'aggregations': {
+                    'value': {
+                        'terms': {
+                            'field': 'metadataEntries.value.raw'
+                        }
+                    }
+                }
+            }
+    if len(ranges) != 0:
+        for facet, range in ranges.items():
+            subranges = []
+            for subrange in range:
+                subranges.append({
+                    'from': subrange['from'],
+                    'to': subrange['to'] + 1
+                })
+            facetList[facet] = {
+                'filter': {
+                    'term': {
+                        'metadataEntries.attribute.raw': facet
+                    }
+                },
+                'aggregations': {
+                    'value': {
+                        'range': {
+                            'field': 'metadataEntries.value.number',
+                            'ranges': subranges
+                        }
+                    }
+                }
+            }
+
+    if len(facetList) != 0:
+        query = {
+            'query': {
+                'nested': {
+                    'path': 'metadataEntries',
+                    'query': {
+                        'term': {
+                            'metadataEntries.unit.raw': 'FlatIndex'
+                        }
+                    }
+                }
+            },
+            'size': 0,
+            'aggregations': {
+                'metadataEntries': {
+                    'nested': {
+                        'path': 'metadataEntries'
+                    },
+                    'aggregations': facetList
+                }
+            }
+        }
+        response = client.search(body=query, index='yoda')
+
+        facetList = {}
+        if 'aggregations' in response:
+            aggregations = response['aggregations']['metadataEntries']
+            for facet, buckets in aggregations.items():
+                if not isinstance(buckets, int):
+                    bucketList = []
+                    for bucket in buckets['value']['buckets']:
+                        if 'from' in bucket:
+                            bucketList.append({
+                                'from': int(bucket['from']),
+                                'to': int(bucket['to']) - 1,
+                                'count': bucket['doc_count']
+                            })
+                        else:
+                            bucketList.append({
+                                'value': bucket['key'],
+                                'count': bucket['doc_count']
+                            })
+                    facetList[facet] = bucketList
+
     if value != "":
         searchQuery = {
             'nested': {
@@ -315,75 +419,6 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
         'query': searchQuery
     }
 
-    facetList = {}
-    if len(facets) != 0:
-        for facet in facets:
-            if facet == 'Person':
-                filter = {
-                    'bool': {
-                        'should': [
-                            {
-                                'term': {
-                                    'metadataEntries.attribute.raw': 'Creator'
-                                }
-                            }, {
-                                'term': {
-                                    'metadataEntries.attribute.raw': 'Contributor'
-                                }
-                            }
-                        ],
-                        'minimum_should_match': 1
-                    }
-                }
-            else:
-                filter = {
-                    'term': {
-                        'metadataEntries.attribute.raw': facet
-                    }
-                }
-            facetList[facet] = {
-                'filter': filter,
-                'aggregations': {
-                    'value': {
-                        'terms': {
-                            'field': 'metadataEntries.value.raw'
-                        }
-                    }
-                }
-            }
-    if len(ranges) != 0:
-        for facet, range in ranges.items():
-            subranges = []
-            for subrange in range:
-                subranges.append({
-                    'from': subrange['from'],
-                    'to': subrange['to'] + 1
-                })
-            facetList[facet] = {
-                'filter': {
-                    'term': {
-                        'metadataEntries.attribute.raw': facet
-                    }
-                },
-                'aggregations': {
-                    'value': {
-                        'range': {
-                            'field': 'metadataEntries.value.number',
-                            'ranges': subranges
-                        }
-                    }
-                }
-            }
-    if len(facetList) != 0:
-        query['aggregations'] = {
-            'metadataEntries': {
-                'nested': {
-                    'path': 'metadataEntries'
-                },
-                'aggregations': facetList
-            }
-        }
-
     if sort is not None:
         if reverse:
             order = 'desc'
@@ -422,25 +457,6 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                 })
         match['attributes'] = attributes
         matches.append(match)
-    facetList = {}
-    if 'aggregations' in response:
-        aggregations = response['aggregations']['metadataEntries']
-        for facet, buckets in aggregations.items():
-            if not isinstance(buckets, int):
-                bucketList = []
-                for bucket in buckets['value']['buckets']:
-                    if 'from' in bucket:
-                        bucketList.append({
-                            'from': int(bucket['from']),
-                            'to': int(bucket['to']) - 1,
-                            'count': bucket['doc_count']
-                        })
-                    else:
-                        bucketList.append({
-                            'value': bucket['key'],
-                            'count': bucket['doc_count']
-                        })
-                facetList[facet] = bucketList
     result = {
         'query': {
             'facets': facets,
