@@ -211,7 +211,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                                 }
                             }, {
                                 'prefix': {
-                                    'metadataEntries.value': value
+                                    'metadataEntries.value': value.lower()
                                 }
                             }
                         ]
@@ -260,7 +260,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                     should = [
                         {
                             'prefix': {
-                                'metadataEntries.value': filter
+                                'metadataEntries.value': filter.lower()
                             }
                         }
                     ]
