@@ -94,10 +94,13 @@ def upload_get() -> Response:
     flow_relative_path = request.args.get('flowRelativePath', type=str)
 
     flow_filename = request.args.get('flowFilename', type=str)
-    has_dot = flow_filename.startswith('.')
-    flow_filename = secure_filename(flow_filename)
-    if has_dot:
-        flow_filename = f'.{flow_filename}'
+    secured_filename = secure_filename(flow_filename)
+    if flow_filename.startswith('._'):
+        flow_filename = f'._{secured_filename}'
+    elif flow_filename.startswith('.'):
+        flow_filename = f'.{secured_filename}'
+    else:
+        flow_filename = secured_filename
 
     filepath = request.args.get('filepath', type=str)
 
@@ -141,10 +144,13 @@ def upload_post() -> Response:
     flow_relative_path = request.form.get('flowRelativePath', type=str)
 
     flow_filename = request.form.get('flowFilename', type=str)
-    has_dot = flow_filename.startswith('.')
-    flow_filename = secure_filename(flow_filename)
-    if has_dot:
-        flow_filename = f'.{flow_filename}'
+    secured_filename = secure_filename(flow_filename)
+    if flow_filename.startswith('._'):
+        flow_filename = f'._{secured_filename}'
+    elif flow_filename.startswith('.'):
+        flow_filename = f'.{secured_filename}'
+    else:
+        flow_filename = secured_filename
 
     filepath = request.form.get('filepath', type=str)
 
