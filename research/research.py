@@ -99,6 +99,8 @@ def upload_get() -> Response:
         flow_filename = f'._{secured_filename}'
     elif flow_filename.startswith('.'):
         flow_filename = f'.{secured_filename}'
+    else:
+        flow_filename = secured_filename
 
     filepath = request.args.get('filepath', type=str)
 
@@ -147,6 +149,8 @@ def upload_post() -> Response:
         flow_filename = f'._{secured_filename}'
     elif flow_filename.startswith('.'):
         flow_filename = f'.{secured_filename}'
+    else:
+        flow_filename = secured_filename
 
     filepath = request.form.get('filepath', type=str)
 
