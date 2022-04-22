@@ -47,7 +47,8 @@ def data() -> Response:
     return render_template('deposit/data.html',
                            activeModule='deposit',
                            items=25,
-                           dir=path)
+                           dir=path,
+                           path=path)
 
 
 @deposit_bp.route('/metadata')

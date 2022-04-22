@@ -3,21 +3,21 @@
     <div class="step {% if step == 1 %}active{% endif %}">
       <span class="step-trigger">
         <span class="bs-stepper-circle">1</span>
-        <span class="bs-stepper-label">Upload data</span>
+        <span class="bs-stepper-label"><a href="/deposit/data?dir={{ path|urlencode }}">Upload data</a></span>
       </span>
     </div>
     <div class="line"></div>
     <div class="step {% if step == 2 %}active{% endif %}">
       <span class="step-trigger">
         <span class="bs-stepper-circle">2</span>
-        <span class="bs-stepper-label">Document data</span>
+        <span class="bs-stepper-label"><a href="/deposit/metadata?dir={{ path|urlencode }}">Document data</a></span>
       </span>
     </div>
     <div class="line"></div>
     <div class="step {% if step == 3 %}active{% endif %}">
       <span class="step-trigger">
         <span class="bs-stepper-circle">3</span>
-        <span class="bs-stepper-label">Submit data</span>
+        <span class="bs-stepper-label"><a href="/deposit/submit?dir={{ path|urlencode }}">Submit data</a></span>
       </span>
     </div>
   </div>
