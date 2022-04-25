@@ -3,21 +3,34 @@
     <div class="step {% if step == 1 %}active{% endif %}">
       <span class="step-trigger">
         <span class="bs-stepper-circle">1</span>
-        <span class="bs-stepper-label"><a href="/deposit/data?dir={{ path|urlencode }}">Upload data</a></span>
+        <span class="bs-stepper-label">
+            <!-- <button class="btn-step-away">Step away</button> -->
+            {% if step == 2 %}
+                <a class="link-step-upload" style="cursor: pointer;">Upload data</a>
+            {% else %}
+                <a href="/deposit/data?dir={{ path|urlencode }}">Upload data</a>
+            {% endif %}
+        </span>
       </span>
     </div>
     <div class="line"></div>
     <div class="step {% if step == 2 %}active{% endif %}">
       <span class="step-trigger">
         <span class="bs-stepper-circle">2</span>
-        <span class="bs-stepper-label"><a href="/deposit/metadata?dir={{ path|urlencode }}">Document data</a></span>
+        <span class="bs-stepper-label"><a href="/deposit/metadata?dir={{ path|urlencode }}">Add metadata</a></span>
       </span>
     </div>
     <div class="line"></div>
     <div class="step {% if step == 3 %}active{% endif %}">
       <span class="step-trigger">
         <span class="bs-stepper-circle">3</span>
-        <span class="bs-stepper-label"><a href="/deposit/submit?dir={{ path|urlencode }}">Submit data</a></span>
+        <span class="bs-stepper-label">
+            {% if step == 2 %}
+                <a class="link-step-submit" style="cursor: pointer;">Submit datapackage</a>
+            {% else %}
+                <a href="/deposit/submit?dir={{ path|urlencode }}">Submit datapackage</a>
+            {% endif %}
+        </span>
       </span>
     </div>
   </div>
