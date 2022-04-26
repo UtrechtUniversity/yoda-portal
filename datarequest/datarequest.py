@@ -3,15 +3,18 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from flask import abort, redirect, url_for, send_file, Blueprint, g, jsonify, make_response, render_template, escape, request, session
-
-import os
 import io
 import json
-import api
+import os
 
+from flask import (
+    abort, Blueprint, escape, g, jsonify, make_response, redirect, render_template, request, send_file, session, url_for
+)
 from irods.message import iRODSMessage
 from werkzeug.utils import secure_filename
+
+import api
+
 
 datarequest_bp = Blueprint(
     'datarequest_bp',
@@ -20,12 +23,13 @@ datarequest_bp = Blueprint(
     static_folder='static/datarequest'
 )
 
-# Helper functions
 
+# Helper functions.
 def permission_check(request_id, roles, statuses):
     return api.call('datarequest_action_permitted', {'request_id': request_id,
                                                      'statuses': statuses,
                                                      'roles': roles})['data']
+
 
 def human_readable_status(request_status):
     if request_status == "DRAFT":
@@ -77,29 +81,21 @@ def human_readable_status(request_status):
     elif request_status == "DATA_READY":
         return "Data ready"
 
-#def build_object_path(path, relative_path, filename):
-#    relative_path = os.path.dirname(relative_path)
-#    path = path.lstrip("/")
-#
-#    # Build relative path.
-#    if relative_path:
-#    else:
-#        base_dir = os.path.join("/" + g.irods.zone, 'home', path)
-#
-#    return os.path.join(base_dir, filename)
-
 
 # Controllers
-
 @datarequest_bp.route('/archive')
 def index_archived():
-    return index(archived = True)
+    return index(archived=True)
+
+
 @datarequest_bp.route('/dacrequests')
 def index_dacrequests():
-    return index(dacrequests = True)
+    return index(dacrequests=True)
+
+
 @datarequest_bp.route('/index')
 @datarequest_bp.route('/')
-def index(archived = False, dacrequests = False):
+def index(archived=False, dacrequests=False):
     # Todo: read browser-items-per-page from config
     items = 10
 
@@ -122,7 +118,7 @@ def index(archived = False, dacrequests = False):
 def view(request_id):
     roles = api.call('datarequest_roles_get', {'request_id': request_id})['data']
 
-    if not 'PM' in roles and not 'DM' in roles and not 'DAC' in roles and not 'OWN' in roles:
+    if 'PM' not in roles and 'DM' not in roles and 'DAC' not in roles and 'OWN' not in roles:
         abort(403)
 
     is_project_manager  = 'PM' in roles
@@ -138,26 +134,28 @@ def view(request_id):
     human_request_status = human_readable_status(request_status)
     request_type         = request_info['requestType']
     request              = json.loads(request_info['requestJSON'])
+    attachments          = api.call('datarequest_attachments_get', {'request_id': request_id})['data']
 
-    return render_template('datarequest/view.html', request_id=request_id,
-                                                    request_info=request_info,
-                                                    request_status=request_status,
-                                                    available_documents=available_documents,
-                                                    human_request_status=human_request_status,
-                                                    request_type=request_type,
-                                                    request=request,
-                                                    is_project_manager=is_project_manager,
-                                                    is_datamanager=is_datamanager,
-                                                    is_dac_member=is_dac_member,
-                                                    is_request_owner=is_request_owner,
-                                                    is_reviewer=is_reviewer,
-                                                    is_pending_reviewer=is_pending_reviewer,
-                                                    attachments=api.call('datarequest_attachments_get', {'request_id': request_id})['data'])
+    return render_template('datarequest/view.html',
+                           request_id=request_id,
+                           request_info=request_info,
+                           request_status=request_status,
+                           available_documents=available_documents,
+                           human_request_status=human_request_status,
+                           request_type=request_type,
+                           request=request,
+                           is_project_manager=is_project_manager,
+                           is_datamanager=is_datamanager,
+                           is_dac_member=is_dac_member,
+                           is_request_owner=is_request_owner,
+                           is_reviewer=is_reviewer,
+                           is_pending_reviewer=is_pending_reviewer,
+                           attachments=attachments)
 
 
 @datarequest_bp.route('add')
 @datarequest_bp.route('add/<previous_request_id>')
-def add(previous_request_id = None):
+def add(previous_request_id=None):
     if previous_request_id:
         return render_template('datarequest/add.html', previous_request_id=previous_request_id)
     else:
@@ -219,7 +217,7 @@ def upload_attachment(request_id):
 def download_attachment(request_id):
     if not permission_check(request_id, ['PM', 'ED', 'DM', 'DAC', 'OWN'], None):
         abort(403)
-    
+
     coll_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'attachments')
     file_name = api.call('datarequest_attachments_get', {'request_id': request_id})['data'][int(request.args.get('file'))]
     file_path = os.path.join(coll_path, file_name)
@@ -236,7 +234,7 @@ def download_attachment(request_id):
 def submit_attachments(request_id):
     if not permission_check(request_id, ['OWN'], ['PENDING_ATTACHMENTS']):
         abort(403)
-    
+
     result = api.call('datarequest_attachments_submit', {'request_id': request_id})
 
     if result['status'] == 'ok':
@@ -248,8 +246,10 @@ def preliminary_review(request_id):
     if not permission_check(request_id, ['PM'], ['SUBMITTED']):
         abort(403)
 
-    return render_template('datarequest/preliminary_review.html', request_id=request_id,
-                                                                  attachments=api.call('datarequest_attachments_get', {'request_id': request_id})['data'])
+    attachments = api.call('datarequest_attachments_get', {'request_id': request_id})['data']
+    return render_template('datarequest/preliminary_review.html',
+                           request_id=request_id,
+                           attachments=attachments)
 
 
 @datarequest_bp.route('datamanager_review/<request_id>')
@@ -257,8 +257,10 @@ def datamanager_review(request_id):
     if not permission_check(request_id, ['DM'], ['PRELIMINARY_ACCEPT']):
         abort(403)
 
-    return render_template('datarequest/datamanager_review.html', request_id=request_id,
-                                                                  attachments=api.call('datarequest_attachments_get', {'request_id': request_id})['data'])
+    attachments = api.call('datarequest_attachments_get', {'request_id': request_id})['data']
+    return render_template('datarequest/datamanager_review.html',
+                           request_id=request_id,
+                           attachments=attachments)
 
 
 @datarequest_bp.route('assign/<request_id>')
@@ -266,8 +268,10 @@ def assign(request_id):
     if not permission_check(request_id, ['PM'], ['DATAMANAGER_ACCEPT', 'DATAMANAGER_REJECT', 'DATAMANAGER_RESUBMIT']):
         abort(403)
 
-    return render_template('datarequest/assign.html', request_id=request_id,
-                                                      attachments=api.call('datarequest_attachments_get', {'request_id': request_id})['data'])
+    attachments = api.call('datarequest_attachments_get', {'request_id': request_id})['data']
+    return render_template('datarequest/assign.html',
+                           request_id=request_id,
+                           attachments=attachments)
 
 
 @datarequest_bp.route('review/<request_id>')
@@ -275,9 +279,11 @@ def review(request_id):
     if not permission_check(request_id, ['REV'], ['UNDER_REVIEW']):
         abort(403)
 
-    return render_template('datarequest/review.html', request_id=request_id,
-                                                      attachments=api.call('datarequest_attachments_get', {'request_id': request_id})['data'],
-                                                      username=session['login_username'])
+    attachments = api.call('datarequest_attachments_get', {'request_id': request_id})['data']
+    return render_template('datarequest/review.html',
+                           request_id=request_id,
+                           attachments=attachments,
+                           username=session['login_username'])
 
 
 @datarequest_bp.route('evaluate/<request_id>')
@@ -286,11 +292,14 @@ def evaluate(request_id):
         abort(403)
 
     if api.call('datarequest_get', {'request_id': request_id})['data']['requestStatus'] == 'DAO_SUBMITTED':
-        return render_template('datarequest/dao_evaluate.html', request_id=request_id,
-                                                                attachments=api.call('datarequest_attachments_get', {'request_id': request_id})['data'])
+        template = 'datarequest/dao_evaluate.html'
     else:
-        return render_template('datarequest/evaluate.html', request_id=request_id,
-                                                            attachments=api.call('datarequest_attachments_get', {'request_id': request_id})['data'])
+        template = 'datarequest/evaluate.html'
+
+    attachments = api.call('datarequest_attachments_get', {'request_id': request_id})['data']
+    return render_template(template,
+                           request_id=request_id,
+                           attachments=attachments)
 
 
 @datarequest_bp.route('preregister/<request_id>')
@@ -308,7 +317,8 @@ def preregistration_confirm(request_id):
     if not permission_check(request_id, ['PM'], ['PREREGISTRATION_SUBMITTED']):
         abort(403)
 
-    osf_url = json.loads(api.call('datarequest_preregistration_get', {'request_id': request_id})['data'])['preregistration_url']
+    osf_url_json = api.call('datarequest_preregistration_get', {'request_id': request_id})['data']
+    osf_url = json.loads(osf_url_json)['preregistration_url']
 
     return render_template('datarequest/preregistration_confirm.html', request_id=request_id, osf_url=osf_url)
 
@@ -328,7 +338,7 @@ def confirm_preregistration(request_id):
 def upload_dta(request_id):
     if not permission_check(request_id, ['DM'], ['PREREGISTRATION_CONFIRMED', 'DAO_APPROVED']):
         abort(403)
-    
+
     filename = secure_filename(request.files['file'].filename)
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'dta', filename)
 
@@ -365,7 +375,7 @@ def upload_dta(request_id):
 def download_dta(request_id):
     if not permission_check(request_id, ['PM', 'DM', 'OWN'], None):
         abort(403)
-    
+
     if request.path == '/datarequest/download_signed_dta/' + request_id:
         file_path = api.call('datarequest_signed_dta_path_get', {'request_id': request_id})['data']
     else:
@@ -383,7 +393,7 @@ def download_dta(request_id):
 def upload_signed_dta(request_id):
     if not permission_check(request_id, ['OWN'], ['DTA_READY']):
         abort(403)
-    
+
     filename = secure_filename(request.files['file'].filename)
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'signed_dta', filename)
 
