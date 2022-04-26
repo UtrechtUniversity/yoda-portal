@@ -218,11 +218,11 @@ class YodaButtons extends React.Component {
     }
 
     renderBackButton() {
-        return (<button onClick={this.props.backButton} type="submit" className="btn btn-secondary float-start">Deposit data</button>);
+        return (<button onClick={this.props.backButton} type="submit" className="btn btn-secondary float-start btn-step-upload"><i class="fa-solid fa-chevron-left"></i> Upload data</button>);
     }
 
     renderSubmitButton() {
-        return (<button onClick={this.props.submitButton} type="submit" className="btn btn-primary float-end">Submit data</button>);
+        return (<button onClick={this.props.submitButton} type="submit" className="btn btn-primary float-end btn-step-submit">Submit datapackage <i class="fa-solid fa-chevron-right"></i></button>);
     }
 
     renderDeleteButton() {
@@ -315,6 +315,13 @@ function deleteMetadata() {
 function loadForm() {
     // Inhibit "loading" text.
     formLoaded = true;
+
+    $('.link-step-upload').click(function(){
+        $('.btn-step-upload').click();
+    });
+    $('.link-step-submit').click(function(){
+        $('.btn-step-submit').click();
+    });
 
     Yoda.call('meta_form_load',
         {coll: Yoda.basePath+path},
