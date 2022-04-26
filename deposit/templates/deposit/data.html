@@ -11,7 +11,7 @@
 {% block scripts %}
 <script>
     var browsePageItems = {{ items }};
-    var browseStartDir = dir = path  = {{ dir|tojson|safe }};
+    var browseStartDir = dir = path = {{ path|tojson|safe }};
     var view = 'browse';
 </script>
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
@@ -97,7 +97,7 @@
     </div>
 
     <div class="col-md-12">
-        <a class="btn btn-primary mt-3 float-end btn-document-data" href="/deposit/metadata?dir={{ dir|urlencode }}" title="Document your data">Add metadata <i class="fa-solid fa-chevron-right"></i></a>
+        <a class="btn btn-primary mt-3 float-end btn-document-data" href="/deposit/metadata?dir={{ path|urlencode }}" title="Document your data">Add metadata <i class="fa-solid fa-chevron-right"></i></a>
     </div>
 </div>
 
