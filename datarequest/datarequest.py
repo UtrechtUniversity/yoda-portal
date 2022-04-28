@@ -3,6 +3,7 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+from enum import Enum
 import magic
 import io
 import json
@@ -31,56 +32,31 @@ def permission_check(request_id, roles, statuses):
                                                      'statuses': statuses,
                                                      'roles': roles})['data']
 
-
-def human_readable_status(request_status):
-    if request_status == "DRAFT":
-        return "In draft"
-    elif request_status == "PENDING_ATTACHMENTS":
-        return "Pending attachments"
-    elif request_status == "DAO_SUBMITTED":
-        return "Submitted (data assessment)"
-    elif request_status == "SUBMITTED":
-        return "Submitted"
-    elif request_status == "PRELIMINARY_ACCEPT":
-        return "Preliminary accept"
-    elif request_status == "PRELIMINARY_REJECT":
-        return "Rejected at preliminary review"
-    elif request_status == "PRELIMINARY_RESUBMIT":
-        return "Rejected (resubmit) at preliminary review"
-    elif request_status == "DATAMANAGER_ACCEPT":
-        return "Datamanager accept"
-    elif request_status == "DATAMANAGER_REJECT":
-        return "Datamanager reject"
-    elif request_status == "DATAMANAGER_RESUBMIT":
-        return "Datamanager reject (resubmit)"
-    elif request_status == "UNDER_REVIEW":
-        return "Under review"
-    elif request_status == "REJECTED_AFTER_DATAMANAGER_REVIEW":
-        return "Rejected after datamanager review"
-    elif request_status == "RESUBMIT_AFTER_DATAMANAGER_REVIEW":
-        return "Rejected (resubmit) after datamanager review"
-    elif request_status == "REVIEWED":
-        return "Reviewed"
-    elif request_status == "APPROVED":
-        return "Approved"
-    elif request_status == "REJECTED":
-        return "Rejected"
-    elif request_status == "RESUBMIT":
-        return "Rejected (resubmit)"
-    elif request_status == "RESUBMITTED":
-        return "Resubmitted"
-    elif request_status == "DAO_APPROVED":
-        return "Approved (data assessment)"
-    elif request_status == "PREREGISTRATION_SUBMITTED":
-        return "Preregistration submitted"
-    elif request_status == "PREREGISTRATION_CONFIRMED":
-        return "Preregistration confirmed"
-    elif request_status == "DTA_READY":
-        return "DTA ready"
-    elif request_status == "DTA_SIGNED":
-        return "DTA signed"
-    elif request_status == "DATA_READY":
-        return "Data ready"
+class human_readable_status(Enum):
+    DRAFT = 'In draft'
+    PENDING_ATTACHMENTS = 'Pending attachments'
+    DAO_SUBMITTED = 'Submitted (data assessment)'
+    SUBMITTED = 'Submitted'
+    PRELIMINARY_ACCEPT = 'Preliminary accept'
+    PRELIMINARY_REJECT = 'Rejected at preliminary review'
+    PRELIMINARY_RESUBMIT = 'Rejected (resubmit) at preliminary review'
+    DATAMANAGER_ACCEPT = 'Datamanager accept'
+    DATAMANAGER_REJECT = 'Datamanager reject'
+    DATAMANAGER_RESUBMIT = 'Datamanager reject (resubmit)'
+    UNDER_REVIEW = 'Under review'
+    REJECTED_AFTER_DATAMANAGER_REVIEW = 'Rejected after datamanager review'
+    RESUBMIT_AFTER_DATAMANAGER_REVIEW = 'Rejected (resubmit) after datamanager review'
+    REVIEWED = 'Reviewed'
+    APPROVED = 'Approved'
+    REJECTED = 'Rejected'
+    RESUBMIT = 'Rejected (resubmit)'
+    RESUBMITTED = 'Resubmitted'
+    DAO_APPROVED = 'Approved (data assessment)'
+    PREREGISTRATION_SUBMITTED = 'Preregistration submitted'
+    PREREGISTRATION_CONFIRMED = 'Preregistration confirmed'
+    DTA_READY = 'DTA ready'
+    DTA_SIGNED = 'DTA signed'
+    DATA_READY = 'Data ready'
 
 
 # Controllers
@@ -132,7 +108,7 @@ def view(request_id):
     request_info         = api.call('datarequest_get', {'request_id': request_id})['data']
     request_status       = request_info['requestStatus']
     available_documents  = request_info['requestAvailableDocuments']
-    human_request_status = human_readable_status(request_status)
+    human_request_status = human_readable_status[request_status].value
     request_type         = request_info['requestType']
     request              = json.loads(request_info['requestJSON'])
     attachments          = api.call('datarequest_attachments_get', {'request_id': request_id})['data']
