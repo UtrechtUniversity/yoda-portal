@@ -3,6 +3,7 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import magic
 import io
 import json
 import os
@@ -339,10 +340,15 @@ def upload_dta(request_id):
     if not permission_check(request_id, ['DM'], ['PREREGISTRATION_CONFIRMED', 'DAO_APPROVED']):
         abort(403)
 
+    # Verify that uploaded file is a PDF
+    mimetype = magic.from_buffer(request.files['file'].stream.read(2048), mime = True)
+    if not mimetype == "application/pdf":
+        response = make_response(jsonify({"message": "Only PDF files are permitted to be uploaded."}), 422)
+        response.headers["Content-Type"] = "application/json"
+        return response
+
     filename = secure_filename(request.files['file'].filename)
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'dta', filename)
-
-    # Verify that uploaded file is a PDF
 
     api.call('datarequest_dta_upload_permission', {'request_id': request_id, 'action': 'grant'})
 
@@ -393,6 +399,13 @@ def download_dta(request_id):
 def upload_signed_dta(request_id):
     if not permission_check(request_id, ['OWN'], ['DTA_READY']):
         abort(403)
+
+    # Verify that uploaded file is a PDF
+    mimetype = magic.from_buffer(request.files['file'].stream.read(2048), mime = True)
+    if not mimetype == "application/pdf":
+        response = make_response(jsonify({"message": "Only PDF files are permitted to be uploaded."}), 422)
+        response.headers["Content-Type"] = "application/json"
+        return response
 
     filename = secure_filename(request.files['file'].filename)
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'signed_dta', filename)
