@@ -198,6 +198,39 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
         http_compress=True
     )
 
+    if value != "":
+        searchQuery = {
+            'nested': {
+                'path': 'metadataEntries',
+                'query': {
+                    'bool': {
+                        'must': [
+                            {
+                                'term': {
+                                    'metadataEntries.unit.raw': 'FlatIndex'
+                                }
+                            }, {
+                                'prefix': {
+                                    'metadataEntries.value': value.lower()
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    else:
+        searchQuery = {
+            'nested': {
+                'path': 'metadataEntries',
+                'query': {
+                    'term': {
+                        'metadataEntries.unit.raw': 'FlatIndex'
+                    }
+                }
+            }
+        }
+
     facetList = {}
     if len(facets) != 0:
         for facet in facets:
@@ -260,16 +293,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
 
     if len(facetList) != 0:
         query = {
-            'query': {
-                'nested': {
-                    'path': 'metadataEntries',
-                    'query': {
-                        'term': {
-                            'metadataEntries.unit.raw': 'FlatIndex'
-                        }
-                    }
-                }
-            },
+            'query': searchQuery,
             'size': 0,
             'aggregations': {
                 'metadataEntries': {
@@ -301,39 +325,6 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                                 'count': bucket['doc_count']
                             })
                     facetList[facet] = bucketList
-
-    if value != "":
-        searchQuery = {
-            'nested': {
-                'path': 'metadataEntries',
-                'query': {
-                    'bool': {
-                        'must': [
-                            {
-                                'term': {
-                                    'metadataEntries.unit.raw': 'FlatIndex'
-                                }
-                            }, {
-                                'prefix': {
-                                    'metadataEntries.value': value.lower()
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        }
-    else:
-        searchQuery = {
-            'nested': {
-                'path': 'metadataEntries',
-                'query': {
-                    'term': {
-                        'metadataEntries.unit.raw': 'FlatIndex'
-                    }
-                }
-            }
-        }
 
     if len(filters) != 0:
         queryList = [searchQuery]
