@@ -95,15 +95,15 @@ def index(archived=False, dacrequests=False):
 def view(request_id):
     roles = api.call('datarequest_roles_get', {'request_id': request_id})['data']
 
-    if 'PM' not in roles and 'DM' not in roles and 'DAC' not in roles and 'OWN' not in roles:
-        abort(403)
-
     is_project_manager  = 'PM' in roles
     is_datamanager      = 'DM' in roles
     is_dac_member       = 'DAC' in roles
     is_request_owner    = 'OWN' in roles
     is_reviewer         = 'REV' in roles
     is_pending_reviewer = 'PENREV' in roles
+
+    if not is_project_manager and not is_datamanager and not is_dac_member and not is_request_owner:
+        abort(403)
 
     request_info         = api.call('datarequest_get', {'request_id': request_id})['data']
     request_status       = request_info['requestStatus']
