@@ -3,13 +3,10 @@ var dlgCurrentFolder = '';
 var currentBrowseFolder = '';
 
 $( document ).ready(function() {
-
     dlgCurrentFolder = currentBrowseFolder = browseStartDir;
-    console.info('dlgCurrentFolder: ' + dlgCurrentFolder);
 
     // single file/folder moves
     $("body").on("click", "a.file-copy, a.file-move, a.folder-copy, a.folder-move", function() {
-
         // Determine action
         if($(this).hasClass("file-move")) {
             $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'file-move');
@@ -87,18 +84,6 @@ $( document ).ready(function() {
         dlgBrowse($(this).attr('data-path'));
         e.preventDefault();
     });
-
-// move/copy
-//    $('.dlg-action-button').on('click', function(){
-//        let filepath = $(this).attr('data-collection') + "/" + $(this).attr('data-name');
-//        let newFilepath = dlgCurrentFolder + "/" + $(this).attr('data-name');
-//
-//        if($(this).attr("data-action") == 'move') {
-//            moveFile(filepath, newFilepath);
-//        } else if ($(this).attr("data-action") == 'copy') {
-//            copyFile(filepath, newFilepath);
-//        }
-//    })
 
     $('.dlg-action-button').on('click', function(){
         let action = $(this).attr("data-action");

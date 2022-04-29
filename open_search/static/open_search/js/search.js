@@ -6,7 +6,7 @@ let itemsPerPage;
 let currentPage = 1;
 let sort;
 let sortOrder;
-let facets = ['Data_Access_Restriction'];
+let facets = ['Data_Access_Restriction', 'Person'];
 let filters = {};
 let ranges = {};
 
@@ -51,13 +51,25 @@ $(function() {
 
     $("body").on("change", "input:radio[id=Data_Access_Restriction]", function() {
         if ($(this).val() == '') {
-            filters = {};
+            delete filters.Data_Access_Restriction;
         } else {
             filters["Data_Access_Restriction"] = $(this).val();
         }
         console.log(filters);
 
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
+    });
+
+    $("body").on("keyup", "input:text[id=Person]", function(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            if ($(this).val() == '') {
+                delete filters.Person;
+            } else {
+                filters["Person"] = $(this).val();
+            }
+
+            search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
+        }
     });
 });
 

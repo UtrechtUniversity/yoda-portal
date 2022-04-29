@@ -10,7 +10,7 @@
 {% block scripts %}
 <script>
     var browsePageItems = {{ items }};
-    var browseStartDir = dir = path  = {{ dir|tojson|safe }};
+    var browseStartDir = dir = path = {{ path|tojson|safe }};
     var view = 'browse';
 </script>
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
@@ -24,7 +24,7 @@
     </div>
     <div class="col-md-6">
         <a class="btn btn-primary float-end" href="/deposit/data" title="Start new deposit">Start new deposit</a>
-        <a class="btn btn-light float-end me-3" href="https://dag.sites.uu.nl/deposit/my-deposits/" target="_blank" title="Guidance"><i class="fa-solid fa-info-circle"></i> Guidance</a>
+        <a class="btn btn-light float-end me-3" href="https://dag.sites.uu.nl/depositing-data/during-depositing/" target="_blank" title="Guidance"><i class="fa-solid fa-info-circle"></i> Guidance</a>
     </div>
 
     <div class="mt-3">

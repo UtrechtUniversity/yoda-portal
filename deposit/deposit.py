@@ -3,7 +3,7 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
-from flask import abort, Blueprint, redirect, render_template, request, url_for
+from flask import abort, Blueprint, redirect, render_template, request, Response, url_for
 
 import api
 
@@ -23,17 +23,17 @@ deposit_bp = Blueprint('deposit_bp', __name__,
 
 @deposit_bp.route('/')
 @deposit_bp.route('/browse')
-def index():
+def index() -> Response:
     """Deposit overview"""
     path = "/deposit-pilot"
     return render_template('deposit/overview.html',
                            activeModule='deposit',
                            items=25,
-                           dir=path)
+                           path=path)
 
 
 @deposit_bp.route('/data')
-def data():
+def data() -> Response:
     """Step 1: Add data"""
     path = request.args.get('dir', None)
     if path is None:
@@ -47,11 +47,11 @@ def data():
     return render_template('deposit/data.html',
                            activeModule='deposit',
                            items=25,
-                           dir=path)
+                           path=path)
 
 
 @deposit_bp.route('/metadata')
-def metadata():
+def metadata() -> Response:
     """Step 2: Document data"""
     path = request.args.get('dir', None)
     if path is None:
@@ -60,7 +60,7 @@ def metadata():
 
 
 @deposit_bp.route('/submit')
-def submit():
+def submit() -> Response:
     """Step 3: Submit data"""
     path = request.args.get('dir', None)
     if path is None:
@@ -69,6 +69,6 @@ def submit():
 
 
 @deposit_bp.route('/thank-you')
-def thankyou():
+def thankyou() -> Response:
     """Step 4: Thank you"""
     return render_template('deposit/thank-you.html')
