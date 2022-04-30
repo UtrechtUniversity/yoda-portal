@@ -6,7 +6,7 @@ let itemsPerPage;
 let currentPage = 1;
 let sort;
 let sortOrder;
-let facets = ['Data_Access_Restriction', 'Person'];
+let facets = ['Data_Access_Restriction', 'Person', 'Collection_Name', 'Research_Group'];
 let filters = {};
 let ranges = {};
 
@@ -15,11 +15,11 @@ $(function() {
     sort = $('#sort').val();
     sortOrder = $("select option:selected").attr('data-order');
 
-    let filter = null;
+    let filter = '';
     if ($("#search-filter").val().length > 0) {
         filter = $("#search-filter").val();
-        search(filter, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     }
+    search(filter, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
 
     $("#search-filter").on('keyup', function (e) {
         if (e.key === 'Enter' || e.keyCode === 13) {
@@ -49,13 +49,14 @@ $(function() {
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
 
-    $("body").on("change", "input:radio[id=Data_Access_Restriction]", function() {
-        if ($(this).val() == '') {
-            delete filters.Data_Access_Restriction;
+    $("body").on("change", "input:checkbox[name^=\"filters[\"]", function() {
+        let isChecked = $(this).is(':checked');
+        let filter = $(this).attr('data-filter');
+        if (isChecked) {
+            filters[filter] = $(this).val();
         } else {
-            filters["Data_Access_Restriction"] = $(this).val();
+            delete filters[filter];
         }
-        console.log(filters);
 
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
@@ -176,7 +177,7 @@ function itemTemplate(data)
     return html;
 }
 
-function radioItem(value, count, checked = false) {
+function radioItem(name, value, count, checked = false) {
     let checkedHtml = '';
     if (checked) {
         checkedHtml = 'checked';
@@ -184,8 +185,25 @@ function radioItem(value, count, checked = false) {
 
     let html = `    
     <div class="form-check">
-        <input class="form-check-input" type="radio" value="${value}"  name="filters['Data_Access_Restriction']" id="Data_Access_Restriction" ${checkedHtml}>
+        <input class="form-check-input" type="radio" value="${value}"  name="filters['${name}']" id="Data_Access_Restriction" ${checkedHtml}>
         <label class="form-check-label" for="Data_Access_Restriction">
+          ${value} (${count})
+        </label>
+    </div>
+    `;
+    return html;
+}
+
+function checkboxItem(index, name, value, count, checked = false) {
+    let checkedHtml = '';
+    if (checked) {
+        checkedHtml = 'checked';
+    }
+
+    let html = `    
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="${value}"  name="filters['${name}']" data-index="${index}" data-filter="${name}" ${checkedHtml}>
+        <label class="form-check-label">
           ${value} (${count})
         </label>
     </div>
@@ -250,16 +268,56 @@ function buildFacets(facets)
         filterValue = filters.Data_Access_Restriction;
     }
 
-    $(facets.Data_Access_Restriction).each(function(index, facet) {
+    $(facets.Data_Access_Restriction).each(function(facetIndex, facet) {
         $(facet).each(function(index, element) {
             checked = false;
             if (filterValue == element.value) {
                 checked = true;
             }
-            html += radioItem(element.value, element.count, checked);
+            //html += radioItem('Data_Access_Restriction', element.value, element.count, checked);
+            html += checkboxItem(facetIndex, 'Data_Access_Restriction', element.value, element.count, checked);
         });
 
         $('.data-access-options').html(html);
+    });
+
+    filterValue = '';
+    if (filters.hasOwnProperty("Collection_Name")) {
+        filterValue = filters.Collection_Name;
+    }
+    checked = false;
+    html = '';
+
+    $(facets.Collection_Name).each(function(facetIndex, facet) {
+        $(facet).each(function(index, element) {
+            checked = false;
+            if (filterValue == element.value) {
+                checked = true;
+            }
+            html += checkboxItem(facetIndex, 'Collection_Name', element.value, element.count, checked);
+        });
+
+        $('.collection-name-options').html(html);
+    });
+
+    filterValue = '';
+    if (filters.hasOwnProperty("Research_Group")) {
+        filterValue = filters.Research_Group;
+    }
+
+    checked = false;
+    html = '';
+
+    $(facets.Research_Group).each(function(facetIndex, facet) {
+        $(facet).each(function(index, element) {
+            checked = false;
+            if (filterValue == element.value) {
+                checked = true;
+            }
+            html += checkboxItem(facetIndex, 'Research_Group', element.value, element.count, checked);
+        });
+
+        $('.research-group-options').html(html);
     });
 }
 
