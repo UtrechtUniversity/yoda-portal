@@ -198,6 +198,39 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
         http_compress=True
     )
 
+    if value != "":
+        searchQuery = {
+            'nested': {
+                'path': 'metadataEntries',
+                'query': {
+                    'bool': {
+                        'must': [
+                            {
+                                'term': {
+                                    'metadataEntries.unit.raw': 'FlatIndex'
+                                }
+                            }, {
+                                'prefix': {
+                                    'metadataEntries.value': value.lower()
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    else:
+        searchQuery = {
+            'nested': {
+                'path': 'metadataEntries',
+                'query': {
+                    'term': {
+                        'metadataEntries.unit.raw': 'FlatIndex'
+                    }
+                }
+            }
+        }
+
     facetList = {}
     if len(facets) != 0:
         for facet in facets:
@@ -260,16 +293,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
 
     if len(facetList) != 0:
         query = {
-            'query': {
-                'nested': {
-                    'path': 'metadataEntries',
-                    'query': {
-                        'term': {
-                            'metadataEntries.unit.raw': 'FlatIndex'
-                        }
-                    }
-                }
-            },
+            'query': searchQuery,
             'size': 0,
             'aggregations': {
                 'metadataEntries': {
@@ -302,48 +326,17 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                             })
                     facetList[facet] = bucketList
 
-    if value != "":
-        searchQuery = {
-            'nested': {
-                'path': 'metadataEntries',
-                'query': {
-                    'bool': {
-                        'must': [
-                            {
-                                'term': {
-                                    'metadataEntries.unit.raw': 'FlatIndex'
-                                }
-                            }, {
-                                'prefix': {
-                                    'metadataEntries.value': value.lower()
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        }
-    else:
-        searchQuery = {
-            'nested': {
-                'path': 'metadataEntries',
-                'query': {
-                    'term': {
-                        'metadataEntries.unit.raw': 'FlatIndex'
-                    }
-                }
-            }
-        }
-
     if len(filters) != 0:
         queryList = [searchQuery]
-        for attribute, filter in filters.items():
+        for filter in filters:
+            attribute = filter['name']
             match = {
                 'term': {
                     'metadataEntries.attribute.raw': attribute
                 }
             }
-            if isinstance(filter, str):
+            if 'value' in filter:
+                name = filter['value']
                 if attribute == 'Person':
                     match = {
                         'bool': {
@@ -364,7 +357,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                     should = [
                         {
                             'prefix': {
-                                'metadataEntries.value': filter.lower()
+                                'metadataEntries.value': name.lower()
                             }
                         }
                     ]
@@ -372,21 +365,20 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                     should = [
                         {
                             'term': {
-                                'metadataEntries.value.raw': filter
+                                'metadataEntries.value.raw': name
                             }
                         }
                     ]
             else:
                 should = []
-                for subrange in filter:
-                    should.append({
-                        'range': {
-                            'metadataEntries.value.number': {
-                                'gte': subrange['from'],
-                                'lte': subrange['to']
-                            }
+                should.append({
+                    'range': {
+                        'metadataEntries.value.number': {
+                            'gte': filter['from'],
+                            'lte': filter['to']
                         }
-                    })
+                    }
+                })
             queryList.append({
                 'nested': {
                     'path': 'metadataEntries',
