@@ -6,8 +6,8 @@ let itemsPerPage;
 let currentPage = 1;
 let sort;
 let sortOrder;
-let facets = ['Data_Access_Restriction', 'Person', 'Collection_Name', 'Research_Group'];
-let filters = {};
+let facets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name'];
+let filters = [];
 let ranges = {};
 
 $(function() {
@@ -51,11 +51,16 @@ $(function() {
 
     $("body").on("change", "input:checkbox[name^=\"filters[\"]", function() {
         let isChecked = $(this).is(':checked');
-        let filter = $(this).attr('data-filter');
+        let filterName = $(this).attr('data-filter');
+        let filterValue = $(this).val();
         if (isChecked) {
-            filters[filter] = $(this).val();
+            filters.push({"name": filterName, "value": filterValue });
         } else {
-            delete filters[filter];
+            $.each(filters, function(index, object) {
+                if (object['name'] == filterName && object['value'] == filterValue) {
+                    filters.splice(index, 1);
+                }
+            });
         }
 
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
@@ -63,10 +68,14 @@ $(function() {
 
     $("body").on("keyup", "input:text[id=Person]", function(e) {
         if (e.key === 'Enter' || e.keyCode === 13) {
-            if ($(this).val() == '') {
-                delete filters.Person;
-            } else {
-                filters["Person"] = $(this).val();
+            let filterValue = $(this).val();
+            $.each(filters, function(index, object) {
+                if (object['name'] == 'Person') {
+                    filters.splice(index, 1);
+                }
+            });
+            if (filterValue != "") {
+                filters.push({"name": 'Person', "value": filterValue });
             }
 
             search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
@@ -194,7 +203,7 @@ function radioItem(name, value, count, checked = false) {
     return html;
 }
 
-function checkboxItem(index, name, value, count, checked = false) {
+function checkboxItem(name, value, count, checked = false) {
     let checkedHtml = '';
     if (checked) {
         checkedHtml = 'checked';
@@ -202,7 +211,7 @@ function checkboxItem(index, name, value, count, checked = false) {
 
     let html = `    
     <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="${value}"  name="filters['${name}']" data-index="${index}" data-filter="${name}" ${checkedHtml}>
+        <input class="form-check-input" type="checkbox" value="${value}"  name="filters['${name}']" data-filter="${name}" ${checkedHtml}>
         <label class="form-check-label">
           ${value} (${count})
         </label>
@@ -258,66 +267,32 @@ function buildPagination(totalItems)
     $('.paging-info').text(totalItems + ' result(s)');
 }
 
-function buildFacets(facets)
+function buildFacets(data)
 {
     let html = '';
     let checked = false;
-    var filterValue = '';
+    let placeholder = '';
+    let values = [];
 
-    if (filters.hasOwnProperty("Data_Access_Restriction")) {
-        filterValue = filters.Data_Access_Restriction;
-    }
-
-    $(facets.Data_Access_Restriction).each(function(facetIndex, facet) {
-        $(facet).each(function(index, element) {
-            checked = false;
-            if (filterValue == element.value) {
-                checked = true;
+    $(facets).each(function(i, facet) {
+        html = '';
+        placeholder = 'data-' + facet;
+        values = [];
+        $.each(filters, function(index, object) {
+            if (object['name'] == facet) {
+                values.push(object['value']);
             }
-            //html += radioItem('Data_Access_Restriction', element.value, element.count, checked);
-            html += checkboxItem(facetIndex, 'Data_Access_Restriction', element.value, element.count, checked);
         });
 
-        $('.data-access-options').html(html);
-    });
-
-    filterValue = '';
-    if (filters.hasOwnProperty("Collection_Name")) {
-        filterValue = filters.Collection_Name;
-    }
-    checked = false;
-    html = '';
-
-    $(facets.Collection_Name).each(function(facetIndex, facet) {
-        $(facet).each(function(index, element) {
+        $(data[facet]).each(function(index, element) {
             checked = false;
-            if (filterValue == element.value) {
+            if ($.inArray(element.value, values) >= 0) {
                 checked = true;
             }
-            html += checkboxItem(facetIndex, 'Collection_Name', element.value, element.count, checked);
+            html += checkboxItem(facet, element.value, element.count, checked);
         });
 
-        $('.collection-name-options').html(html);
-    });
-
-    filterValue = '';
-    if (filters.hasOwnProperty("Research_Group")) {
-        filterValue = filters.Research_Group;
-    }
-
-    checked = false;
-    html = '';
-
-    $(facets.Research_Group).each(function(facetIndex, facet) {
-        $(facet).each(function(index, element) {
-            checked = false;
-            if (filterValue == element.value) {
-                checked = true;
-            }
-            html += checkboxItem(facetIndex, 'Research_Group', element.value, element.count, checked);
-        });
-
-        $('.research-group-options').html(html);
+        $('.' + placeholder).html(html);
     });
 }
 
