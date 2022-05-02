@@ -26,10 +26,7 @@
             </div>
         </div>
     </div>
-    <div class="row no-results hide">
-        <p>Your search '<span class="search-term"></span>' did not match any data package.</p>
-    </div>
-    <div class="row content hide">
+    <div class="row">
         <div class="col-2">
             <label for="sort" class="form-label">Sort by</label>
             <select class="form-select" id="sort">
@@ -51,36 +48,41 @@
             <input type="text" id="Person" class="form-control person-filter" placeholder="Name">
         </div>
         <div class="col-10">
-            <div class="row justify-content-between mb-2">
-                <div class="col-4 paging-info">
-                </div>
-                <div class="col-2 results-per-page">
-                    <div class="float-end row row-cols-auto">
-                        <div class="col pe-0">
-                            <span class="page-items-label">Show</span>
-                        </div>
-                        <div class="col">
-                            <select class="form-select form-select-sm float-end" id="items-count">
-                                <option value="5" selected>5</option>
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                            </select>
+            <div class="row no-results hide">
+                <p>No data packages found.</p>
+            </div>
+            <div class="content hide">
+                <div class="row justify-content-between mb-2">
+                    <div class="col-4 paging-info">
+                    </div>
+                    <div class="col-2 results-per-page">
+                        <div class="float-end row row-cols-auto">
+                            <div class="col pe-0">
+                                <span class="page-items-label">Show</span>
+                            </div>
+                            <div class="col">
+                                <select class="form-select form-select-sm float-end" id="items-count">
+                                    <option value="5" selected>5</option>
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="search-results"></div>
+                <div id="search-results"></div>
 
-            <div class="search-pagination hide">
-                <button type="button" class="btn btn-outline-secondary previous">
-                    <i class="fa-solid fa-angles-left"></i>
-                    Previous
-                </button>
-                <button type="button" class="btn btn-outline-secondary float-end next">
-                    <i class="fa-solid fa-angles-right"></i>
-                    Next
-                </button>
+                <div class="search-pagination hide">
+                    <button type="button" class="btn btn-outline-secondary previous">
+                        <i class="fa-solid fa-angles-left"></i>
+                        Previous
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary float-end next">
+                        <i class="fa-solid fa-angles-right"></i>
+                        Next
+                    </button>
+                </div>
             </div>
         </div>
     </div>
