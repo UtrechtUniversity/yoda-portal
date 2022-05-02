@@ -3,12 +3,12 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from enum import Enum
-import magic
 import io
 import json
 import os
+from enum import Enum
 
+import magic
 from flask import (
     abort, Blueprint, escape, g, jsonify, make_response, redirect, render_template, request, send_file, session, url_for
 )
@@ -31,6 +31,7 @@ def permission_check(request_id, roles, statuses):
     return api.call('datarequest_action_permitted', {'request_id': request_id,
                                                      'statuses': statuses,
                                                      'roles': roles})['data']
+
 
 class human_readable_status(Enum):
     DRAFT = 'In draft'
@@ -323,7 +324,7 @@ def upload_dta(request_id):
         abort(403)
 
     # Verify that uploaded file is a PDF
-    mimetype = magic.from_buffer(request.files['file'].stream.read(2048), mime = True)
+    mimetype = magic.from_buffer(request.files['file'].stream.read(2048), mime=True)
     if not mimetype == "application/pdf":
         response = make_response(jsonify({"message": "Only PDF files are permitted to be uploaded."}), 422)
         response.headers["Content-Type"] = "application/json"
@@ -389,7 +390,7 @@ def upload_signed_dta(request_id):
         abort(403)
 
     # Verify that uploaded file is a PDF
-    mimetype = magic.from_buffer(request.files['file'].stream.read(2048), mime = True)
+    mimetype = magic.from_buffer(request.files['file'].stream.read(2048), mime=True)
     if not mimetype == "application/pdf":
         response = make_response(jsonify({"message": "Only PDF files are permitted to be uploaded."}), 422)
         response.headers["Content-Type"] = "application/json"
