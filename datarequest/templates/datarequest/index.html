@@ -34,7 +34,6 @@
         <a href="/datarequest" class="btn btn-primary mb-3 me-1 float-end" role="button">View active requests</a>
         {% endif %}
 
-{{ is_dac_member }} 
         {% if is_dac_member and not dacrequests %}
         <a href="/datarequest/dacrequests" class="btn btn-primary mb-3 me-1 float-end" role="button">View own requests</a>
         {% endif %}
