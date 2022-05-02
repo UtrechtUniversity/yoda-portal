@@ -164,7 +164,9 @@ def upload_attachment(request_id):
     filename = secure_filename(request.files['file'].filename)
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'attachments', filename)
 
-    api.call('datarequest_attachment_upload_permission', {'request_id': request_id, 'action': 'grant'})
+    result = api.call('datarequest_attachment_upload_permission', {'request_id': request_id, 'action': 'grant'})
+    if not result['status'] == 'ok':
+        abort(500)
 
     session = g.irods
 
@@ -182,8 +184,12 @@ def upload_attachment(request_id):
         response.headers["Content-Type"] = "application/json"
         return response
 
-    api.call('datarequest_attachment_post_upload_actions', {'request_id': request_id, 'filename': filename})
-    api.call('datarequest_attachment_upload_permission', {'request_id': request_id, 'action': 'grantread'})
+    result = api.call('datarequest_attachment_post_upload_actions', {'request_id': request_id, 'filename': filename})
+    if not result['status'] == 'ok':
+        abort(500)
+    result = api.call('datarequest_attachment_upload_permission', {'request_id': request_id, 'action': 'grantread'})
+    if not result['status'] == 'ok':
+        abort(500)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
     response.headers["Content-Type"] = "application/json"
@@ -326,7 +332,9 @@ def upload_dta(request_id):
     filename = secure_filename(request.files['file'].filename)
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'dta', filename)
 
-    api.call('datarequest_dta_upload_permission', {'request_id': request_id, 'action': 'grant'})
+    result = api.call('datarequest_dta_upload_permission', {'request_id': request_id, 'action': 'grant'})
+    if not result['status'] == 'ok':
+        abort(500)
 
     session = g.irods
 
@@ -344,8 +352,12 @@ def upload_dta(request_id):
         response.headers["Content-Type"] = "application/json"
         return response
 
-    api.call('datarequest_dta_post_upload_actions', {'request_id': request_id, 'filename': filename})
-    api.call('datarequest_dta_upload_permission', {'request_id': request_id, 'action': 'revoke'})
+    result = api.call('datarequest_dta_post_upload_actions', {'request_id': request_id, 'filename': filename})
+    if not result['status'] == 'ok':
+        abort(500)
+    result = api.call('datarequest_dta_upload_permission', {'request_id': request_id, 'action': 'revoke'})
+    if not result['status'] == 'ok':
+        abort(500)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
     response.headers["Content-Type"] = "application/json"
@@ -386,7 +398,9 @@ def upload_signed_dta(request_id):
     filename = secure_filename(request.files['file'].filename)
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'signed_dta', filename)
 
-    api.call('datarequest_signed_dta_upload_permission', {'request_id': request_id, 'action': 'grant'})
+    result = api.call('datarequest_signed_dta_upload_permission', {'request_id': request_id, 'action': 'grant'})
+    if not result['status'] == 'ok':
+        abort(500)
 
     session = g.irods
 
@@ -404,8 +418,12 @@ def upload_signed_dta(request_id):
         response.headers["Content-Type"] = "application/json"
         return response
 
-    api.call('datarequest_signed_dta_post_upload_actions', {'request_id': request_id, 'filename': filename})
-    api.call('datarequest_signed_dta_upload_permission', {'request_id': request_id, 'action': 'grantread'})
+    result = api.call('datarequest_signed_dta_post_upload_actions', {'request_id': request_id, 'filename': filename})
+    if not result['status'] == 'ok':
+        abort(500)
+    result = api.call('datarequest_signed_dta_upload_permission', {'request_id': request_id, 'action': 'grantread'})
+    if not result['status'] == 'ok':
+        abort(500)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
     response.headers["Content-Type"] = "application/json"
