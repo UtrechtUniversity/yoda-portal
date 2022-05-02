@@ -222,5 +222,5 @@ function convertToHumanReadableStatus(status) {
 function htmlEncode(value){
     //create a in-memory div, set it's inner text(which jQuery automatically encodes)
     //then grab the encoded contents back out.  The div never exists on the page.
-    return $('<div/>').text(value).html().replace('"', '&quot;');
+    return $('<div/>').text(value).html().replaceAll('"', '&quot;');
 }
