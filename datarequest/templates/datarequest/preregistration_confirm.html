@@ -18,7 +18,7 @@
 <div class="row">
     <div class="col-md-12">
         <a id="confirmPreregistration" href="/datarequest/confirm_preregistration/{{ request_id }}" class="disabled btn btn-primary mb-3 float-end">Confirm preregistration</a>
-        <a id="visitPreregistration" target="_blank" href="{{ osf_url }}" class="btn btn-primary mb-3 me-1 float-end">Visit OSF preregistration</a>
+        <a rel="noopener" id="visitPreregistration" target="_blank" href="{{ osf_url }}" class="btn btn-primary mb-3 me-1 float-end">Visit OSF preregistration</a>
     </div>
     <div class="col-md-12">
         {% include 'datarequest/partials/preregistration.html' %}
