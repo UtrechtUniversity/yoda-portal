@@ -328,17 +328,22 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
 
     if len(filters) != 0:
         queryList = [searchQuery]
+        filterDict = {}
         for filter in filters:
             attribute = filter['name']
-            match = {
-                'term': {
-                    'metadataEntries.attribute.raw': attribute
+            if not attribute in filterDict:
+                filterDict[attribute] = {
+                    'match': {
+                        'term': {
+                            'metadataEntries.attribute.raw': attribute
+                        }
+                    },
+                    'should': []
                 }
-            }
             if 'value' in filter:
                 name = filter['value']
                 if attribute == 'Person':
-                    match = {
+                    filterDict[attribute]['match'] = {
                         'bool': {
                             'should': [
                                 {
@@ -354,7 +359,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                             'minimum_should_match': 1
                         }
                     }
-                    should = [
+                    filterDict[attribute]['should'] += [
                         {
                             'prefix': {
                                 'metadataEntries.value': name.lower()
@@ -362,7 +367,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                         }
                     ]
                 else:
-                    should = [
+                    filterDict[attribute]['should'] += [
                         {
                             'term': {
                                 'metadataEntries.value.raw': name
@@ -370,29 +375,31 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                         }
                     ]
             else:
-                should = []
-                should.append({
-                    'range': {
-                        'metadataEntries.value.number': {
-                            'gte': filter['from'],
-                            'lte': filter['to']
+                filterDict[attribute]['should'] += [
+                    {
+                        'range': {
+                            'metadataEntries.value.number': {
+                                'gte': filter['from'],
+                                'lte': filter['to']
+                            }
                         }
                     }
-                })
+                ]
+        for filter in filterDict.values():
             queryList.append({
                 'nested': {
                     'path': 'metadataEntries',
                     'query': {
                         'bool': {
                             'must': [
-                                match,
+                                filter['match'],
                                 {
                                     'term': {
                                         'metadataEntries.unit.raw': 'FlatIndex'
                                     }
                                 }
                             ],
-                            'should': should,
+                            'should': filter['should'],
                             'minimum_should_match': 1
                         }
                     }
