@@ -331,7 +331,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
         filterDict = {}
         for filter in filters:
             attribute = filter['name']
-            if not attribute in filterDict:
+            if attribute not in filterDict:
                 filterDict[attribute] = {
                     'match': {
                         'term': {
