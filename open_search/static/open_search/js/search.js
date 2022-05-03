@@ -66,21 +66,19 @@ $(function() {
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
 
-    $("body").on("keyup", "input:text[id=Person]", function(e) {
-        if (e.key === 'Enter' || e.keyCode === 13) {
-            let filterValue = $(this).val();
-            $.each(filters, function(index, object) {
-                if (object['name'] == 'Person') {
-                    filters.splice(index, 1);
-                }
-            });
-            if (filterValue != "") {
-                filters.push({"name": 'Person', "value": filterValue });
+    $("body").on("keyup", "input:text[id=Person]", delay(function (e) {
+        let filterValue = $(this).val();
+        $.each(filters, function(index, object) {
+            if (object['name'] == 'Person') {
+                filters.splice(index, 1);
             }
-
-            search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
+        });
+        if (filterValue != "") {
+            filters.push({"name": 'Person', "value": filterValue });
         }
-    });
+
+        search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
+    }, 200));
 });
 
 
@@ -294,6 +292,17 @@ function buildFacets(data)
 
         $('.' + placeholder).html(html);
     });
+}
+
+function delay(callback, ms) {
+    var timer = 0;
+    return function() {
+        var context = this, args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            callback.apply(context, args);
+        }, ms || 0);
+    };
 }
 
 OpenSearchApi.call = async function(data={}, options={}) {
