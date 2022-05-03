@@ -6,7 +6,7 @@ let itemsPerPage;
 let currentPage = 1;
 let sort;
 let sortOrder;
-let facets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name'];
+let facets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name', 'Collected_Start_Year', 'Collected_End_Year'];
 let filters = [];
 let ranges = {};
 
@@ -212,7 +212,7 @@ function checkboxItem(name, value, count, checked = false) {
     let html = `    
     <div class="form-check">
         <input class="form-check-input" type="checkbox" value="${value}"  name="filters['${name}']" data-filter="${name}" ${checkedHtml}>
-        <label class="form-check-label">
+        <label class="form-check-label fs-6">
           ${value} (${count})
         </label>
     </div>
