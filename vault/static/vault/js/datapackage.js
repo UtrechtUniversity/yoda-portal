@@ -199,7 +199,8 @@ async function handleRestrictedMetadataInfo() {
         metadata = j.metadata;
         // bring separately delivered deposit_date into the metadata dict for ease of reference
         metadata['deposit_date'] = j.deposit_date;
-
+        // Correct Personal data values derived from Data_Classification
+        metadata['Data_Classification'] = convertClassificationToPersonal(metadata['Data_Classification']);
 
         // Show the collected metadata
         metadataShow();
@@ -229,6 +230,8 @@ function handleOpenMetadataInfo(dir) {
             metadata = result.data.metadata;
             // bring separately delivered deposit_date into the metadata dict for ease of reference
             metadata['deposit_date'] = result.data.deposit_date;
+            // Correct Personal data values derived from Data_Classification
+            metadata['Data_Classification'] = convertClassificationToPersonal(metadata['Data_Classification']);
 
             // Show the collected metadata
             metadataShow();
@@ -237,6 +240,13 @@ function handleOpenMetadataInfo(dir) {
     catch (error) {
         console.error(error);
     }
+}
+
+function convertClassificationToPersonal(classification) {
+    if (classification == 'Basic') {
+        return 'No'
+    }
+    return 'Yes'
 }
 
 function metadataShow() {

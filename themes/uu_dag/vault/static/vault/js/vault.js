@@ -456,7 +456,8 @@ function metadataInfo(dir) {
             $('.metadata-info').show();
             $(".metadata-title").text(metadata.Title);
             $(".metadata-access").text(metadata.Data_Access_Restriction);
-            $(".metadata-data-classification").text(metadata.Data_Classification);
+            // Translate data classification to values Yes/No (reference to datapackage containing personal data)
+            $(".metadata-data-classification").text(((metadata.Data_Classification)=='Basic'?'No':'Yes'));
             $(".metadata-license").text(metadata.License);
 
             if (metadata.Description){
