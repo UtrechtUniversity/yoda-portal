@@ -193,7 +193,7 @@ def callback() -> Response:
         response = requests.get(
             userinfo_uri,
             headers={
-                'Authorization': 'Bearer {token}'
+                'Authorization': f'Bearer {token}'
             }
         )
 
