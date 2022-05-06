@@ -138,7 +138,7 @@ function startBrowsing(items)
         "bInfo": false,
         "bLengthChange": true,
         "language": {
-            "emptyTable": "No accessible files/folders present",
+            "emptyTable": "No data requests present",
             "lengthMenu": "_MENU_"
         },
         "dom": '<"top">frt<"bottom"lp><"clear">',
