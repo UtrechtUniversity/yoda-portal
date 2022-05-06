@@ -296,7 +296,9 @@ def preregister(request_id):
     if not permission_check(request_id, ['OWN'], ['APPROVED']):
         abort(403)
 
-    approval_conditions = json.loads(api.call('datarequest_approval_conditions_get', {'request_id': request_id})['data'])
+    approval_conditions = api.call('datarequest_approval_conditions_get', {'request_id': request_id})['data']
+    if approval_conditions is not None:
+        approval_conditions = json.loads(approval_conditions)
 
     return render_template('datarequest/preregister.html', request_id=request_id, approval_conditions=approval_conditions)
 
