@@ -10,7 +10,8 @@ from enum import Enum
 
 import magic
 from flask import (
-    abort, Blueprint, escape, g, jsonify, make_response, redirect, render_template, request, send_file, session, url_for
+    abort, Blueprint, current_app as app, escape, g, jsonify, make_response, redirect,
+    render_template, request, send_file, session, url_for
 )
 from irods.message import iRODSMessage
 from werkzeug.utils import secure_filename
@@ -88,8 +89,8 @@ def index(archived=False, dacrequests=False):
                            dacrequests=dacrequests,
                            submission_allowed=submission_allowed,
                            is_dac_member=is_dac_member,
-                           help_contact_name='Todo_help_contact_name',
-                           help_contact_email='Todo_help_contact_email')
+                           help_contact_name=app.config.get('DATAREQUEST_HELP_CONTACT_NAME'),
+                           help_contact_email=app.config.get('DATAREQUEST_HELP_CONTACT_EMAIL'))
 
 
 @datarequest_bp.route('view/<request_id>')
