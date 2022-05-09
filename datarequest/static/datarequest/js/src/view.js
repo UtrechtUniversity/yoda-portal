@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         var assignSchema   = {};
         var assignUiSchema = {};
         var assignFormData = {};
-    
+
         // Get assignment schema and uischema
         Yoda.call("datarequest_schema_get",
                   {schema_name: "assignment"})
@@ -294,8 +294,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
               );
             });
-            console.log(reviews);
-
             render(<div>{reviews}</div>, document.getElementById("reviews"));
         });
     }
