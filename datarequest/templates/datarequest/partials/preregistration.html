@@ -1,14 +1,14 @@
-<div class="card">
+<div class="card mb-3">
     <div class="card-header clearfix">
         <div class="input-group-sm has-feedback float-start">
-            <a class="btn btn-secondary collapse-buttons" data-bs-toggle="collapse" href="#preregistrationDiv" role="button" aria-expanded="false">
+            <a class="btn btn-secondary collapse-buttons" data-bs-toggle="collapse" href="#preregistrationDiv" role="button" aria-expanded="{% if not expanded %}false{% endif %}{%if expanded %}true{% endif %}">
                 <span class="text-collapsed">Show</span>
                 <span class="text-expanded">Hide</span>
             </a>
         </div>
         <h5 class="float-start">Preregistration</h5>
     </div>
-    <div id="preregistrationDiv" class="card-body collapse">
+    <div id="preregistrationDiv" class="card-body {% if not expanded %}collapse{% endif %}{% if expanded %}show{% endif %}">
         <div id="preregistration" class="metadata-form"
              data-csrf_token_name="<?php echo rawurlencode($tokenName); ?>"
              data-csrf_token_hash="<?php echo rawurlencode($tokenHash); ?>">

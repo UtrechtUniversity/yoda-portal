@@ -23,7 +23,10 @@
         {% include 'datarequest/partials/preliminary_review.html' %}
     </div>
     <div class="col-md-6">
+        {% with %}
+        {% set expanded = true %}
         {% include 'datarequest/partials/datarequest.html' %}
+        {% endwith %}
         {% if attachments|length > 0 %} 
         {% include 'datarequest/partials/attachments.html' %}
         {% endif %}

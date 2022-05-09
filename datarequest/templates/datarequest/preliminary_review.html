@@ -26,7 +26,10 @@
 
 <div class="row">
     <div class="col-md-12">
+        {% with %}
+        {% set expanded = true %}
         {% include 'datarequest/partials/datarequest.html' %}
+        {% endwith %}
         {% if attachments|length > 0 %} 
         {% include 'datarequest/partials/attachments.html' %}
         {% endif %}

@@ -21,7 +21,10 @@
         <a rel="noopener" id="visitPreregistration" target="_blank" href="{{ osf_url }}" class="btn btn-primary mb-3 me-1 float-end">Visit OSF preregistration</a>
     </div>
     <div class="col-md-12">
+        {% with %}
+        {% set expanded = true %}
         {% include 'datarequest/partials/preregistration.html' %}
+        {% endwith %}
         {% include 'datarequest/partials/datarequest.html' %}
     </div>
 </div>
