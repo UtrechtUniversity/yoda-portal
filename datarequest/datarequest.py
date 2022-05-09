@@ -113,9 +113,12 @@ def view(request_id):
     human_request_status = human_readable_status[request_status].value
     request_type         = request_info['requestType']
     request              = json.loads(request_info['requestJSON'])
-    publication_type     = "Other, namely: " + request['datarequest']['publication_type_other'] if \
+    if request_type == 'REGULAR':
+        publication_type = "Other, namely: " + request['datarequest']['publication_type_other'] if \
                            request['datarequest']['publication_type'] == 'Other (please specify below)' else \
                            request['datarequest']['publication_type']
+    else:
+        publication_type = None
     attachments          = api.call('datarequest_attachments_get', {'request_id': request_id})['data']
 
     return render_template('datarequest/view.html',
