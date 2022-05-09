@@ -332,6 +332,7 @@ def upload_dta(request_id):
 
     # Verify that uploaded file is a PDF
     mimetype = magic.from_buffer(request.files['file'].stream.read(2048), mime=True)
+    request.files['file'].stream.seek(0)
     if not mimetype == "application/pdf":
         response = make_response(jsonify({"message": "Only PDF files are permitted to be uploaded."}), 422)
         response.headers["Content-Type"] = "application/json"
@@ -398,6 +399,7 @@ def upload_signed_dta(request_id):
 
     # Verify that uploaded file is a PDF
     mimetype = magic.from_buffer(request.files['file'].stream.read(2048), mime=True)
+    request.files['file'].stream.seek(0)
     if not mimetype == "application/pdf":
         response = make_response(jsonify({"message": "Only PDF files are permitted to be uploaded."}), 422)
         response.headers["Content-Type"] = "application/json"
