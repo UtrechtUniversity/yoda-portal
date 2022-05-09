@@ -128,13 +128,13 @@
 
         {% if request_status == 'DTA_READY' and is_request_owner %}
         <?php if ($requestStatus == "DTA_READY" && $isRequestOwner): ?>
-        <button type="button" class="btn btn-primary mb-3 ml-1 float-end upload_signed_dta" data-path="">Upload signed DTA</button>
+        <button type="button" class="btn btn-primary mb-3 ms-1 float-end upload_signed_dta" data-path="">Upload signed DTA</button>
         <?php endif ?>
         {% endif %}
 
         {% if request_status == 'DTA_SIGNED' and is_datamanager %}
         <?php if ($requestStatus == "DTA_SIGNED" && $isDatamanager): ?>
-        <a href="/datarequest/data_ready/{{ request_id }}" class="btn btn-primary mb-3 ml-1 float-end" role="button">Data ready</a>
+        <a href="/datarequest/data_ready/{{ request_id }}" class="btn btn-primary mb-3 ms-1 float-end" role="button">Data ready</a>
         <?php endif ?>
         {% endif %}
 
@@ -146,13 +146,13 @@
 
         {% if request_status in ['DTA_SIGNED', 'DATA_READY'] and (is_request_owner or is_project_manager or is_datamanager) %}
         <?php if (in_array($requestStatus, array("DTA_SIGNED", "DATA_READY")) && ($isRequestOwner || $isProjectManager || $isDatamanager)): ?>
-        <a href="/datarequest/download_signed_dta/{{ request_id }}" class="btn btn-primary mb-3 ml-1 float-end">Download signed DTA</a>
+        <a href="/datarequest/download_signed_dta/{{ request_id }}" class="btn btn-primary mb-3 ms-1 float-end">Download signed DTA</a>
         <?php endif ?>
         {% endif %}
 
         {% if request_status in ['DTA_READY', 'DTA_SIGNED', 'DATA_READY'] and (is_request_owner or is_project_manager or is_datamanager) %}
         <?php if (in_array($requestStatus, array("DTA_READY", "DTA_SIGNED", "DATA_READY")) && ($isRequestOwner || $isProjectManager || $isDatamanager)): ?>
-        <a href="/datarequest/download_dta/{{ request_id }}" class="btn btn-primary mb-3 ml-1 float-end">Download DTA</a>
+        <a href="/datarequest/download_dta/{{ request_id }}" class="btn btn-primary mb-3 ms-1 float-end">Download DTA</a>
         <?php endif ?>
         {% endif %}
     </div>
@@ -160,7 +160,7 @@
 
 <div class="row">
     <div class=col-md-12>
-        <div class="card">
+        <div class="card mb-3">
             <div class="card-header clearfix">
                 <h5 class="float-start">Summary and progress</h5>
                 <div class="input-group-sm has-feedback float-end">
