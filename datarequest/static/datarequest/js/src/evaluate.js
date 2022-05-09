@@ -112,19 +112,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     var assignUiSchema = {};
     var assignFormData = {};
 
-    // Get assignment
-    Yoda.call("datarequest_assignment_get",
-              {request_id: config.request_id},
-              {errorPrefix: "Could not get assignment"})
-    .then(response => {
-        assignFormData = JSON.parse(response);
-    })
     // Get assignment schema and uischema
+    Yoda.call("datarequest_schema_get",
+              {schema_name: "assignment"})
+    .then(response => {
+        assignSchema   = response.schema;
+        assignUiSchema = response.uischema;
+    })
+    // Get assignment
     .then(async () => {
-        await Yoda.call("datarequest_schema_get", {schema_name: "assignment"})
+        await Yoda.call("datarequest_assignment_get",
+                        {request_id: config.request_id},
+                        {errorPrefix: "Could not get assignment"})
         .then(response => {
-            assignSchema   = response.schema;
-            assignUiSchema = response.uischema;
+        assignFormData = JSON.parse(response);
+        assignSchema.dependencies.decision.oneOf[0].properties.assign_to.items.enum = assignFormData.assign_to;
+        assignSchema.dependencies.decision.oneOf[0].properties.assign_to.items.enumNames = assignFormData.assign_to;
         })
     })
     // Render assignment as disabled form
