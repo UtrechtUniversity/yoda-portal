@@ -115,6 +115,31 @@ def login() -> Response:
 @user_bp.route('/logout')
 def logout() -> Response:
     """Logout user and redirect to index."""
+    def revocation_request() -> requests.Response:
+        access_token = session.get('password')
+        data = {
+            'token': access_token,
+            'token_type_hint': 'access_token'
+        }
+
+        # Content-type is application/x-www-form-urlencoded by default when data is a dict
+        response = requests.post(
+            app.config.get('OIDC_REVOCATION_URI'),
+            data,
+            auth=(
+                app.config.get('OIDC_CLIENT_ID'),
+                app.config.get('OIDC_CLIENT_SECRET')
+            )
+        )
+
+        return response
+
+    # Revoke access token for OIDC.
+    if session.get('password'):
+        response = revocation_request()
+        print(response.status_code)
+        print(response.text)
+
     connman.clean(session.sid)
     session.clear()
     return redirect(url_for('general_bp.index'))
