@@ -109,8 +109,8 @@ def view(request_id):
 
     request_info         = api.call('datarequest_get', {'request_id': request_id})['data']
     request_status       = request_info['requestStatus']
-    available_documents  = request_info['requestAvailableDocuments']
     human_request_status = human_readable_status[request_status].value
+    available_documents  = request_info['requestAvailableDocuments']
     request_type         = request_info['requestType']
     request              = json.loads(request_info['requestJSON'])
     if request_type == 'REGULAR':
@@ -125,8 +125,8 @@ def view(request_id):
                            request_id=request_id,
                            request_info=request_info,
                            request_status=request_status,
-                           available_documents=available_documents,
                            human_request_status=human_request_status,
+                           available_documents=available_documents,
                            request_type=request_type,
                            publication_type=publication_type,
                            request=request,
