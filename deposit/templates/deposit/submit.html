@@ -33,29 +33,22 @@
         <div class="form-check">
             <p>Data uploaded? <i id="data_check" aria-hidden="true" class="fa-solid fa-times text-danger"></i></p>
             <p>Data documented? <i id="metadata_check" aria-hidden="true" class="fa-solid fa-times text-danger"></i></p>
-            <p class="accept_terms_line ps-4">
-                <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms">
-                <label class="form-check-label" for="accept_terms">I accept the</label>
-                <a href="" data-bs-toggle="modal" data-bs-target="#terms_conditions_modal" title="Click to accept Terms and Conditions" class="btn-terms-conditions">Terms and Conditions</a>
+            <p class="mt-4">
+            You understand that:
+                <ul>
+                    <li>You are about to deposit a data package to the DAG</li>
+                    <li>The data package will be managed by data management staff within the faculty</li>
+                    <li>The data package will be findable by all faculty members via the entered metadata</li>
+                    <li>The data package will be accessible by you and the data managers, when you chose access category 'restricted'</li>
+                    <li>All faculty members, when you chose access category 'open'</li>
+                    <li>If there is personal data in the data package (which should be indicated in the metadata under “personal data”) then the data package will be inspected by the data management staff, and they may contact you if there are any concerns</li>
+                </ul>
             </p>
         </div>
     </div>
     <div class="modal-footer">
         <a href="/deposit/metadata?dir={{ path|urlencode }}" class="btn btn-secondary btn-document-data" title="Go back to document data"><i class="fa-solid fa-chevron-left"></i> Add metadata</a>
         <button id="submit" type="submit" class="btn btn-primary float-end btn-submit-data" title="Submit data" disabled>Submit datapackage</button>
-    </div>
-</div>
-
-<div class="modal fade" tabindex="-1" role="dialog" id="terms_conditions_modal" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Terms and conditions</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close"></button>
-            </div>
-            <div class="modal-body">
-            </div>
-        </div>
     </div>
 </div>
 {% endblock content %}
