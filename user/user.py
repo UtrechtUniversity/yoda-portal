@@ -116,7 +116,13 @@ def login() -> Response:
 def logout() -> Response:
     """Logout user and redirect to index."""
     def revocation_request() -> requests.Response:
-        access_token = session.get('password')
+        password = session.get('password')
+
+        # Get access token out of password.
+        password = password[14:]
+        sub_ix = password.index('end_sub')
+        access_token = password[sub_ix + 7:]
+
         data = {
             'token': access_token,
             'token_type_hint': 'access_token'
@@ -370,13 +376,11 @@ def oidc_authorize_url(username: str) -> str:
 
 def irods_login(username: str, password: str) -> None:
     """Start session with iRODS."""
-    password = escape_irods_pam_password(password)
-
     irods = iRODSSession(
         host=app.config.get('IRODS_ICAT_HOSTNAME'),
         port=app.config.get('IRODS_ICAT_PORT'),
         user=username,
-        password=password,
+        password=escape_irods_pam_password(password),
         zone=app.config.get('IRODS_DEFAULT_ZONE'),
         configure=True,
         **app.config.get('IRODS_SESSION_OPTIONS')
