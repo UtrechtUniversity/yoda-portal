@@ -200,22 +200,25 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
     )
 
     if value != "":
+        searchList = [
+            {
+                'term': {
+                    'metadataEntries.unit.raw': 'FlatIndex'
+                }
+            }
+        ]
+        for name in re.split(' +', value.lower()):
+            searchList.append({
+                'prefix': {
+                    'metadataEntries.value': name
+                }
+            })
         searchQuery = {
             'nested': {
                 'path': 'metadataEntries',
                 'query': {
                     'bool': {
-                        'must': [
-                            {
-                                'term': {
-                                    'metadataEntries.unit.raw': 'FlatIndex'
-                                }
-                            }, {
-                                'prefix': {
-                                    'metadataEntries.value': value.lower()
-                                }
-                            }
-                        ]
+                        'must': searchList
                     }
                 }
             }
