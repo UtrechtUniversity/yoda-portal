@@ -4,13 +4,10 @@ __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
 import io
-import os
 from typing import Iterator
 
-from flask import abort, Blueprint, g, redirect, render_template, request, Response, url_for, stream_with_context
+from flask import abort, Blueprint, g, redirect, render_template, request, Response, stream_with_context, url_for
 from irods.exception import CAT_NO_ACCESS_PERMISSION
-from irods.message import iRODSMessage
-from werkzeug.utils import secure_filename
 
 import api
 
