@@ -212,6 +212,31 @@ $(function() {
         $('#messages').html('');
     });
 
+    $("body").on("click", "a.view-video", function() {
+        let path = $(this).attr('data-path');
+        let viewerHtml = `<video width="570" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></video>`;
+        $('#viewer').html(viewerHtml);
+        $('#viewMedia').modal('show');
+    });
+
+    $("body").on("click", "a.view-audio", function() {
+        let path = $(this).attr('data-path');
+        let viewerHtml = `<audio width="570" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></audio>`;
+        $('#viewer').html(viewerHtml);
+        $('#viewMedia').modal('show');
+    });
+
+    $("body").on("click", "a.view-image", function() {
+        let path = $(this).attr('data-path');
+        let viewerHtml = `<img width="570" src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}" />`;
+        $('#viewer').html(viewerHtml);
+        $('#viewMedia').modal('show');
+    });
+
+    $("#viewMedia.modal").on("hidden.bs.modal", function() {
+        $("#viewer").html("");
+    });
+
     $("body").on("click", ".browse", function(e) {
         browse($(this).attr('data-path'), true);
         // Dismiss stale messages.
@@ -622,6 +647,20 @@ const tableRenderer = {
         }
         else {
             // Context menu for files
+            const viewExts = {
+                image: ['jpg', 'jpeg', 'gif', 'png'],
+                audio: ['mp3', 'ogg', 'wav'],
+                video: ['mp4', 'ogg', 'webm']
+            };
+            let ext = row.name.replace(/.*\./, '').toLowerCase();
+
+            actions.append(`<a class="dropdown-item" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file">Download</a>`);
+
+            // Generate dropdown "view" actions for different media types.
+            for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
+                actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`);
+            }
+
             actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this file">Rename</a>`);
             actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`);
             actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Copy this file">Copy</a>`);
