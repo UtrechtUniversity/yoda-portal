@@ -272,28 +272,36 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                 }
             }
     if len(ranges) != 0:
-        for facet, range in ranges.items():
-            subranges = []
-            for subrange in range:
-                subranges.append({
-                    'from': subrange['from'],
-                    'to': subrange['to'] + 1
-                })
-            facetList[facet] = {
-                'filter': {
-                    'term': {
-                        'metadataEntries.attribute.raw': facet
-                    }
-                },
-                'aggregations': {
-                    'value': {
-                        'range': {
-                            'field': 'metadataEntries.value.number',
-                            'ranges': subranges
-                        }
+        for range in ranges:
+            facet = range['name']
+            if facet not in facetList:
+                aggregations = {
+                    'range': {
+                        'field': 'metadataEntries.value.number',
+                        'ranges': []
                     }
                 }
-            }
+                facetList[facet] = {
+                    'filter': {
+                        'term': {
+                            'metadataEntries.attribute.raw': facet
+                        }
+                    },
+                    'aggregations': {
+                        'value': aggregations
+                    }
+                }
+            else:
+                aggregations = facetList[facet]['aggregations']['value']
+                if 'range' not in aggregations:
+                    aggregations['range'] = {
+                        'field': 'metadataEntries.value.number',
+                        'ranges': []
+                    }
+            aggregations['range']['ranges'].append({
+                'from': range['from'],
+                'to': range['to'] + 1
+            })
 
     if len(facetList) != 0:
         query = {
