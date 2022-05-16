@@ -66,6 +66,23 @@ $(function() {
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
 
+    $("body").on("change", "select.Collected_Start_Year, select.Collected_End_Year", function() {
+        let filterValue = $(this).val();
+        let filterName = $(this).attr('data-filter');
+
+        // Delete current filter
+        $.each(filters, function(index, object) {
+            if (object['name'] == filterName && object['value'] == filterValue) {
+                filters.splice(index, 1);
+            }
+        });
+
+        // Add selected filter
+        filters.push([{"name": filterName, "value": filterValue }]);
+
+        search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
+    });
+
     $("body").on("keyup", "input:text[id=Person]", delay(function (e) {
         let filterValue = $(this).val();
         $.each(filters, function(index, object) {
@@ -218,6 +235,16 @@ function checkboxItem(name, value, count, checked = false) {
     return html;
 }
 
+function selectItem(name, value, count, checked = false) {
+    let selectedHtml = '';
+    if (checked) {
+        selectedHtml = 'selected';
+    }
+
+    let html = `<option value="${value}" ${selectedHtml}>${value}</option>`;
+    return html;
+}
+
 function truncate(str, max, suffix) {
     if (str.length < max) {
         return str;
@@ -271,6 +298,8 @@ function buildFacets(data)
     let checked = false;
     let placeholder = '';
     let values = [];
+    let checkboxFacets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name'];
+    //let selectFacets = ['Collected_Start_Year', 'Collected_End_Year'];
 
     $(facets).each(function(i, facet) {
         html = '';
@@ -287,10 +316,17 @@ function buildFacets(data)
             if ($.inArray(element.value, values) >= 0) {
                 checked = true;
             }
-            html += checkboxItem(facet, element.value, element.count, checked);
+            if ($.inArray(facet, checkboxFacets) >= 0) {
+                html += checkboxItem(facet, element.value, element.count, checked);
+            } else {
+                html = selectItem(facet, element.value, element.count, checked);
+                $('.' + facet).append(html);
+            }
         });
 
-        $('.' + placeholder).html(html);
+        if ($.inArray(facet, checkboxFacets) >= 0) {
+            $('.' + placeholder).html(html);
+        }
     });
 }
 
