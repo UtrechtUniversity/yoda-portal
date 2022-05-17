@@ -3,7 +3,11 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__ = 'GPLv3, see LICENSE'
 
-from flask import abort, Blueprint, redirect, render_template, request, Response, url_for
+import io
+from typing import Iterator
+
+from flask import abort, Blueprint, g, redirect, render_template, request, Response, stream_with_context, url_for
+from irods.exception import CAT_NO_ACCESS_PERMISSION
 
 import api
 
@@ -48,6 +52,41 @@ def data() -> Response:
                            activeModule='deposit',
                            items=25,
                            path=path)
+
+
+@deposit_bp.route('/browse/download')
+def download() -> Response:
+    path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
+    filename = path.rsplit('/', 1)[1]
+    session = g.irods
+
+    READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
+
+    def read_file_chunks(path: str) -> Iterator[bytes]:
+        obj = session.data_objects.get(path)
+        try:
+            with obj.open('r') as fd:
+                while True:
+                    buf = fd.read(READ_BUFFER_SIZE)
+                    if buf:
+                        yield buf
+                    else:
+                        break
+        except CAT_NO_ACCESS_PERMISSION:
+            abort(403)
+        except Exception:
+            abort(500)
+
+    if session.data_objects.exists(path):
+        return Response(
+            stream_with_context(read_file_chunks(path)),
+            headers={
+                'Content-Disposition': f'attachment; filename={filename}',
+                'Content-Type': 'application/octet'
+            }
+        )
+    else:
+        abort(404)
 
 
 @deposit_bp.route('/metadata')
