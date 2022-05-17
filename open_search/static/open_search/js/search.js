@@ -8,12 +8,18 @@ let sort;
 let sortOrder;
 let facets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name', 'Collected_Start_Year', 'Collected_End_Year'];
 let filters = [];
-let ranges = {};
+let ranges = [];
+let collectedStartYear = 2022;
+let collectedEndYear = 2022;
 
 $(function() {
     itemsPerPage = $('#items-count').val();
     sort = $('#sort').val();
     sortOrder = $("select option:selected").attr('data-order');
+
+    let year = new Date().getFullYear();
+    collectedStartYear = year;
+    collectedEndYear = year;
 
     let filter = '';
     if ($("#search-filter").val().length > 0) {
@@ -66,19 +72,25 @@ $(function() {
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
 
-    $("body").on("change", "select.Collected_Start_Year, select.Collected_End_Year", function() {
+    $("body").on("change", "select.data-Collected_Start_Year, select.data-Collected_End_Year", function() {
         let filterValue = $(this).val();
         let filterName = $(this).attr('data-filter');
 
         // Delete current filter
-        $.each(filters, function(index, object) {
-            if (object['name'] == filterName && object['value'] == filterValue) {
-                filters.splice(index, 1);
+        $.each(ranges, function(index, object) {
+            if (object['name'] == filterName) {
+                ranges.splice(index, 1);
             }
         });
 
+        if (filterName == 'Collected_Start_Year') {
+            collectedStartYear = filterValue;
+        } else {
+            collectedEndYear = filterValue;
+        }
+
         // Add selected filter
-        filters.push([{"name": filterName, "value": filterValue }]);
+        ranges.push({"name": filterName, "from": collectedStartYear, "to": collectedEndYear });
 
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
@@ -319,14 +331,18 @@ function buildFacets(data)
             if ($.inArray(facet, checkboxFacets) >= 0) {
                 html += checkboxItem(facet, element.value, element.count, checked);
             } else {
-                html = selectItem(facet, element.value, element.count, checked);
-                $('.' + facet).append(html);
+                if (index == 0) {
+                    if (facet == 'Collected_Start_Year') {
+                        html += '<option>Start year</option>';
+                    } else if (facet == 'Collected_End_Year') {
+                        html += '<option>End year</option>';
+                    }
+                }
+                html += selectItem(facet, element.value, element.count, checked);
             }
         });
 
-        if ($.inArray(facet, checkboxFacets) >= 0) {
-            $('.' + placeholder).html(html);
-        }
+        $('.' + placeholder).html(html);
     });
 }
 
