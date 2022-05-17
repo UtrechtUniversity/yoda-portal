@@ -7,11 +7,12 @@ import io
 import json
 import os
 from enum import Enum
+from typing import List, Optional
 
 import magic
 from flask import (
     abort, Blueprint, current_app as app, escape, g, jsonify, make_response, redirect,
-    render_template, request, send_file, session, url_for
+    render_template, request, Response, send_file, session, url_for
 )
 from irods.message import iRODSMessage
 from werkzeug.utils import secure_filename
@@ -28,7 +29,7 @@ datarequest_bp = Blueprint(
 
 
 # Helper functions.
-def permission_check(request_id, roles, statuses):
+def permission_check(request_id: str, roles: List[str], statuses: Optional[List[str]]) -> bool:
     return api.call('datarequest_action_permitted', {'request_id': request_id,
                                                      'statuses': statuses,
                                                      'roles': roles})['data']
@@ -63,18 +64,18 @@ class human_readable_status(Enum):
 
 # Controllers
 @datarequest_bp.route('/archive')
-def index_archived():
+def index_archived() -> Response:
     return index(archived=True)
 
 
 @datarequest_bp.route('/dacrequests')
-def index_dacrequests():
+def index_dacrequests() -> Response:
     return index(dacrequests=True)
 
 
 @datarequest_bp.route('/index')
 @datarequest_bp.route('/')
-def index(archived=False, dacrequests=False):
+def index(archived: Optional[bool] = False, dacrequests: Optional[bool] = False) -> Response:
     # Todo: read browser-items-per-page from config
     items = 10
 
@@ -94,7 +95,7 @@ def index(archived=False, dacrequests=False):
 
 
 @datarequest_bp.route('view/<request_id>')
-def view(request_id):
+def view(request_id: str) -> Response:
     roles = api.call('datarequest_roles_get', {'request_id': request_id})['data']
 
     is_project_manager  = 'PM' in roles
@@ -141,7 +142,7 @@ def view(request_id):
 
 @datarequest_bp.route('add')
 @datarequest_bp.route('add/<previous_request_id>')
-def add(previous_request_id=None):
+def add(previous_request_id: Optional[str] = None) -> Response:
     if previous_request_id:
         return render_template('datarequest/add.html', previous_request_id=previous_request_id)
     else:
@@ -149,14 +150,14 @@ def add(previous_request_id=None):
 
 
 @datarequest_bp.route('add_from_draft/<draft_request_id>')
-def add_from_draft(draft_request_id):
+def add_from_draft(draft_request_id: str) -> Response:
     if not permission_check(draft_request_id, ['OWN'], None):
         abort(403)
     return render_template('datarequest/add.html', draft_request_id=draft_request_id)
 
 
 @datarequest_bp.route('add_attachments/<request_id>')
-def add_attachments(request_id):
+def add_attachments(request_id: str) -> Response:
     if not permission_check(request_id, ['OWN'], ['PENDING_ATTACHMENTS']):
         abort(403)
 
@@ -166,7 +167,7 @@ def add_attachments(request_id):
 
 
 @datarequest_bp.route('upload_attachment/<request_id>', methods=['POST'])
-def upload_attachment(request_id):
+def upload_attachment(request_id: str) -> Response:
     if not permission_check(request_id, ['OWN'], ['PENDING_ATTACHMENTS']):
         abort(403)
 
@@ -206,7 +207,7 @@ def upload_attachment(request_id):
 
 
 @datarequest_bp.route('download_attachment/<request_id>')
-def download_attachment(request_id):
+def download_attachment(request_id: str) -> Response:
     if not permission_check(request_id, ['PM', 'ED', 'DM', 'DAC', 'OWN'], None):
         abort(403)
 
@@ -223,7 +224,7 @@ def download_attachment(request_id):
 
 
 @datarequest_bp.route('submit_attachments/<request_id>')
-def submit_attachments(request_id):
+def submit_attachments(request_id: str) -> Response:
     if not permission_check(request_id, ['OWN'], ['PENDING_ATTACHMENTS']):
         abort(403)
 
@@ -234,7 +235,7 @@ def submit_attachments(request_id):
 
 
 @datarequest_bp.route('preliminary_review/<request_id>')
-def preliminary_review(request_id):
+def preliminary_review(request_id: str) -> Response:
     if not permission_check(request_id, ['PM'], ['SUBMITTED']):
         abort(403)
 
@@ -245,7 +246,7 @@ def preliminary_review(request_id):
 
 
 @datarequest_bp.route('datamanager_review/<request_id>')
-def datamanager_review(request_id):
+def datamanager_review(request_id: str) -> Response:
     if not permission_check(request_id, ['DM'], ['PRELIMINARY_ACCEPT']):
         abort(403)
 
@@ -256,7 +257,7 @@ def datamanager_review(request_id):
 
 
 @datarequest_bp.route('assign/<request_id>')
-def assign(request_id):
+def assign(request_id: str) -> Response:
     if not permission_check(request_id, ['PM'], ['DATAMANAGER_ACCEPT', 'DATAMANAGER_REJECT', 'DATAMANAGER_RESUBMIT']):
         abort(403)
 
@@ -267,7 +268,7 @@ def assign(request_id):
 
 
 @datarequest_bp.route('review/<request_id>')
-def review(request_id):
+def review(request_id: str) -> Response:
     if not permission_check(request_id, ['REV'], ['UNDER_REVIEW']):
         abort(403)
 
@@ -279,7 +280,7 @@ def review(request_id):
 
 
 @datarequest_bp.route('evaluate/<request_id>')
-def evaluate(request_id):
+def evaluate(request_id: str) -> Response:
     if not permission_check(request_id, ['PM'], ['DAO_SUBMITTED', 'REVIEWED']):
         abort(403)
 
@@ -295,7 +296,7 @@ def evaluate(request_id):
 
 
 @datarequest_bp.route('preregister/<request_id>')
-def preregister(request_id):
+def preregister(request_id: str) -> Response:
     if not permission_check(request_id, ['OWN'], ['APPROVED']):
         abort(403)
 
@@ -307,7 +308,7 @@ def preregister(request_id):
 
 
 @datarequest_bp.route('preregistration_confirm/<request_id>')
-def preregistration_confirm(request_id):
+def preregistration_confirm(request_id: str) -> Response:
     if not permission_check(request_id, ['PM'], ['PREREGISTRATION_SUBMITTED']):
         abort(403)
 
@@ -318,7 +319,7 @@ def preregistration_confirm(request_id):
 
 
 @datarequest_bp.route('confirm_preregistration/<request_id>')
-def confirm_preregistration(request_id):
+def confirm_preregistration(request_id: str) -> Response:
     if not permission_check(request_id, ['PM'], ['PREREGISTRATION_SUBMITTED']):
         abort(403)
 
@@ -329,7 +330,7 @@ def confirm_preregistration(request_id):
 
 
 @datarequest_bp.route('upload_dta/<request_id>', methods=['POST'])
-def upload_dta(request_id):
+def upload_dta(request_id: str) -> Response:
     if not permission_check(request_id, ['DM'], ['PREREGISTRATION_CONFIRMED', 'DAO_APPROVED']):
         abort(403)
 
@@ -378,7 +379,7 @@ def upload_dta(request_id):
 
 @datarequest_bp.route('download_dta/<request_id>')
 @datarequest_bp.route('download_signed_dta/<request_id>')
-def download_dta(request_id):
+def download_dta(request_id: str) -> Response:
     if not permission_check(request_id, ['PM', 'DM', 'OWN'], None):
         abort(403)
 
@@ -396,7 +397,7 @@ def download_dta(request_id):
 
 
 @datarequest_bp.route('upload_signed_dta/<request_id>', methods=['POST'])
-def upload_signed_dta(request_id):
+def upload_signed_dta(request_id: str) -> Response:
     if not permission_check(request_id, ['OWN'], ['DTA_READY']):
         abort(403)
 
@@ -444,7 +445,7 @@ def upload_signed_dta(request_id):
 
 
 @datarequest_bp.route('data_ready/<request_id>')
-def data_ready(request_id):
+def data_ready(request_id: str) -> Response:
     if not permission_check(request_id, ['DM'], ['DTA_SIGNED']):
         abort(403)
 
