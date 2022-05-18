@@ -8,12 +8,18 @@ let sort;
 let sortOrder;
 let facets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name', 'Collected_Start_Year', 'Collected_End_Year'];
 let filters = [];
-let ranges = {};
+let ranges = [];
+let collectedStartYear = 2022;
+let collectedEndYear = 2022;
 
 $(function() {
     itemsPerPage = $('#items-count').val();
     sort = $('#sort').val();
     sortOrder = $("select option:selected").attr('data-order');
+
+    let year = new Date().getFullYear();
+    collectedStartYear = year;
+    collectedEndYear = year;
 
     let filter = '';
     if ($("#search-filter").val().length > 0) {
@@ -62,6 +68,29 @@ $(function() {
                 }
             });
         }
+
+        search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
+    });
+
+    $("body").on("change", "select.data-Collected_Start_Year, select.data-Collected_End_Year", function() {
+        let filterValue = $(this).val();
+        let filterName = $(this).attr('data-filter');
+
+        // Delete current filter
+        $.each(ranges, function(index, object) {
+            if (object['name'] == filterName) {
+                ranges.splice(index, 1);
+            }
+        });
+
+        if (filterName == 'Collected_Start_Year') {
+            collectedStartYear = filterValue;
+        } else {
+            collectedEndYear = filterValue;
+        }
+
+        // Add selected filter
+        ranges.push({"name": filterName, "from": collectedStartYear, "to": collectedEndYear });
 
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
@@ -218,6 +247,16 @@ function checkboxItem(name, value, count, checked = false) {
     return html;
 }
 
+function selectItem(name, value, count, checked = false) {
+    let selectedHtml = '';
+    if (checked) {
+        selectedHtml = 'selected';
+    }
+
+    let html = `<option value="${value}" ${selectedHtml}>${value}</option>`;
+    return html;
+}
+
 function truncate(str, max, suffix) {
     if (str.length < max) {
         return str;
@@ -271,6 +310,8 @@ function buildFacets(data)
     let checked = false;
     let placeholder = '';
     let values = [];
+    let checkboxFacets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name'];
+    //let selectFacets = ['Collected_Start_Year', 'Collected_End_Year'];
 
     $(facets).each(function(i, facet) {
         html = '';
@@ -287,7 +328,18 @@ function buildFacets(data)
             if ($.inArray(element.value, values) >= 0) {
                 checked = true;
             }
-            html += checkboxItem(facet, element.value, element.count, checked);
+            if ($.inArray(facet, checkboxFacets) >= 0) {
+                html += checkboxItem(facet, element.value, element.count, checked);
+            } else {
+                if (index == 0) {
+                    if (facet == 'Collected_Start_Year') {
+                        html += '<option>Start year</option>';
+                    } else if (facet == 'Collected_End_Year') {
+                        html += '<option>End year</option>';
+                    }
+                }
+                html += selectItem(facet, element.value, element.count, checked);
+            }
         });
 
         $('.' + placeholder).html(html);

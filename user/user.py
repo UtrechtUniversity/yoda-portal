@@ -429,7 +429,7 @@ def prepare_user() -> None:
 
         # Check for notifications.
         endpoints = ["static", "call", "upload_get", "upload_post"]
-        if not request.endpoint.endswith(tuple(endpoints)):
+        if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
             response = api.call('notifications_load', data={})
             g.notifications = len(response['data'])
     else:

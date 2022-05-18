@@ -1,0 +1,18 @@
+<div class="card mb-3">
+    <div class="card-header clearfix">
+        <div class="input-group-sm has-feedback float-start">
+            <a class="btn btn-secondary collapse-buttons" data-bs-toggle="collapse" href="#evaluationDiv" role="button" aria-expanded="false">
+                <span class="text-collapsed">Show</span>
+                <span class="text-expanded">Hide</span>
+            </a>
+        </div>
+	<h5 class="float-start">Evaluation</h5>
+    </div>
+    <div id="evaluationDiv" class="card-body collapse">
+        <div id="evaluation" class="metadata-form"
+             data-csrf_token_name="<?php echo rawurlencode($tokenName); ?>"
+             data-csrf_token_hash="<?php echo rawurlencode($tokenHash); ?>">
+            <p>Loading metadata <i class="fa fa-spinner fa-spin fa-fw"></i></p>
+        </div>
+    </div>
+</div>

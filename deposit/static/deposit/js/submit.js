@@ -10,27 +10,17 @@ $(document).ajaxSend(function(e, request, settings) {
 });
 
 $(function() {
-    getStatus();
+    submitStatus();
 
     $("body").on("click", "button#submit", function() {
         submitToVault();
     });
-
-    $("#accept_terms").change(function() {
-        submitStatus();
-    });
-
-    // Load the terms and conditions:
-    Yoda.call('vault_get_publication_terms', {}).then((data) => {
-        $('#terms_conditions_modal .modal-body').html(data);
-    });
-
 });
 
 async function submitStatus()
 {
     let status = await getStatus();
-    if($("#accept_terms").is(':checked') && status) {
+    if(status) {
         $("#submit").prop('disabled', false);
     } else {
         $("#submit").prop('disabled', true);
