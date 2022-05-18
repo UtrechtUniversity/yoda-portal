@@ -45,6 +45,10 @@ def index() -> Response:
     # check whether user is part of the study-group.
     # if not, stop access
     permissions = get_intake_study_permissions(study_id)
+
+    # determine whether group prefix is intake or grp-intake
+    qualified_study_id = permissions['group_path'] + study_id
+
     if not (permissions['manager'] or permissions['assistant']):
         alert_nr = 100  # NO ACCESS
 
@@ -63,7 +67,7 @@ def index() -> Response:
         # Store in current session for purpose when study_id is missing in requests
         session['study_id'] = study_id
 
-        intake_path = '/' + g.irods.zone + '/home/grp-intake-' + study_id
+        intake_path = '/' + g.irods.zone + '/home/' + qualified_study_id # permissions['group_path'] + study_id
 
         result = api.call('browse_collections', {'coll': intake_path,
                                                  'sort_on': 'name',
@@ -110,14 +114,26 @@ def index() -> Response:
                            totalErrorCount=len(data_erroneous_files),
                            totalFileCount=total_file_count,
                            study_id=study_id,
+                           qualified_study_id=qualified_study_id,
                            study_folder=study_folder,
                            full_path=full_path,
                            title='Study ' + study_title)
 
 
 def get_intake_study_permissions(study_id: str) -> Dict[str, str]:
-    return {'assistant': api.call('group_user_is_member',
-                                  {'username': g.user, 'group_name': 'grp-intake-' + study_id})['data'],
+    # Two types of groupnames 1) grp-intake- and 2) intake-
+    group_path = 'grp-intake-'
+    assistant_access = False
+    if api.call('group_user_is_member',
+                {'username': g.user, 'group_name': 'grp-intake-' + study_id})['data']:
+        assistant_access = True
+    elif api.call('group_user_is_member',
+                  {'username': g.user, 'group_name': 'intake-' + study_id})['data']:
+        assistant_access = True
+        group_path = 'intake-'
+
+    return {'assistant': assistant_access,
+            'group_path': group_path,
             'manager': api.call('group_user_is_member',
                                 {'username': g.user, 'group_name': 'grp-datamanager-' + study_id})['data']}
 
