@@ -204,6 +204,11 @@ $(function() {
     $("body").on("click", "a.action-go-to-research", function() {
         window.location.href = '/research/?dir=' + encodeURIComponent('/'+$(this).attr('research-path'));
     });
+
+    // FILE stage
+    $("body").on("click", "a.file-stage", function() {
+        handleFileStage($(this).attr('data-collection'), $(this).attr('data-name'));
+    });
 });
 
 function changeBrowserUrl(path)
@@ -376,28 +381,52 @@ const tableRenderer = {
          elem.attr('title', date.toString()); // (should include seconds and TZ info)
          return elem[0].outerHTML;
     },
+    state: (_, __, row) => {
+        let state = $('<span>');
+        if (row.type === 'data' && row.state === 'OFL') {
+            state = $('<span class="badge bg-secondary" title="Stored offline on tape archive">Offline</span>');
+        } else if (row.type === 'data' && row.state === 'UNM') {
+            state = $('<span class="badge bg-secondary" title="Migrating from tape archive to disk">Bringing online</span>');
+        } else if (row.type === 'data' && row.state === 'MIG') {
+            state = $('<span class="badge bg-secondary" title="Migrating from disk to tape archive">Storing offline</span>');
+        }
+        return state[0].outerHTML;
+    },
     context: (_, __, row) => {
-        let actions = $('<span>');
+        let actions = $('<div class="dropdown-menu">');
 
         if (row.type === 'coll')
             return '';
 
-        // Render context menu for files.
-        const viewExts = {
-            image: ['jpg', 'jpeg', 'gif', 'png'],
-            audio: ['mp3', 'ogg', 'wav'],
-            video: ['mp4', 'ogg', 'webm']
-        };
-        let ext = row.name.replace(/.*\./, '').toLowerCase();
+        if (row.state === 'OFL') {
+            actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`);
+        } else if (row.state === 'MIG' || row.state === 'UNM') {
+            // no context menu for data objects migrating from or to tape archive
+            return ''
+        } else {
+            // Render context menu for files.
+            const viewExts = {
+                image: ['jpg', 'jpeg', 'gif', 'png'],
+                audio: ['mp3', 'ogg', 'wav'],
+                video: ['mp4', 'ogg', 'webm']
+            };
+            let ext = row.name.replace(/.*\./, '').toLowerCase();
 
-        actions.append(`<a href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file"><i class="fa-solid fa-download"></a>`);
+            actions.append(`<a class="dropdown-item" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file">Download</a>`);
 
-        // Generate dropdown "view" actions for different media types.
-        for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-            actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file"><i class="fa-solid fa-eye"></a>`);
+            // Generate dropdown "view" actions for different media types.
+            for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
+                actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`);
+            }
         }
 
-        return actions[0].innerHTML;
+        let dropdown = $(`<div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <i class="fa-solid fa-ellipsis-h" aria-hidden="true"></i>
+                            </button>`);
+        dropdown.append(actions);
+
+        return dropdown[0].outerHTML;
     }
 };
 
@@ -419,6 +448,7 @@ function startBrowsing(items)
                     // (enabling this as is may result in duplicated results for data objects)
                     {render: tableRenderer.size,    orderable: false, data: 'size'},
                     {render: tableRenderer.date,    orderable: false, data: 'modify_time'},
+                    {render: tableRenderer.state,   orderable: false},
                     {render: tableRenderer.context, orderable: false }],
         "ajax": getFolderContents,
         "processing": true,
@@ -766,6 +796,20 @@ function vaultAccess(action, folder)
 
         topInformation(folder, false);
     }, "json");
+}
+
+async function handleFileStage(collection, file_name) {
+    let result = await Yoda.call('tape_archive_stage',
+        {path: Yoda.basePath +  collection + "/" + file_name},
+        {'quiet': true, 'rawResult': true}
+    );
+
+    if (result.status == 'ok') {
+        Yoda.set_message('success', 'Successfully requested to bring file <' + file_name + '> online');
+    }
+    else {
+        Yoda.set_message('error', 'Failed to request to bring file <' + file_name + '> online');
+    }
 }
 
 function metadataInfo(dir) {

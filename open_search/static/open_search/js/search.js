@@ -6,20 +6,26 @@ let itemsPerPage;
 let currentPage = 1;
 let sort;
 let sortOrder;
-let facets = ['Data_Access_Restriction', 'Person'];
-let filters = {};
-let ranges = {};
+let facets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name', 'Collected_Start_Year', 'Collected_End_Year'];
+let filters = [];
+let ranges = [];
+let collectedStartYear = 2022;
+let collectedEndYear = 2022;
 
 $(function() {
     itemsPerPage = $('#items-count').val();
     sort = $('#sort').val();
     sortOrder = $("select option:selected").attr('data-order');
 
-    let filter = null;
+    let year = new Date().getFullYear();
+    collectedStartYear = year;
+    collectedEndYear = year;
+
+    let filter = '';
     if ($("#search-filter").val().length > 0) {
         filter = $("#search-filter").val();
-        search(filter, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     }
+    search(filter, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
 
     $("#search-filter").on('keyup', function (e) {
         if (e.key === 'Enter' || e.keyCode === 13) {
@@ -49,28 +55,59 @@ $(function() {
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
 
-    $("body").on("change", "input:radio[id=Data_Access_Restriction]", function() {
-        if ($(this).val() == '') {
-            delete filters.Data_Access_Restriction;
+    $("body").on("change", "input:checkbox[name^=\"filters[\"]", function() {
+        let isChecked = $(this).is(':checked');
+        let filterName = $(this).attr('data-filter');
+        let filterValue = $(this).val();
+        if (isChecked) {
+            filters.push({"name": filterName, "value": filterValue });
         } else {
-            filters["Data_Access_Restriction"] = $(this).val();
+            $.each(filters, function(index, object) {
+                if (object['name'] == filterName && object['value'] == filterValue) {
+                    filters.splice(index, 1);
+                }
+            });
         }
-        console.log(filters);
 
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
 
-    $("body").on("keyup", "input:text[id=Person]", function(e) {
-        if (e.key === 'Enter' || e.keyCode === 13) {
-            if ($(this).val() == '') {
-                delete filters.Person;
-            } else {
-                filters["Person"] = $(this).val();
-            }
+    $("body").on("change", "select.data-Collected_Start_Year, select.data-Collected_End_Year", function() {
+        let filterValue = $(this).val();
+        let filterName = $(this).attr('data-filter');
 
-            search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
+        // Delete current filter
+        $.each(ranges, function(index, object) {
+            if (object['name'] == filterName) {
+                ranges.splice(index, 1);
+            }
+        });
+
+        if (filterName == 'Collected_Start_Year') {
+            collectedStartYear = filterValue;
+        } else {
+            collectedEndYear = filterValue;
         }
+
+        // Add selected filter
+        ranges.push({"name": filterName, "from": collectedStartYear, "to": collectedEndYear });
+
+        search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
+
+    $("body").on("keyup", "input:text[id=Person]", delay(function (e) {
+        let filterValue = $(this).val();
+        $.each(filters, function(index, object) {
+            if (object['name'] == 'Person') {
+                filters.splice(index, 1);
+            }
+        });
+        if (filterValue != "") {
+            filters.push({"name": 'Person', "value": filterValue });
+        }
+
+        search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
+    }, 200));
 });
 
 
@@ -110,7 +147,7 @@ function search(term, page, itemsPerPage, sort, sortOrder, facets = [], filters=
                 html += itemTemplate(attr);
             });
         } else {
-            $('.no-results .search-term').text(term);
+            //$('.no-results .search-term').text(term);
         }
         buildPagination(results);
         $('#search-results').html(html);
@@ -176,7 +213,7 @@ function itemTemplate(data)
     return html;
 }
 
-function radioItem(value, count, checked = false) {
+function radioItem(name, value, count, checked = false) {
     let checkedHtml = '';
     if (checked) {
         checkedHtml = 'checked';
@@ -184,12 +221,39 @@ function radioItem(value, count, checked = false) {
 
     let html = `    
     <div class="form-check">
-        <input class="form-check-input" type="radio" value="${value}"  name="filters['Data_Access_Restriction']" id="Data_Access_Restriction" ${checkedHtml}>
+        <input class="form-check-input" type="radio" value="${value}"  name="filters['${name}']" id="Data_Access_Restriction" ${checkedHtml}>
         <label class="form-check-label" for="Data_Access_Restriction">
           ${value} (${count})
         </label>
     </div>
     `;
+    return html;
+}
+
+function checkboxItem(name, value, count, checked = false) {
+    let checkedHtml = '';
+    if (checked) {
+        checkedHtml = 'checked';
+    }
+
+    let html = `    
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="${value}"  name="filters['${name}']" data-filter="${name}" ${checkedHtml}>
+        <label class="form-check-label fs-6">
+          ${value} (${count})
+        </label>
+    </div>
+    `;
+    return html;
+}
+
+function selectItem(name, value, count, checked = false) {
+    let selectedHtml = '';
+    if (checked) {
+        selectedHtml = 'selected';
+    }
+
+    let html = `<option value="${value}" ${selectedHtml}>${value}</option>`;
     return html;
 }
 
@@ -240,27 +304,57 @@ function buildPagination(totalItems)
     $('.paging-info').text(totalItems + ' result(s)');
 }
 
-function buildFacets(facets)
+function buildFacets(data)
 {
     let html = '';
     let checked = false;
-    var filterValue = '';
+    let placeholder = '';
+    let values = [];
+    let checkboxFacets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name'];
+    //let selectFacets = ['Collected_Start_Year', 'Collected_End_Year'];
 
-    if (filters.hasOwnProperty("Data_Access_Restriction")) {
-        filterValue = filters.Data_Access_Restriction;
-    }
-
-    $(facets.Data_Access_Restriction).each(function(index, facet) {
-        $(facet).each(function(index, element) {
-            checked = false;
-            if (filterValue == element.value) {
-                checked = true;
+    $(facets).each(function(i, facet) {
+        html = '';
+        placeholder = 'data-' + facet;
+        values = [];
+        $.each(filters, function(index, object) {
+            if (object['name'] == facet) {
+                values.push(object['value']);
             }
-            html += radioItem(element.value, element.count, checked);
         });
 
-        $('.data-access-options').html(html);
+        $(data[facet]).each(function(index, element) {
+            checked = false;
+            if ($.inArray(element.value, values) >= 0) {
+                checked = true;
+            }
+            if ($.inArray(facet, checkboxFacets) >= 0) {
+                html += checkboxItem(facet, element.value, element.count, checked);
+            } else {
+                if (index == 0) {
+                    if (facet == 'Collected_Start_Year') {
+                        html += '<option>Start year</option>';
+                    } else if (facet == 'Collected_End_Year') {
+                        html += '<option>End year</option>';
+                    }
+                }
+                html += selectItem(facet, element.value, element.count, checked);
+            }
+        });
+
+        $('.' + placeholder).html(html);
     });
+}
+
+function delay(callback, ms) {
+    var timer = 0;
+    return function() {
+        var context = this, args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            callback.apply(context, args);
+        }, ms || 0);
+    };
 }
 
 OpenSearchApi.call = async function(data={}, options={}) {

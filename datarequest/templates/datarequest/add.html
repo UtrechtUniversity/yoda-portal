@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Datarequest {{ request_id }} &dash; Add request{% endblock title %}
+
+{% block scripts %}
+<script type="text/javascript"> window.config = {
+  draft_request_id: '{{ draft_request_id }}',
+  previous_request_id: '{{ previous_request_id }}'
+}
+</script>
+<script src="{{ url_for('datarequest_bp.static', filename='js/add.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+
+<div class="row metadata-form">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="float-start">
+                    Data request submission form
+                </h5>
+                <div class="input-group-sm has-feedback float-end">
+                    <a class="btn btn-secondary" href="/datarequest/">Back</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="form" class="metadata-form"
+                     data-csrf_token_name="<?php echo rawurlencode($tokenName); ?>"
+                     data-csrf_token_hash="<?php echo rawurlencode($tokenHash); ?>">
+                    <p>Loading metadata <i class="fa fa-spinner fa-spin fa-fw"></i></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

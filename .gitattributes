@@ -1,0 +1,32 @@
+# Do not try and merge these files.
+datarequest/static/datarequest/js/add_attachments.js -diff
+datarequest/static/datarequest/js/add_attachments.js.LICENSE.txt -diff
+datarequest/static/datarequest/js/add.js -diff
+datarequest/static/datarequest/js/add.js.LICENSE.txt -diff
+datarequest/static/datarequest/js/assign.js -diff
+datarequest/static/datarequest/js/assign.js.LICENSE.txt -diff
+datarequest/static/datarequest/js/dao_evaluate.js -diff
+datarequest/static/datarequest/js/dao_evaluate.js.LICENSE.txt -diff
+datarequest/static/datarequest/js/datamanager_review.js -diff
+datarequest/static/datarequest/js/datamanager_review.js.LICENSE.txt -diff
+datarequest/static/datarequest/js/evaluate.js -diff
+datarequest/static/datarequest/js/evaluate.js.LICENSE.txt -diff
+datarequest/static/datarequest/js/preliminary_review.js -diff
+datarequest/static/datarequest/js/preliminary_review.js.LICENSE.txt -diff
+datarequest/static/datarequest/js/preregister.js -diff
+datarequest/static/datarequest/js/preregister.js.LICENSE.txt -diff
+datarequest/static/datarequest/js/preregistration_confirm.js -diff
+datarequest/static/datarequest/js/preregistration_confirm.js.LICENSE.txt -diff
+datarequest/static/datarequest/js/review.js -diff
+datarequest/static/datarequest/js/review.js.LICENSE.txt -diff
+datarequest/static/datarequest/js/view.js -diff
+datarequest/static/datarequest/js/view.js.LICENSE.txt -diff
+
+deposit/static/deposit/js/metadata-form.js -diff
+deposit/static/deposit/js/metadata-form.js.LICENSE.txt -diff
+
+research/static/research/js/metadata-form.js -diff
+research/static/research/js/metadata-form.js.LICENSE.txt -diff
+
+vault/static/vault/js/metadata-form.js -diff
+vault/static/vault/js/metadata-form.js.LICENSE.txt -diff

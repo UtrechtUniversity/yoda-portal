@@ -26,7 +26,7 @@ class Session(object):
 
     def __del__(self) -> None:
         self.irods.cleanup()
-        print('[gc/logout]: Dropped iRODS session of session {}'.format(self.sid))
+        print(f"[gc/logout]: Dropped iRODS session of session {self.sid}")
 
 
 sessions: Dict[int, Session] = dict()  # Custom session dict instead of Flask session (cannot pickle iRODS session)
@@ -70,7 +70,7 @@ def add(sid: int, irods: iRODSSession) -> None:
     sessions[sid] = s
     s.time = time.time()
     s.lock.acquire()
-    print('[login]: Successfully connected to iRODS for session {}'.format(sid))
+    print(f"[login]: Successfully connected to iRODS for session {sid}'")
 
 
 def release(sid: int) -> None:

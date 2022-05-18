@@ -88,7 +88,7 @@ def authenticated() -> bool:
 
 @api_bp.errorhandler(Exception)
 def api_error_handler(error: Exception) -> Response:
-    log_error('API Error: {}'.format(error), True)
+    log_error(f'API Error: {error}', True)
     status = "internal_error"
     status_info = "Something went wrong"
     data: Dict[str, Any] = {}

@@ -26,11 +26,8 @@
             </div>
         </div>
     </div>
-    <div class="row no-results hide">
-        <p>Your search '<span class="search-term"></span>' did not match any data package.</p>
-    </div>
-    <div class="row content hide">
-        <div class="col-2">
+    <div class="row">
+        <div class="col-3">
             <label for="sort" class="form-label">Sort by</label>
             <select class="form-select" id="sort">
                 <option value="Creation_Time" data-order="desc" selected>Deposit date</option>
@@ -39,48 +36,64 @@
             </select>
 
             <label for="sort" class="form-label mt-2">Access data</label>
-            <div class="form-check">
-                <input id="Data_Access_Restriction" class="form-check-input" type="radio" name="filters['Data_Access_Restriction']" value="" checked>
-                <label class="form-check-label">
-                    All
-                </label>
-            </div>
-            <div class="data-access-options"></div>
+            <div class="data-Data_Access_Restriction"></div>
+
+            <label for="sort" class="form-label mt-2">Research group</label>
+            <div class="data-Research_Group"></div>
+
+            <label for="sort" class="form-label mt-2">Project</label>
+            <div class="data-Collection_Name"></div>
 
             <label for="sort" class="form-label mt-2">Person</label>
             <input type="text" id="Person" class="form-control person-filter" placeholder="Name">
+
+            <label for="sort" class="form-label mt-2">Reseach period</label>
+            <div class="input-group">
+                <select class="form-select data-Collected_Start_Year" data-filter="Collected_Start_Year">
+
+                </select>
+                <label class="input-group-text">-</label>
+                <select class="form-select data-Collected_End_Year" data-filter="Collected_End_Year">
+                    <option>End year</option>
+                </select>
+            </div>
         </div>
-        <div class="col-10">
-            <div class="row justify-content-between mb-2">
-                <div class="col-4 paging-info">
-                </div>
-                <div class="col-2 results-per-page">
-                    <div class="float-end row row-cols-auto">
-                        <div class="col pe-0">
-                            <span class="page-items-label">Show</span>
-                        </div>
-                        <div class="col">
-                            <select class="form-select form-select-sm float-end" id="items-count">
-                                <option value="5" selected>5</option>
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                            </select>
+        <div class="col-9">
+            <div class="row no-results hide">
+                <p>No data packages found.</p>
+            </div>
+            <div class="content hide">
+                <div class="row justify-content-between mb-2">
+                    <div class="col-4 paging-info">
+                    </div>
+                    <div class="col-2 results-per-page">
+                        <div class="float-end row row-cols-auto">
+                            <div class="col pe-0">
+                                <span class="page-items-label">Show</span>
+                            </div>
+                            <div class="col">
+                                <select class="form-select form-select-sm float-end" id="items-count">
+                                    <option value="5" selected>5</option>
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="search-results"></div>
+                <div id="search-results"></div>
 
-            <div class="search-pagination hide">
-                <button type="button" class="btn btn-outline-secondary previous">
-                    <i class="fa-solid fa-angles-left"></i>
-                    Previous
-                </button>
-                <button type="button" class="btn btn-outline-secondary float-end next">
-                    <i class="fa-solid fa-angles-right"></i>
-                    Next
-                </button>
+                <div class="search-pagination hide">
+                    <button type="button" class="btn btn-outline-secondary previous">
+                        <i class="fa-solid fa-angles-left"></i>
+                        Previous
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary float-end next">
+                        <i class="fa-solid fa-angles-right"></i>
+                        Next
+                    </button>
+                </div>
             </div>
         </div>
     </div>

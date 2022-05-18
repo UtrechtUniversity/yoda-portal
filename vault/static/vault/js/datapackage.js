@@ -25,7 +25,7 @@ mfunction['Tag'] = function(a){
     return '';
 }
 
-mfunction['End_Preservation'] = function(retention_period) {
+mfunction['Retention_Period'] = function(retention_period) {
     if (retention_period && metadata['deposit_date']) {
         let end_date = new Date(metadata['deposit_date']);
         let ret_per = parseInt(retention_period);

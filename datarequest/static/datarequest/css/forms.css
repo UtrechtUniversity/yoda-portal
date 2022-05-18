@@ -1,0 +1,6 @@
+.collapse-buttons[aria-expanded=true] .text-collapsed {
+  display: none;
+}
+.collapse-buttons[aria-expanded=false] .text-expanded {
+  display: none;
+}

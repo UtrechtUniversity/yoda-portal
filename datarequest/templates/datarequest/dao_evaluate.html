@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Datarequest {{ request_id }} &dash; Evaluate DAO request{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('datarequest_bp.static', filename='css/forms.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+<script type="text/javascript"> window.config = {
+  request_id: '{{ request_id }}',
+}
+</script>
+<script src="{{ url_for('datarequest_bp.static', filename='js/dao_evaluate.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div id="evaluation" class="metadata-form">
+            <p>Loading metadata <i class="fa fa-spinner fa-spin fa-fw"></i></p>
+        </div>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {% include 'datarequest/partials/datarequest.html' %}
+        {% if attachments|length > 0 %} 
+        {% include 'datarequest/partials/attachments.html' %}
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
