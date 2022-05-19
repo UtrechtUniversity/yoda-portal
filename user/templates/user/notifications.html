@@ -37,7 +37,7 @@
             </div>
             {% if notification.actor %}<small class="float-start me-2"><i class="fa-solid fa-user" aria-hidden="true"></i> {{ notification.actor }}</small>{% endif %}
             {% if notification.data_package %}<small class="float-start"><i class="fa-solid fa-box-archive" aria-hidden="true"></i> {{ notification.data_package }}</small>{% endif %}
-            <h5 class="dismiss-notification float-end" data-id="{{ notification.timestamp }}" title="Done"><i class="fa-solid fa-check" aria-hidden="true"></i></h5>
+            <h5 class="dismiss-notification float-end" data-id="{{ notification.identifier }}" title="Done"><i class="fa-solid fa-check" aria-hidden="true"></i></h5>
         </a>
         {% endfor %}
     </div>
