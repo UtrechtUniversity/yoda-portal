@@ -36,7 +36,7 @@
                 <a href="{{ url_for('general_bp.index') }}" class="mb-lg-0 me-lg-auto text-dark text-decoration-none">
                     <img class="logo" src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo">
                 </a>
-                {% if g.user %}
+                {% if g.user and request.path != "/open_search/" and request.path != "/search/" %}
                     {% if config.get('OPEN_SEARCH_ENABLED') %}
                     <form class="col-lg-4 mt-2 mb-lg-0 me-3" action="{{ url_for('open_search_bp.index') }}" method="get">
                         <input type="search" name="q" class="search form-control" placeholder="Search..." aria-label="Search">
