@@ -1,0 +1,20 @@
+<nav class="navbar navbar-dark navbar-static-top navbar-expand-lg mb-3">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
+        {% if g.user %}
+        <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link " href="/deposit/browse">Deposit</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " href="/open_search/">Archive</a>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</nav>
