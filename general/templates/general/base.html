@@ -72,25 +72,7 @@
             </div>
         </header>
 
-        <nav class="navbar navbar-dark navbar-static-top navbar-expand-lg mb-3">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
-                {% if g.user %}
-                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        {% for module in config.get('modules') %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.path == url_for(module.function) %}active{% endif %}" href="{{ url_for(module.function) }}">{{ module.name }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-            </div>
-        </nav>
+        {% include 'navigation.html' %}
 
         {% block container %}
         <div class="page">
