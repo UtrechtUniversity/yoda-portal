@@ -6,20 +6,18 @@ let itemsPerPage;
 let currentPage = 1;
 let sort;
 let sortOrder;
-let facets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name', 'Collected_Start_Year', 'Collected_End_Year'];
+let facets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name'];
 let filters = [];
 let ranges = [];
-let collectedStartYear = 2022;
-let collectedEndYear = 2022;
+let collectedStartYear = '';
+let collectedEndYear = '';
+let defaultCollectedStartYear;
+let defaultCollectedEndYear;
 
 $(function() {
     itemsPerPage = $('#items-count').val();
     sort = $('#sort').val();
     sortOrder = $("select option:selected").attr('data-order');
-
-    let year = new Date().getFullYear();
-    collectedStartYear = year;
-    collectedEndYear = year;
 
     let filter = '';
     if ($("#search-filter").val().length > 0) {
@@ -75,22 +73,47 @@ $(function() {
     $("body").on("change", "select.data-Collected_Start_Year, select.data-Collected_End_Year", function() {
         let filterValue = $(this).val();
         let filterName = $(this).attr('data-filter');
+        let fromFilter;
+        let toFilter;
 
-        // Delete current filter
+        // Delete current range
         $.each(ranges, function(index, object) {
             if (object['name'] == filterName) {
                 ranges.splice(index, 1);
             }
         });
 
-        if (filterName == 'Collected_Start_Year') {
-            collectedStartYear = filterValue;
+        if (filterValue == '') {
+            // Empty value, reset to default.
+            if (filterName == 'Collected_Start_Year') {
+                collectedStartYear = '';
+            } else {
+                collectedEndYear = '';
+            }
         } else {
-            collectedEndYear = filterValue;
-        }
+            if (filterName == 'Collected_Start_Year') {
+                fromFilter = filterValue;
+                collectedStartYear = filterValue;
 
-        // Add selected filter
-        ranges.push({"name": filterName, "from": collectedStartYear, "to": collectedEndYear });
+                if (collectedEndYear === '') {
+                    toFilter = defaultCollectedEndYear;
+                } else {
+                    toFilter = collectedEndYear;
+                }
+            } else {
+                toFilter = filterValue;
+                collectedEndYear = filterValue;
+
+                if (collectedStartYear === '') {
+                    fromFilter = defaultCollectedStartYear;
+                } else {
+                    fromFilter = collectedStartYear;
+                }
+            }
+
+            // Add selected range
+            ranges.push({"name": filterName, "from": fromFilter, "to": toFilter });
+        }
 
         search(currentSearchString, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges);
     });
@@ -120,6 +143,21 @@ function search(term, page, itemsPerPage, sort, sortOrder, facets = [], filters=
     let reverse = false;
     if (sortOrder == 'desc') {
         reverse = true;
+    }
+
+    // Handle facets & ranges
+    if (ranges.length === 0) {
+        facets.push('Collected_Start_Year', 'Collected_End_Year');
+    } else {
+        let index = facets.indexOf('Collected_Start_Year');
+        if (index !== -1) {
+            facets.splice(index, 1);
+        }
+
+        index = facets.indexOf('Collected_End_Year');
+        if (index !== -1) {
+            facets.splice(index, 1);
+        }
     }
 
     OpenSearchApi.call(
@@ -311,8 +349,9 @@ function buildFacets(data)
     let placeholder = '';
     let values = [];
     let checkboxFacets = ['Data_Access_Restriction', 'Research_Group', 'Collection_Name'];
-    //let selectFacets = ['Collected_Start_Year', 'Collected_End_Year'];
+    let rangeFields = ['Collected_Start_Year', 'Collected_End_Year'];
 
+    // Filters
     $(facets).each(function(i, facet) {
         html = '';
         placeholder = 'data-' + facet;
@@ -328,9 +367,30 @@ function buildFacets(data)
             if ($.inArray(element.value, values) >= 0) {
                 checked = true;
             }
-            if ($.inArray(facet, checkboxFacets) >= 0) {
-                html += checkboxItem(facet, element.value, element.count, checked);
-            } else {
+            html += checkboxItem(facet, element.value, element.count, checked);
+        });
+
+        $('.' + placeholder).html(html);
+    });
+
+    // Research period (ranges)
+    if (ranges.length === 0) {
+        $(rangeFields).each(function(i, facet) {
+            placeholder = 'data-' + facet;
+            html = '';
+            values = [];
+            $.each(ranges, function(index, object) {
+                if (object['name'] == facet) {
+                    values.push(object['value']);
+                }
+            });
+
+            $(data[facet]).each(function(index, element) {
+                checked = false;
+                if ($.inArray(element.value, values) >= 0) {
+                    checked = true;
+                }
+
                 if (index == 0) {
                     if (facet == 'Collected_Start_Year') {
                         html += '<option>Start year</option>';
@@ -339,11 +399,16 @@ function buildFacets(data)
                     }
                 }
                 html += selectItem(facet, element.value, element.count, checked);
-            }
+            });
+
+            $('.' + placeholder).html(html);
         });
 
-        $('.' + placeholder).html(html);
-    });
+        // Set research period default range years
+        defaultCollectedStartYear = $(data['Collected_Start_Year']).get(0)['value'];
+        defaultCollectedEndYear = $(data['Collected_End_Year']).get(-1)['value'];
+    }
+
 }
 
 function delay(callback, ms) {
