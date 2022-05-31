@@ -393,9 +393,9 @@ function buildFacets(data)
 
                 if (index == 0) {
                     if (facet == 'Collected_Start_Year') {
-                        html += '<option>Start year</option>';
+                        html += '<option value="">Start year</option>';
                     } else if (facet == 'Collected_End_Year') {
-                        html += '<option>End year</option>';
+                        html += '<option value="">End year</option>';
                     }
                 }
                 html += selectItem(facet, element.value, element.count, checked);
