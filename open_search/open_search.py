@@ -300,7 +300,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                     }
             aggregations['range']['ranges'].append({
                 'from': range['from'],
-                'to': range['to'] + 1
+                'to': str(int(range['to']) + 1)
             })
 
     if len(facetList) != 0:
