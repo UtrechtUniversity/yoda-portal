@@ -299,21 +299,21 @@ $(function() {
 
     $("body").on("click", "a.view-video", function() {
         let path = $(this).attr('data-path');
-        let viewerHtml = `<video width="570" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></video>`;
+        let viewerHtml = `<video width="640" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></video>`;
         $('#viewer').html(viewerHtml);
         $('#viewMedia').modal('show');
     });
 
     $("body").on("click", "a.view-audio", function() {
         let path = $(this).attr('data-path');
-        let viewerHtml = `<audio width="570" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></audio>`;
+        let viewerHtml = `<audio width="640" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></audio>`;
         $('#viewer').html(viewerHtml);
         $('#viewMedia').modal('show');
     });
 
     $("body").on("click", "a.view-image", function() {
         let path = $(this).attr('data-path');
-        let viewerHtml = `<img width="570" src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}" />`;
+        let viewerHtml = `<img width="640" src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}" />`;
         $('#viewer').html(viewerHtml);
         $('#viewMedia').modal('show');
     });
@@ -867,8 +867,8 @@ const tableRenderer = {
             } else {
                 // Render context menu for files.
                 const viewExts = {
-                    image: ['jpg', 'jpeg', 'gif', 'png'],
-                    audio: ['mp3', 'ogg', 'wav'],
+                    image: ['jpg', 'jpeg', 'gif', 'png', 'webp'],
+                    audio: ['aac', 'flac', 'mp3', 'ogg', 'wav'],
                     video: ['mp4', 'ogg', 'webm']
                 };
                 let ext = row.name.replace(/.*\./, '').toLowerCase();
