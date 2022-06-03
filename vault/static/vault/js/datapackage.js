@@ -74,20 +74,18 @@ mfunction['Related_Datapackage'] = function(Related_Datapackage) {
             let link = ''
 
             if (identifier !== undefined) {
-                if (identifier.startsWith('http')){ // include both http or https this way, this makes handling of scheme=='URL' obsolete
-                    // Identifier contains complete URI that can be used as href and description
+                if (identifier.startsWith('https://')){
                     row += '<td><a href="' + identifier + '">' + identifier + '</a></td></tr>';
-                }
-                else {
-                    if (scheme == 'DOI') {
-                        link = 'https://doi.org/' + identifier;
-                        row += '<td><a href="' + link + '">' + link + '</a></td></tr>';
-                    } else if (scheme == 'Handle') {
-                        link = 'https://hdl.handle.net/' + identifier;
-                        row += '<td><a href="' + link + '">' + link + '</a></td></tr>';
-                    } else {
-                       row += '<td>' + identifier + '</td>';
-                    }
+                } else if (identifier.startsWith('http://')){
+                    row += '<td><a href="' + identifier + '">' + identifier + '</a></td></tr>';
+                } else if (scheme == 'DOI') {
+                    link = 'https://doi.org/' + identifier;
+                    row += '<td><a href="' + link + '">' + link + '</a></td></tr>';
+                } else if (scheme == 'Handle') {
+                    link = 'https://hdl.handle.net/' + identifier;
+                    row += '<td><a href="' + link + '">' + link + '</a></td></tr>';
+                } else {
+                   row += '<td>' + identifier + '</td>';
                 }
             }
 
