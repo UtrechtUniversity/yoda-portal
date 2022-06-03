@@ -458,7 +458,6 @@ function metadataInfo(dir) {
             $(".metadata-access").text(metadata.Data_Access_Restriction);
             // Translate data classification to values Yes/No (reference to datapackage containing personal data)
             $(".metadata-data-classification").text(((metadata.Data_Classification)=='Basic'?'No':'Yes'));
-            $(".metadata-license").text(metadata.License);
 
             if (metadata.Description){
                 let description = metadata.Description;

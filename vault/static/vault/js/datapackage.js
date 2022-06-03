@@ -71,16 +71,21 @@ mfunction['Related_Datapackage'] = function(Related_Datapackage) {
             let scheme = ref.Persistent_Identifier.Identifier_Scheme;
             let identifier = ref.Persistent_Identifier.Identifier;
             let row = '<tr><td style="width:300px;">' + ref.Title + '</td>';
+            let link = ''
 
             if (identifier !== undefined) {
-                if (scheme == 'DOI') {
-                    row += '<td><a href="https://doi.org/' + identifier + '">' + identifier + '</a></td></tr>';
-                } else if (scheme == 'Handle') {
-                    row += '<td><a href="https://hdl.handle.net/' + identifier + '">' + identifier + '</a></td></tr>';
-                } else if (scheme == 'URL') {
+                if (identifier.startsWith('https://')){
                     row += '<td><a href="' + identifier + '">' + identifier + '</a></td></tr>';
+                } else if (identifier.startsWith('http://')){
+                    row += '<td><a href="' + identifier + '">' + identifier + '</a></td></tr>';
+                } else if (scheme == 'DOI') {
+                    link = 'https://doi.org/' + identifier;
+                    row += '<td><a href="' + link + '">' + link + '</a></td></tr>';
+                } else if (scheme == 'Handle') {
+                    link = 'https://hdl.handle.net/' + identifier;
+                    row += '<td><a href="' + link + '">' + link + '</a></td></tr>';
                 } else {
-                    row += '<td>' + identifier + '</td>';
+                   row += '<td>' + identifier + '</td>';
                 }
             }
 
