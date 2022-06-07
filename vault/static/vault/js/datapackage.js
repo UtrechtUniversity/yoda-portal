@@ -25,7 +25,7 @@ mfunction['Tag'] = function(a){
     return '';
 }
 
-mfunction['End_Preservation'] = function(retention_period) {
+mfunction['Retention_Period'] = function(retention_period) {
     if (retention_period && metadata['deposit_date']) {
         let end_date = new Date(metadata['deposit_date']);
         let ret_per = parseInt(retention_period);
@@ -71,16 +71,21 @@ mfunction['Related_Datapackage'] = function(Related_Datapackage) {
             let scheme = ref.Persistent_Identifier.Identifier_Scheme;
             let identifier = ref.Persistent_Identifier.Identifier;
             let row = '<tr><td style="width:300px;">' + ref.Title + '</td>';
+            let link = ''
 
             if (identifier !== undefined) {
-                if (scheme == 'DOI') {
-                    row += '<td><a href="https://doi.org/' + identifier + '">' + identifier + '</a></td></tr>';
-                } else if (scheme == 'Handle') {
-                    row += '<td><a href="https://hdl.handle.net/' + identifier + '">' + identifier + '</a></td></tr>';
-                } else if (scheme == 'URL') {
+                if (identifier.startsWith('https://')){
                     row += '<td><a href="' + identifier + '">' + identifier + '</a></td></tr>';
+                } else if (identifier.startsWith('http://')){
+                    row += '<td><a href="' + identifier + '">' + identifier + '</a></td></tr>';
+                } else if (scheme == 'DOI') {
+                    link = 'https://doi.org/' + identifier;
+                    row += '<td><a href="' + link + '">' + link + '</a></td></tr>';
+                } else if (scheme == 'Handle') {
+                    link = 'https://hdl.handle.net/' + identifier;
+                    row += '<td><a href="' + link + '">' + link + '</a></td></tr>';
                 } else {
-                    row += '<td>' + identifier + '</td>';
+                   row += '<td>' + identifier + '</td>';
                 }
             }
 
@@ -199,7 +204,8 @@ async function handleRestrictedMetadataInfo() {
         metadata = j.metadata;
         // bring separately delivered deposit_date into the metadata dict for ease of reference
         metadata['deposit_date'] = j.deposit_date;
-
+        // Correct Personal data values derived from Data_Classification
+        metadata['Data_Classification'] = convertClassificationToPersonal(metadata['Data_Classification']);
 
         // Show the collected metadata
         metadataShow();
@@ -229,6 +235,8 @@ function handleOpenMetadataInfo(dir) {
             metadata = result.data.metadata;
             // bring separately delivered deposit_date into the metadata dict for ease of reference
             metadata['deposit_date'] = result.data.deposit_date;
+            // Correct Personal data values derived from Data_Classification
+            metadata['Data_Classification'] = convertClassificationToPersonal(metadata['Data_Classification']);
 
             // Show the collected metadata
             metadataShow();
@@ -237,6 +245,13 @@ function handleOpenMetadataInfo(dir) {
     catch (error) {
         console.error(error);
     }
+}
+
+function convertClassificationToPersonal(classification) {
+    if (classification == 'Basic') {
+        return 'No'
+    }
+    return 'Yes'
 }
 
 function metadataShow() {

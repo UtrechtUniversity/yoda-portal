@@ -36,7 +36,7 @@
                 <a href="{{ url_for('general_bp.index') }}" class="mb-lg-0 me-lg-auto text-dark text-decoration-none">
                     <img class="logo" src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo">
                 </a>
-                {% if g.user %}
+                {% if g.user and request.path != "/open_search/" and request.path != "/search/" %}
                     {% if config.get('OPEN_SEARCH_ENABLED') %}
                     <form class="col-lg-4 mt-2 mb-lg-0 me-3" action="{{ url_for('open_search_bp.index') }}" method="get">
                         <input type="search" name="q" class="search form-control" placeholder="Search..." aria-label="Search">
@@ -48,49 +48,12 @@
                     {% endif %}
                 {% endif %}
                 <div class="mt-2 text-end">
-                    {% if g.user %}
-                        <div class="dropdown">
-                            <button type="button" class="btn btn-primary dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ g.user }} {% if g.notifications %}<i class="fa-solid fa-bell" aria-hidden="true"></i>{% endif %}
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="{{ url_for('user_bp.notifications') }}">
-                                    Notifications {% if g.notifications %}<span class="badge bg-primary">{{ g.notifications }}</span>{% endif %}
-                                </a>
-                                <a class="dropdown-item" href="{{ url_for('user_bp.settings') }}">Settings</a>
-                                {% if config.get('TOKENS_ENABLED') %}
-                                <a class="dropdown-item" href="{{ url_for('user_bp.data_access') }}">Data Access Password</a>
-                                {% endif %}
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{{ url_for('user_bp.logout') }}">Log out</a>
-                            </div>
-                        </div>
-                    {% else %}
-                        <a class="btn btn-primary" href="{{ url_for('user_bp.gate') }}">Sign in</a>
-                    {% endif %}
+                    {% include 'user.html' %}
                 </div>
             </div>
         </header>
 
-        <nav class="navbar navbar-dark navbar-static-top navbar-expand-lg mb-3">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
-                {% if g.user %}
-                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        {% for module in config.get('modules') %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.path == url_for(module.function) %}active{% endif %}" href="{{ url_for(module.function) }}">{{ module.name }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-            </div>
-        </nav>
+        {% include 'navigation.html' %}
 
         {% block container %}
         <div class="page">

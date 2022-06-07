@@ -4,6 +4,7 @@ __copyright__ = 'Copyright (c) 2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
+import re
 from datetime import datetime
 from typing import Any, Dict, Optional
 
@@ -199,22 +200,25 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
     )
 
     if value != "":
+        searchList = [
+            {
+                'term': {
+                    'metadataEntries.unit.raw': 'FlatIndex'
+                }
+            }
+        ]
+        for name in re.split(' +', value.lower()):
+            searchList.append({
+                'prefix': {
+                    'metadataEntries.value': name
+                }
+            })
         searchQuery = {
             'nested': {
                 'path': 'metadataEntries',
                 'query': {
                     'bool': {
-                        'must': [
-                            {
-                                'term': {
-                                    'metadataEntries.unit.raw': 'FlatIndex'
-                                }
-                            }, {
-                                'prefix': {
-                                    'metadataEntries.value': value.lower()
-                                }
-                            }
-                        ]
+                        'must': searchList
                     }
                 }
             }
@@ -268,28 +272,36 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                 }
             }
     if len(ranges) != 0:
-        for facet, range in ranges.items():
-            subranges = []
-            for subrange in range:
-                subranges.append({
-                    'from': subrange['from'],
-                    'to': subrange['to'] + 1
-                })
-            facetList[facet] = {
-                'filter': {
-                    'term': {
-                        'metadataEntries.attribute.raw': facet
-                    }
-                },
-                'aggregations': {
-                    'value': {
-                        'range': {
-                            'field': 'metadataEntries.value.number',
-                            'ranges': subranges
-                        }
+        for range in ranges:
+            facet = range['name']
+            if facet not in facetList:
+                aggregations = {
+                    'range': {
+                        'field': 'metadataEntries.value.number',
+                        'ranges': []
                     }
                 }
-            }
+                facetList[facet] = {
+                    'filter': {
+                        'term': {
+                            'metadataEntries.attribute.raw': facet
+                        }
+                    },
+                    'aggregations': {
+                        'value': aggregations
+                    }
+                }
+            else:
+                aggregations = facetList[facet]['aggregations']['value']
+                if 'range' not in aggregations:
+                    aggregations['range'] = {
+                        'field': 'metadataEntries.value.number',
+                        'ranges': []
+                    }
+            aggregations['range']['ranges'].append({
+                'from': range['from'],
+                'to': str(int(range['to']) + 1)
+            })
 
     if len(facetList) != 0:
         query = {
@@ -359,32 +371,34 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                             'minimum_should_match': 1
                         }
                     }
-                    filterDict[attribute]['should'] += [
-                        {
+                    prefixList = []
+                    nameList = re.split(' +', name.lower())
+                    for name in nameList:
+                        prefixList.append({
                             'prefix': {
-                                'metadataEntries.value': name.lower()
+                                'metadataEntries.value': name
                             }
+                        })
+                    filterDict[attribute]['should'].append({
+                        'bool': {
+                            'must': prefixList
                         }
-                    ]
+                    })
                 else:
-                    filterDict[attribute]['should'] += [
-                        {
-                            'term': {
-                                'metadataEntries.value.raw': name
-                            }
+                    filterDict[attribute]['should'].append({
+                        'term': {
+                            'metadataEntries.value.raw': name
                         }
-                    ]
+                    })
             else:
-                filterDict[attribute]['should'] += [
-                    {
-                        'range': {
-                            'metadataEntries.value.number': {
-                                'gte': filter['from'],
-                                'lte': filter['to']
-                            }
+                filterDict[attribute]['should'].append({
+                    'range': {
+                        'metadataEntries.value.number': {
+                            'gte': filter['from'],
+                            'lte': filter['to']
                         }
                     }
-                ]
+                })
         for filter in filterDict.values():
             queryList.append({
                 'nested': {
