@@ -60,7 +60,8 @@ $( document ).ready(function() {
         $('#dlg-file-browse-operations span.action-file').text('selected item(s)');
 
         // Set current folder & initiate browse object.
-        //dlgCurrentFolder = browseStartDir;
+        currentBrowseFolder = $('.folder-create').attr('data-path');
+        dlgCurrentFolder = currentBrowseFolder;
         dlgSelectAlertHide();
         startBrowsing2();
 
@@ -68,7 +69,7 @@ $( document ).ready(function() {
     });
 
     $("body").on("click", "a.multiple-delete", function() {
-        $('#multi-select-delete .collection').text(dlgCurrentFolder);
+        $('#multi-select-delete .collection').text($('.folder-create').attr('data-path'));
         $('#mutli-select-progress').attr('data-action', 'delete');
         $('#multi-select-delete').modal('show');
     });
@@ -145,7 +146,7 @@ $( document ).ready(function() {
             let collection;
             let newPath;
             if (action == 'delete') {
-                collection = dlgCurrentFolder;
+                collection = $('.folder-create').attr('data-path');
             } else {
                 newPath = dlgCurrentFolder + "/" + name;
             }
