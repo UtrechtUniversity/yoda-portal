@@ -115,17 +115,10 @@ def login() -> Response:
 @user_bp.route('/logout')
 def logout() -> Response:
     """Logout user and redirect to index."""
-    def revocation_request() -> requests.Response:
-        password = session.get('password')
-
-        # Get access token out of password.
-        password = password[14:]
-        sub_ix = password.index('end_sub')
-        access_token = password[sub_ix + 7:]
-
+    def revocation_request(refresh_token) -> requests.Response:
         data = {
-            'token': access_token,
-            'token_type_hint': 'access_token'
+            'token': refresh_token,
+            'token_type_hint': 'refresh_token'
         }
 
         # Content-type is application/x-www-form-urlencoded by default when data is a dict
@@ -141,10 +134,11 @@ def logout() -> Response:
         return response
 
     # Revoke access token for OIDC.
-    if session.get('password'):
-        response = revocation_request()
-        print(response.status_code)
-        print(response.text)
+    refresh_token = session.get('refresh_token', None)
+    if refresh_token is not None:
+        response = revocation_request(refresh_token)
+        if response.status_code != 200:
+            log_error(f"Revocation request failed for session {session.sid}")
 
     connman.clean(session.sid)
     session.clear()
@@ -279,6 +273,10 @@ def callback() -> Response:
 
         if email not in userinfo_email:
             raise UserinfoEmailMismatchError
+
+        # Store refresh_token is session for single log out.
+        if "refresh_token" in js:
+            session['refresh_token'] = js['refresh_token']
 
         # Add a prefix to consume in the PAM stack
         access_token = '++oidc_token++' + payload['sub'] + 'end_sub' + access_token
