@@ -41,6 +41,36 @@
     </div>
 </div>
 
+<div class="modal" tabindex="-1" role="dialog" id="confirmCopyAsNewDeposit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title modal-map-title">Copy datapackage to deposit area</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <span class='dlg-deposit-copy-text'>Are you sure you want to copy this datapackage as a new deposit?</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <span class='dlg-deposit-copy-result'></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button class='btn btn-primary ms-2 action-confirm-copy-as-new-deposit' data-yoda-reference='{{ reference }}'>Copy datapackage as a new deposit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container">
     <div class="row justify-content-between bg-gray pt-2 pb-2">
         <div class="col-4">
@@ -98,6 +128,7 @@
         </div>
         <div class="col">
             <span class="metadata" data-dp-attr="Tag"></span>
+            <button class="btn btn-secondary btn-sm float-end btn-copy-as-new-deposit"><i class="fa fa-copy"></i> Copy as a new deposit</button>
         </div>
     </div>
 

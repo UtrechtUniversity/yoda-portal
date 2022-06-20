@@ -336,6 +336,32 @@ function metadataShow() {
         }
         $('#viewMap').modal('show');
     });
+
+    $('.btn-copy-as-new-deposit').click(function(){
+        // initialisation of proper texts etc
+        // but possibly this is a one time situation so no reinitialization is required.
+        // I.e. the texts can be hardcoded in the corresponding template
+        // $('.dlg-deposit-copy-result').html('');
+        // $('.action-confirm-copy-as-new-deposit').prop('disabled', false);
+        // $('.dlg-deposit-copy-text').html('Are you sure you want to copy this datapackage as a new deposit?');
+        $('#confirmCopyAsNewDeposit').modal('show');
+    });
+
+    $('.action-confirm-copy-as-new-deposit').click(function(){
+        Yoda.call('deposit_dp_copy',
+            {reference: $(this).attr('data-yoda-reference')},
+            {rawResult: true})
+        .then((result) => {
+            if (!result || jQuery.isEmptyObject(result.data)){
+                $('.dlg-deposit-copy-result').html('Something went wrong trying starting a new deposit and copying current datapackage');
+                return console.info('Something went wrong trying starting a new deposit and copying current datapackage');
+            }
+            // Successful initiation of copying process. Inform user and set button status to disabled.
+            $('.action-confirm-copy-as-new-deposit').prop('disabled', true);
+            $('.dlg-deposit-copy-text').html('The package is being copied as a new deposit.<br><br>Please be aware that it can take some time before this fully complete.');
+            $('.dlg-deposit-copy-result').html('<a href="/deposit/data?dir=%2F' + encodeURIComponent(result.data.data) + '">Please use this link to go to the newly created deposit</a>');
+        })
+    });
 }
 
 function truncate(str, nr_words) {
