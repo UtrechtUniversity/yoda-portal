@@ -338,12 +338,6 @@ function metadataShow() {
     });
 
     $('.btn-copy-as-new-deposit').click(function(){
-        // initialisation of proper texts etc
-        // but possibly this is a one time situation so no reinitialization is required.
-        // I.e. the texts can be hardcoded in the corresponding template
-        // $('.dlg-deposit-copy-result').html('');
-        // $('.action-confirm-copy-as-new-deposit').prop('disabled', false);
-        // $('.dlg-deposit-copy-text').html('Are you sure you want to copy this datapackage as a new deposit?');
         $('#confirmCopyAsNewDeposit').modal('show');
     });
 
@@ -353,8 +347,8 @@ function metadataShow() {
             {rawResult: true})
         .then((result) => {
             if (!result || jQuery.isEmptyObject(result.data)){
-                $('.dlg-deposit-copy-result').html('Something went wrong trying starting a new deposit and copying current datapackage');
-                return console.info('Something went wrong trying starting a new deposit and copying current datapackage');
+                $('.dlg-deposit-copy-result').html('Something went wrong trying to copy this data package as a new deposit');
+                return console.info('Something went wrong trying to copy this data package as a new deposit');
             }
             // Successful initiation of copying process. Inform user and set button status to disabled.
             $('.action-confirm-copy-as-new-deposit').prop('disabled', true);

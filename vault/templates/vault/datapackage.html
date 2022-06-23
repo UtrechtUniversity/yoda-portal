@@ -45,12 +45,12 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title modal-map-title">Copy datapackage to deposit area</h5>
+                <h5 class="modal-title modal-map-title">Copy data package to as new deposit</h5>
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-sm-12">
-                        <span class='dlg-deposit-copy-text'>Are you sure you want to copy this datapackage as a new deposit?</span>
+                        <span class='dlg-deposit-copy-text'>Are you sure you want to copy this data package as a new deposit?</span>
                     </div>
                 </div>
             </div>
@@ -63,7 +63,7 @@
                 <div class="row">
                     <div class="col-sm-12">
                         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button class='btn btn-primary ms-2 action-confirm-copy-as-new-deposit' data-yoda-reference='{{ reference }}'>Copy datapackage as a new deposit</button>
+                        <button class='btn btn-primary ms-2 action-confirm-copy-as-new-deposit' data-yoda-reference='{{ reference }}'>Copy</button>
                     </div>
                 </div>
             </div>
@@ -93,6 +93,7 @@
         <div class="col-4">
             {% if not dp_is_restricted %}
             <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary float-end btn-sm btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
+            <button class="btn btn-secondary btn-sm float-end btn-copy-as-new-deposit"><i class="fa fa-copy"></i> Copy as a new deposit</button>
             {% endif %}
 
             <span class="metadata-access"></span>
@@ -128,7 +129,6 @@
         </div>
         <div class="col">
             <span class="metadata" data-dp-attr="Tag"></span>
-            <button class="btn btn-secondary btn-sm float-end btn-copy-as-new-deposit"><i class="fa fa-copy"></i> Copy as a new deposit</button>
         </div>
     </div>
 
