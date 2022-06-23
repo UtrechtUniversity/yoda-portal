@@ -342,7 +342,7 @@ function metadataShow() {
     });
 
     $('.action-confirm-copy-as-new-deposit').click(function(){
-        Yoda.call('deposit_dp_copy',
+        Yoda.call('deposit_copy_data_package',
             {reference: $(this).attr('data-yoda-reference')},
             {rawResult: true})
         .then((result) => {
