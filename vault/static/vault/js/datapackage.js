@@ -353,7 +353,7 @@ function metadataShow() {
             // Successful initiation of copying process. Inform user and set button status to disabled.
             $('.action-confirm-copy-as-new-deposit').prop('disabled', true);
             $('.dlg-deposit-copy-text').html('The package is being copied as a new deposit.<br><br>Please be aware that it can take some time before this fully complete.');
-            $('.dlg-deposit-copy-result').html('<a href="/deposit/data?dir=%2F' + encodeURIComponent(result.data.data) + '">Please use this link to go to the newly created deposit</a>');
+            $('.dlg-deposit-copy-result').html('<a class="btn btn-primary ms-2" href="/deposit/data?dir=%2F' + encodeURIComponent(result.data.data) + '">Go to deposit</a>');
         })
     });
 }

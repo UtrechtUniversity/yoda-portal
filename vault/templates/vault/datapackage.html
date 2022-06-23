@@ -57,13 +57,10 @@
             <div class="modal-footer">
                 <div class="row">
                     <div class="col-sm-12">
-                        <span class='dlg-deposit-copy-result'></span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-12">
                         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button class='btn btn-primary ms-2 action-confirm-copy-as-new-deposit' data-yoda-reference='{{ reference }}'>Copy</button>
+                        <span class='dlg-deposit-copy-result'>
+                            <button class='btn btn-primary ms-2 action-confirm-copy-as-new-deposit' data-yoda-reference='{{ reference }}'>Copy</button>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -92,8 +89,8 @@
         </div>
         <div class="col-4">
             {% if not dp_is_restricted %}
+            <button class="btn btn-secondary btn-sm float-end me-2 btn-copy-as-new-deposit"><i class="fa fa-copy"></i> Copy as a new deposit</button>
             <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary float-end btn-sm btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
-            <button class="btn btn-secondary btn-sm float-end btn-copy-as-new-deposit"><i class="fa fa-copy"></i> Copy as a new deposit</button>
             {% endif %}
 
             <span class="metadata-access"></span>
