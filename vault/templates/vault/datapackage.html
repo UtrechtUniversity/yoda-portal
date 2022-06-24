@@ -89,8 +89,8 @@
         </div>
         <div class="col-4">
             {% if not dp_is_restricted %}
-            <button class="btn btn-secondary btn-sm float-end me-2 btn-copy-as-new-deposit"><i class="fa fa-copy"></i> Copy as a new deposit</button>
-            <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary float-end btn-sm btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
+            <button class="btn btn-secondary btn-sm float-end btn-copy-as-new-deposit"><i class="fa fa-copy"></i> Copy as a new deposit</button>
+            <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary float-end btn-sm btn-show-file-browser me-2"><i class="fa fa-folder-open"></i> Access data</a>
             {% endif %}
 
             <span class="metadata-access"></span>
