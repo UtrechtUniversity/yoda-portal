@@ -341,6 +341,26 @@ function metadataShow() {
         }
         $('#viewMap').modal('show');
     });
+
+    $('.btn-copy-as-new-deposit').click(function(){
+        $('#confirmCopyAsNewDeposit').modal('show');
+    });
+
+    $('.action-confirm-copy-as-new-deposit').click(function(){
+        Yoda.call('deposit_copy_data_package',
+            {reference: $(this).attr('data-yoda-reference')},
+            {rawResult: true})
+        .then((result) => {
+            if (!result || jQuery.isEmptyObject(result.data)){
+                $('.dlg-deposit-copy-result').html('Something went wrong trying to copy this data package as a new deposit');
+                return console.info('Something went wrong trying to copy this data package as a new deposit');
+            }
+            // Successful initiation of copying process. Inform user and set button status to disabled.
+            $('.action-confirm-copy-as-new-deposit').prop('disabled', true);
+            $('.dlg-deposit-copy-text').html('The package is being copied as a new deposit.<br><br>Please be aware that it can take some time before this fully complete.');
+            $('.dlg-deposit-copy-result').html('<a class="btn btn-primary ms-2" href="/deposit/data?dir=%2F' + encodeURIComponent(result.data.data) + '">Go to deposit</a>');
+        })
+    });
 }
 
 function truncate(str, nr_words) {
