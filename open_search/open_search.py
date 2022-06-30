@@ -67,10 +67,25 @@ def query(name: str, value: str,
           start: int = 0, size: int = 500,
           sort: Optional[str] = None,
           reverse: bool = False) -> Dict[str, Any]:
-    client = OpenSearch(
-        hosts=[{'host': open_search_host, 'port': open_search_port}],
-        http_compress=True
-    )
+    result = {
+        'query': {
+            'name': name,
+            'value': value,
+            'from': start,
+            'size': size
+        },
+        'matches': [],
+        'total_matches': 0
+    }
+
+    try:
+        client = OpenSearch(
+            hosts=[{'host': open_search_host, 'port': open_search_port}],
+            http_compress=True
+        )
+    except Exception as e:
+        result['status'] = repr(e)
+        return result
 
     query = {
         'from': start,
@@ -123,7 +138,12 @@ def query(name: str, value: str,
             }
         ]
 
-    response = client.search(body=query, index='yoda')
+    try:
+        response = client.search(body=query, index='yoda')
+    except Exception as e:
+        result['status'] = repr(e)
+        return result
+
     matches = []
     for hit in response['hits']['hits']:
         src = hit['_source']
@@ -140,17 +160,9 @@ def query(name: str, value: str,
                 })
         match['attributes'] = attributes
         matches.append(match)
-    result = {
-        'query': {
-            'name': name,
-            'value': value,
-            'from': start,
-            'size': size
-        },
-        'matches': matches,
-        'total_matches': response['hits']['total']['value'],
-        'status': 'ok'
-    }
+    result['matches'] = matches
+    result['total_matches'] = response['hits']['total']['value']
+    result['status'] = 'ok'
     if sort is not None:
         result['query']['sort'] = sort
         result['query']['reverse'] = reverse
@@ -194,10 +206,27 @@ def _faceted_query() -> Response:
 
 
 def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, reverse=False):
-    client = OpenSearch(
-        hosts=[{'host': open_search_host, 'port': open_search_port}],
-        http_compress=True
-    )
+    result = {
+        'query': {
+            'facets': facets,
+            'ranges': ranges,
+            'filters': filters,
+            'from': start,
+            'size': size
+        },
+        'matches': [],
+        'total_matches': 0,
+        'facets': {}
+    }
+
+    try:
+        client = OpenSearch(
+            hosts=[{'host': open_search_host, 'port': open_search_port}],
+            http_compress=True
+        )
+    except Exception as e:
+        result['status'] = repr(e)
+        return result
 
     if value != "":
         searchList = [
@@ -316,7 +345,11 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                 }
             }
         }
-        response = client.search(body=query, index='yoda')
+        try:
+            response = client.search(body=query, index='yoda')
+        except Exception as e:
+            result['status'] = repr(e)
+            return result
 
         facetList = {}
         if 'aggregations' in response:
@@ -453,7 +486,12 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
             }
         ]
 
-    response = client.search(body=query, index='yoda')
+    try:
+        response = client.search(body=query, index='yoda')
+    except Exception as e:
+        result['status'] = repr(e)
+        return result
+
     matches = []
     for hit in response['hits']['hits']:
         src = hit['_source']
@@ -470,18 +508,10 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
                 })
         match['attributes'] = attributes
         matches.append(match)
-    result = {
-        'query': {
-            'facets': facets,
-            'filters': filters,
-            'from': start,
-            'size': size
-        },
-        'matches': matches,
-        'total_matches': response['hits']['total']['value'],
-        'facets': facetList,
-        'status': 'ok'
-    }
+    result['matches'] = matches
+    result['total_matches'] = response['hits']['total']['value']
+    result['facets'] = facetList
+    result['status'] = 'ok'
     if value is not None:
         result['query']['value'] = value
     if sort is not None:
