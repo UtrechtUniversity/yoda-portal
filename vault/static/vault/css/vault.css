@@ -81,10 +81,9 @@ ol.breadcrumb li.active {
     max-width: 40px;
     text-align: right;
 }
-
-#file-browser .fa-solid {
-    padding-left: 4px;
-    padding-right: 4px;
+#file-browser tr > :nth-child(5) {
+    max-width: 30px;
+    text-align: right;
 }
 
 a.dropdown-item:hover, a.dropdown-item:focus {
