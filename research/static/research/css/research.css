@@ -93,13 +93,13 @@ ol.breadcrumb li.active {
     text-align: right;
 }
 #file-browser tr > :nth-child(4) {
-    max-width: 40px;
+    max-width: 80px;
 }
 #file-browser tr > :nth-child(5) {
     max-width: 40px;
 }
 #file-browser tr > :nth-child(6) {
-    max-width: 10px;
+    max-width: 30px;
     text-align: right;
 }
 
