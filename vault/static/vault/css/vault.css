@@ -67,18 +67,23 @@ ol.breadcrumb li.active {
 }
 
 #file-browser tr > :nth-child(1) {
-    padding-left: 10px;
+    min-width: 60%;
+    word-break: break-all;
 }
 #file-browser tr > :nth-child(2) {
+    max-width: 30px;
     text-align: right;
+}
+#file-browser tr > :nth-child(3) {
+    max-width: 85px;
 }
 #file-browser tr > :nth-child(4) {
+    max-width: 40px;
     text-align: right;
 }
-
-#file-browser .fa-solid {
-    padding-left: 4px;
-    padding-right: 4px;
+#file-browser tr > :nth-child(5) {
+    max-width: 30px;
+    text-align: right;
 }
 
 a.dropdown-item:hover, a.dropdown-item:focus {

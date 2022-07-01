@@ -9,19 +9,21 @@
 }
 
 #file-browser tr > :nth-child(1) {
-    width: 50px;
+    max-width: 2px;
 }
 #file-browser tr > :nth-child(2) {
     min-width: 60%;
-    word-break:break-all;
+    word-break: break-all;
 }
 #file-browser tr > :nth-child(3) {
+    max-width: 30px;
     text-align: right;
 }
 #file-browser tr > :nth-child(4) {
+    max-width: 85px;
 }
 #file-browser tr > :nth-child(5) {
-    max-width: 90px;
+    max-width: 30px;
     text-align: right;
 }
 
