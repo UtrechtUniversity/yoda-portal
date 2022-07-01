@@ -19,6 +19,7 @@
     text-align: right;
 }
 #file-browser tr > :nth-child(4) {
+    max-width: 80px;
 }
 #file-browser tr > :nth-child(5) {
     max-width: 90px;
