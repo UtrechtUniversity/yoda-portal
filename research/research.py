@@ -5,11 +5,14 @@ __license__   = 'GPLv3, see LICENSE'
 
 import io
 import os
+import binascii
 from typing import Iterator
 
 from flask import abort, Blueprint, g, jsonify, make_response, render_template, request, Response, stream_with_context
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
+from irods.models import Collection, DataObject
+from irods.column import Like
 from werkzeug.utils import secure_filename
 
 research_bp = Blueprint('research_bp', __name__,
@@ -196,6 +199,24 @@ def upload_post() -> Response:
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
     response.headers["Content-Type"] = "application/json"
+    return response
+
+
+def decode_checksum(cksum: str) -> str:
+    if len(cksum) == 0:
+        return "0"
+    else:
+        return binascii.hexlify(binascii.a2b_base64(cksum[5:])).decode("UTF-8")
+
+
+@research_bp.route('/manifest')
+def manifest() -> Response:
+    dir = os.path.join("/" + g.irods.zone, "home", request.args.get("filepath"))
+    session = g.irods
+    q = session.query(Collection.name, DataObject.name, DataObject.checksum).filter(Like(Collection.name, dir + "%"))
+    dict = { row[Collection.name] + "/" + row[DataObject.name]: decode_checksum(row[DataObject.checksum]) for row in q }
+    response = jsonify({"manifest": dict})
+    response.status_code = 200
     return response
 
 
