@@ -3,16 +3,16 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import binascii
 import io
 import os
-import binascii
 from typing import Iterator
 
 from flask import abort, Blueprint, g, jsonify, make_response, render_template, request, Response, stream_with_context
+from irods.column import Like
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
 from irods.models import Collection, DataObject
-from irods.column import Like
 from werkzeug.utils import secure_filename
 
 research_bp = Blueprint('research_bp', __name__,
@@ -214,7 +214,7 @@ def manifest() -> Response:
     dir = os.path.join("/" + g.irods.zone, "home", request.args.get("filepath"))
     session = g.irods
     q = session.query(Collection.name, DataObject.name, DataObject.checksum).filter(Like(Collection.name, dir + "%"))
-    dict = { row[Collection.name] + "/" + row[DataObject.name]: decode_checksum(row[DataObject.checksum]) for row in q }
+    dict = {row[Collection.name] + "/" + row[DataObject.name]: decode_checksum(row[DataObject.checksum]) for row in q}
     response = jsonify({"manifest": dict})
     response.status_code = 200
     return response
