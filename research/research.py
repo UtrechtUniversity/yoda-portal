@@ -203,7 +203,7 @@ def upload_post() -> Response:
 
 
 def decode_checksum(cksum: str) -> str:
-    if len(cksum) == 0:
+    if cksum is None:
         return "0"
     else:
         return binascii.hexlify(binascii.a2b_base64(cksum[5:])).decode("UTF-8")
