@@ -164,8 +164,8 @@ def protect_pages() -> Optional[Response]:
 
 
 @app.after_request
-def content_security_policy(response: Response) -> Response:
-    """Add Content-Security-Policy headers."""
+def add_security_headers(response: Response) -> Response:
+    """Add security headers."""
 
     # Endpoints which allow unsafe eval and OSM data.
     unsafe_eval_endpoints = ['research_bp.form',
@@ -187,12 +187,16 @@ def content_security_policy(response: Response) -> Response:
     # Endpoints which allow form action https.
     form_action_endpoints = ['user_bp.gate', 'user_bp.login']
 
+    # Content Security Policy (CSP)
     if request.endpoint in unsafe_eval_endpoints:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: *.openstreetmap.org; frame-ancestors 'self'; form-action 'self'; object-src 'none'"  # noqa: E501
     elif request.endpoint in form_action_endpoints:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'self'; form-action 'self' https:; object-src 'none'"  # noqa: E501
     else:
         response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'self'; form-action 'self'; object-src 'none'"  # noqa: E501
+
+    # X-Content-Type-Options
+    response.headers['X-Content-Type-Options'] = 'nosniff'
 
     return response
 
