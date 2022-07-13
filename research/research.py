@@ -213,9 +213,12 @@ def decode_checksum(cksum: str) -> str:
 def manifest() -> Response:
     dir = os.path.join("/" + g.irods.zone, "home", request.args.get("filepath"))
     session = g.irods
+    length = len(dir) + 1
     q = session.query(Collection.name, DataObject.name, DataObject.checksum).filter(Like(Collection.name, dir + "%"))
-    dict = {row[Collection.name] + "/" + row[DataObject.name]: decode_checksum(row[DataObject.checksum]) for row in q}
-    response = jsonify({"manifest": dict})
+    dict = {(row[Collection.name] + "/")[length:] + row[DataObject.name]: decode_checksum(row[DataObject.checksum]) for row in q}
+    response = jsonify({
+	"manifest": [{"name": name, "checksum": checksum} for name, checksum in dict.items()]
+    })
     response.status_code = 200
     return response
 
