@@ -235,6 +235,11 @@ function showFolderSelectDialog(restorationObjectId, path, orgFileName)
     $('.cover').addClass('hide');
     $('.revision-restore-dialog').removeClass('hide');
 
+    // dialog initialisation
+    $("#select-folder .modal-title").html('Select a location for you revision to be restored');
+    $("#btn-restore").prop('disabled', false);
+    $("#select-folder .cover-browse-elements").removeClass('hide');
+
     $('#select-folder').modal('show');
 }
 
@@ -430,6 +435,7 @@ $( document ).ready(function() {
     $('#btn-cancel-overwrite-dialog').on('click', function(){
         $('.cover').addClass('hide');
         $('.revision-restore-dialog').removeClass('hide');
+        $("#select-folder .cover-browse-elements").removeClass('hide');    
     });
 
     $("body").on("click",".dlg-browse", function(e) {
@@ -500,7 +506,7 @@ function makeBreadcrumb(urlEncodedDir)
     var totalParts = parts.length;
 
     if (totalParts > 0 && parts[0]!='undefined') {
-        var html = '<li class="breadcrumb-item browse dlg-browse" data-path="">Home</li>';
+        var html = '<li class="breadcrumb-item browse dlg-browse" data-path="" style="cursor:pointer;">Home</li>';
         var path = "";
         $.each( parts, function( k, part ) {
             path += "/" + encodeURIComponent(part);
@@ -510,7 +516,7 @@ function makeBreadcrumb(urlEncodedDir)
             if (k == (totalParts-1)) {
                 html += '<li class="breadcrumb-item active">' + valueString + '</li>';
             } else {
-                html += '<li class="breadcrumb-item browse dlg-browse" data-path="' + path + '">' + valueString + '</li>';
+                html += '<li class="breadcrumb-item browse dlg-browse" data-path="' + path + '" style="cursor:pointer;">' + valueString + '</li>';
             }
         });
     } else {
@@ -569,10 +575,16 @@ async function restoreRevision(overwriteFlag)
         $('.cover').removeClass('hide');
         $('.mode-dlg-exists').removeClass('hide');
         $('#form-restore-overwrite').removeClass('hide');
+        $("#select-folder .cover-browse-elements").addClass('hide');
     }
     else if (result.status == 'ok') {
-        html = 'Successfully made a copy of revision';
-        html += ' <a class="btn btn-primary" href="/research/?dir=' + dlgCurrentFolder + '">Go to research area</a>';
+        $("#select-folder .modal-title").html('Successfully restored file');
+        $("#btn-restore").prop('disabled', true);
+        $("#select-folder .cover-browse-elements").addClass('hide');
+
+        html = 'Successfully restored your revision in: ' + dlgCurrentFolder;
+        // html += '<br> <a class="btn btn-primary" href="/research/?dir=' + dlgCurrentFolder + '">Go to research area</a>';
+        html += '<br>Please follow <a href="/research/?dir=' + dlgCurrentFolder + '">this link to go to research area</a>!';
 
         dlgAlertShow(html);
         $('.cover').addClass('hide');
