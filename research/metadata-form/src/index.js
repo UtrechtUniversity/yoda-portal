@@ -397,8 +397,14 @@ function loadForm() {
 
         } else if (formProperties.data.metadata === null && !formProperties.data.can_edit) {
             // No metadata present and no write access. Do not show a form.
+            $('#metadata-form').removeClass('hide');
             $('#form').addClass('hide');
-            $('#no-metadata').removeClass('hide');
+            if (formProperties.data.is_locked) {
+                $('#no-metadata-and-locked').removeClass('hide');
+            }
+            else {
+                $('#no-metadata').removeClass('hide');
+            }
 
         } else {
             // Metadata present or user has write access, load the form.
