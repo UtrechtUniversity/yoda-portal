@@ -420,6 +420,27 @@ function loadForm() {
                 $('#metadata-form').removeClass('hide');
             }
 
+            // Specific required textarea handling 
+            $('textarea').each(function() {
+                if ($(this).attr('required')) {
+                    // initial setting when form is opened
+                    if ($(this).val()=='') {
+                        $(this).addClass('is-invalid');
+                    }
+                    // following changes in the required textarea and adjust border status
+                    $(this).on("change keyup paste", function() {
+                        if ($(this).val()=='') {
+                            if (!$(this).hasClass('is-invalid')) {
+                                $(this).addClass('is-invalid');
+                            }
+                        }
+                        else {
+                            $(this).removeClass('is-invalid');
+                        }
+                    });
+                }
+            })
+
             updateCompleteness();
         }
     });
