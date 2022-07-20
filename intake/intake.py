@@ -83,9 +83,7 @@ def index() -> Response:
         # get the total of dataset files
         total_dataset_files = 0
         for dataset in datasets:
-            print('in dataset loop')
             total_dataset_files += dataset['objects']
-            print(total_dataset_files)
 
         data_erroneous_files = api.call('intake_list_unrecognized_files', {"coll": coll})['data']
 
@@ -141,7 +139,6 @@ def get_dataset_detail_view() -> Response:
 
     list_comments = []
     for comment in datasetComments:
-        print(comment)
         parts = comment.split(':')
         list_comments.append({'name': parts[0],
                               'time': time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(int(parts[1]))),
