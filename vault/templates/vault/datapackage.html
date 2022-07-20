@@ -78,7 +78,7 @@
             <a class="btn btn-light float-end" href="https://dag.sites.uu.nl/search/datapackage-request-access/" target="_blank" title="How to request for access for this restricted datapackage"><i class="fa fa-info-circle"></i> Request access</a>
             {% else %}
             <a class="btn btn-light float-end" href="https://dag.sites.uu.nl/find-and-retrieve-data/" target="_blank" title="Guidance"><i class="fa fa-info-circle"></i> Guidance</a>
-            <button class="btn btn-secondary float-end btn-copy-as-new-deposit"><i class="fa fa-copy"></i> Copy as a new deposit</button>
+            <button class="btn btn-secondary float-end btn-copy-as-new-deposit me-2"><i class="fa fa-copy"></i> Copy as a new deposit</button>
             {% endif %}
         </div>
     </div>
@@ -90,7 +90,7 @@
         </div>
         <div class="col-4">
             {% if not dp_is_restricted %}
-            <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary float-end btn-show-file-browser me-2"><i class="fa fa-folder-open"></i> Access data</a>
+            <a  href="/vault/browse?dir={{ dir|urlencode }}" class="btn btn-primary float-end btn-show-file-browser"><i class="fa fa-folder-open"></i> Access data</a>
             {% endif %}
 
             <span class="metadata-access"></span>
