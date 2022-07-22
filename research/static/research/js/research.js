@@ -221,6 +221,10 @@ $(function() {
         r.cancel();
         $('#files').html("");
         $('#uploads').addClass('hidden');
+        // clear information present for next time dialog is presented
+        $('.uploads-progress-information').html('');
+        $('.uploads-total-progress-bar').css('width', '0%');
+        $('.uploads-total-progress-bar-perc').html('0%');
     });
 
     // Flow.js handle events
@@ -274,7 +278,6 @@ $(function() {
         $("#" + file.uniqueIdentifier + " .msg").html("<span class='text-success'>Upload complete</span>");
         let $self = $('#'+file.uniqueIdentifier);
         $self.find('.upload-btns').hide();
-
     });
     r.on('fileError', function(file, message){
         $("#" + file.uniqueIdentifier + " .msg").html("Upload failed");
@@ -285,6 +288,21 @@ $(function() {
     r.on('fileProgress', function(file){
         var percent = Math.floor(file.progress()*100);
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', percent + '%');
+
+        // handling presentation of totals 
+        var total_size = 0;
+        var total_uploaded = 0;
+        var total_completed = 0
+        $.each(r.files, function(key, flow_file) {
+            total_size += flow_file.size;
+            total_uploaded += flow_file.size*flow_file.progress();
+            if (flow_file.progress()==1) {
+                total_completed++;
+            }
+        });
+        $('.uploads-progress-information').html('&nbsp;Completed ' + total_completed.toString() + ' of ' + r.files.length.toString());
+        $('.uploads-total-progress-bar').css('width', Math.floor((total_uploaded/total_size)*100) + '%');
+        $('.uploads-total-progress-bar-perc').html(Math.floor((total_uploaded/total_size)*100) + '%');
     });
 
     $("body").on("dragbetterenter",function(event){
