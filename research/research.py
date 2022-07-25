@@ -199,7 +199,7 @@ def upload_post() -> Response:
         final_object_path = build_object_path(filepath, flow_relative_path, flow_filename)
         try:
             # overwriting doesn't work using the move command, therefore unlink the previous file first
-            session.data_objects.unlink (final_object_path, force = True)
+            session.data_objects.unlink(final_object_path, force=True)
         except Exception:
             # Probably there was no file present which is no erroneous situation
             pass
