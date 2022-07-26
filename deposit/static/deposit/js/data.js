@@ -143,11 +143,21 @@ $(function() {
         r.cancel();
         $('#files').html("");
         $('#uploads').addClass('hidden');
+        // clear information present for next time dialog is presented
+        $('.uploads-progress-information').html('');
+        $('.uploads-total-progress-bar').css('width', '0%');
+        $('.uploads-total-progress-bar-perc').html('0%');
     });
 
     // Flow.js handle events
     r.on('filesAdded', function(files){
         if (files.length) {
+            $('#files').html("");
+            // clear information present for new totals
+            $('.uploads-progress-information').html('');
+            $('.uploads-total-progress-bar').css('width', '0%');
+            $('.uploads-total-progress-bar-perc').html('0%');
+
             $.each(files, function(key, file) {
                 logUpload(file.uniqueIdentifier, file);
 
@@ -200,6 +210,29 @@ $(function() {
     r.on('fileProgress', function(file){
         var percent = Math.floor(file.progress()*100);
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', percent + '%');
+
+        // presentation of totalised datasize percentages
+        var total_size = 0;
+        var total_size_uploaded = 0;
+        // presentation of totalised file counts
+        var count_total = 0;
+        var count_total_completed = 0;
+        $.each(r.files, function(key, flow_file) {
+            // id has to be present in frontend as r.files contains all files (including the ones already uploaded)
+            if($('#'+flow_file.uniqueIdentifier).length) {
+                // size totals
+                total_size += flow_file.size;
+                total_size_uploaded += flow_file.size*flow_file.progress();
+                // count totals
+                count_total++;
+                if (flow_file.progress()==1) {
+                    count_total_completed++;
+                }
+            }
+        });
+        $('.uploads-progress-information').html('&nbsp;-&nbsp;completed ' + count_total_completed.toString() + ' of ' + count_total.toString());
+        $('.uploads-total-progress-bar').css('width', Math.floor((total_size_uploaded/total_size)*100) + '%');
+        $('.uploads-total-progress-bar-perc').html(Math.floor((total_size_uploaded/total_size)*100) + '%');
     });
 
     $("body").on("dragbetterenter",function(event){

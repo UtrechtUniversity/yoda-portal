@@ -277,7 +277,17 @@
     <div class="modal-dialog mw-100 w-75">
         <div class="modal-content">
             <div class="modal-header" id="uploads_header">
-                <h5 class="modal-title">Uploads</h5>
+                <div class="col-md-6">
+                    <h5 class="modal-title">Uploads
+                        <span class="uploads-progress-information"></span>
+                    </h5>
+                </div>
+                <div class="col-md-3">
+                    <div class="progress position-relative">
+                        <div class="progress-bar progress-bar-striped bg-info uploads-total-progress-bar" style="width: 0%;"></div>
+                        <small class="justify-content-center d-flex position-absolute w-100 uploads-total-progress-bar-perc"></small>
+                    </div>
+                </div>
                 <button type="button" class="btn-close btn-close-uploads-overview" data-bs-dismiss="modal" aria-label="Close" title="Close"></button>
             </div>
             <div class="modal-body">
