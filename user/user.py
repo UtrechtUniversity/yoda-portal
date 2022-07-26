@@ -337,7 +337,7 @@ def should_redirect_to_oidc(username: str) -> bool:
 def oidc_authorize_url(username: str) -> str:
     authorize_url: str = app.config.get('OIDC_AUTH_URI')
 
-    if username:
+    if app.config.get('OIDC_LOGIN_HINT') and username:
         authorize_url += '&login_hint=' + username
 
     return authorize_url

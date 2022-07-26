@@ -120,6 +120,11 @@ def upload_get() -> Response:
     # Partial file name for chunked uploads.
     if flow_total_chunks > 1:
         object_path = f"{object_path}.part"
+    else:
+        # Ensuring single chunk files get to the overwrite stage as well
+        response = make_response(jsonify({"message": "Chunk not found"}), 204)
+        response.headers["Content-Type"] = "application/json"
+        return response
 
     try:
         obj = session.data_objects.get(object_path)
@@ -195,6 +200,12 @@ def upload_post() -> Response:
     # Rename partial file name when complete for chunked uploads.
     if flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
         final_object_path = build_object_path(filepath, flow_relative_path, flow_filename)
+        try:
+            # overwriting doesn't work using the move command, therefore unlink the previous file first
+            session.data_objects.unlink(final_object_path, force=True)
+        except Exception:
+            # Probably there was no file present which is no erroneous situation
+            pass
         session.data_objects.move(object_path, final_object_path)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
