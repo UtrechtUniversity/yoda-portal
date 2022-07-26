@@ -132,6 +132,29 @@ $(function() {
         $('#cleanup-collection').modal('show');
     });
 
+    // Show checksum report
+    $("body").on("click", "a.action-show-checksum-report", function() {
+
+        let folder = $(this).attr('data-folder');
+        $('#showChecksumReport .collection').text(folder);
+
+        $('#showChecksumReport .modal-body').html('');
+        Yoda.call('research_manifest',
+            {coll: Yoda.basePath + folder}).then((data) => {
+            let table = '<table class="table table-striped"><tbody>';
+            $.each(data, function( index, obj ) {
+                table += `<tr>
+                     <td>${obj.name}</td>
+                     <td>${obj.checksum}</td>
+                </tr>`;
+            });
+            table += '</tbody></table>';
+
+            $('#showChecksumReport .modal-body').html(table);
+            $('#showChecksumReport').modal('show');
+        });
+    });
+
     $('.btn-confirm-cleanup-collection').click(function() {
         $(".cleanup-select-file").each(function(index,item){
             if ($(item).is(":checked")) {
@@ -1187,6 +1210,9 @@ function topInformation(dir, showAlert)
             // Add unpreservable files check to actions.
             actions['check-for-unpreservable-files'] = 'Check for compliance with policy';
 
+            // Add checksum report
+            actions['show-checksum-report'] = 'Show checksum report';
+
             // Add go to vault to actions.
             if (typeof vaultPath != 'undefined' ) {
                 actions['go-to-vault'] = 'Go to vault';
@@ -1235,6 +1261,7 @@ function handleActionsList(actions, folder)
 
     var possibleVaultActions = ['cleanup',
                                 'check-for-unpreservable-files',
+                                'show-checksum-report',
                                 'go-to-vault'];
 
     $.each(possibleActions, function( index, value ) {
