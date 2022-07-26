@@ -252,7 +252,14 @@ def callback() -> Response:
         # Add a prefix to consume in the PAM stack
         access_token = '++oidc_token++' + payload['sub'] + 'end_sub' + access_token
 
-        irods_login(email, access_token)
+        try:
+            irods_login(email, access_token)
+
+        except PAM_AUTH_PASSWORD_FAILED:
+            flash('Username/password was incorrect', 'danger')
+            log_error("iRODS authentication failed for user " + username)
+            return render_template('user/login.html')
+
         exception_occurred = False
 
     except jwt.PyJWTError:
