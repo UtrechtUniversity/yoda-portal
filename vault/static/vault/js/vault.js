@@ -53,6 +53,29 @@ $(function() {
         $("#viewer").html("");
     });
 
+    // Show checksum report
+    $("body").on("click", "a.action-show-checksum-report", function() {
+
+        let folder = $(this).attr('data-folder');
+        $('#showChecksumReport .collection').text(folder);
+
+        $('#showChecksumReport .modal-body').html('');
+        Yoda.call('research_manifest',
+            {coll: Yoda.basePath + folder}).then((data) => {
+            let table = '<table class="table table-striped"><tbody>';
+            $.each(data, function( index, obj ) {
+                table += `<tr>
+                     <td>${obj.name}</td>
+                     <td>${obj.checksum}</td>
+                </tr>`;
+            });
+            table += '</tbody></table>';
+
+            $('#showChecksumReport .modal-body').html(table);
+            $('#showChecksumReport').modal('show');
+        });
+    });
+
     $("body").on("click", "a.action-check-for-unpreservable-files", function() {
         // Check for unpreservable file formats.
         // If present, show extensions to user.
@@ -633,6 +656,9 @@ function topInformation(dir, showAlert) {
             // Add unpreservable files check to actions.
             actions['check-for-unpreservable-files'] = 'Check for compliance with policy';
 
+            // Add checksum report
+            actions['show-checksum-report'] = 'Show checksum report';
+
             // Add go to research to actions.
             if (typeof researchPath != 'undefined') {
                 actions['go-to-research'] = 'Go to research';
@@ -677,6 +703,7 @@ function handleActionsList(actions, folder)
     var possibleVaultActions = ['grant-vault-access', 'revoke-vault-access',
                                 'copy-vault-package-to-research',
                                 'check-for-unpreservable-files',
+                                'show-checksum-report',
                                 'go-to-research'];
 
     $.each(possibleActions, function( index, value ) {
