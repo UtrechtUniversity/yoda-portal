@@ -9,7 +9,7 @@ from typing import List
 import jwt
 import requests
 from flask import Blueprint, current_app as app, flash, g, redirect, render_template, request, Response, session, url_for
-from irods.exception import iRODSException, PAM_AUTH_PASSWORD_FAILED, CAT_INVALID_USER
+from irods.exception import CAT_INVALID_USER, iRODSException, PAM_AUTH_PASSWORD_FAILED
 from irods.session import iRODSSession
 
 import api
