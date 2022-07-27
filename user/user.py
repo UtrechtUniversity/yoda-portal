@@ -9,7 +9,7 @@ from typing import List
 import jwt
 import requests
 from flask import Blueprint, current_app as app, flash, g, redirect, render_template, request, Response, session, url_for
-from irods.exception import iRODSException, PAM_AUTH_PASSWORD_FAILED
+from irods.exception import iRODSException, PAM_AUTH_PASSWORD_FAILED, CAT_INVALID_USER
 from irods.session import iRODSSession
 
 import api
@@ -207,7 +207,7 @@ def callback() -> Response:
 
     token_response = None
     userinfo_response = None
-    exception_occurred = True  # To identify exception in finally-clause
+    exception_occurred = "OPENID_ERROR"  # To identify exception in finally-clause
 
     try:
         token_response = token_request()
@@ -255,12 +255,12 @@ def callback() -> Response:
         try:
             irods_login(email, access_token)
 
-        except PAM_AUTH_PASSWORD_FAILED:
-            flash('Username/password was incorrect', 'danger')
-            log_error("iRODS authentication failed for user " + username)
-            return render_template('user/login.html')
-
-        exception_occurred = False
+        except CAT_INVALID_USER:
+            log_error("iRODS authentication failed for user " + email)
+            exception_occurred = "CAT_INVALID_USER_ERROR"
+        else:
+            # no errors in entire process consequently clear the exception_occurred flag
+            exception_occurred = ""
 
     except jwt.PyJWTError:
         # Error occurred during steps for verification,
@@ -317,14 +317,17 @@ def callback() -> Response:
         log_error(f"Unexpected exception during callback for username {email}", True)
 
     finally:
-        if exception_occurred:
+        if exception_occurred == "CAT_INVALID_USER_ERROR":
+            flash('Username/password was incorrect', 'danger')
+        elif exception_occurred == "OPENID_ERROR":
             flash(
                 'An error occurred during the OpenID Connect protocol. '
                 'If the issue persists, please contact the system '
                 'administrator',
                 'danger'
             )
-
+        # if exception_occurred is not "" redirect to url(user_bp.gate)
+        if exception_occurred:
             return redirect(url_for('user_bp.gate'))
 
     return redirect(original_destination())
