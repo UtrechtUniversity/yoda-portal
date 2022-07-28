@@ -14,8 +14,6 @@
     "@rjsf/bootstrap-4": "^4.2.2",
     "@rjsf/core": "^4.2.2",
     "babel-loader": "^8.2.5",
-    "leaflet": "^1.6.0",
-    "leaflet-draw": "^1.0.4",
     "react": "^18.2.0",
     "react-bootstrap": "^1.0.1",
     "react-dom": "^18.2.0",
