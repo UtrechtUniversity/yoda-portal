@@ -59,7 +59,7 @@ class Geolocation extends React.Component {
 
     afterOpenModal(e) {
         const {northBoundLatitude, westBoundLongitude, southBoundLatitude, eastBoundLongitude} = this.state;
-        let map = this.refs.map.leafletElement;
+        let map = this.refs.map;
         if (typeof northBoundLatitude !== 'undefined' &&
             typeof westBoundLongitude !== 'undefined' &&
             typeof southBoundLatitude !== 'undefined' &&
@@ -205,7 +205,7 @@ class Geolocation extends React.Component {
     }
 
     drawStop(e) {
-        let map = this.refs.map.leafletElement;
+        let map = this.refs.map;
         map.eachLayer(function (layer) {
             if (layer instanceof L.Marker || layer instanceof L.Rectangle) {
                 map.removeLayer(layer);
