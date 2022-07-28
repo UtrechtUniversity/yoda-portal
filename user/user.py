@@ -9,7 +9,7 @@ from typing import List
 import jwt
 import requests
 from flask import Blueprint, current_app as app, flash, g, redirect, render_template, request, Response, session, url_for
-from irods.exception import CAT_INVALID_USER, iRODSException, PAM_AUTH_PASSWORD_FAILED
+from irods.exception import CAT_INVALID_AUTHENTICATION, CAT_INVALID_USER, iRODSException, PAM_AUTH_PASSWORD_FAILED
 from irods.session import iRODSSession
 
 import api
@@ -87,7 +87,7 @@ def login() -> Response:
 
         except iRODSException:
             flash(
-                'An error occurred while connecting to iRODs. '
+                'An error occurred while connecting to iRODS. '
                 'If the issue persists, please contact the '
                 'system administrator',
                 'danger')
@@ -97,7 +97,7 @@ def login() -> Response:
 
         except Exception:
             flash(
-                'An error occurred while connecting to iRODs. '
+                'An error occurred while connecting to iRODS. '
                 'If the issue persists, please contact the '
                 'system administrator',
                 'danger')
@@ -254,12 +254,14 @@ def callback() -> Response:
 
         try:
             irods_login(email, access_token)
-
         except CAT_INVALID_USER:
-            log_error("iRODS authentication failed for user " + email)
+            log_error(f"iRODS invalid user {email}", True)
             exception_occurred = "CAT_INVALID_USER_ERROR"
+        except CAT_INVALID_AUTHENTICATION:
+            log_error(f"RODS invalid authentication for user {email}", True)
+            exception_occurred = "CAT_INVALID_AUTHENTICATION"
         else:
-            # no errors in entire process consequently clear the exception_occurred flag
+            # No errors in entire process, clear the exception_occurred flag.
             exception_occurred = ""
 
     except jwt.PyJWTError:
@@ -317,7 +319,7 @@ def callback() -> Response:
         log_error(f"Unexpected exception during callback for username {email}", True)
 
     finally:
-        if exception_occurred == "CAT_INVALID_USER_ERROR":
+        if exception_occurred == "CAT_INVALID_USER_ERROR" or exception_occurred == "CAT_INVALID_AUTHENTICATION":
             flash('Username/password was incorrect', 'danger')
         elif exception_occurred == "OPENID_ERROR":
             flash(
@@ -326,7 +328,8 @@ def callback() -> Response:
                 'administrator',
                 'danger'
             )
-        # if exception_occurred is not "" redirect to url(user_bp.gate)
+
+        # Redirect to gate when exception has occured.
         if exception_occurred:
             return redirect(url_for('user_bp.gate'))
 
