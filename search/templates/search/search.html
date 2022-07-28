@@ -90,25 +90,27 @@
             <div class="modal-body">
                 <p class="alert-folder-select">ALERT SECTION</p>
 
-                <!--- BREADCRUMS -->
-                <div class="row d-block">
-                    <nav aria-label="breadcrumb flex-column">
-                        <ol class="breadcrumb dlg-breadcrumb">
-                            <li class="breadcrumb-item">Home</li>
-                        </ol>
-                    </nav>
-                </div>
+                <div class='cover-browse-elements'>
+                    <!--- BREADCRUMS -->
+                    <div class="row d-block">
+                        <nav aria-label="breadcrumb flex-column">
+                            <ol class="breadcrumb dlg-breadcrumb">
+                                <li class="breadcrumb-item">Home</li>
+                            </ol>
+                        </nav>
+                    </div>
 
-                <!--- FOLDER SELECTION-->
-                <div class="row d-block">
-                    <table id="folder-browser" class="table yoda-table table-bordered">
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Modified date</th>
-                        </tr>
-                        </thead>
-                    </table>
+                    <!--- FOLDER SELECTION-->
+                    <div class="row d-block">
+                        <table id="folder-browser" class="table yoda-table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Modified date</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -120,16 +122,17 @@
             <div id="coverAll" class="cover restore-exists hide">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title">The file already exists </h5>
+                        <h5 class="card-title">The file already exists in the selected folder</h5>
                     </div>
                     <div class="card-body">
                         <p class="alert-dlg-already-exists"></p>
-                        <h6 class="card-title">Make a selection to overwrite or rename current file</h6>
+                        <h6 class="card-title">Please choose to overwrite or rename current file:</h6>
+                        </br>
                         <div class="row">
                             <div class="col-md-6">
                                 <form id="form-restore-overwrite">
                                     <div class="row d-block">
-                                        <p>Overwrite this file</p>
+                                        <p>1. Overwrite this file</p>
                                     </div>
                                     <div class="row d-block">
                                         <p>
@@ -139,24 +142,25 @@
                                 </form>
                             </div>
                             <div class="col-md-6">
-                                <form class="form-inline">
+                                <form class="form-inlineblabla">
                                     <div class="row d-block">
-                                        <p>Enter new name filename</p>
+                                        <p>2. Enter new name filename</p>
                                     </div>
                                     <div class="row d-block">
-                                        <input type="text"  class="form-control" placeholder="Enter new filename" id="newFileName">
-                                        <button  class="btn btn-primary" id="btn-restore-next-to">Restore with a new filename</button>
+                                        <p>
+                                            <input type="text"  class="form-control" placeholder="Enter new filename" id="newFileName">
+                                            <button  class="btn btn-primary" id="btn-restore-next-to">Restore with a new filename</button>
+                                        </p>
                                     </div>
                                 </form>
                             </div>
                         </div>
-                        <div class="row">
-                            <hr>
-                            <button class="btn btn-secondary float-end"  id="btn-cancel-overwrite-dialog">Cancel</button>
-                        </div>
+                        </br></br>
+                        <hr>
+                        <button type="button" class="btn btn-secondary float-end" id="btn-cancel-overwrite-dialog">Cancel restoring at current location</button>
                     </div>
                 </div>
-            </div>>
+            </div>
         </div>
     </div>
 </div>

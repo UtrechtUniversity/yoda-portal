@@ -287,9 +287,9 @@ function metadataShow() {
     }
 
     if (metadata['Data_Access_Restriction'] == "Open - freely retrievable") {
-        $(".metadata-access").html('<span class="badge rounded-pill bg-success me-2 mt-1 float-end"><i class="fa-solid fa-lock-open"></i> Open</span>');
+        $(".metadata-access").html('<span class="badge rounded-pill bg-success mt-2 me-2 float-end"><i class="fa-solid fa-lock-open"></i> Open</span>');
     } else {
-        $(".metadata-access").html('<span class="badge rounded-pill bg-warning me-2 mt-1 float-end"><i class="fa-solid fa-lock"></i> Restricted</span>');
+        $(".metadata-access").html('<span class="badge rounded-pill bg-warning mt-2 me-2 float-end"><i class="fa-solid fa-lock"></i> Restricted</span>');
     }
 
     // Step through all rows each containing fields with class 'metadata'.

@@ -132,6 +132,29 @@ $(function() {
         $('#cleanup-collection').modal('show');
     });
 
+    // Show checksum report
+    $("body").on("click", "a.action-show-checksum-report", function() {
+
+        let folder = $(this).attr('data-folder');
+        $('#showChecksumReport .collection').text(folder);
+
+        $('#showChecksumReport .modal-body').html('');
+        Yoda.call('research_manifest',
+            {coll: Yoda.basePath + folder}).then((data) => {
+            let table = '<table class="table table-striped"><tbody>';
+            $.each(data, function( index, obj ) {
+                table += `<tr>
+                     <td>${obj.name}</td>
+                     <td>${obj.checksum}</td>
+                </tr>`;
+            });
+            table += '</tbody></table>';
+
+            $('#showChecksumReport .modal-body').html(table);
+            $('#showChecksumReport').modal('show');
+        });
+    });
+
     $('.btn-confirm-cleanup-collection').click(function() {
         $(".cleanup-select-file").each(function(index,item){
             if ($(item).is(":checked")) {
@@ -221,12 +244,21 @@ $(function() {
         r.cancel();
         $('#files').html("");
         $('#uploads').addClass('hidden');
+        // clear information present for next time dialog is presented
+        $('.uploads-progress-information').html('');
+        $('.uploads-total-progress-bar').css('width', '0%');
+        $('.uploads-total-progress-bar-perc').html('0%');
     });
 
     // Flow.js handle events
     r.on('filesAdded', function(files){
         if (files.length) {
             $('#files').html("");
+            // clear information present for new totals
+            $('.uploads-progress-information').html('');
+            $('.uploads-total-progress-bar').css('width', '0%');
+            $('.uploads-total-progress-bar-perc').html('0%');
+
             $.each(files, function(key, file) {
                 logUpload(file.uniqueIdentifier, file);
 
@@ -274,7 +306,6 @@ $(function() {
         $("#" + file.uniqueIdentifier + " .msg").html("<span class='text-success'>Upload complete</span>");
         let $self = $('#'+file.uniqueIdentifier);
         $self.find('.upload-btns').hide();
-
     });
     r.on('fileError', function(file, message){
         $("#" + file.uniqueIdentifier + " .msg").html("Upload failed");
@@ -285,6 +316,29 @@ $(function() {
     r.on('fileProgress', function(file){
         var percent = Math.floor(file.progress()*100);
         $("#" + file.uniqueIdentifier + " .progress-bar").css('width', percent + '%');
+
+        // presentation of totalised datasize percentages
+        var total_size = 0;
+        var total_size_uploaded = 0;
+        // presentation of totalised file counts
+        var count_total = 0;
+        var count_total_completed = 0;
+        $.each(r.files, function(key, flow_file) { 
+            // id has to be present in frontend as r.files contains all files (including the ones already uploaded)
+            if($('#'+flow_file.uniqueIdentifier).length) {
+                // size totals
+                total_size += flow_file.size;
+                total_size_uploaded += flow_file.size*flow_file.progress();
+                // count totals
+                count_total++;
+                if (flow_file.progress()==1) {
+                    count_total_completed++;
+                }
+            }
+        });
+        $('.uploads-progress-information').html('&nbsp;-&nbsp;completed ' + count_total_completed.toString() + ' of ' + count_total.toString());
+        $('.uploads-total-progress-bar').css('width', Math.floor((total_size_uploaded/total_size)*100) + '%');
+        $('.uploads-total-progress-bar-perc').html(Math.floor((total_size_uploaded/total_size)*100) + '%');
     });
 
     $("body").on("dragbetterenter",function(event){
@@ -1156,6 +1210,9 @@ function topInformation(dir, showAlert)
             // Add unpreservable files check to actions.
             actions['check-for-unpreservable-files'] = 'Check for compliance with policy';
 
+            // Add checksum report
+            actions['show-checksum-report'] = 'Show checksum report';
+
             // Add go to vault to actions.
             if (typeof vaultPath != 'undefined' ) {
                 actions['go-to-vault'] = 'Go to vault';
@@ -1204,6 +1261,7 @@ function handleActionsList(actions, folder)
 
     var possibleVaultActions = ['cleanup',
                                 'check-for-unpreservable-files',
+                                'show-checksum-report',
                                 'go-to-vault'];
 
     $.each(possibleActions, function( index, value ) {

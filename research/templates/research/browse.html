@@ -51,6 +51,24 @@
     </div>
 </div>
 
+<div class="modal" tabindex="-1" role="dialog" id="showChecksumReport">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Checksum report for <span class="collection"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal" tabindex="-1" role="dialog" id="cleanup-collection">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -277,7 +295,17 @@
     <div class="modal-dialog mw-100 w-75">
         <div class="modal-content">
             <div class="modal-header" id="uploads_header">
-                <h5 class="modal-title">Uploads</h5>
+                <div class="col-md-6">
+                    <h5 class="modal-title">Uploads
+                        <span class="uploads-progress-information"></span>
+                    </h5>
+                </div>
+                <div class="col-md-3">
+                    <div class="progress position-relative">
+                        <div class="progress-bar progress-bar-striped bg-info uploads-total-progress-bar" style="width: 0%;"></div>
+                        <small class="justify-content-center d-flex position-absolute w-100 uploads-total-progress-bar-perc"></small>
+                    </div>
+                </div>
                 <button type="button" class="btn-close btn-close-uploads-overview" data-bs-dismiss="modal" aria-label="Close" title="Close"></button>
             </div>
             <div class="modal-body">
