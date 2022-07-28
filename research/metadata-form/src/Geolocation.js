@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
 import Modal from 'react-modal';
-import { Map, TileLayer, Marker, FeatureGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, FeatureGroup } from 'react-leaflet';
 import L from 'leaflet';
 import { EditControl } from "react-leaflet-draw";
 
@@ -237,7 +237,7 @@ class Geolocation extends React.Component {
                     style={customModalStyles}
                     ariaHideApp={false}
                 >
-                    <Map ref='map' center={[48.760, 13.275]} zoom={4} animate={false}>
+                    <MapContainer ref='map' center={[48.760, 13.275]} zoom={4} animate={false}>
                         <TileLayer
                             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -262,7 +262,7 @@ class Geolocation extends React.Component {
                                 }}
                             />
                         </FeatureGroup>
-                    </Map>
+                    </MapContainer>
 
                     <div className='row'>
                         <div className='col-sm-12 mt-1'>
