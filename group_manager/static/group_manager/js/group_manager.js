@@ -448,7 +448,7 @@ $(function() {
 
             // Fix bad bootstrap borders caused by hidden elements.
             $userPanel.find('.card-header').css({ borderBottom: ''               });
-            $userPanel.find('.card-footer').css( { borderTop:    '1px solid #ddd' });
+            $userPanel.find('.card-footer').css({ borderTop:    '1px solid #ddd' });
 
             Yoda.storage.session.remove('selected-group');
         },
@@ -1275,10 +1275,6 @@ $(function() {
 
             // Group list search.
             $('#group-list-search').on('keyup', function() {
-                // TODO: Figure out how to correctly hide / show collapsible Bootstrap elements.
-                return;
-
-                /*
                 $groupList  = $('#group-list');
 
                 var $categories   = $groupList.find('.category');
@@ -1303,7 +1299,6 @@ $(function() {
                     if ($selected.length)
                         that.unfoldToGroup($selected.attr('data-name'));
                 }
-                 */
             });
 
             // Group creation {{{
