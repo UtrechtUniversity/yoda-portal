@@ -3,13 +3,16 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import binascii
 import io
 import os
 from typing import Iterator
 
 from flask import abort, Blueprint, g, jsonify, make_response, render_template, request, Response, stream_with_context
+from irods.column import Like
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
+from irods.models import Collection, DataObject
 from werkzeug.utils import secure_filename
 
 research_bp = Blueprint('research_bp', __name__,
@@ -117,6 +120,11 @@ def upload_get() -> Response:
     # Partial file name for chunked uploads.
     if flow_total_chunks > 1:
         object_path = f"{object_path}.part"
+    else:
+        # Ensuring single chunk files get to the overwrite stage as well
+        response = make_response(jsonify({"message": "Chunk not found"}), 204)
+        response.headers["Content-Type"] = "application/json"
+        return response
 
     try:
         obj = session.data_objects.get(object_path)
@@ -192,10 +200,37 @@ def upload_post() -> Response:
     # Rename partial file name when complete for chunked uploads.
     if flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
         final_object_path = build_object_path(filepath, flow_relative_path, flow_filename)
+        try:
+            # overwriting doesn't work using the move command, therefore unlink the previous file first
+            session.data_objects.unlink(final_object_path, force=True)
+        except Exception:
+            # Probably there was no file present which is no erroneous situation
+            pass
         session.data_objects.move(object_path, final_object_path)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
     response.headers["Content-Type"] = "application/json"
+    return response
+
+
+def decode_cksum(cksum: str) -> str:
+    if cksum is None:
+        return "0"
+    else:
+        return binascii.hexlify(binascii.a2b_base64(cksum[5:])).decode("UTF-8")
+
+
+@research_bp.route('/manifest')
+def manifest() -> Response:
+    dir = os.path.join("/" + g.irods.zone, "home", request.args.get("filepath"))
+    session = g.irods
+    length = len(dir) + 1
+    q = session.query(Collection.name, DataObject.name, DataObject.checksum).filter(Like(Collection.name, dir + "%"))
+    dict = {(row[Collection.name] + "/")[length:] + row[DataObject.name]: decode_cksum(row[DataObject.checksum]) for row in q}
+    response = jsonify({
+        "manifest": [{"name": name, "checksum": checksum} for name, checksum in dict.items()]
+    })
+    response.status_code = 200
     return response
 
 

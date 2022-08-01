@@ -397,8 +397,14 @@ function loadForm() {
 
         } else if (formProperties.data.metadata === null && !formProperties.data.can_edit) {
             // No metadata present and no write access. Do not show a form.
+            $('#metadata-form').removeClass('hide');
             $('#form').addClass('hide');
-            $('#no-metadata').removeClass('hide');
+            if (formProperties.data.is_locked) {
+                $('#no-metadata-and-locked').removeClass('hide');
+            }
+            else {
+                $('#no-metadata').removeClass('hide');
+            }
 
         } else {
             // Metadata present or user has write access, load the form.
@@ -413,6 +419,27 @@ function loadForm() {
                 $('#metadata-form').fadeIn(220);
                 $('#metadata-form').removeClass('hide');
             }
+
+            // Specific required textarea handling 
+            $('textarea').each(function() {
+                if ($(this).attr('required')) {
+                    // initial setting when form is opened
+                    if ($(this).val()=='') {
+                        $(this).addClass('is-invalid');
+                    }
+                    // following changes in the required textarea and adjust border status
+                    $(this).on("change keyup paste", function() {
+                        if ($(this).val()=='') {
+                            if (!$(this).hasClass('is-invalid')) {
+                                $(this).addClass('is-invalid');
+                            }
+                        }
+                        else {
+                            $(this).removeClass('is-invalid');
+                        }
+                    });
+                }
+            })
 
             updateCompleteness();
         }
