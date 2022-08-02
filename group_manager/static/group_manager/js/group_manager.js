@@ -1280,13 +1280,16 @@ $(function() {
                 var $groups       = $groupList.find('.group');
 
                 if ($(this).val().length) {
+                    // Filter all group not matching search value.
                     var quotedVal = Yoda.escapeQuotes($(this).val());
                     $groups.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered');
                     $groups.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered');
 
+                    // Loop through categories and filter out empty categories.
                     $categories.each(function() {
                         var $subcategories = $(this).find('.subcategory-ul');
                         var emptyCategory = true;
+                        // Loop through subcategories and filter out empty subcategories.
                         $subcategories.each(function() {
                             if($(this).children(':not(.filtered)').length == 0) {
                                 $(this).parent().addClass('filtered');
@@ -1300,6 +1303,7 @@ $(function() {
                         }
                     });
                 } else {
+                    // Reset all filters.
                     var $filtered = $groupList.find('.filtered');
                     $filtered.each(function() {
                         $(this).removeClass('filtered');
