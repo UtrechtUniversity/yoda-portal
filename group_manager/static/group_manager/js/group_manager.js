@@ -9,6 +9,30 @@
 "use strict";
 
 $(function() {
+    console.log('1')
+    $('.user-search-groups').click(function(){
+        console.log('blabla');
+        $('#result-user-search-groups').html('');
+        $('#input-user-search-groups').val('');
+        $('#user-search-groups').modal('show');
+    });
+    $('.btn-user-search-groups').click(function(){
+        console.log($('#input-user-search-groups').val());
+         $('#result-user-search-groups').html('');
+        let username = $('#input-user-search-groups').val();
+        Yoda.call('group_get_user_groups', {username: username}).then((data) => {
+            if (data.length==0){
+                $('#result-user-search-groups').html("No groups found for user " + username);
+                return;
+            }
+
+            $.each(data, function(index, usergroup) {
+                let div_usergroup = '<div class="col-md-12">' + usergroup + '</div>';
+                $('#result-user-search-groups').append(div_usergroup);
+            });
+        });
+    });
+
     Yoda.groupManager = {
 
         /**

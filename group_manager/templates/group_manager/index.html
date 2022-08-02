@@ -19,7 +19,15 @@
 {% endblock scripts %}
 
 {% block content %}
-<h1>Group Manager</h1>
+<div class="row">
+    <div class="col-md-6">
+        <h1>Group manager</h1>
+    </div>
+    <div class="col-md-6">
+        <button type="button" class="btn btn-primary user-search-groups float-end" title="Search groups for users"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Search groups for user</button>
+    </div>
+</div>
+
 
 <div class="row">
 	<div class="col-md-5">
@@ -136,7 +144,7 @@
 			</div>
 			<div class="list-group" id="user-list">
 				<div class="list-group-item item-user-create" hidden>
-					<a class="user-create-text" href="#" onclick="return false;">
+					<ia class="user-create-text" href="#" onclick="return false;">
 						Click here to add a new member to this group
 					</a>
 					<form action="{{ url_for('group_manager_bp.user_create') }}" method="POST" class="form-inline hidden" id="f-user-create">
@@ -160,6 +168,28 @@
 			</div>
 		</div>
 	</div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="user-search-groups">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Search groups for user</h5>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <input type="text" class="form-control" id='input-user-search-groups' value="" placeholder="Enter name of user">
+                    </div>
+                     <button class='btn btn-primary btn-user-search-groups' data-path=""> Find groups</button>
+                </div>
+                <hr>
+                <div id="result-user-search-groups"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="modal-group-create" role="dialog">
