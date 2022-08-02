@@ -2,7 +2,7 @@
  * \file
  * \brief     Yoda Group Manager frontend.
  * \author    Chris Smeele
- * \copyright Copyright (c) 2015-2018, Utrecht University
+ * \copyright Copyright (c) 2015-2022, Utrecht University
  * \license   GPLv3, see LICENSE
  */
 
@@ -1259,7 +1259,6 @@ $(function() {
                 }
             });
 
-
             $groupList.on('hide.bs.collapse', function(e) {
                 $(e.target).parent('.list-group-item').find('.triangle').first()
                     .removeClass('fa-caret-down')
@@ -1278,26 +1277,33 @@ $(function() {
                 $groupList  = $('#group-list');
 
                 var $categories   = $groupList.find('.category');
-                var $collapsibles = $categories.children('ul');
                 var $groups       = $groupList.find('.group');
 
-                var quotedVal = Yoda.escapeQuotes($(this).val());
+                if ($(this).val().length) {
+                    var quotedVal = Yoda.escapeQuotes($(this).val());
+                    $groups.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered');
+                    $groups.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered');
 
-                $collapsibles.css('transition', 'none');
-                //$collapsibles.collapse('hide');
-                $collapsibles.addClass('hidden');
+                    $categories.each(function() {
+                        var $subcategories = $(this).find('.subcategory-ul');
+                        var emptyCategory = true;
+                        $subcategories.each(function() {
+                            if($(this).children(':not(.filtered)').length == 0) {
+                                $(this).parent().addClass('filtered');
+                            } else {
+                                emptyCategory = false;
+                            }
+                        });
 
-                if (quotedVal.length) {
-                    var $matches = $groups.filter('[data-name*="' + quotedVal + '"]');
-                    $matches.each(function() { unfoldToGroup($(this).attr('data-name')); });
+                        if (emptyCategory) {
+                            $(this).addClass('filtered');
+                        }
+                    });
                 } else {
-                    //$categories.children('ul').collapse('hide');
-                    //$categories.children('ul:not(.in)').addClass('collapse');
-                    //$categories.children('a.name:not(.collapsed)').addClass('collapsed');
-
-                    var $selected = $groups.filter('.active');
-                    if ($selected.length)
-                        that.unfoldToGroup($selected.attr('data-name'));
+                    var $filtered = $groupList.find('.filtered');
+                    $filtered.each(function() {
+                        $(this).removeClass('filtered');
+                    });
                 }
             });
 
@@ -1482,15 +1488,15 @@ $(function() {
             for (var groupName in this.groups) {
                 if (this.isManagerOfGroup(groupName)) {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                        '<i class="float-end fa-regular fa-user-circle" title="You manage this group"></i>'
+                        '<i class="float-end fa-regular fa-user-circle mt-1" title="You manage this group"></i>'
                     );
                 } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                        '<i class="float-end fa-solid fa-wrench" title="You are not a member of this group, but you can manage it as an iRODS administrator."></i>'
+                        '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator."></i>'
                     );
                 } else if (this.groups[groupName].members[this.userNameFull].access == 'reader') {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                        '<i class="float-end fa-solid fa-eye" title="You have read access to this group"></i>'
+                        '<i class="float-end fa-solid fa-eye mt-1" title="You have read access to this group"></i>'
                     );
                 }
             }
