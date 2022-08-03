@@ -408,6 +408,7 @@ $(function() {
                 $userList.find('#f-user-create-group').val(groupName);
 
                 var $userPanel = $('.card.users');
+                $userPanel.find('#user-list').removeClass('hidden');
                 $userPanel.find('.card-body:has(.placeholder-text)').addClass('hidden');
 
                 // Fix bad bootstrap borders caused by hidden elements.
