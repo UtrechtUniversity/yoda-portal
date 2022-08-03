@@ -9,7 +9,6 @@
 "use strict";
 
 $(function() {
-    console.log('1')
     $('.user-search-groups').click(function(){
         console.log('blabla');
         $('#result-user-search-groups').html('');
@@ -17,19 +16,27 @@ $(function() {
         $('#user-search-groups').modal('show');
     });
     $('.btn-user-search-groups').click(function(){
-        console.log($('#input-user-search-groups').val());
-         $('#result-user-search-groups').html('');
-        let username = $('#input-user-search-groups').val();
-        Yoda.call('group_get_user_groups', {username: username}).then((data) => {
-            if (data.length==0){
-                $('#result-user-search-groups').html("No groups found for user " + username);
-                return;
+        var hier = Yoda.groupManager.groupHierarchy;
+        let username = $('#input-user-search-groups').val() + '#' + Yoda.groupManager.zone;
+        var isDatamanager = false;
+        var data = []
+        for (var categoryName in hier) {
+            for (var subcategoryName in hier[categoryName]) {
+                for (var groupName in hier[categoryName][subcategoryName]) {
+                    if (hier[categoryName][subcategoryName][groupName].members[username] != undefined) {
+                        data.push(groupName);
+                    }
+                }
             }
-
-            $.each(data, function(index, usergroup) {
-                let div_usergroup = '<div class="col-md-12">' + usergroup + '</div>';
-                $('#result-user-search-groups').append(div_usergroup);
-            });
+        }
+        $('#result-user-search-groups').html('');
+        if (data.length==0){
+            $('#result-user-search-groups').html("No groups found for user " + username);
+            return;
+        }
+        $.each(data, function(index, usergroup) {
+            let div_usergroup = '<div class="col-md-12">' + usergroup + '</div>';
+            $('#result-user-search-groups').append(div_usergroup);
         });
     });
 
@@ -1229,14 +1236,16 @@ $(function() {
         load: function(groupHierarchy, userType, userZone) {
             this.groupHierarchy = groupHierarchy;
             this.isRodsAdmin    = userType == 'rodsadmin';
+            this.isDatamanager  = false;
             this.zone           = userZone;
             this.userNameFull   = Yoda.user.username + '#' + userZone;
-            this.groups         = (function(hier) {
+            this.groupdata      = (function(hier, userfullname) {
                 // Create a flat group map based on the hierarchy object.
                 var groups = { };
-                for (var categoryName in hier)
-                    for (var subcategoryName in hier[categoryName])
-                        for (var groupName in hier[categoryName][subcategoryName])
+                var isDm = false;
+                for (var categoryName in hier) {
+                    for (var subcategoryName in hier[categoryName]) {
+                        for (var groupName in hier[categoryName][subcategoryName]) {
                             groups[groupName] = {
                                 category:    categoryName,
                                 subcategory: subcategoryName,
@@ -1245,12 +1254,26 @@ $(function() {
                                 data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
                                 members:     hier[categoryName][subcategoryName][groupName].members
                             };
-                return groups;
-            })(this.groupHierarchy);
 
+                            if (groupName.startsWith('datamanager-')) {
+                                if (hier[categoryName][subcategoryName][groupName].members[userfullname] != undefined) {
+                                    isDm = true;
+                                }
+                            }
+                        }
+                    }
+                } 
+                return [groups, isDm];
+            })(this.groupHierarchy, this.userNameFull);
+            this.groups = this.groupdata[0];
+            this.isDatamanager = this.groupdata[1];
             var that = this;
             var $groupList = $('#group-list');
 
+            // prepare search for groups button based on username. Only allowed for rodsadmin and datamanagers.
+            if (this.isRodsAdmin || this.isDatamanager) {
+                $('.div-show-search-groups').removeClass('hidden');
+            }
             // Attach event handlers {{{
             // Generic {{{
 
@@ -1282,7 +1305,6 @@ $(function() {
                     subs.first().children('.subcategory-ul').collapse('show');
                 }
             });
-
 
             $groupList.on('hide.bs.collapse', function(e) {
                 $(e.target).parent('.list-group-item').find('.triangle').first()
