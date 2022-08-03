@@ -570,7 +570,7 @@ function ArrayFieldTemplate(props) {
                                 <div className="d-flex flex-row">
                                     {el.hasMoveUp && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm"
+                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onReorderClick(
                                                         el.index,
                                                         el.index - 1
@@ -582,7 +582,7 @@ function ArrayFieldTemplate(props) {
 
                                     {el.hasMoveDown && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm"
+                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onReorderClick(
                                                         el.index,
                                                         el.index + 1
@@ -594,7 +594,7 @@ function ArrayFieldTemplate(props) {
 
                                     {el.hasRemove && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm"
+                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onDropIndexClick(el.index)}>
                                                 <i className="fa-solid fa-trash" aria-hidden="true"></i>
                                             </button>
