@@ -10,7 +10,6 @@
 
 $(function() {
     $('.user-search-groups').click(function(){
-        console.log('blabla');
         $('#result-user-search-groups').html('');
         $('#input-user-search-groups').val('');
         $('#user-search-groups').modal('show');
