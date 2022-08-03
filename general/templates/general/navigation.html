@@ -8,9 +8,11 @@
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 {% for module in config.get('modules') %}
+                    {% if module.function != "stats_bp.index" and module.function != "group_manager_bp.index" %}
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == url_for(module.function) %}active{% endif %}" href="{{ url_for(module.function) }}">{{ module.name }}</a>
                     </li>
+                    {% endif %}
                 {% endfor %}
             </ul>
         </div>
