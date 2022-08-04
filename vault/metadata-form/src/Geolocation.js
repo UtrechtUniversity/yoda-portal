@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
 import Modal from 'react-modal';
-import { Map, TileLayer, Marker, FeatureGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, FeatureGroup } from 'react-leaflet';
 import L from 'leaflet';
 import { EditControl } from "react-leaflet-draw";
 
@@ -16,7 +16,7 @@ const customModalStyles = {
         bottom                : 'auto',
         marginRight           : '-50%',
         transform             : 'translate(-50%, -50%)',
-        width                 : '58%',
+        width                 : '70%',
         height                : '625px',
     }
 };
@@ -25,7 +25,7 @@ class Geolocation extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            showModal: false,
+            //showModal: false,
             ...props.formData
         };
 
@@ -38,6 +38,7 @@ class Geolocation extends React.Component {
         this.drawStop = this.drawStop.bind(this);
         this.setFormData = this.setFormData.bind(this);
         this.geoBoxID = globalGeoBoxCounter;
+        this.showModal = false;
         globalGeoBoxCounter++;
     }
 
@@ -45,20 +46,20 @@ class Geolocation extends React.Component {
         e.preventDefault();
 
         globalThis = this; // @todo: get rid of this dirty trick
-
-        this.setState({showModal: true});
+        this.showModal = true;
+        this.setState(this.state);
     }
 
     closeModal(e) {
         e.preventDefault();
 
-        delete this.state["showModal"];
+        this.showModal = false;
         this.setState(this.state);
     }
 
     afterOpenModal(e) {
         const {northBoundLatitude, westBoundLongitude, southBoundLatitude, eastBoundLongitude} = this.state;
-        let map = this.refs.map.leafletElement;
+        let map = this.refs.map;
         if (typeof northBoundLatitude !== 'undefined' &&
             typeof westBoundLongitude !== 'undefined' &&
             typeof southBoundLatitude !== 'undefined' &&
@@ -204,7 +205,7 @@ class Geolocation extends React.Component {
     }
 
     drawStop(e) {
-        let map = this.refs.map.leafletElement;
+        let map = this.refs.map;
         map.eachLayer(function (layer) {
             if (layer instanceof L.Marker || layer instanceof L.Rectangle) {
                 map.removeLayer(layer);
@@ -230,13 +231,13 @@ class Geolocation extends React.Component {
                 </div>
 
                 <Modal
-                    isOpen={this.state.showModal}
+                    isOpen={this.showModal}
                     onAfterOpen={this.afterOpenModal}
                     onRequestClose={this.closeModal}
                     style={customModalStyles}
                     ariaHideApp={false}
                 >
-                    <Map ref='map' center={[48.760, 13.275]} zoom={4} animate={false}>
+                    <MapContainer ref='map' center={[48.760, 13.275]} zoom={4} animate={false}>
                         <TileLayer
                             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -261,7 +262,7 @@ class Geolocation extends React.Component {
                                 }}
                             />
                         </FeatureGroup>
-                    </Map>
+                    </MapContainer>
 
                     <div className='row'>
                         <div className='col-sm-12 mt-1'>
