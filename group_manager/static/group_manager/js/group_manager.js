@@ -10,8 +10,8 @@
 
 $(function() {
     $('.user-search-groups').click(function(){
-        $('#result-user-search-groups').html('');
-        $('#input-user-search-groups').val('');
+        // $('#result-user-search-groups').html('');
+        // $('#input-user-search-groups').val('');
         $('#user-search-groups').modal('show');
     });
     $('.btn-user-search-groups').click(function(){
@@ -23,7 +23,7 @@ $(function() {
             for (var subcategoryName in hier[categoryName]) {
                 for (var groupName in hier[categoryName][subcategoryName]) {
                     if (hier[categoryName][subcategoryName][groupName].members[username] != undefined) {
-                        data.push(groupName);
+                        data.push([groupName, hier[categoryName][subcategoryName][groupName].members[username]['access']]);
                     }
                 }
             }
@@ -34,8 +34,16 @@ $(function() {
             return;
         }
         $.each(data, function(index, usergroup) {
-            let div_usergroup = '<div class="col-md-12">' + usergroup + '</div>';
+            let div_usergroup = '<div class="col-md-12 user-search-result-group" style="cursor: pointer;" user-search-result-group="' + usergroup[0] + '">';
+            div_usergroup += '<i class="fa-solid ' + Yoda.groupManager.accessIcons[usergroup[1]] + '" title="' + Yoda.groupManager.accessNames[usergroup[1]] + '"></i> ';
+            div_usergroup += usergroup[0] + '</div>';
             $('#result-user-search-groups').append(div_usergroup);
+        });
+        $('.user-search-result-group').click(function() {
+             $('#user-search-groups').modal('hide');
+             let groupName = $(this).attr('user-search-result-group');
+             Yoda.groupManager.unfoldToGroup(groupName);
+             Yoda.groupManager.selectGroup(groupName);
         });
     });
 
@@ -302,6 +310,8 @@ $(function() {
             this.deselectGroup();
 
             this.unfoldToGroup(groupName);
+
+            $('#group-properties-title').html('Group properties - <strong>' + groupName + '</strong>');
 
             $oldGroup.removeClass('active');
             $group.addClass('active');
@@ -1235,13 +1245,11 @@ $(function() {
         load: function(groupHierarchy, userType, userZone) {
             this.groupHierarchy = groupHierarchy;
             this.isRodsAdmin    = userType == 'rodsadmin';
-            this.isDatamanager  = false;
             this.zone           = userZone;
             this.userNameFull   = Yoda.user.username + '#' + userZone;
-            this.groupdata      = (function(hier, userfullname) {
+            this.groups         = (function(hier) {
                 // Create a flat group map based on the hierarchy object.
                 var groups = { };
-                var isDm = false;
                 for (var categoryName in hier) {
                     for (var subcategoryName in hier[categoryName]) {
                         for (var groupName in hier[categoryName][subcategoryName]) {
@@ -1254,25 +1262,14 @@ $(function() {
                                 members:     hier[categoryName][subcategoryName][groupName].members
                             };
 
-                            if (groupName.startsWith('datamanager-')) {
-                                if (hier[categoryName][subcategoryName][groupName].members[userfullname] != undefined) {
-                                    isDm = true;
-                                }
-                            }
                         }
                     }
                 } 
-                return [groups, isDm];
-            })(this.groupHierarchy, this.userNameFull);
-            this.groups = this.groupdata[0];
-            this.isDatamanager = this.groupdata[1];
+                return groups;
+            })(this.groupHierarchy);
             var that = this;
             var $groupList = $('#group-list');
 
-            // prepare search for groups button based on username. Only allowed for rodsadmin and datamanagers.
-            if (this.isRodsAdmin || this.isDatamanager) {
-                $('.div-show-search-groups').removeClass('hidden');
-            }
             // Attach event handlers {{{
             // Generic {{{
 
