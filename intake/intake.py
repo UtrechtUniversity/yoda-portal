@@ -67,7 +67,7 @@ def index() -> Response:
         # Store in current session for purpose when study_id is missing in requests
         session['study_id'] = study_id
 
-        intake_path = '/' + g.irods.zone + '/home/' + qualified_study_id # permissions['group_path'] + study_id
+        intake_path = '/' + g.irods.zone + '/home/' + qualified_study_id  # permissions['group_path'] + study_id
 
         result = api.call('browse_collections', {'coll': intake_path,
                                                  'sort_on': 'name',
