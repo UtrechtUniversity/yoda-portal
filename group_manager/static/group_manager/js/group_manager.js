@@ -9,6 +9,52 @@
 "use strict";
 
 $(function() {
+    $('.user-search-groups').click(function(){
+        // $('#result-user-search-groups').html('');
+        // $('#input-user-search-groups').val('');
+        $('#user-search-groups').modal('show');
+    });
+    $('.btn-user-search-groups').click(function(){
+        var hier = Yoda.groupManager.groupHierarchy;
+        let username = $('#input-user-search-groups').val() + '#' + Yoda.groupManager.zone;
+        var isDatamanager = false;
+        var data = []
+        for (var categoryName in hier) {
+            for (var subcategoryName in hier[categoryName]) {
+                for (var groupName in hier[categoryName][subcategoryName]) {
+                    if (hier[categoryName][subcategoryName][groupName].members[username] != undefined) {
+                        data.push([groupName, hier[categoryName][subcategoryName][groupName].members[username]['access']]);
+                    }
+                }
+            }
+        }
+        $('#result-user-search-groups').html('');
+        if (data.length==0){
+            $('#result-user-search-groups').html("No groups found for user " + username);
+            return;
+        }
+
+        // Build result table.
+        let table = '<table class="table table-striped"><tbody>';
+        $.each(data, function(index, usergroup) {
+            table += `<tr>
+                 <td class="user-search-result-group" style="cursor: pointer"  user-search-result-group="${usergroup[0]}">
+                    <i class="fa-solid ${Yoda.groupManager.accessIcons[usergroup[1]]}" title="${Yoda.groupManager.accessNames[usergroup[1]]}"></i>
+                    ${usergroup[0]}
+                 </td>
+            </tr>`;
+        });
+        table += '</tbody></table>';
+        $('#result-user-search-groups').html(table);
+
+        $('.user-search-result-group').click(function() {
+             $('#user-search-groups').modal('hide');
+             let groupName = $(this).attr('user-search-result-group');
+             Yoda.groupManager.unfoldToGroup(groupName);
+             Yoda.groupManager.selectGroup(groupName);
+        });
+    });
+
     Yoda.groupManager = {
 
         /**
@@ -272,6 +318,8 @@ $(function() {
             this.deselectGroup();
 
             this.unfoldToGroup(groupName);
+
+            $('#group-properties-title').html('Group properties - <strong>' + groupName + '</strong>');
 
             $oldGroup.removeClass('active');
             $group.addClass('active');
@@ -1211,9 +1259,9 @@ $(function() {
             this.groups         = (function(hier) {
                 // Create a flat group map based on the hierarchy object.
                 var groups = { };
-                for (var categoryName in hier)
-                    for (var subcategoryName in hier[categoryName])
-                        for (var groupName in hier[categoryName][subcategoryName])
+                for (var categoryName in hier) {
+                    for (var subcategoryName in hier[categoryName]) {
+                        for (var groupName in hier[categoryName][subcategoryName]) {
                             groups[groupName] = {
                                 category:    categoryName,
                                 subcategory: subcategoryName,
@@ -1222,9 +1270,12 @@ $(function() {
                                 data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
                                 members:     hier[categoryName][subcategoryName][groupName].members
                             };
+
+                        }
+                    }
+                }
                 return groups;
             })(this.groupHierarchy);
-
             var that = this;
             var $groupList = $('#group-list');
 
