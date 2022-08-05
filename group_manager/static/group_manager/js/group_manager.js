@@ -33,12 +33,18 @@ $(function() {
             $('#result-user-search-groups').html("No groups found for user " + username);
             return;
         }
+
+        // Build result table.
+        let table = '<table class="table table-striped"><tbody>';
         $.each(data, function(index, usergroup) {
-            let div_usergroup = '<div class="col-md-12 user-search-result-group" style="cursor: pointer;" user-search-result-group="' + usergroup[0] + '">';
-            div_usergroup += '<i class="fa-solid ' + Yoda.groupManager.accessIcons[usergroup[1]] + '" title="' + Yoda.groupManager.accessNames[usergroup[1]] + '"></i> ';
-            div_usergroup += usergroup[0] + '</div>';
-            $('#result-user-search-groups').append(div_usergroup);
+            table += `<tr>
+                 <td><i class="fa-solid ${Yoda.groupManager.accessIcons[usergroup[1]]}" title="${Yoda.groupManager.accessNames[usergroup[1]]}"></i></td>
+                 <td class="user-search-result-group" style="cursor: pointer"  user-search-result-group="${usergroup[0]}">${usergroup[0]}</td>
+            </tr>`;
         });
+        table += '</tbody></table>';
+        $('#result-user-search-groups').html(table);
+
         $('.user-search-result-group').click(function() {
              $('#user-search-groups').modal('hide');
              let groupName = $(this).attr('user-search-result-group');
@@ -1265,7 +1271,7 @@ $(function() {
 
                         }
                     }
-                } 
+                }
                 return groups;
             })(this.groupHierarchy);
             var that = this;
