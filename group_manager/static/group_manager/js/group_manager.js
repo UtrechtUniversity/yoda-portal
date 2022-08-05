@@ -38,8 +38,10 @@ $(function() {
         let table = '<table class="table table-striped"><tbody>';
         $.each(data, function(index, usergroup) {
             table += `<tr>
-                 <td><i class="fa-solid ${Yoda.groupManager.accessIcons[usergroup[1]]}" title="${Yoda.groupManager.accessNames[usergroup[1]]}"></i></td>
-                 <td class="user-search-result-group" style="cursor: pointer"  user-search-result-group="${usergroup[0]}">${usergroup[0]}</td>
+                 <td class="user-search-result-group" style="cursor: pointer"  user-search-result-group="${usergroup[0]}">
+                    <i class="fa-solid ${Yoda.groupManager.accessIcons[usergroup[1]]}" title="${Yoda.groupManager.accessNames[usergroup[1]]}"></i>
+                    ${usergroup[0]}
+                 </td>
             </tr>`;
         });
         table += '</tbody></table>';
