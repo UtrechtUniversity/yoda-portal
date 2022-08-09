@@ -15,6 +15,9 @@ from irods.message import iRODSMessage
 from irods.models import Collection, DataObject
 from werkzeug.utils import secure_filename
 
+import api
+import json
+
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
                         static_folder='static/research',
@@ -239,3 +242,18 @@ def form() -> Response:
     path = request.args.get('path')
 
     return render_template('research/metadata-form.html', path=path)
+
+
+@research_bp.route('/browse/download_checksum_report')
+def download_report() -> Response:
+    dir = os.path.join("/" + g.irods.zone, "home", request.args.get("path"))
+
+    response = api.call('research_manifest', data={'col': dir})
+    data = json.loads(response['data'])
+
+    return Response(
+        'File content...',
+        mimetype='text/plain',
+        headers={'Content-disposition': 'attachment; filename=checksums.txt'}
+    )
+
