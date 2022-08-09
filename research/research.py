@@ -226,8 +226,9 @@ def download_report() -> Response:
     response = api.call('research_manifest', data={'coll': coll})
 
     output = ""
-    for result in response["data"]:
-        output += f"{result['name']} {result['checksum']} \n"
+    if response['status'] == 'ok':
+        for result in response["data"]:
+            output += f"{result['name']} {result['checksum']} \n"
 
     return Response(
         output,
