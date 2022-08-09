@@ -246,13 +246,16 @@ def form() -> Response:
 
 @research_bp.route('/browse/download_checksum_report')
 def download_report() -> Response:
-    dir = os.path.join("/" + g.irods.zone, "home", request.args.get("path"))
+    path = request.args.get("path")
+    coll = "/" + g.irods.zone + "/home" + path
+    response = api.call('research_manifest', data={'coll': coll})
 
-    response = api.call('research_manifest', data={'col': dir})
-    data = json.loads(response['data'])
+    output = ""
+    for result in response["data"]:
+        output += f"{result['name']} {result['checksum']} \n"
 
     return Response(
-        'File content...',
+        output,
         mimetype='text/plain',
         headers={'Content-disposition': 'attachment; filename=checksums.txt'}
     )
