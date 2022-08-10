@@ -10,7 +10,7 @@ from typing import Any, Dict, Optional
 
 import jsonavu
 from flask import Blueprint, jsonify, render_template, request, Response
-from opensearchpy import OpenSearch
+from opensearchpy import ConnectionError, OpenSearch
 
 open_search_bp = Blueprint('open_search_bp', __name__,
                            template_folder='templates',
