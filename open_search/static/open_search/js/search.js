@@ -161,23 +161,36 @@ function search(term, page, itemsPerPage, sort, sortOrder, facets = [], filters=
         },
         {'quiet': true, 'rawResult': true}
     ).then((data) => {
-        let html = '';
-        let results = data.total_matches;
-        if (results) {
-            buildFacets(data.facets);
-            $(data.matches).each(function(index, element) {
-                let attr = {};
-                $(element.attributes).each(function(index, attribute) {
-                    attr[attribute.name] = attribute.value;
+        if (data.status === 200) {
+            let html = '';
+            let results = data.total_matches;
+            if (results) {
+                buildFacets(data.facets);
+                $(data.matches).each(function(index, element) {
+                    let attr = {};
+                    $(element.attributes).each(function(index, attribute) {
+                        attr[attribute.name] = attribute.value;
+                    });
+                    html += itemTemplate(attr);
                 });
-                html += itemTemplate(attr);
-            });
+            }
+            
+            buildPagination(results);
+            $('#search-results').html(html);
+            load(false, results);
         } else {
-            //$('.no-results .search-term').text(term);
+            let text;
+            if (data.status === 503) {
+                // openSearch connection failure
+                text = "We're sorry, but search looks offline. Please contact your IT support department.";
+            } else {
+                text = "We're sorry, but something went wrong. Please contact your IT support department.";
+            }
+
+            $('.no-results p').text(text);
+            $('.no-results').removeClass('hide');
+            load(false, false);
         }
-        buildPagination(results);
-        $('#search-results').html(html);
-        load(false, results);
     });
 }
 
@@ -429,6 +442,7 @@ OpenSearchApi.call = async function(data={}, options={}) {
                 'credentials': 'same-origin',
             });
         } catch (error) {
+            console.log(error);
             // Network failure / abort.
             console.error(`API Error: ${error}`);
             return errorResult('Your request could not be completed due to a network connection issue.'
@@ -438,7 +452,7 @@ OpenSearchApi.call = async function(data={}, options={}) {
             // API responses should either produce 200, 400 or 500.
             // Any other status code indicates an internal error without (human-readable) information.
             console.error(`API Error: HTTP status ${r.status}`);
-            return errorResult();
+            return Promise.reject({'data': null, 'status': r.status});
         }
         try {
             var j = await r.json();
@@ -447,7 +461,7 @@ OpenSearchApi.call = async function(data={}, options={}) {
             return errorResult();
         }
 
-        if (j.status === 'ok') {
+        if (j.status === 200) {
             return Promise.resolve(j);
         }
         return Promise.reject(j);
