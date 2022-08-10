@@ -32,143 +32,6 @@ def index() -> Response:
                            searchTerm=searchTerm)
 
 
-@open_search_bp.route('/query', methods=['POST'])
-def _query() -> Response:
-    data = json.loads(request.form['data'])
-    name = data['name']
-    value = data['value']
-    if 'from' in data:
-        start = data['from']
-        size = data['size']
-    else:
-        start = 0
-        size = 500
-    if 'sort' in data:
-        sort = data['sort']
-    else:
-        sort = None
-    if 'reverse' in data:
-        reverse = data['reverse']
-    else:
-        reverse = False
-
-    res = query(name, value, start=start, size=size, sort=sort, reverse=reverse)
-    code = 200
-
-    if res['status'] != 'ok':
-        code = 400
-
-    response = jsonify(res)
-    response.status_code = code
-    return response
-
-
-def query(name: str, value: str,
-          start: int = 0, size: int = 500,
-          sort: Optional[str] = None,
-          reverse: bool = False) -> Dict[str, Any]:
-    result = {
-        'query': {
-            'name': name,
-            'value': value,
-            'from': start,
-            'size': size
-        },
-        'matches': [],
-        'total_matches': 0
-    }
-
-    try:
-        client = OpenSearch(
-            hosts=[{'host': open_search_host, 'port': open_search_port}],
-            http_compress=True
-        )
-    except Exception as e:
-        result['status'] = repr(e)
-        return result
-
-    query = {
-        'from': start,
-        'size': size,
-        'track_total_hits': True,
-        'query': {
-            'nested': {
-                'path': 'metadataEntries',
-                'query': {
-                    'bool': {
-                        'must': [
-                            {
-                                'term': {
-                                    'metadataEntries.attribute.raw': name
-                                }
-                            }, {
-                                'term': {
-                                    'metadataEntries.unit.raw': 'FlatIndex'
-                                }
-                            }, {
-                                'match': {
-                                    'metadataEntries.value': value
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        }
-    }
-
-    if sort is not None:
-        if reverse:
-            order = 'desc'
-        else:
-            order = 'asc'
-        query['sort'] = [
-            {
-                'metadataEntries.value.raw': {
-                    'order': order,
-                    'nested': {
-                        'path': 'metadataEntries',
-                        'filter': {
-                            'term': {
-                                'metadataEntries.attribute.raw': sort
-                            }
-                        }
-                    }
-                }
-            }
-        ]
-
-    try:
-        response = client.search(body=query, index='yoda')
-    except Exception as e:
-        result['status'] = repr(e)
-        return result
-
-    matches = []
-    for hit in response['hits']['hits']:
-        src = hit['_source']
-        match = {
-            'fileName': src['fileName'],
-            'parentPath': src['parentPath']
-        }
-        attributes = []
-        for avu in src['metadataEntries']:
-            if avu['unit'] == 'FlatIndex':
-                attributes.append({
-                    'name': avu['attribute'],
-                    'value': avu['value']
-                })
-        match['attributes'] = attributes
-        matches.append(match)
-    result['matches'] = matches
-    result['total_matches'] = response['hits']['total']['value']
-    result['status'] = 'ok'
-    if sort is not None:
-        result['query']['sort'] = sort
-        result['query']['reverse'] = reverse
-    return result
-
-
 @open_search_bp.route('/faceted_query', methods=['POST'])
 def _faceted_query() -> Response:
     data = json.loads(request.form['data'])
@@ -525,23 +388,15 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
 def _metadata() -> Response:
     data = json.loads(request.form['data'])
     uuid = data['uuid']
-    code = 200
 
     # Query data package metadata on UUID.
     res = metadata(uuid)
-    if res['status'] != 'ok':
-        code = 400
-
     if res['total_matches'] == 1:
         avus = res['matches'][0]
         metadata_json = jsonavu.avu2json(avus['attributes'], 'usr')
-    else:
-        code = 400
 
     # Query data package on UUID.
-    res = query('Data_Package_Reference', uuid, size=1)
-    if res['status'] != 'ok':
-        code = 400
+    res = faceted_query('Data_Package_Reference', uuid, [], [], size=1)
 
     # Transform search result into data package metadata.
     deposit_date = ""
@@ -557,7 +412,7 @@ def _metadata() -> Response:
         code = 400
 
     response = jsonify({"metadata": metadata_json, "deposit_date": deposit_date})
-    response.status_code = code
+    response.status_code = res['status']
 
     return response
 
