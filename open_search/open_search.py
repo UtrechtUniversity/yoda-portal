@@ -195,13 +195,8 @@ def _faceted_query() -> Response:
         reverse = False
 
     res = faceted_query(value, facets, ranges, filters, start=start, size=size, sort=sort, reverse=reverse)
-    code = 200
-
-    if res['status'] != 'ok':
-        code = 400
-
     response = jsonify(res)
-    response.status_code = code
+    response.status_code = res['status']
     return response
 
 
@@ -224,8 +219,11 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
             hosts=[{'host': open_search_host, 'port': open_search_port}],
             http_compress=True
         )
-    except Exception as e:
-        result['status'] = repr(e)
+    except ConnectionError:
+        result['status'] = 503
+        return result
+    except Exception:
+        result['status'] = 500
         return result
 
     if value != "":
@@ -347,8 +345,8 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
         }
         try:
             response = client.search(body=query, index='yoda')
-        except Exception as e:
-            result['status'] = repr(e)
+        except Exception:
+            result['status'] = 400
             return result
 
         facetList = {}
@@ -488,8 +486,8 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
 
     try:
         response = client.search(body=query, index='yoda')
-    except Exception as e:
-        result['status'] = repr(e)
+    except Exception:
+        result['status'] = 400
         return result
 
     matches = []
@@ -511,7 +509,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
     result['matches'] = matches
     result['total_matches'] = response['hits']['total']['value']
     result['facets'] = facetList
-    result['status'] = 'ok'
+    result['status'] = 200
     if value is not None:
         result['query']['value'] = value
     if sort is not None:
