@@ -108,3 +108,21 @@ def metadata(reference: str) -> Response:
                            dir=dir,
                            reference=reference,
                            dp_is_restricted=dp_is_restricted)
+
+
+@vault_bp.route('/browse/download_checksum_report')
+def download_report() -> Response:
+    path = request.args.get("path")
+    coll = "/" + g.irods.zone + "/home" + path
+    response = api.call('research_manifest', data={'coll': coll})
+
+    output = ""
+    if response['status'] == 'ok':
+        for result in response["data"]:
+            output += f"{result['name']} {result['checksum']} \n"
+
+    return Response(
+        output,
+        mimetype='text/plain',
+        headers={'Content-disposition': 'attachment; filename=checksums.txt'}
+    )

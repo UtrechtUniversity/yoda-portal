@@ -57,9 +57,12 @@ $(function() {
     $("body").on("click", "a.action-show-checksum-report", function() {
 
         let folder = $(this).attr('data-folder');
-        $('#showChecksumReport .collection').text(folder);
+        let download_url = 'browse/download_checksum_report?path=' + encodeURIComponent(folder);
 
+        $('#showChecksumReport .collection').text(folder);
         $('#showChecksumReport .modal-body').html('');
+        $('#showChecksumReport .modal-footer .download-report').attr('href', download_url);
+        
         Yoda.call('research_manifest',
             {coll: Yoda.basePath + folder}).then((data) => {
             let table = '<table class="table table-striped"><tbody>';
