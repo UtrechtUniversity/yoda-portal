@@ -173,9 +173,8 @@ function search(term, page, itemsPerPage, sort, sortOrder, facets = [], filters=
                     });
                     html += itemTemplate(attr);
                 });
-            } else {
-                //$('.no-results .search-term').text(term);
             }
+            
             buildPagination(results);
             $('#search-results').html(html);
             load(false, results);
