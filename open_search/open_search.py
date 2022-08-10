@@ -219,9 +219,6 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
             hosts=[{'host': open_search_host, 'port': open_search_port}],
             http_compress=True
         )
-    except ConnectionError:
-        result['status'] = 503
-        return result
     except Exception:
         result['status'] = 500
         return result
@@ -345,6 +342,9 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
         }
         try:
             response = client.search(body=query, index='yoda')
+        except ConnectionError:
+            result['status'] = 503
+            return result
         except Exception:
             result['status'] = 400
             return result
@@ -486,6 +486,9 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
 
     try:
         response = client.search(body=query, index='yoda')
+    except ConnectionError:
+        result['status'] = 503
+        return result
     except Exception:
         result['status'] = 400
         return result
