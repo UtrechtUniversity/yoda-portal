@@ -6,7 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 import json
 import re
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import jsonavu
 from flask import Blueprint, jsonify, render_template, request, Response
@@ -408,8 +408,6 @@ def _metadata() -> Response:
             value = attribute['value']
             if name == 'Creation_Time':
                 deposit_date = datetime.utcfromtimestamp(int(value)).strftime('%Y-%m-%d')
-    else:
-        code = 400
 
     response = jsonify({"metadata": metadata_json, "deposit_date": deposit_date})
     response.status_code = res['status']
