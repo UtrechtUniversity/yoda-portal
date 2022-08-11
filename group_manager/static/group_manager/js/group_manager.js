@@ -10,9 +10,19 @@
 
 $(function() {
     $('.user-search-groups').click(function(){
-        // $('#result-user-search-groups').html('');
-        // $('#input-user-search-groups').val('');
         $('#user-search-groups').modal('show');
+        if ($('#input-user-search-groups').val().length==0) {
+            $('#result-user-search-groups').html('Please enter a username of to find groups for.');
+        }
+        else {
+            $('#input-user-search-groups').focus().select();
+        }
+    });
+    $('#input-user-search-groups').keypress(function (e) {
+        if (e.which == 13) {
+            $('.btn-user-search-groups').trigger('click');
+            return false;
+        }
     });
     $('.btn-user-search-groups').click(function(){
         var hier = Yoda.groupManager.groupHierarchy;
@@ -23,25 +33,32 @@ $(function() {
             for (var subcategoryName in hier[categoryName]) {
                 for (var groupName in hier[categoryName][subcategoryName]) {
                     if (hier[categoryName][subcategoryName][groupName].members[username] != undefined) {
-                        data.push([groupName, hier[categoryName][subcategoryName][groupName].members[username]['access']]);
+                        data.push([groupName, hier[categoryName][subcategoryName][groupName].members[username]['access'], categoryName, subcategoryName]);
                     }
                 }
             }
         }
         $('#result-user-search-groups').html('');
         if (data.length==0){
-            $('#result-user-search-groups').html("No groups found for user " + username);
+            if ($('#input-user-search-groups').val().length==0) {
+                $('#result-user-search-groups').html('Please enter a username to find groups for.');
+            }
+            else {
+                $('#result-user-search-groups').html("No groups found for user '" + $('#input-user-search-groups').val() + "'");
+            }
             return;
         }
 
         // Build result table.
-        let table = '<table class="table table-striped"><tbody>';
+        let table = '<table class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th></tr></thead><tbody>';
         $.each(data, function(index, usergroup) {
             table += `<tr>
                  <td class="user-search-result-group" style="cursor: pointer"  user-search-result-group="${usergroup[0]}">
                     <i class="fa-solid ${Yoda.groupManager.accessIcons[usergroup[1]]}" title="${Yoda.groupManager.accessNames[usergroup[1]]}"></i>
                     ${usergroup[0]}
                  </td>
+                 <td>${usergroup[2]}</td>
+                 <td>${usergroup[3]}</td>
             </tr>`;
         });
         table += '</tbody></table>';
