@@ -5,7 +5,7 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#yodaNavbar" aria-controls="yodaNavbar" aria-expanded="true" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="navbar-collapse collapse show" id="yodaNavbar">
+        <div class="navbar-collapse collapse" id="yodaNavbar">
             <div class="nav navbar-nav">
                 <a class="nav-link {% if request.path == url_for('deposit_bp.index') %}active{% endif %}" href="{{ url_for('deposit_bp.index') }}">Deposit</a>
                 <a class="nav-link {% if request.path == url_for('open_search_bp.index') %}active{% endif %}" href="{{ url_for('open_search_bp.index') }}">Archive</a>
