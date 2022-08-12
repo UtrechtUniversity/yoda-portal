@@ -83,7 +83,7 @@ $(function() {
         handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
-    // Cleanup temporary files.
+    // Clean up temporary files.
     $("body").on("click", "a.action-cleanup", function() {
         fileMgmtDialogAlert('cleanup-collection', '');
 
@@ -1125,7 +1125,7 @@ function topInformation(dir, showAlert)
                     statusText = "";
                     actions['lock'] = 'Lock';
                     actions['submit'] = 'Submit';
-                    actions['cleanup'] = 'Cleanup temporary files';
+                    actions['cleanup'] = 'Clean up temporary files';
                 } else if (status == 'LOCKED') {
                     statusText = "Locked";
                     actions['unlock'] = 'Unlock';
@@ -1139,12 +1139,12 @@ function topInformation(dir, showAlert)
                     statusText = "Secured";
                     actions['lock'] = 'Lock';
                     actions['submit'] = 'Submit';
-                    actions['cleanup'] = 'Cleanup temporary files';
+                    actions['cleanup'] = 'Clean up temporary files';
                 } else if (status == 'REJECTED') {
                     statusText = "Rejected";
                     actions['lock'] = 'Lock';
                     actions['submit'] = 'Submit';
-                    actions['cleanup'] = 'Cleanup temporary files';
+                    actions['cleanup'] = 'Clean up temporary files';
                 }
 
                 // Show metadata button.
