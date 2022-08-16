@@ -12,7 +12,7 @@ $(function() {
     $('.user-search-groups').click(function(){
         $('#user-search-groups').modal('show');
         if ($('#input-user-search-groups').val().length==0) {
-            $('#result-user-search-groups').html('Please enter a username of to find groups for.');
+            $('#result-user-search-groups').html('Please enter a username to find groups for.');
             $('#input-user-search-groups').focus();
         }
         else {
