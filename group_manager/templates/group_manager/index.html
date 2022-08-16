@@ -76,7 +76,7 @@
 	<div class="col-md-7">
 		<div class="sticky-top">
 			<div class="card  properties">
-				<div class="card-header">Group properties</div>
+				<div class="card-header">Group properties <span class="float-end" id="group-properties-group-name"></span></div>
 				<div class="card-body" id="group-properties">
 					<p class="placeholder-text">
 						Please select a group.
@@ -174,16 +174,16 @@
 <div class="modal" tabindex="-1" role="dialog" id="user-search-groups">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Search groups for user</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
             <div class="modal-body">
-                <h5 class="modal-title">Search groups for user</h5>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <input type="text" class="form-control" id='input-user-search-groups' value="" placeholder="Enter name of user">
-                    </div>
-                     <button class='btn btn-primary btn-user-search-groups' data-path=""> Find groups</button>
-                </div>
-                <hr>
-                <div id="result-user-search-groups"></div>
+				<div class="input-group mb-3">
+					<input id="input-user-search-groups" type="text" class="form-control" val="" placeholder="Enter name of user">
+					<button class="btn btn-primary btn-user-search-groups" data-path="">Find groups</button>
+				</div>
+                <div id="result-user-search-groups">Please enter a username to find groups for.</div>
             </div>
 
             <div class="modal-footer">
