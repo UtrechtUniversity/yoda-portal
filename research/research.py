@@ -3,17 +3,16 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-import binascii
 import io
 import os
 from typing import Iterator
 
 from flask import abort, Blueprint, g, jsonify, make_response, render_template, request, Response, stream_with_context
-from irods.column import Like
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
-from irods.models import Collection, DataObject
 from werkzeug.utils import secure_filename
+
+import api
 
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
@@ -213,29 +212,26 @@ def upload_post() -> Response:
     return response
 
 
-def decode_cksum(cksum: str) -> str:
-    if cksum is None:
-        return "0"
-    else:
-        return binascii.hexlify(binascii.a2b_base64(cksum[5:])).decode("UTF-8")
-
-
-@research_bp.route('/manifest')
-def manifest() -> Response:
-    dir = os.path.join("/" + g.irods.zone, "home", request.args.get("filepath"))
-    session = g.irods
-    length = len(dir) + 1
-    q = session.query(Collection.name, DataObject.name, DataObject.checksum).filter(Like(Collection.name, dir + "%"))
-    dict = {(row[Collection.name] + "/")[length:] + row[DataObject.name]: decode_cksum(row[DataObject.checksum]) for row in q}
-    response = jsonify({
-        "manifest": [{"name": name, "checksum": checksum} for name, checksum in dict.items()]
-    })
-    response.status_code = 200
-    return response
-
-
 @research_bp.route('/metadata/form')
 def form() -> Response:
     path = request.args.get('path')
 
     return render_template('research/metadata-form.html', path=path)
+
+
+@research_bp.route('/browse/download_checksum_report')
+def download_report() -> Response:
+    path = request.args.get("path")
+    coll = "/" + g.irods.zone + "/home" + path
+    response = api.call('research_manifest', data={'coll': coll})
+
+    output = ""
+    if response['status'] == 'ok':
+        for result in response["data"]:
+            output += f"{result['name']} {result['checksum']} \n"
+
+    return Response(
+        output,
+        mimetype='text/plain',
+        headers={'Content-disposition': 'attachment; filename=checksums.txt'}
+    )

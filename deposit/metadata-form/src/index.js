@@ -40,7 +40,7 @@ const enumWidget = (props) => {
             }
         })
     };
-
+    let required = props.required
     let error = "should be equal to one of the allowed values";
 
     // Intervene handling of Required attribute as determined by React
@@ -72,10 +72,10 @@ const enumWidget = (props) => {
     // Only perform a correction for highest level select fields (i.e. length == 1)
     if (name_hierarchy.length == 1) {
         // Determine actual value for required from top level required list within the jsonschema
-        props.required = formProperties.data.schema.required.includes(name_hierarchy[0]);
+        required = formProperties.data.schema.required.includes(name_hierarchy[0]);
     }
 
-    if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) || (props.required && props.value == null)) {
+    if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) || (required && props.value == null)) {
         label = <label className="text-danger form-label select-required">{title}*</label>
         customStyles = {
             control: styles => ({
@@ -87,7 +87,7 @@ const enumWidget = (props) => {
                 }
             })
         };
-    } else if (props.required) {
+    } else if (required) {
         label = <label className="form-label select-required select-filled">{title}*</label>
     }
 
@@ -96,7 +96,7 @@ const enumWidget = (props) => {
             {label}
             <Select className={'select-box'}
                     placeholder={placeholder}
-                    required={props.required}
+                    required={required}
                     isDisabled={props.readonly}
                     onChange={(event) => props.onChange(event.value)}
                     options={props['options']['enumOptions']}
@@ -606,7 +606,7 @@ function ArrayFieldTemplate(props) {
                                 <div className="d-flex flex-row">
                                     {el.hasMoveUp && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm"
+                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onReorderClick(
                                                         el.index,
                                                         el.index - 1
@@ -618,7 +618,7 @@ function ArrayFieldTemplate(props) {
 
                                     {el.hasMoveDown && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm"
+                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onReorderClick(
                                                         el.index,
                                                         el.index + 1
@@ -630,7 +630,7 @@ function ArrayFieldTemplate(props) {
 
                                     {el.hasRemove && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm"
+                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onDropIndexClick(el.index)}>
                                                 <i className="fa-solid fa-trash" aria-hidden="true"></i>
                                             </button>

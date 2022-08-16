@@ -1,19 +1,15 @@
-<nav class="navbar navbar-dark navbar-static-top navbar-expand-lg mb-3">
+<nav class="navbar navbar-dark navbar-expand-lg mb-3">
     <div class="container">
-        <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">DAG Portal</a>
+        <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
         {% if g.user %}
-        <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#yodaNavbar" aria-controls="yodaNavbar" aria-expanded="true" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('deposit_bp.index') }}">Deposit</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('open_search_bp.index') }}">Archive</a>
-                </li>
-            </ul>
+        <div class="navbar-collapse collapse" id="yodaNavbar">
+            <div class="nav navbar-nav">
+                <a class="nav-link {% if request.path == url_for('deposit_bp.index') %}active{% endif %}" href="{{ url_for('deposit_bp.index') }}">Deposit</a>
+                <a class="nav-link {% if request.path == url_for('open_search_bp.index') %}active{% endif %}" href="{{ url_for('open_search_bp.index') }}">Archive</a>
+            </div>
         </div>
         {% endif %}
     </div>

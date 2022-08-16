@@ -83,7 +83,7 @@ $(function() {
         handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
-    // Cleanup temporary files.
+    // Clean up temporary files.
     $("body").on("click", "a.action-cleanup", function() {
         fileMgmtDialogAlert('cleanup-collection', '');
 
@@ -134,14 +134,18 @@ $(function() {
 
     // Show checksum report
     $("body").on("click", "a.action-show-checksum-report", function() {
-
         let folder = $(this).attr('data-folder');
-        $('#showChecksumReport .collection').text(folder);
+        let download_url = 'browse/download_checksum_report?path=' + encodeURIComponent(folder);
 
-        $('#showChecksumReport .modal-body').html('');
+        $('#showChecksumReport .collection').text(folder);
+        $('#showChecksumReport .modal-body #checksumReport').html('');
+        $('#showChecksumReport .modal-footer .download-report').attr('href', download_url);
+
         Yoda.call('research_manifest',
             {coll: Yoda.basePath + folder}).then((data) => {
             let table = '<table class="table table-striped"><tbody>';
+
+            table += '<thead><tr><th>Filename</th><th>Checksum</th></thead>';
             $.each(data, function( index, obj ) {
                 table += `<tr>
                      <td>${obj.name}</td>
@@ -150,7 +154,7 @@ $(function() {
             });
             table += '</tbody></table>';
 
-            $('#showChecksumReport .modal-body').html(table);
+            $('#showChecksumReport .modal-body #checksumReport').html(table);
             $('#showChecksumReport').modal('show');
         });
     });
@@ -323,7 +327,7 @@ $(function() {
         // presentation of totalised file counts
         var count_total = 0;
         var count_total_completed = 0;
-        $.each(r.files, function(key, flow_file) { 
+        $.each(r.files, function(key, flow_file) {
             // id has to be present in frontend as r.files contains all files (including the ones already uploaded)
             if($('#'+flow_file.uniqueIdentifier).length) {
                 // size totals
@@ -1123,7 +1127,7 @@ function topInformation(dir, showAlert)
                     statusText = "";
                     actions['lock'] = 'Lock';
                     actions['submit'] = 'Submit';
-                    actions['cleanup'] = 'Cleanup temporary files';
+                    actions['cleanup'] = 'Clean up temporary files';
                 } else if (status == 'LOCKED') {
                     statusText = "Locked";
                     actions['unlock'] = 'Unlock';
@@ -1137,12 +1141,12 @@ function topInformation(dir, showAlert)
                     statusText = "Secured";
                     actions['lock'] = 'Lock';
                     actions['submit'] = 'Submit';
-                    actions['cleanup'] = 'Cleanup temporary files';
+                    actions['cleanup'] = 'Clean up temporary files';
                 } else if (status == 'REJECTED') {
                     statusText = "Rejected";
                     actions['lock'] = 'Lock';
                     actions['submit'] = 'Submit';
-                    actions['cleanup'] = 'Cleanup temporary files';
+                    actions['cleanup'] = 'Clean up temporary files';
                 }
 
                 // Show metadata button.

@@ -1,7 +1,7 @@
 /**
  * \file
  * \brief     Yoda Portal platform code.
- * \copyright Copyright (c) 2015-2021, Utrecht university. All rights reserved
+ * \copyright Copyright (c) 2015-2022, Utrecht university. All rights reserved
  * \license   GPLv3, see LICENSE
  */
 "use strict";
@@ -22,9 +22,9 @@ Yoda.set_message = function(type, msg) {
     type = (type === 'error') ? 'danger' : type;
 
     // Insert message if a #messages container is present.
-    let $messages = $('#messages');
-    if ($messages.length) {
-        $messages.append(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">`
+    const $messages = document.querySelector('#messages');
+    if ($messages) {
+        $messages.insertAdjacentHTML('beforeend', `<div class="alert alert-${type} alert-dismissible fade show" role="alert">`
                          + `${Yoda.escapeEntities(msg)}`
                          + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
                          + '</div>');
@@ -33,13 +33,12 @@ Yoda.set_message = function(type, msg) {
 
 Yoda.load = function() {
     // Insert sessionStorage messages if a #messages container is present.
-    let $messages = $('#messages');
-    if ($messages.length) {
+    const $messages = document.querySelector('#messages');
+    if ($messages) {
         let messages = Yoda.storage.session.get('messages', []);
         Yoda.storage.session.remove('messages');
-
         messages.forEach(item =>
-            $messages.append(`<div class="alert alert-${item.type} alert-dismissible fade show" role="alert">`
+            $messages.insertAdjacentHTML( 'beforeend', `<div class="alert alert-${item.type} alert-dismissible fade show" role="alert">`
                              + `${Yoda.escapeEntities(item.message)}`
                              + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
                              + '</div>'));
@@ -175,6 +174,17 @@ Yoda.storage = {
 Yoda.escapeQuotes = str => str.replace(/\\/g, '\\\\').replace(/("|')/g, '\\$1');
 
 /// Escape characters that may have a special meaning in HTML by converting them to HTML entities.
-Yoda.escapeEntities = str => $('<div>').text(str).html();
+Yoda.escapeEntities = str => str.replace(/[\u00A0-\u9999<>\&]/g, i => '&#'+i.charCodeAt(0)+';')
 
-$(Yoda.load);
+// DOM ready.
+const onReady = (callback) =>{
+  if (document.readyState!='loading') callback();
+  else if (document.addEventListener) document.addEventListener('DOMContentLoaded', callback);
+  else document.attachEvent('onreadystatechange', function() {
+    if (document.readyState=='complete') callback();
+  });
+};
+
+onReady(() => {
+    Yoda.load
+});
