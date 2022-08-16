@@ -138,12 +138,14 @@ $(function() {
         let download_url = 'browse/download_checksum_report?path=' + encodeURIComponent(folder);
 
         $('#showChecksumReport .collection').text(folder);
-        $('#showChecksumReport .modal-body').html('');
+        $('#showChecksumReport .modal-body #checksumReport').html('');
         $('#showChecksumReport .modal-footer .download-report').attr('href', download_url);
 
         Yoda.call('research_manifest',
             {coll: Yoda.basePath + folder}).then((data) => {
             let table = '<table class="table table-striped"><tbody>';
+
+            table += '<thead><tr><th>Filename</th><th>Checksum</th></thead>';
             $.each(data, function( index, obj ) {
                 table += `<tr>
                      <td>${obj.name}</td>
@@ -152,7 +154,7 @@ $(function() {
             });
             table += '</tbody></table>';
 
-            $('#showChecksumReport .modal-body').html(table);
+            $('#showChecksumReport .modal-body #checksumReport').html(table);
             $('#showChecksumReport').modal('show');
         });
     });
@@ -325,7 +327,7 @@ $(function() {
         // presentation of totalised file counts
         var count_total = 0;
         var count_total_completed = 0;
-        $.each(r.files, function(key, flow_file) { 
+        $.each(r.files, function(key, flow_file) {
             // id has to be present in frontend as r.files contains all files (including the ones already uploaded)
             if($('#'+flow_file.uniqueIdentifier).length) {
                 // size totals
