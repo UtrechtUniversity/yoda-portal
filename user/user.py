@@ -358,8 +358,6 @@ def oidc_authorize_url(username: str) -> str:
 
 def irods_login(username: str, password: str) -> None:
     """Start session with iRODS."""
-    password = escape_irods_pam_password(password)
-
     irods = iRODSSession(
         host=app.config.get('IRODS_ICAT_HOSTNAME'),
         port=app.config.get('IRODS_ICAT_PORT'),
@@ -374,17 +372,6 @@ def irods_login(username: str, password: str) -> None:
     session['user_id'] = username
     session['password'] = password
     connman.add(session.sid, irods)
-
-
-def escape_irods_pam_password(password: str) -> str:
-    translation = str.maketrans({
-        "@": r"\@",
-        "=": r"\=",
-        "&": r"\&",
-        ";": r"\;"
-    })
-
-    return password.translate(translation)
 
 
 def original_destination() -> str:
