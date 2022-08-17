@@ -186,5 +186,5 @@ const onReady = (callback) =>{
 };
 
 onReady(() => {
-    Yoda.load
+    Yoda.load();
 });
