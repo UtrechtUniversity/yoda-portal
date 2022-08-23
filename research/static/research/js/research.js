@@ -139,7 +139,8 @@ $(function() {
 
         $('#showChecksumReport .collection').text(folder);
         $('#showChecksumReport .modal-body #checksumReport').html('');
-        $('#showChecksumReport .modal-footer .download-report').attr('href', download_url);
+        $('#showChecksumReport .modal-footer .download-report-text').attr('href', download_url + '&format=text');
+        $('#showChecksumReport .modal-footer .download-report-csv').attr('href', download_url + '&format=csv');
 
         Yoda.call('research_manifest',
             {coll: Yoda.basePath + folder}).then((data) => {

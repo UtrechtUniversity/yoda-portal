@@ -221,17 +221,27 @@ def form() -> Response:
 
 @research_bp.route('/browse/download_checksum_report')
 def download_report() -> Response:
+    output = ""
     path = request.args.get("path")
+    format = request.args.get("format")
     coll = "/" + g.irods.zone + "/home" + path
     response = api.call('research_manifest', data={'coll': coll})
 
-    output = ""
-    if response['status'] == 'ok':
-        for result in response["data"]:
-            output += f"{result['name']} {result['checksum']} \n"
+    if format == 'csv':
+        mime = 'text/csv'
+        ext = '.csv'
+        if response['status'] == 'ok':
+            for result in response["data"]:
+                output += f"{result['name']},{result['checksum']} \n"
+    else:
+        mime = 'text/plain'
+        ext = '.txt'
+        if response['status'] == 'ok':
+            for result in response["data"]:
+                output += f"{result['name']} {result['checksum']} \n"
 
     return Response(
         output,
-        mimetype='text/plain',
-        headers={'Content-disposition': 'attachment; filename=checksums.txt'}
+        mimetype=mime,
+        headers={'Content-disposition': 'attachment; filename=checksums' + ext}
     )
