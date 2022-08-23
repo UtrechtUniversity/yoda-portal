@@ -116,7 +116,7 @@
 
         {% if request_status == 'PREREGISTRATION_SUBMITTED' and is_project_manager %}
         <?php if (in_array($requestStatus, ["PREREGISTRATION_SUBMITTED"]) && $isProjectManager): ?>
-        <a href="/datarequest/preregistration_confirm/{{ request_id }}" class="btn btn-primary mb-3 float-end" role="button">Confirm preregistration</a>
+        <a href="/datarequest/preregistration_confirm/{{ request_id }}" class="btn btn-primary mb-3 float-end" role="button">Go to preregistration confirmation page</a>
         <?php endif ?>
         {% endif %}
 
