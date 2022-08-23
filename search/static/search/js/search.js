@@ -109,6 +109,7 @@ const resultsRenderer = {
             target = name.split("/").slice(0, -1).join("/");
         }
 
+        target = encodeURIComponent(target);
         if (name.startsWith('/vault-')) {
             href = "/vault/?dir=" + target;
         } else if (name.startsWith('/deposit-')) {
@@ -118,9 +119,9 @@ const resultsRenderer = {
         }
 
         if (row.type === 'coll') {
-            return `<a class="browse-search" href="${encodeURIComponent(href)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
+            return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`;
         } else {
-            return `<a class="browse-search" href="${encodeURIComponent(href)}"><i class="fa-regular fa-file"></i> ${htmlEncode(name)}</a>`;
+            return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa-regular fa-file"></i> ${htmlEncode(name)}</a>`;
         }
     },
     size: (size, _, row) => {
