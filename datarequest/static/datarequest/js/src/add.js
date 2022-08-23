@@ -13,7 +13,7 @@ let save = false;
 document.addEventListener("DOMContentLoaded", async () => {
 
     // Get data request schema and uiSchema
-    Yoda.call("datarequest_schema_get", {schema_name: "datarequest"})
+    Yoda.call("datarequest_schema_get", {schema_name: "datarequest_submission"})
     .then(response => {
         let datarequestSchema = response.schema;
         let datarequestUiSchema = response.uischema;
