@@ -39,7 +39,7 @@ $(function() {
     });
 
     $('#btn-start-scan').click(function(){
-        var study_id = 'grp-intake-' + $('#studyID').val();
+        var study_id = $('#studyID').val();
 
         $(this).prop('disabled', true).addClass('disabled');
         inProgressStart('Scanning in progress...');
@@ -58,7 +58,7 @@ $(function() {
     // datamanager only
     $('#btn-lock').click(function(){
         var datasets = [],
-            intake_path = Yoda.basePath + '/' + 'grp-intake-' + $('#studyID').val();
+            intake_path = Yoda.basePath + '/' + $('#studyID').val();
         inProgressStart('Locking in progress...');
 
         $('.cbDataSet').each(function(){
@@ -72,7 +72,7 @@ $(function() {
     // datamanager only
     $('#btn-unlock').click(function(){
         var datasets = [],
-            intake_path = Yoda.basePath + '/' + 'grp-intake-' + $('#studyID').val();
+            intake_path = Yoda.basePath + '/' + $('#studyID').val();
         inProgressStart('Locking in progress...');
 
         $('.cbDataSet').each(function(){
@@ -238,7 +238,10 @@ function reload_page_with_alert(alertNr) {
     var studyID = $("#studyID").val(),
         studyFolder= $("#studyFolder").val();
 
-    params = '?studyID=' + studyID;
+    // bring back to study-id alone without group qualification
+    parts = studyID.split('-');
+    // take last only to get to study
+    params = '?studyID=' + parts[parts.length-1]
     if (studyFolder) {
         params += '&studyFolder=' + studyFolder;
     }
