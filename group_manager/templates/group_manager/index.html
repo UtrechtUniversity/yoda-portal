@@ -9,6 +9,7 @@
 {% endblock style %}
 
 {% block scripts %}
+    <script src="{{ url_for('group_manager_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
     <script src="{{ url_for('group_manager_bp.static', filename='js/group_manager.js') }}"></script>
     <script src="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.min.js') }}"></script>
     <script>
@@ -24,6 +25,11 @@
         <h1>Group manager</h1>
     </div>
     <div class="col-md-6 div-show-search-groups">
+        {% if user_is_datamanager %}
+
+        <button type="button" class="btn btn-primary import-groups-csv" title="dialog csv import"><i class="fa-solid fa-upload" aria-hidden="true"></i> dialog import groups CSV </button>
+
+        {% endif %}
         <button type="button" class="btn btn-primary user-search-groups float-end" title="Search groups for users"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Search groups for user</button>
     </div>
 </div>
@@ -169,6 +175,43 @@
 			</div>
 		</div>
 	</div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="dlg-import-groups-csv">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Import group definitions in CSV file</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Step 1. Upload the csv file</h6>
+                <p class="placeholder-text">Select a csv file containing group definions.<br>
+                These have to be in accordance with the description as state here.</p>
+                <button type="button" class="btn btn-primary upload-csv" title="Upload CSV with group definition"><i class="fa-solid fa-upload" aria-hidden="true"></i> Upload CSV with group definitions</button>
+                <br>
+
+                <div id="files"></div>
+                <br>
+                <div class="div-process-results-import hidden">
+                    <hr>
+                    <h6>Step 2. Process the uploaded csv file</h6>
+                    <p class="placeholder-text">Check the options you prefer and hit the process button.</p>
+                    <input class="form-check-input" type="checkbox" id="import-allow-updates"> Allow updates
+                    <br>
+                    <input class="form-check-input" type="checkbox" id="import-delete-users"> Delete users
+                    <br>
+                    <br>
+                    <button type="button" class="btn btn-primary process-csv" title="Process CSV with group definition(s)"><i class="fa-solid fa-upload" aria-hidden="true"></i> Process CSV</button>
+                    <hr>
+                    <div id="result-import-groups-csv"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal" tabindex="-1" role="dialog" id="user-search-groups">

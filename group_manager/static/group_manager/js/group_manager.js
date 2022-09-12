@@ -8,7 +8,45 @@
 
 "use strict";
 
+
+
+function htmlEncode(value){
+    //create a in-memory div, set it's inner text(which jQuery automatically encodes)
+    //then grab the encoded contents back out.  The div never exists on the page.
+    return $('<div/>').text(value).html().replace('"', '&quot;');
+}
+
+function logUpload(id, file) {
+    let log = `<div class="row upload-row" id="${id}">
+                  <div class="col-md-6">
+                    <div class="upload-filename">${htmlEncode(file.relativePath)}</div>
+                    <div class="upload-btns btn-group btn-group-sm" role="group" aria-label="Basic example">
+                      <button type="button" class="btn btn-secondary upload-cancel me-1">
+                        Cancel
+                      </button>
+                      <button type="button" class="btn btn-secondary upload-resume hide me-1">
+                        Resume
+                      </button>
+                      <button type="button" class="btn btn-secondary upload-pause">
+                        Pause
+                      </button>
+                      <button type="button" class="btn btn-secondary upload-retry hide">
+                        Retry
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-md-3"><div class="progress mt-1"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>
+                  <div class="col-md-3 msg"><i class="fa-solid fa-spinner fa-spin fa-fw"></i></div>
+               </div>`;
+    $('#files').append(log);
+}
+
 $(function() {
+    var csv_import_filename = 'blabla.csv';
+    $('.import-groups-csv').click(function(){
+        $('#dlg-import-groups-csv').modal('show');
+    });
+
     $('.user-search-groups').click(function(){
         $('#user-search-groups').modal('show');
         if ($('#input-user-search-groups').val().length==0) {
@@ -71,6 +109,212 @@ $(function() {
              Yoda.groupManager.unfoldToGroup(groupName);
              Yoda.groupManager.selectGroup(groupName);
         });
+    });
+    $('.process-csv').click(function(){
+        alert('PROCESS CSV' + csv_import_filename);
+        console.log($('#import-allow-updates').is(':checked'));
+        console.log($('#import-delete-users').is(':checked'));
+
+
+        Yoda.call('group_process_csv', 
+            {csv_filename: csv_import_filename,
+             allow_update: $('#import-allow-updates').is(':checked'), 
+             delete_user: $('#import-delete-users').is(':checked')}).then((data) => {
+
+            console.log(data);
+            if (data['status'] != 'ok') {
+                var error_html = '';
+                data['errors'].forEach(function myFunction(item) {
+                    error_html += '<br>' + item;
+                });
+                $('#result-import-groups-csv').html('Something went wrong processing your group definition file:<br>' + error_html);
+
+                return;
+            }
+
+            let table = '<table class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th>Manager</th><th>Member</th><th>Viewer</th></tr></thead><tbody>';
+
+            $.each(data['group-data'], function(index, newgroup) {
+                table += `<tr>
+                     <td class="import-csv-result-group" style="cursor: pointer"  import-csv-result-group="${newgroup[2]}">
+                        ${newgroup[2]}
+                     </td>
+                     <td>${newgroup[0]}</td>
+                     <td>${newgroup[1]}</td>
+                     <td>${newgroup[3].join(', ')}</td>
+                     <td>${newgroup[4].join(', ')}</td>
+                     <td>${newgroup[5].join(', ')}</td>
+                </tr>`;
+            });
+            table += '</tbody></table>';
+            $('#result-import-groups-csv').html(table);
+
+            // reinitialize the groupmanager as new groups / definitions have been added.
+            Yoda.call('group_data').then((groupdata) => {
+                console.log(groupdata);
+                // overwrite older data
+                Yoda.groupManager.groupHierarchy = groupdata['group_hierarchy']
+                console.log(Yoda.groupManager.groupHierarchy);
+
+                Yoda.groupManager.groups = (function(hier) {
+                    // Create a flat group map based on the hierarchy object.
+                    var groups = { };
+                    for (var categoryName in hier) {
+                        for (var subcategoryName in hier[categoryName]) {
+                            for (var groupName in hier[categoryName][subcategoryName]) {
+                                groups[groupName] = {
+                                    category:    categoryName,
+                                    subcategory: subcategoryName,
+                                    name:        groupName,
+                                    description: hier[categoryName][subcategoryName][groupName].description,
+                                    data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
+                                    members:     hier[categoryName][subcategoryName][groupName].members
+                                };
+
+                            }
+                        }
+                    }
+                    console.log(groups);
+                    return groups;
+                })(groupdata['group_hierarchy']);
+
+                var cat_idx = 1;
+                var html = '';
+                var subcat_idx = 1;
+                var grp_idx = 1;
+                for (var category in groupdata['group_hierarchy']) {
+                    html += `<div class="list-group-item category" id="category-${ cat_idx }" data-name="${ category }">
+                                <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-${ cat_idx }" href="#category-${ cat_idx }-ul">
+                                    <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ category }
+                                </a>
+                                <div class="list-group collapse category-ul" id="category-${ cat_idx }-ul">`;
+                    subcat_idx = 1;
+                    for (var subcat in groupdata['group_hierarchy'][category]) {
+                        html += 
+
+                        `<div class="list-group-item subcategory" data-name="${ subcat }">
+                            <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-${ subcat_idx }" href="#subcategory-${ subcat_idx }-ul">
+                                <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ subcat }
+                            </a>
+                            <div class="list-group collapse subcategory-ul" id="subcategory-${ subcat_idx }-ul">`;
+
+                        grp_idx = 1;
+                        for (var group in groupdata['group_hierarchy'][category][subcat]) {
+                            html +=
+                                `<a class="list-group-item list-group-item-action group" id="group-${ grp_idx }" data-name="${ group }">
+                                    ${ group }
+                                </a>`;
+
+                            grp_idx += 1
+                        }
+
+                        html += '</div></div>';
+                        subcat_idx = subcat_idx + 1;
+                    }
+
+                    html += '</div></div>';
+                    cat_idx = cat_idx + 1;
+                }
+                $('#group-list').html(html);
+            });
+
+            // Yoda.groupManager.load(Yoda.groupManager.groupHierarchy, "rodsadmin", Yoda.groupManager.zone);
+
+            $('.import-csv-result-group').click(function() {
+                // $('#user-search-groups').modal('hide');
+                let groupName = $(this).attr('import-csv-result-group');
+                Yoda.groupManager.unfoldToGroup(groupName);
+                Yoda.groupManager.selectGroup(groupName);
+            });
+        });
+    });
+
+    // Flow.js upload handler
+    var r = new Flow({
+        target: '/research/upload',
+        chunkSize: 25 * 1024 * 1024,
+        forceChunkSize: true,
+        simultaneousUploads: 1,
+        query: {'csrf_token': Yoda.csrf.tokenValue, filepath : ''}
+    });
+    // Flow.js isn't supported, fall back on a different method
+    if (!r.support) {
+        Yoda.set_message('error', 'No upload browser support.');
+    }
+
+    // .assignBrowse(domNodes, isDirectory, singleFile, attributes)
+    r.assignBrowse($('.upload-csv')[0], false, true, {"accept": ".csv"});
+
+    // Flow.js handle events
+    r.on('filesAdded', function(files){
+        // reset the second step
+        $('.div-process-results-import').addClass('hidden');
+        $('#result-import-groups-csv').html('');
+        if (files.length) {
+            $('#files').html("");
+
+            $.each(files, function(key, file) {
+                logUpload(file.uniqueIdentifier, file);
+
+                let $self = $('#'+file.uniqueIdentifier);
+
+                // Pause btn
+                $self.find('.upload-pause').on('click', function () {
+                    file.pause();
+                    $self.find('.upload-pause').hide();
+                    $self.find('.upload-resume').show();
+                    $self.find('.msg').text('Upload paused');
+                });
+                // Resume btn
+                $self.find('.upload-resume').on('click', function () {
+                    file.resume();
+                    $self.find('.upload-pause').show();
+                    $self.find('.upload-resume').hide();
+                    $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
+                });
+                // Cancel btn
+                $self.find('.upload-cancel').on('click', function () {
+                    file.cancel();
+                    $self.remove();
+                });
+                // Retry btn
+                $self.find('.upload-retry').on('click', function () {
+                    file.retry();
+                    $self.find('.upload-pause').show();
+                    $self.find('.upload-retry').hide();
+                    $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
+                });
+            });
+        }
+    });
+    r.on('filesSubmitted', function() {
+        let path = '/research-default-2'; // $('.upload').attr('data-path');
+        r.opts.query.filepath = path;
+        r.upload();
+    });
+    r.on('complete', function(){
+        let path = '/research-default-2'; //$('.upload').attr('data-path');
+
+        $('.div-process-results-import').removeClass('hidden');
+    });
+    r.on('fileSuccess', function(file,message){
+        $("#" + file.uniqueIdentifier + " .msg").html("<span class='text-success'>Upload complete</span>");
+        let $self = $('#'+file.uniqueIdentifier);
+        $self.find('.upload-btns').hide();
+
+        console.log('COMPLETE2');
+        csv_import_filename = file.name;
+        console.log(file.name);
+    });
+    r.on('fileError', function(file, message){
+        $("#" + file.uniqueIdentifier + " .msg").html("Upload failed");
+        $("#" + file.uniqueIdentifier + " .progress-bar").css('width', '0%');
+        let $self = $('#'+file.uniqueIdentifier);
+        $self.find('.upload-pause').hide();
+    });
+    r.on('fileProgress', function(file){
+        var percent = Math.floor(file.progress()*100);
+        $("#" + file.uniqueIdentifier + " .progress-bar").css('width', percent + '%');
     });
 
     Yoda.groupManager = {
