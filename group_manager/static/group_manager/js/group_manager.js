@@ -467,11 +467,10 @@ $(function() {
                 });
 
                 // Move the user creation item to the bottom of the list.
-                var $userCreateItem = $userList.find('.item-user-create');
-                $userCreateItem.appendTo($userList);
-                $userCreateItem.attr('hidden', !that.canManageGroup(groupName));
-
-                $userList.find('#f-user-create-group').val(groupName);
+                var $userList2 = $('#user-list-add-user');
+                var $userCreateItem = $userList2.find('.item-user-create');
+                $userList2.find('#f-user-create-group').val(groupName);
+                $userList2.attr('hidden', !that.canManageGroup(groupName));
 
                 var $userPanel = $('.card.users');
                 $userPanel.find('#user-list').removeClass('hidden');
@@ -796,7 +795,6 @@ $(function() {
                             var query   = $el.data('select2').search.val().toLowerCase();
                             var results = [];
                             var inputMatches = false;
-
                             users.forEach(function(userName) {
                                 // Exclude users already in the group.
                                 if (!(userName in that.groups[$($el.attr('data-group')).val()].members)) {
@@ -1077,8 +1075,8 @@ $(function() {
                     };
 
                     $(el).find('#f-user-create-name').select2('val', '');
-                    $(el).addClass('hidden');
-                    $(el).parents('.list-group-item').find('.user-create-text').removeAttr('hidden');
+                    // $(el).addClass('hidden');
+                    // $(el).parents('.list-group-item').find('.user-create-text').removeAttr('hidden');
 
                     that.deselectGroup();
                     that.selectGroup(groupName);
@@ -1490,22 +1488,6 @@ $(function() {
                     that.deselectUser();
                 else
                     that.selectUser($(this).attr('data-name'));
-            });
-
-            $userList.on('click', '.list-group-item:has(.user-create-text:not(.hidden))', function() {
-                // Show the user add form.
-                that.deselectUser();
-                $(this).find('.user-create-text').attr('hidden', '');
-                $(this).find('form').removeClass('hidden');
-                $(this).find('form').find('#f-user-create-name').select2('open');
-            });
-
-            $('#f-user-create-name').on('select2-close', function() {
-                // Remove the new user name input on unfocus if nothing was entered.
-                if ($(this).val().length === 0) {
-                    // $(this).parents('form').attr('hidden', 'true');
-                    $(this).parents('.list-group-item').find('.user-create-text').removeAttr('hidden');
-                }
             });
 
             // Adding users to groups.
