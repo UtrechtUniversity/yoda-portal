@@ -339,6 +339,9 @@ $(function() {
 
             $('#group-properties-group-name').html('<strong>[' + groupName + ']</strong>');
 
+            // Reset messages possibly present in the user panel
+            $('#user-create-message').html('');
+
             $oldGroup.removeClass('active');
             $group.addClass('active');
             Yoda.storage.session.set('selected-group', groupName);
@@ -1075,12 +1078,14 @@ $(function() {
                     };
 
                     $(el).find('#f-user-create-name').select2('val', '');
-                    // $(el).addClass('hidden');
-                    // $(el).parents('.list-group-item').find('.user-create-text').removeAttr('hidden');
 
                     that.deselectGroup();
                     that.selectGroup(groupName);
                     that.selectUser(userName);
+
+                    // open the select-user select2 for ease of use and inform user of success
+                    $('.selectify-user-name').select2('open');
+                    $('#user-create-message').html(userName + ' was added to group.');
                 } else {
                     // Something went wrong. :(
                     if ('message' in result)
