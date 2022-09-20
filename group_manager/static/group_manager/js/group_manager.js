@@ -11,12 +11,12 @@
 $(function() {
     // When allowed to add groups the fields have to be initialized
     $('.create-button-new').click(function(){
-        $('#properties-update').addClass('hidden');
-        $('#properties-select-group').addClass('hidden');
-        $('#properties-create').removeClass('hidden');
+        $('.properties-update').addClass('hidden');
+        $('.users').addClass('hidden');
+        $('.properties-create').removeClass('hidden');
 
         var that = Yoda.groupManager;
-  
+
         var $prefixDiv = $('#f-group-create-prefix-div');
         $prefixDiv.find('button .text').html(that.GROUP_DEFAULT_PREFIX + '&nbsp;');
 
@@ -373,9 +373,9 @@ $(function() {
             this.unfoldToGroup(groupName);
 
             // handle visibility of correct update cards.
-            $('#properties-create').addClass('hidden');
-            $('#properties-update').removeClass('hidden');
-            $('#properties-select-group').addClass('hidden');
+            $('.properties-create').addClass('hidden');
+            $('.properties-update').removeClass('hidden');
+            $('.users').removeClass('hidden');
 
             $('#group-properties-group-name').html('<strong>[' + groupName + ']</strong>');
 
@@ -888,7 +888,7 @@ $(function() {
          * \param button the button that determines updating or creation of group data
          */
         onSubmitGroupCreateOrUpdate: function(button) {
-            
+
             var action =
                 $(button).attr('id') === 'f-group-create-submit'
                 ? 'create' : 'update';

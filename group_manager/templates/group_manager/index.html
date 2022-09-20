@@ -70,17 +70,8 @@
     </div>
     <div class="col-md-7">
         <div class="sticky-top">
-            <!--- Entire create / update group management -->
-            <div class="card select-group" id="properties-select-group">
-                <div class="card-body" id="group-properties-create">
-                    <p class="placeholder-text">
-                        Please select a group.
-                    </p>
-                </div>
-            </div>
-
             <!---  CREATE  -->
-            <div class="card  properties-create hidden" id="properties-create">
+            <div class="card properties-create hidden">
                 <div class="card-header">Create new group </div>
                     <div class="card-body" id="group-properties-create">
                         <form class="form-horizontal" id="f-group-create" action="{{ url_for('group_manager_bp.group_create') }}" method="POST">
@@ -150,7 +141,7 @@
                 </div>
 
             <!---  UPDATE  -->
-            <div class="card properties hidden" id="properties-update">
+            <div class="card properties-update hidden">
                 <div class="card-header">Group properties <span class="float-end" id="group-properties-group-name"></span></div>
 
                 <div class="card-body" id="group-properties">
