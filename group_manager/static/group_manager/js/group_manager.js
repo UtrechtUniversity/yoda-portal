@@ -557,6 +557,8 @@ $(function() {
             $userPanel.find('.card-header').css({ borderBottom: ''               });
             $userPanel.find('.card-footer').css({ borderTop:    '1px solid #ddd' });
 
+            $('#group-properties-group-name').html('');
+
             Yoda.storage.session.remove('selected-group');
         },
 
