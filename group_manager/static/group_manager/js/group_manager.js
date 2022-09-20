@@ -340,7 +340,7 @@ $(function() {
             $('#group-properties-group-name').html('<strong>[' + groupName + ']</strong>');
 
             // Reset messages possibly present in the user panel
-            $('#user-create-message').html('');
+            $('#user-create-message').html('Group members');
 
             $oldGroup.removeClass('active');
             $group.addClass('active');
@@ -1085,7 +1085,21 @@ $(function() {
 
                     // open the select-user select2 for ease of use and inform user of success
                     $('.selectify-user-name').select2('open');
-                    $('#user-create-message').html(userName + ' was added to group.');
+                    $('#user-create-message').html(userName + ' was added to group');
+                    // $('.selectify-user-name').select2({ placeholder: userName + ' was added to group.'});
+
+                    // var $select2Container = $('.selectify-user-name').data('select2').$container;
+                    // $select2Container.find('.select2-selection__placeholder').text('BLaBLABLA');
+
+                    // var $select2 = $('.selectify-user-name').data('select2');
+                    // $select2.selection.placeholder.text = 'blabla';
+                    // $select2.$container.find('.select2-selection__placeholder').text('blabla');
+
+                    // var $el = $('.selectify-user-name');
+                    // $el.data('select2').selection.placeholder.text = 'BLABLA';
+  
+                    // change placeholder in dom
+                    // $el.next("span.select2:first").find("span.select2-selection__placeholder").html('BLABLA');
                 } else {
                     // Something went wrong. :(
                     if ('message' in result)

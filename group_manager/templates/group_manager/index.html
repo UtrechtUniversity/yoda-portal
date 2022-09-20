@@ -132,7 +132,8 @@
 				</div>
 			</div>
 			<div class="card users mt-2">
-				<div class="card-header">Group members
+				<div class="card-header">
+                                       <div class="float-start" id="user-create-message">Group members</div>
 					<div class="input-group-sm has-feedback float-end">
 						<input class="form-control form-control-sm mt-1" id="user-list-search" type="text" placeholder="Filter members" />
 					</div>
@@ -148,7 +149,6 @@
                                 <div class="list-group" id="user-list-add-user" hidden>
                                         <div class="list-group-item item-user-create">
                                                 <form action="{{ url_for('group_manager_bp.user_create') }}" method="POST" class="form-inline" id="f-user-create">
-                                                        <div id="user-create-message"></div>
                                                         <input name="group_name" id="f-user-create-group" type="hidden" />
                                                         <div class="input-group">
                                                                 <input name="user_name" id="f-user-create-name" class="form-control form-control-sm selectify-user-name" type="hidden" required placeholder="Click here to start adding a user..." data-group="#f-user-create-group" />
