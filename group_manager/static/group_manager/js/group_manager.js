@@ -1349,10 +1349,10 @@ $(function() {
 
             // Set inial state of group create button {{{
             if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
-                $('.create-button-new').removeClass('disabled');
+                $('.create-button-new').removeClass('hidden');
             }
             else {
-                $('.create-button-new').addClass('disabled');
+                $('.create-button-new').addClass('hidden');
             }
             // }}}
 
