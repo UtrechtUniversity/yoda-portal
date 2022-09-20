@@ -160,7 +160,10 @@ def settings() -> Response:
 def data_access() -> Response:
     """Data Access Passwords overview"""
     response = api.call('token_load')
-    return render_template('user/data_access.html', tokens=response['data'])
+    token_lifetime = app.config.get('TOKEN_LIFETIME')
+    return render_template('user/data_access.html',
+                           tokens=response['data'],
+                           token_lifetime=token_lifetime)
 
 
 @user_bp.route('/callback')
