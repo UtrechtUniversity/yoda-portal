@@ -1468,7 +1468,7 @@ $(function() {
 
             // Group removal.
             $('#modal-group-delete .confirm').on('click', function(e) {
-                that.onClickGroupDelete($('.groups.properties-update .delete-button')[0]);
+                that.onClickGroupDelete($('.card.properties-update .delete-button')[0]);
                 $('#modal-group-delete').modal('hide');
             });
 
