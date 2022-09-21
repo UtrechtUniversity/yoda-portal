@@ -344,12 +344,8 @@ $(function() {
 
         updateGroupMemberCount: function(groupName) {
             var $userPanelTitle = $('.card.users .card-title');
-            $userPanelTitle.text(
-                $userPanelTitle.text().replace(
-                    /(?:\s*\(\d+\))?$/,
-                    ' (' + Object.keys(this.groups[groupName].members).length + ')'
-                )
-            );
+            console.log(Object.keys(this.groups[groupName].members).length);
+            $('#user-group-member-count').text('Group members (' + Object.keys(this.groups[groupName].members).length + ')');
         },
 
         /**
@@ -378,9 +374,6 @@ $(function() {
             $('.users').removeClass('hidden');
 
             $('#group-properties-group-name').html('<strong>[' + groupName + ']</strong>');
-
-            // Reset messages possibly present in the user panel
-            $('#user-create-message').html('Group members');
 
             $oldGroup.removeClass('active');
             $group.addClass('active');

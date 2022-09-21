@@ -206,7 +206,7 @@
             </div>
             <div class="card users mt-2">
                 <div class="card-header">
-                                       <div class="float-start" id="user-create-message">Group members</div>
+                                       <div class="float-start" id="user-group-member-count">Group members</div>
                     <div class="input-group-sm has-feedback float-end">
                         <input class="form-control form-control-sm mt-1" id="user-list-search" type="text" placeholder="Filter members" />
                     </div>
@@ -216,7 +216,7 @@
                         Please select a group.
                     </p>
                 </div>
-                <div class="list-group overflow-auto" id="user-list" style="max-height: 289px"></div>
+                <div class="list-group overflow-auto" id="user-list" style="max-height: 243px"></div>
                 <div class="list-group-item item-user-create" id="user-list-add-user" hidden>
                     <form action="{{ url_for('group_manager_bp.user_create') }}" method="POST" class="form-inline" id="f-user-create">
                         <input name="group_name" id="f-user-create-group" type="hidden" />
