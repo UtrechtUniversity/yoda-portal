@@ -1122,7 +1122,10 @@ $(function() {
                     that.selectUser(userName);
 
                     // Give a visual hint that the user was added.
-                    $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]')[0].scrollIntoView();
+                    $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]')[0].scrollIntoView({
+                        block: "center",
+                        behavior: "smooth"
+                    });
                     $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once');
 
                     // open the select-user select2 for ease of use
