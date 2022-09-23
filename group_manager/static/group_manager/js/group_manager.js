@@ -8,6 +8,118 @@
 
 "use strict";
 
+function readSingleFile(e) {
+  var file = e.target.files[0];
+  if (!file) {
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var contents = e.target.result;
+    console.log(contents);
+    // displayContents(contents);
+    // displayParsed(contents);
+    //
+    // const json = contents.split(',');
+    // console.log(JSON.stringify(json))
+
+    var result = csvToArray(contents);
+    // console.log(result);
+
+    // first row will contain fixed definion
+    var ar_keys = result[0]
+
+    // First compress all columns to 
+    // category, subcategory, groupname, manager, member, viewer
+    const colums = ['category', 'subcategory', 'groupname', 'manager', 'member', 'viewer']
+    var new_result = [];
+
+    result.forEach(function myFunction(group_def) {
+        // initialise all columns that must be present
+        var row = [];
+        colums.forEach(function myFunction(column) {
+            row[column] = '';
+        });
+
+        // now loop through the received rows and put them in the right columns
+        for (const key of Object.keys(ar_keys)) {
+            colums.forEach(function myFunction(column) {
+                if (key == column) {
+                    row[column] = group_def[key];
+                    //break;
+                }
+                else if (key.startsWith(column)) {
+                    if (group_def[key] != '\r') {
+                        row[column] += (row[column] ? ',' : '') + group_def[key];
+                    }
+                    //break;
+                }
+            });
+        }
+
+        new_result.push(row);
+    });
+    console.log('START');
+    console.log(new_result); 
+    console.log('END');
+
+
+    // build the header row of the table
+    let table = '<table class="table table-striped"><thead><tr>'
+    colums.forEach(function myFunction(column) {
+        table += '<th>' + column + '</th>';
+    });
+    table += '</tr></thead><tbody>';
+
+    // Add all the data rows and close the table
+
+    new_result.forEach(function myFunction(group_def) {
+        table += '<tr>';
+        colums.forEach(function myFunction(column) {
+            table += '<td>' + group_def[column] + '</td>';
+        });
+        table += '</tr>';
+    });
+
+    table += '</tbody></table>';
+    $('#result-import-groups-csv').html(table);
+
+    // now have user choose to actually process the uploaded data.
+    $('.div-process-results-import').removeClass('hidden');
+  };
+  reader.readAsText(file);
+}
+
+
+    function csvToArray(str, delimiter = ",") {
+
+      const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+
+      const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+
+      const arr = rows.map(function (row) {
+        const values = row.split(delimiter);
+        const el = headers.reduce(function (object, header, index) {
+          object[header] = values[index];
+          return object;
+        }, {});
+        return el;
+      });
+
+      return arr;
+    }
+
+function displayContents(contents) {
+  var element = document.getElementById('file-content');
+  element.textContent = contents;
+}
+
+function displayParsed(contents) {
+  const element = document.getElementById('file-parsed');
+  const json = contents.split(',');
+  element.textContent = JSON.stringify(json);
+}
 
 
 function htmlEncode(value){
@@ -16,32 +128,25 @@ function htmlEncode(value){
     return $('<div/>').text(value).html().replace('"', '&quot;');
 }
 
-function logUpload(id, file) {
-    let log = `<div class="row upload-row" id="${id}">
-                  <div class="col-md-6">
-                    <div class="upload-filename">${htmlEncode(file.relativePath)}</div>
-                    <div class="upload-btns btn-group btn-group-sm" role="group" aria-label="Basic example">
-                      <button type="button" class="btn btn-secondary upload-cancel me-1">
-                        Cancel
-                      </button>
-                      <button type="button" class="btn btn-secondary upload-resume hide me-1">
-                        Resume
-                      </button>
-                      <button type="button" class="btn btn-secondary upload-pause">
-                        Pause
-                      </button>
-                      <button type="button" class="btn btn-secondary upload-retry hide">
-                        Retry
-                      </button>
-                    </div>
-                  </div>
-                  <div class="col-md-3"><div class="progress mt-1"><div class="progress-bar progress-bar-striped bg-info"></div></div></div>
-                  <div class="col-md-3 msg"><i class="fa-solid fa-spinner fa-spin fa-fw"></i></div>
-               </div>`;
-    $('#files').append(log);
-}
-
 $(function() {
+    document.getElementById('file-input').addEventListener('change', readSingleFile, false);
+
+    $('#file-input-blabla').change(function(e){
+        console.log('hahahaha');
+
+        var file = e.target.files[0];
+        if (!file) {
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var contents = e.target.result;
+            console.log(contents);
+        }
+    });
+
+
     var csv_import_filename = 'blabla.csv';
     $('.import-groups-csv').click(function(){
         $('#dlg-import-groups-csv').modal('show');
@@ -227,94 +332,6 @@ $(function() {
                 Yoda.groupManager.selectGroup(groupName);
             });
         });
-    });
-
-    // Flow.js upload handler
-    var r = new Flow({
-        target: '/research/upload',
-        chunkSize: 25 * 1024 * 1024,
-        forceChunkSize: true,
-        simultaneousUploads: 1,
-        query: {'csrf_token': Yoda.csrf.tokenValue, filepath : ''}
-    });
-    // Flow.js isn't supported, fall back on a different method
-    if (!r.support) {
-        Yoda.set_message('error', 'No upload browser support.');
-    }
-
-    // .assignBrowse(domNodes, isDirectory, singleFile, attributes)
-    r.assignBrowse($('.upload-csv')[0], false, true, {"accept": ".csv"});
-
-    // Flow.js handle events
-    r.on('filesAdded', function(files){
-        // reset the second step
-        $('.div-process-results-import').addClass('hidden');
-        $('#result-import-groups-csv').html('');
-        if (files.length) {
-            $('#files').html("");
-
-            $.each(files, function(key, file) {
-                logUpload(file.uniqueIdentifier, file);
-
-                let $self = $('#'+file.uniqueIdentifier);
-
-                // Pause btn
-                $self.find('.upload-pause').on('click', function () {
-                    file.pause();
-                    $self.find('.upload-pause').hide();
-                    $self.find('.upload-resume').show();
-                    $self.find('.msg').text('Upload paused');
-                });
-                // Resume btn
-                $self.find('.upload-resume').on('click', function () {
-                    file.resume();
-                    $self.find('.upload-pause').show();
-                    $self.find('.upload-resume').hide();
-                    $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
-                });
-                // Cancel btn
-                $self.find('.upload-cancel').on('click', function () {
-                    file.cancel();
-                    $self.remove();
-                });
-                // Retry btn
-                $self.find('.upload-retry').on('click', function () {
-                    file.retry();
-                    $self.find('.upload-pause').show();
-                    $self.find('.upload-retry').hide();
-                    $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
-                });
-            });
-        }
-    });
-    r.on('filesSubmitted', function() {
-        let path = '/research-default-2'; // $('.upload').attr('data-path');
-        r.opts.query.filepath = path;
-        r.upload();
-    });
-    r.on('complete', function(){
-        let path = '/research-default-2'; //$('.upload').attr('data-path');
-
-        $('.div-process-results-import').removeClass('hidden');
-    });
-    r.on('fileSuccess', function(file,message){
-        $("#" + file.uniqueIdentifier + " .msg").html("<span class='text-success'>Upload complete</span>");
-        let $self = $('#'+file.uniqueIdentifier);
-        $self.find('.upload-btns').hide();
-
-        console.log('COMPLETE2');
-        csv_import_filename = file.name;
-        console.log(file.name);
-    });
-    r.on('fileError', function(file, message){
-        $("#" + file.uniqueIdentifier + " .msg").html("Upload failed");
-        $("#" + file.uniqueIdentifier + " .progress-bar").css('width', '0%');
-        let $self = $('#'+file.uniqueIdentifier);
-        $self.find('.upload-pause').hide();
-    });
-    r.on('fileProgress', function(file){
-        var percent = Math.floor(file.progress()*100);
-        $("#" + file.uniqueIdentifier + " .progress-bar").css('width', percent + '%');
     });
 
     Yoda.groupManager = {

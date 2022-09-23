@@ -6,7 +6,32 @@
     <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='css/group_manager.css') }}">
     <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.css') }}">
     <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2/select2-bootstrap.min.css') }}">
+
+<style>
+.csv-import-file {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+}
+.csv-import-file + label {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.csv-import-file:focus + label {
+	outline: 1px dotted #000;
+	outline: -webkit-focus-ring-color auto 5px;
+}
+</style>
+
+
 {% endblock style %}
+
+
+</style>
 
 {% block scripts %}
     <script src="{{ url_for('group_manager_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
@@ -27,7 +52,8 @@
     <div class="col-md-6 div-show-search-groups">
         {% if user_is_datamanager %}
 
-        <button type="button" class="btn btn-primary import-groups-csv" title="dialog csv import"><i class="fa-solid fa-upload" aria-hidden="true"></i> dialog import groups CSV </button>
+        <button type="button" class="btn btn-primary import-groups-csv" title="dialog csv import"><i class="fa-solid fa-user-group" aria-hidden="true"></i> dialog import groups CSV </button>
+
 
         {% endif %}
         <button type="button" class="btn btn-primary user-search-groups float-end" title="Search groups for users"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Search groups for user</button>
@@ -178,7 +204,7 @@
 </div>
 
 <div class="modal" tabindex="-1" role="dialog" id="dlg-import-groups-csv">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">Import group definitions in CSV file</h5>
@@ -187,9 +213,23 @@
             <div class="modal-body">
                 <h6>Step 1. Upload the csv file</h6>
                 <p class="placeholder-text">Select a csv file containing group definions.<br>
+
                 These have to be in accordance with the description as state here.</p>
+
+<!---
                 <button type="button" class="btn btn-primary upload-csv" title="Upload CSV with group definition"><i class="fa-solid fa-upload" aria-hidden="true"></i> Upload CSV with group definitions</button>
                 <br>
+-->
+<!---
+                <input type="file" name="file" id="file-input" class="inputfile" />
+                <label for="file-input">Choose a file</label>
+-->
+
+                <input type="file" id="file-input" name="file-input" class="csv-import-file" accept=".csv" title="Upload CSV with group definition" />
+                <label for="file-input" class="btn btn-primary"><i class="fa-solid fa-upload" aria-hidden="true"></i> Upload CSV with group definitions</label>
+
+
+                <div id="result-import-groups-csv"></div>
 
                 <div id="files"></div>
                 <br>
@@ -203,8 +243,6 @@
                     <br>
                     <br>
                     <button type="button" class="btn btn-primary process-csv" title="Process CSV with group definition(s)"><i class="fa-solid fa-upload" aria-hidden="true"></i> Process CSV</button>
-                    <hr>
-                    <div id="result-import-groups-csv"></div>
                 </div>
             </div>
             <div class="modal-footer">
