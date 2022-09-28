@@ -8,7 +8,7 @@
 
 "use strict";
 
-function readSingleFile(e) {
+function readCsvFile(e) {
   var file = e.target.files[0];
   if (!file) {
     return;
@@ -17,68 +17,69 @@ function readSingleFile(e) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var contents = e.target.result;
-    console.log(contents);
-    // displayContents(contents);
-    // displayParsed(contents);
-    //
-    // const json = contents.split(',');
-    // console.log(JSON.stringify(json))
 
+    // required to be able to, in a simple manner, add header and data row to the tr's in the table to pass to the backend
+    const csv_header = contents.slice(0, contents.indexOf("\n"));
+    const csv_rows = contents.slice(contents.indexOf("\n") + 1).split("\n");
+
+    // parse the csv file data to be able to present in a table 
     var result = csvToArray(contents);
-    // console.log(result);
 
     // first row will contain fixed definion
-    var ar_keys = result[0]
+    var ar_keys = result[0];
 
-    // First compress all columns to 
-    // category, subcategory, groupname, manager, member, viewer
-    const colums = ['category', 'subcategory', 'groupname', 'manager', 'member', 'viewer']
+    // First compress all columns to  keys: category, subcategory, groupname and usercount
+    const presentation_columns = ['groupname', 'category', 'subcategory', 'users'];
+    const all_csv_columns = ['groupname', 'category', 'subcategory', 'manager', 'member', 'viewer']
+
     var new_result = [];
 
     result.forEach(function myFunction(group_def) {
-        // initialise all columns that must be present
+        // initialise all columns that must be present in the view
         var row = [];
-        colums.forEach(function myFunction(column) {
+        presentation_columns.forEach(function myFunction(column) {
             row[column] = '';
         });
 
         // now loop through the received rows and put them in the right columns
         for (const key of Object.keys(ar_keys)) {
-            colums.forEach(function myFunction(column) {
+            all_csv_columns.forEach(function myFunction(column) {
                 if (key == column) {
                     row[column] = group_def[key];
                     //break;
                 }
                 else if (key.startsWith(column)) {
                     if (group_def[key] != '\r') {
-                        row[column] += (row[column] ? ',' : '') + group_def[key];
+                        // row[column] += (row[column] ? ',' : '') + group_def[key];
+                        if (row['users'] == '') {
+                            row['users'] = '1';
+                        }
+                        else {
+                            row['users'] = (parseInt(row['users']) + 1).toString();
+                        }
                     }
                     //break;
                 }
             });
         }
-
         new_result.push(row);
     });
-    console.log('START');
-    console.log(new_result); 
-    console.log('END');
-
+    console.log(new_result);
 
     // build the header row of the table
-    let table = '<table class="table table-striped"><thead><tr>'
-    colums.forEach(function myFunction(column) {
+    let table = '<table class="table table-striped"><thead><tr><th></th>'
+    presentation_columns.forEach(function myFunction(column) {
         table += '<th>' + column + '</th>';
     });
-    table += '</tr></thead><tbody>';
+    table += '<td></td></tr></thead><tbody>';
 
-    // Add all the data rows and close the table
-
-    new_result.forEach(function myFunction(group_def) {
-        table += '<tr>';
-        colums.forEach(function myFunction(column) {
+    new_result.forEach(function myFunction(group_def, i) {
+        table += '<tr class="import-groupname" groupname="' + group_def['groupname'] + '" import_row_data="' + csv_header + csv_rows[i] + '">';
+        table += '<td id="processed-indicator-' + group_def['groupname'] + '"></td>';
+        presentation_columns.forEach(function myFunction(column) {
             table += '<td>' + group_def[column] + '</td>';
         });
+        table += '<td id="error-import-' + group_def['groupname'] + '"></td>';
         table += '</tr>';
     });
 
@@ -87,15 +88,15 @@ function readSingleFile(e) {
 
     // now have user choose to actually process the uploaded data.
     $('.div-process-results-import').removeClass('hidden');
+
+    // enable processing again after successful reading 
+    $('.process-csv').prop('disabled', false);
   };
   reader.readAsText(file);
 }
 
-
-    function csvToArray(str, delimiter = ",") {
-
+function csvToArray(str, delimiter = ",") {
       const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
-
       const rows = str.slice(str.indexOf("\n") + 1).split("\n");
 
       const arr = rows.map(function (row) {
@@ -108,19 +109,7 @@ function readSingleFile(e) {
       });
 
       return arr;
-    }
-
-function displayContents(contents) {
-  var element = document.getElementById('file-content');
-  element.textContent = contents;
 }
-
-function displayParsed(contents) {
-  const element = document.getElementById('file-parsed');
-  const json = contents.split(',');
-  element.textContent = JSON.stringify(json);
-}
-
 
 function htmlEncode(value){
     //create a in-memory div, set it's inner text(which jQuery automatically encodes)
@@ -129,25 +118,8 @@ function htmlEncode(value){
 }
 
 $(function() {
-    document.getElementById('file-input').addEventListener('change', readSingleFile, false);
+    document.getElementById('file-input').addEventListener('change', readCsvFile, false);
 
-    $('#file-input-blabla').change(function(e){
-        console.log('hahahaha');
-
-        var file = e.target.files[0];
-        if (!file) {
-            return;
-        }
-
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var contents = e.target.result;
-            console.log(contents);
-        }
-    });
-
-
-    var csv_import_filename = 'blabla.csv';
     $('.import-groups-csv').click(function(){
         $('#dlg-import-groups-csv').modal('show');
     });
@@ -216,44 +188,129 @@ $(function() {
         });
     });
     $('.process-csv').click(function(){
-        alert('PROCESS CSV' + csv_import_filename);
-        console.log($('#import-allow-updates').is(':checked'));
-        console.log($('#import-delete-users').is(':checked'));
+        $(this).prop('disabled', true);
+        // loop through the rows in the table and, if successful, add a click handler to be able to jump to a group in the groupmananger
+        $('.import-groupname').each(function myFunction() {
+            // column definition from original 
+            // and data definition 
+            var groupname = $(this).attr('groupname');
+            var import_row_data = $(this).attr('import_row_data');
+
+            console.log($('.import-groupname').length);
+            console.log($('.import-groupname-done').length);
 
 
-        Yoda.call('group_process_csv', 
-            {csv_filename: csv_import_filename,
-             allow_update: $('#import-allow-updates').is(':checked'), 
-             delete_user: $('#import-delete-users').is(':checked')}).then((data) => {
+            Yoda.call('group_process_csv',
+                {csv_header_and_data: import_row_data,
+                 allow_update: $('#import-allow-updates').is(':checked'),
+                 delete_user: $('#import-delete-users').is(':checked')}).then((data) => {
 
-            console.log(data);
-            if (data['status'] != 'ok') {
-                var error_html = '';
-                data['errors'].forEach(function myFunction(item) {
-                    error_html += '<br>' + item;
-                });
-                $('#result-import-groups-csv').html('Something went wrong processing your group definition file:<br>' + error_html);
+                console.log(data);
+                // Mark group as processed. Required to be able to know when all is complete and reload the data for the left pane
+                $(this).addClass('import-groupname-done');
 
-                return;
-            }
+                console.log($('.import-groupname').length);
+                console.log($('.import-groupname-done').length);
 
-            let table = '<table class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th>Manager</th><th>Member</th><th>Viewer</th></tr></thead><tbody>';
 
-            $.each(data['group-data'], function(index, newgroup) {
-                table += `<tr>
-                     <td class="import-csv-result-group" style="cursor: pointer"  import-csv-result-group="${newgroup[2]}">
-                        ${newgroup[2]}
-                     </td>
-                     <td>${newgroup[0]}</td>
-                     <td>${newgroup[1]}</td>
-                     <td>${newgroup[3].join(', ')}</td>
-                     <td>${newgroup[4].join(', ')}</td>
-                     <td>${newgroup[5].join(', ')}</td>
-                </tr>`;
+                if (data['status'] == 'ok') {
+                    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>');
+                    $(this).addClass('import-csv-group-ok');
+                    // $('#processed-indicator-' + groupname).addClass('import-csv-group-ok');
+
+                }
+                else {
+                    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-xmark"></i>');
+                    $(this).addClass('table-danger');
+ 
+                    var error_html = '';
+                    data['errors'].forEach(function myFunction(item) {
+                        error_html += item + '<br/>';
+                    });
+                    $('#error-import-' + groupname).html(error_html);
+                }
+
+                // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
+                if ($('.import-groupname').length == $('.import-groupname-done').length) {
+
+                    // only enable new groups that have been successfully added
+                    $('.import-csv-group-ok').click(function() {
+                        alert($(this).attr('groupname'));
+                    });
+
+                    // Renew the data of the left pane as new groups have been added not yet loaded.
+                    Yoda.call('group_data').then((groupdata) => {
+
+                        Yoda.groupManager.groupHierarchy = groupdata['group_hierarchy']
+                        console.log(Yoda.groupManager.groupHierarchy);
+
+                        Yoda.groupManager.groups = (function(hier) {
+
+                            var groups = { };
+                            for (var categoryName in hier) {
+                                for (var subcategoryName in hier[categoryName]) {
+                                    for (var groupName in hier[categoryName][subcategoryName]) {
+                                        groups[groupName] = {
+                                            category:    categoryName,
+                                            subcategory: subcategoryName,
+                                            name:        groupName,
+                                            description: hier[categoryName][subcategoryName][groupName].description,
+                                            data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
+                                            members:     hier[categoryName][subcategoryName][groupName].members
+                                        };
+
+                                    }
+                                }
+                            }
+                            console.log(groups);
+                            return groups;
+                        })(groupdata['group_hierarchy']);
+
+                        var cat_idx = 1;
+                        var html = '';
+                        var subcat_idx = 1;
+                        var grp_idx = 1;
+                        for (var category in groupdata['group_hierarchy']) {
+                            html += `<div class="list-group-item category" id="category-${ cat_idx }" data-name="${ category }">
+                                        <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-${ cat_idx }" href="#category-${ cat_idx }-ul">
+                                            <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ category }
+                                        </a>
+                                        <div class="list-group collapse category-ul" id="category-${ cat_idx }-ul">`;
+                            subcat_idx = 1;
+                            for (var subcat in groupdata['group_hierarchy'][category]) {
+                                html +=
+
+                                `<div class="list-group-item subcategory" data-name="${ subcat }">
+                                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-${ subcat_idx }" href="#subcategory-${ subcat_idx }-ul">
+                                        <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ subcat }
+                                    </a>
+                                    <div class="list-group collapse subcategory-ul" id="subcategory-${ subcat_idx }-ul">`;
+
+                                grp_idx = 1;
+                                for (var group in groupdata['group_hierarchy'][category][subcat]) {
+                                    html +=
+                                        `<a class="list-group-item list-group-item-action group" id="group-${ grp_idx }" data-name="${ group }">
+                                            ${ group }
+                                        </a>`;
+
+                                    grp_idx += 1
+                                }
+
+                                html += '</div></div>';
+                                subcat_idx = subcat_idx + 1;
+                            }
+
+                            html += '</div></div>';
+                            cat_idx = cat_idx + 1;
+                        }
+                        $('#group-list').html(html);
+                    });
+
+                }
+
             });
-            table += '</tbody></table>';
-            $('#result-import-groups-csv').html(table);
-
+        });
+        if (false) {
             // reinitialize the groupmanager as new groups / definitions have been added.
             Yoda.call('group_data').then((groupdata) => {
                 console.log(groupdata);
@@ -323,15 +380,18 @@ $(function() {
                 $('#group-list').html(html);
             });
 
-            // Yoda.groupManager.load(Yoda.groupManager.groupHierarchy, "rodsadmin", Yoda.groupManager.zone);
+            // Clicking on successfully imported groups, brings you to this group in the groupmanager
+//            $('.import-csv-group-ok').click(function() {
+//                // $('#user-search-groups').modal('hide');
+//                console.log('Kom ik hier???');
+//                let groupName = $(this).attr('groupname');
+//                alert(groupName);
+//                return;
 
-            $('.import-csv-result-group').click(function() {
-                // $('#user-search-groups').modal('hide');
-                let groupName = $(this).attr('import-csv-result-group');
-                Yoda.groupManager.unfoldToGroup(groupName);
-                Yoda.groupManager.selectGroup(groupName);
-            });
-        });
+//                Yoda.groupManager.unfoldToGroup(groupName);
+//                Yoda.groupManager.selectGroup(groupName);
+//            });
+        }
     });
 
     Yoda.groupManager = {
