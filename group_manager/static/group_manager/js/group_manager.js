@@ -205,7 +205,6 @@ $(function() {
                  allow_update: $('#import-allow-updates').is(':checked'),
                  delete_user: $('#import-delete-users').is(':checked')}).then((data) => {
 
-                console.log(data);
                 // Mark group as processed. Required to be able to know when all is complete and reload the data for the left pane
                 $(this).addClass('import-groupname-done');
 
@@ -220,7 +219,7 @@ $(function() {
 
                 }
                 else {
-                    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-xmark"></i>');
+                    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>');
                     $(this).addClass('table-danger');
  
                     var error_html = '';
@@ -235,7 +234,12 @@ $(function() {
 
                     // only enable new groups that have been successfully added
                     $('.import-csv-group-ok').click(function() {
-                        alert($(this).attr('groupname'));
+                        // alert($(this).attr('groupname'));
+
+                        let groupName = 'research-' + $(this).attr('groupname');
+                        $('#dlg-import-groups-csv').modal('hide');
+                        Yoda.groupManager.unfoldToGroup(groupName);
+                        Yoda.groupManager.selectGroup(groupName);
                     });
 
                     // Renew the data of the left pane as new groups have been added not yet loaded.
@@ -1877,6 +1881,11 @@ $(function() {
             if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
                 var $groupPanel = $('.card.groups');
                 $groupPanel.find('.create-button').removeClass('disabled');
+            }
+
+            if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
+                // show import button only for rodsadmin and members of priv-group-add
+                $('.import-groups-csv').removeClass('hidden');
             }
 
             // Indicate which groups are managed by this user.

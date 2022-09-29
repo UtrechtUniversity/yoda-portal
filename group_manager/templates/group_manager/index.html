@@ -50,12 +50,7 @@
         <h1>Group manager</h1>
     </div>
     <div class="col-md-6 div-show-search-groups">
-        {% if user_is_datamanager %}
-
-        <button type="button" class="btn btn-primary import-groups-csv" title="dialog csv import"><i class="fa-solid fa-user-group" aria-hidden="true"></i> dialog import groups CSV </button>
-
-
-        {% endif %}
+        <button type="button" class="btn btn-primary import-groups-csv hidden" title="dialog csv import"><i class="fa-solid fa-user-group" aria-hidden="true"></i> dialog import groups CSV </button>
         <button type="button" class="btn btn-primary user-search-groups float-end" title="Search groups for users"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Search groups for user</button>
     </div>
 </div>
@@ -218,20 +213,6 @@
 
                   These have to be in accordance with the description as state here.</p>
 
-<!---
-                <button type="button" class="btn btn-primary upload-csv" title="Upload CSV with group definition"><i class="fa-solid fa-upload" aria-hidden="true"></i> Upload CSV with group definitions</button>
-                <br>
--->
-<!---
-                <input type="file" name="file" id="file-input" class="inputfile" />
-                <label for="file-input">Choose a file</label>
--->
-<!---
-                  <input type="file" id="file-input" name="file-input" class="csv-import-file" accept=".csv" title="Upload CSV with group definition" />
-                  <label for="file-input" class="btn btn-primary"><i class="fa-solid fa-upload" aria-hidden="true"></i> Upload CSV with group definitions</label>
--->
-
-<!---                <div id="files"></div> -->
                 </div>
                 <div class='col-sm-6 div-process-results-import hidden'>
                   <div class="div-process-results-import8888">
@@ -251,7 +232,7 @@
                   <label for="file-input" class="btn btn-primary"><i class="fa-solid fa-upload" aria-hidden="true"></i> Upload CSV with group definitions</label>
                 </div>
                 <div class='col-sm-6 div-process-results-import hidden'>
-                    <button type="button" class="btn btn-primary process-csv" title="Process CSV with group definition(s)"><i class="fa-solid fa-upload" aria-hidden="true"></i> Process CSV</button>
+                    <button type="button" class="btn btn-primary process-csv" title="Process CSV with group definition(s)"><i class="fa-solid fa-user-group" aria-hidden="true"></i> Process CSV</button>
                 </div>
               </div>
               <div class="row">

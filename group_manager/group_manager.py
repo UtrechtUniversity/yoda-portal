@@ -31,15 +31,10 @@ def index() -> Response:
     user_type = response['data']['user_type']
     user_zone = response['data']['user_zone']
 
-    # only datamanagers are allowed to upload CSV's for import of group definitions
-    response = api.call('user_is_a_datamanager', data={})
-    user_is_datamanager = response['data']['user_is_a_datamanager']
-
     return render_template('group_manager/index.html',
                            group_hierarchy=group_hierarchy,
                            user_type=user_type,
-                           user_zone=user_zone,
-                           user_is_datamanager=user_is_datamanager)
+                           user_zone=user_zone)
 
 
 @group_manager_bp.route('/get_categories', methods=['POST'])
