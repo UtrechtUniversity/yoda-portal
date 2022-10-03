@@ -18,6 +18,12 @@ function readCsvFile(e) {
   reader.onload = function(e) {
     var contents = e.target.result;
 
+    //remove unwanted characters
+    contents = contents.replaceAll('"', '').replaceAll("'", '').replaceAll(' ', '');
+
+    // ensure correct seperator ','
+    contents = contents.replaceAll(';', ',');
+
     // required to be able to, in a simple manner, add header and data row to the tr's in the table to pass to the backend
     const csv_header = contents.slice(0, contents.indexOf("\n"));
     const csv_rows = contents.slice(contents.indexOf("\n") + 1).split("\n");
@@ -46,11 +52,9 @@ function readCsvFile(e) {
             all_csv_columns.forEach(function myFunction(column) {
                 if (key == column) {
                     row[column] = group_def[key];
-                    //break;
                 }
                 else if (key.startsWith(column)) {
                     if (group_def[key] != '\r') {
-                        // row[column] += (row[column] ? ',' : '') + group_def[key];
                         if (row['users'] == '') {
                             row['users'] = '1';
                         }
@@ -58,13 +62,20 @@ function readCsvFile(e) {
                             row['users'] = (parseInt(row['users']) + 1).toString();
                         }
                     }
-                    //break;
                 }
             });
         }
-        new_result.push(row);
+        // only show row when all required data is present.
+        var row_error = false;
+        presentation_columns.forEach(function myFunction(column) {
+            if (!row_error && (row[column] === undefined || row[column] == '')) {
+                row_error = true;
+            }
+        });
+        if (row_error == false) {
+            new_result.push(row);
+        }
     });
-    console.log(new_result);
 
     // build the header row of the table
     let table = '<table class="table table-striped"><thead><tr><th></th>'
@@ -117,12 +128,133 @@ function htmlEncode(value){
     return $('<div/>').text(value).html().replace('"', '&quot;');
 }
 
+
+async function process_imported_row(row) {
+    // Row specific processing of the imported csv
+    var groupname = row.attr('groupname');
+    var import_row_data = row.attr('import_row_data');
+
+    try {
+        await Yoda.call('group_process_csv',
+            {csv_header_and_data: import_row_data,
+             allow_update: $('#import-allow-updates').is(':checked'),
+             delete_user: $('#import-delete-users').is(':checked')},
+            {"quiet": true}).then((data) => {
+
+            // Successful import -> set correct classes and feedback to inform user
+            row.addClass('import-groupname-done');
+            $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>');
+            row.addClass('import-csv-group-ok');
+         });
+    }
+    catch(error) {
+        // Row processing encountered problems => inform user and add appropriate classes.
+        row.addClass('import-groupname-done');
+
+        $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>');
+        row.addClass('table-danger');
+        // collect error messages and maken 1 string to present to user.
+        var error_html = '';
+        error.status_info.forEach(function myFunction(item) {
+            error_html += item + '<br/>';
+        });
+        $('#error-import-' + groupname).html(error_html);
+    }
+    // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
+    if ($('.import-groupname').length == $('.import-groupname-done').length) {
+        // only enable new groups that have been successfully added
+        $('.import-csv-group-ok').click(function() {
+            let groupName = 'research-' + $(this).attr('groupname');
+            $('#dlg-import-groups-csv').modal('hide');
+            Yoda.groupManager.unfoldToGroup(groupName);
+            Yoda.groupManager.selectGroup(groupName);
+        });
+
+        // Renew the data of the left pane as new groups have been added not yet loaded.
+        Yoda.call('group_data').then((groupdata) => {
+            Yoda.groupManager.groupHierarchy = groupdata['group_hierarchy']
+
+            // Collect the latest data and bring into Yoda.groupManager.groups
+            Yoda.groupManager.groups = (function(hier) {
+                var groups = { };
+                for (var categoryName in hier) {
+                    for (var subcategoryName in hier[categoryName]) {
+                        for (var groupName in hier[categoryName][subcategoryName]) {
+                            groups[groupName] = {
+                                category:    categoryName,
+                                subcategory: subcategoryName,
+                                name:        groupName,
+                                description: hier[categoryName][subcategoryName][groupName].description,
+                                data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
+                                members:     hier[categoryName][subcategoryName][groupName].members
+                            };
+
+                        }
+                    }
+                }
+                return groups;
+            })(groupdata['group_hierarchy']);
+
+            var cat_idx = 1;
+            var html = '';
+            var subcat_idx = 1;
+            var grp_idx = 1;
+            for (var category in groupdata['group_hierarchy']) {
+                            html += `<div class="list-group-item category" id="category-${ cat_idx }" data-name="${ category }">
+                                        <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-${ cat_idx }" href="#category-${ cat_idx }-ul">
+                                            <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ category }
+                                        </a>
+                                        <div class="list-group collapse category-ul" id="category-${ cat_idx }-ul">`;
+                            subcat_idx = 1;
+                            for (var subcat in groupdata['group_hierarchy'][category]) {
+                                html +=
+
+                                `<div class="list-group-item subcategory" data-name="${ subcat }">
+                                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-${ subcat_idx }" href="#subcategory-${ subcat_idx }-ul">
+                                        <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ subcat }
+                                    </a>
+                                    <div class="list-group collapse subcategory-ul" id="subcategory-${ subcat_idx }-ul">`;
+
+                                grp_idx = 1;
+                                for (var group in groupdata['group_hierarchy'][category][subcat]) {
+                                    html +=
+                                        `<a class="list-group-item list-group-item-action group" id="group-${ grp_idx }" data-name="${ group }">
+                                            ${ group }
+                                        </a>`;
+
+                                    grp_idx += 1
+                                }
+
+                                html += '</div></div>';
+                                subcat_idx = subcat_idx + 1;
+                            }
+
+                            html += '</div></div>';
+                            cat_idx = cat_idx + 1;
+            }
+            $('#group-list').html(html);
+        });
+    }
+}
+
+
 $(function() {
+    // CSV import handling {{{
     document.getElementById('file-input').addEventListener('change', readCsvFile, false);
 
     $('.import-groups-csv').click(function(){
         $('#dlg-import-groups-csv').modal('show');
     });
+    $('.process-csv').click(function(){
+        // First disable the button
+        $(this).prop('disabled', true);
+
+        // loop through the rows in the table and, if successful, add a click handler to be able to jump to a group in the groupmananger
+        $('.import-groupname').each(function myFunction() {
+            process_imported_row($(this));
+        });
+    });
+    // }}}
 
     $('.user-search-groups').click(function(){
         $('#user-search-groups').modal('show');
@@ -186,216 +318,6 @@ $(function() {
              Yoda.groupManager.unfoldToGroup(groupName);
              Yoda.groupManager.selectGroup(groupName);
         });
-    });
-    $('.process-csv').click(function(){
-        $(this).prop('disabled', true);
-        // loop through the rows in the table and, if successful, add a click handler to be able to jump to a group in the groupmananger
-        $('.import-groupname').each(function myFunction() {
-            // column definition from original 
-            // and data definition 
-            var groupname = $(this).attr('groupname');
-            var import_row_data = $(this).attr('import_row_data');
-
-            console.log($('.import-groupname').length);
-            console.log($('.import-groupname-done').length);
-
-
-            Yoda.call('group_process_csv',
-                {csv_header_and_data: import_row_data,
-                 allow_update: $('#import-allow-updates').is(':checked'),
-                 delete_user: $('#import-delete-users').is(':checked')}).then((data) => {
-
-                // Mark group as processed. Required to be able to know when all is complete and reload the data for the left pane
-                $(this).addClass('import-groupname-done');
-
-                console.log($('.import-groupname').length);
-                console.log($('.import-groupname-done').length);
-
-
-                if (data['status'] == 'ok') {
-                    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>');
-                    $(this).addClass('import-csv-group-ok');
-                    // $('#processed-indicator-' + groupname).addClass('import-csv-group-ok');
-
-                }
-                else {
-                    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>');
-                    $(this).addClass('table-danger');
- 
-                    var error_html = '';
-                    data['errors'].forEach(function myFunction(item) {
-                        error_html += item + '<br/>';
-                    });
-                    $('#error-import-' + groupname).html(error_html);
-                }
-
-                // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
-                if ($('.import-groupname').length == $('.import-groupname-done').length) {
-
-                    // only enable new groups that have been successfully added
-                    $('.import-csv-group-ok').click(function() {
-                        // alert($(this).attr('groupname'));
-
-                        let groupName = 'research-' + $(this).attr('groupname');
-                        $('#dlg-import-groups-csv').modal('hide');
-                        Yoda.groupManager.unfoldToGroup(groupName);
-                        Yoda.groupManager.selectGroup(groupName);
-                    });
-
-                    // Renew the data of the left pane as new groups have been added not yet loaded.
-                    Yoda.call('group_data').then((groupdata) => {
-
-                        Yoda.groupManager.groupHierarchy = groupdata['group_hierarchy']
-                        console.log(Yoda.groupManager.groupHierarchy);
-
-                        Yoda.groupManager.groups = (function(hier) {
-
-                            var groups = { };
-                            for (var categoryName in hier) {
-                                for (var subcategoryName in hier[categoryName]) {
-                                    for (var groupName in hier[categoryName][subcategoryName]) {
-                                        groups[groupName] = {
-                                            category:    categoryName,
-                                            subcategory: subcategoryName,
-                                            name:        groupName,
-                                            description: hier[categoryName][subcategoryName][groupName].description,
-                                            data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
-                                            members:     hier[categoryName][subcategoryName][groupName].members
-                                        };
-
-                                    }
-                                }
-                            }
-                            console.log(groups);
-                            return groups;
-                        })(groupdata['group_hierarchy']);
-
-                        var cat_idx = 1;
-                        var html = '';
-                        var subcat_idx = 1;
-                        var grp_idx = 1;
-                        for (var category in groupdata['group_hierarchy']) {
-                            html += `<div class="list-group-item category" id="category-${ cat_idx }" data-name="${ category }">
-                                        <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-${ cat_idx }" href="#category-${ cat_idx }-ul">
-                                            <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ category }
-                                        </a>
-                                        <div class="list-group collapse category-ul" id="category-${ cat_idx }-ul">`;
-                            subcat_idx = 1;
-                            for (var subcat in groupdata['group_hierarchy'][category]) {
-                                html +=
-
-                                `<div class="list-group-item subcategory" data-name="${ subcat }">
-                                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-${ subcat_idx }" href="#subcategory-${ subcat_idx }-ul">
-                                        <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ subcat }
-                                    </a>
-                                    <div class="list-group collapse subcategory-ul" id="subcategory-${ subcat_idx }-ul">`;
-
-                                grp_idx = 1;
-                                for (var group in groupdata['group_hierarchy'][category][subcat]) {
-                                    html +=
-                                        `<a class="list-group-item list-group-item-action group" id="group-${ grp_idx }" data-name="${ group }">
-                                            ${ group }
-                                        </a>`;
-
-                                    grp_idx += 1
-                                }
-
-                                html += '</div></div>';
-                                subcat_idx = subcat_idx + 1;
-                            }
-
-                            html += '</div></div>';
-                            cat_idx = cat_idx + 1;
-                        }
-                        $('#group-list').html(html);
-                    });
-
-                }
-
-            });
-        });
-        if (false) {
-            // reinitialize the groupmanager as new groups / definitions have been added.
-            Yoda.call('group_data').then((groupdata) => {
-                console.log(groupdata);
-                // overwrite older data
-                Yoda.groupManager.groupHierarchy = groupdata['group_hierarchy']
-                console.log(Yoda.groupManager.groupHierarchy);
-
-                Yoda.groupManager.groups = (function(hier) {
-                    // Create a flat group map based on the hierarchy object.
-                    var groups = { };
-                    for (var categoryName in hier) {
-                        for (var subcategoryName in hier[categoryName]) {
-                            for (var groupName in hier[categoryName][subcategoryName]) {
-                                groups[groupName] = {
-                                    category:    categoryName,
-                                    subcategory: subcategoryName,
-                                    name:        groupName,
-                                    description: hier[categoryName][subcategoryName][groupName].description,
-                                    data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
-                                    members:     hier[categoryName][subcategoryName][groupName].members
-                                };
-
-                            }
-                        }
-                    }
-                    console.log(groups);
-                    return groups;
-                })(groupdata['group_hierarchy']);
-
-                var cat_idx = 1;
-                var html = '';
-                var subcat_idx = 1;
-                var grp_idx = 1;
-                for (var category in groupdata['group_hierarchy']) {
-                    html += `<div class="list-group-item category" id="category-${ cat_idx }" data-name="${ category }">
-                                <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-${ cat_idx }" href="#category-${ cat_idx }-ul">
-                                    <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ category }
-                                </a>
-                                <div class="list-group collapse category-ul" id="category-${ cat_idx }-ul">`;
-                    subcat_idx = 1;
-                    for (var subcat in groupdata['group_hierarchy'][category]) {
-                        html += 
-
-                        `<div class="list-group-item subcategory" data-name="${ subcat }">
-                            <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-${ subcat_idx }" href="#subcategory-${ subcat_idx }-ul">
-                                <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ subcat }
-                            </a>
-                            <div class="list-group collapse subcategory-ul" id="subcategory-${ subcat_idx }-ul">`;
-
-                        grp_idx = 1;
-                        for (var group in groupdata['group_hierarchy'][category][subcat]) {
-                            html +=
-                                `<a class="list-group-item list-group-item-action group" id="group-${ grp_idx }" data-name="${ group }">
-                                    ${ group }
-                                </a>`;
-
-                            grp_idx += 1
-                        }
-
-                        html += '</div></div>';
-                        subcat_idx = subcat_idx + 1;
-                    }
-
-                    html += '</div></div>';
-                    cat_idx = cat_idx + 1;
-                }
-                $('#group-list').html(html);
-            });
-
-            // Clicking on successfully imported groups, brings you to this group in the groupmanager
-//            $('.import-csv-group-ok').click(function() {
-//                // $('#user-search-groups').modal('hide');
-//                console.log('Kom ik hier???');
-//                let groupName = $(this).attr('groupname');
-//                alert(groupName);
-//                return;
-
-//                Yoda.groupManager.unfoldToGroup(groupName);
-//                Yoda.groupManager.selectGroup(groupName);
-//            });
-        }
     });
 
     Yoda.groupManager = {
