@@ -27,6 +27,7 @@ function readCsvFile(e) {
     // required to be able to, in a simple manner, add header and data row to the tr's in the table to pass to the backend
     const csv_header = contents.slice(0, contents.indexOf("\n"));
     const csv_rows = contents.slice(contents.indexOf("\n") + 1).split("\n");
+    var csv_rows_corrected = [];
 
     // parse the csv file data to be able to present in a table 
     var result = csvToArray(contents);
@@ -39,7 +40,7 @@ function readCsvFile(e) {
     const all_csv_columns = ['groupname', 'category', 'subcategory', 'manager', 'member', 'viewer']
 
     var new_result = [];
-
+    var row_nr = 0;
     result.forEach(function myFunction(group_def) {
         // initialise all columns that must be present in the view
         var row = [];
@@ -74,7 +75,9 @@ function readCsvFile(e) {
         });
         if (row_error == false) {
             new_result.push(row);
+            csv_rows_corrected.push(csv_rows[row_nr]);
         }
+        row_nr += 1;
     });
 
     // build the header row of the table
@@ -85,7 +88,7 @@ function readCsvFile(e) {
     table += '<td></td></tr></thead><tbody>';
 
     new_result.forEach(function myFunction(group_def, i) {
-        table += '<tr class="import-groupname" groupname="' + group_def['groupname'] + '" import_row_data="' + csv_header + csv_rows[i] + '">';
+        table += '<tr class="import-groupname" groupname="' + group_def['groupname'] + '" import_row_data="' + csv_header + csv_rows_corrected[i] + '">';
         table += '<td id="processed-indicator-' + group_def['groupname'] + '"></td>';
         presentation_columns.forEach(function myFunction(column) {
             table += '<td>' + group_def[column] + '</td>';
