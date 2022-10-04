@@ -3,22 +3,10 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-#from flask import Blueprint, make_response, render_template, request, Response
-#from irods.exception import CAT_NO_ACCESS_PERMISSION
-#from irods.message import iRODSMessage
-#from werkzeug.utils import secure_filename
-
 
 from flask import Blueprint, make_response, render_template, request, Response
 
 import api
-
-# from flask import abort, Blueprint, g, jsonify, make_response, render_template, request, Response, stream_with_context
-# from irods.exception import CAT_NO_ACCESS_PERMISSION
-# from irods.message import iRODSMessage
-# from werkzeug.utils import secure_filename
-
-# import api
 
 
 group_manager_bp = Blueprint('group_manager_bp', __name__,
