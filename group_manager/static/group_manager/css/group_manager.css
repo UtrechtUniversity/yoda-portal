@@ -140,3 +140,8 @@
     outline: 1px dotted #000;
     outline: -webkit-focus-ring-color auto 5px;
 }
+
+#result-import-groups-csv {
+    max-height: 500px;
+    overflow-y: auto;
+}
