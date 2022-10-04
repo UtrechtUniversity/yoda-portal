@@ -15,7 +15,11 @@
     <br />
     <br />
     Below you can generate a data access password.
-    The password is valid for 72 hours.
+{% if token_lifetime >= 48 and token_lifetime % 24 == 0 -%}
+    The password is valid for {{ (token_lifetime / 24) | int }} days.
+{% else %}
+    The password is valid for {{ token_lifetime }} hours.
+{%- endif %}
     If the password has expired, you can simply repeat this procedure.
 </p>
 <div class="card">

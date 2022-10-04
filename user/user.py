@@ -135,10 +135,7 @@ def settings() -> Response:
     if request.method == 'POST':
         # Build user settings dict.
         settings = {}
-        if request.form.get('mail_notifications') != 'on':
-            settings['mail_notifications'] = 'OFF'
-        else:
-            settings['mail_notifications'] = request.form.get('mail_notifications_type', "DAILY")
+        settings['mail_notifications'] = request.form.get('mail_notifications', "OFF")
 
         # Save user settings and handle API response.
         data = {"settings": settings}
@@ -160,7 +157,10 @@ def settings() -> Response:
 def data_access() -> Response:
     """Data Access Passwords overview"""
     response = api.call('token_load')
-    return render_template('user/data_access.html', tokens=response['data'])
+    token_lifetime = app.config.get('TOKEN_LIFETIME')
+    return render_template('user/data_access.html',
+                           tokens=response['data'],
+                           token_lifetime=token_lifetime)
 
 
 @user_bp.route('/callback')

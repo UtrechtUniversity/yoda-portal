@@ -2,10 +2,6 @@
 
 {% block title %}{{ super() }} &dash; Settings{% endblock title %}
 
-{% block scripts %}
-    <script src="{{ url_for('user_bp.static', filename='js/settings.js') }}"></script>
-{% endblock scripts %}
-
 {% block content %}
 <h1>Settings</h1>
 
@@ -16,22 +12,18 @@
     <div class="card-body">
         <form method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <fieldset class="col-md-3">
-                <div class="input-group mb-3 form-check form-switch">
-                    <input type="checkbox" class="form-check-input" id="mail_notifications" name="mail_notifications" {% if mail_notifications != 'OFF' %}checked{% else %}{% endif %}>
-                    <label class="form-check-label" for="mail_notifications">Receive mail notifications</label>
+            <fieldset class="col-md-6">
+                <label for="mail_notifications" class="form-label">E-mail notifications</label>
+                <select class="form-select" id="mail_notifications" name="mail_notifications" aria-describedby="mail_notifications_help">
+                    <option value="OFF" {% if mail_notifications == 'OFF' %}selected{% else %}{% endif %}>Off</option>
+                    <option value="IMMEDIATE" {% if mail_notifications == 'IMMEDIATE' %}selected{% else %}{% endif %}>Immediate e-mail</option>
+                    <option value="DAILY" {% if mail_notifications == 'DAILY' %}selected{% else %}{% endif %}>Daily digest</option>
+                    <option value="WEEKLY" {% if mail_notifications == 'WEEKLY' %}selected{% else %}{% endif %}>Weekly digest</option>
+                </select>
+                <div id="mail_notifications_help" class="form-text">
+                    Receive e-mails of your notifications in Yoda.
                 </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <label class="input-group-text" for="mail_notifications_type">Type</label>
-                    </div>
-                    <select class="form-select" id="mail_notifications_type" name="mail_notifications_type" {% if mail_notifications == 'OFF' %}disabled{% else %}{% endif %}>
-                        <option value="IMMEDIATE" {% if mail_notifications == 'IMMEDIATE' %}selected{% else %}{% endif %}>Immediate</option>
-                        <option value="DAILY" {% if mail_notifications == 'DAILY' or mail_notifications == 'OFF' %}selected{% else %}{% endif %}>Daily</option>
-                        <option value="WEEKLY" {% if mail_notifications == 'WEEKLY' %}selected{% else %}{% endif %}>Weekly</option>
-                    </select>
-                </div>
-                <div class="input-group mb-3">
+                <div class="input-group mt-3 mb-3">
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </fieldset>

@@ -248,6 +248,7 @@ $(function() {
     $('.import-groups-csv').click(function(){
         $('#dlg-import-groups-csv').modal('show');
     });
+
     $('.process-csv').click(function(){
         // First disable the button
         $(this).prop('disabled', true);
@@ -258,6 +259,41 @@ $(function() {
         });
     });
     // }}}
+
+    // When allowed to add groups the fields have to be initialized
+    $('.create-button-new').click(function(){
+        $('.properties-update').addClass('hidden');
+        $('.users').addClass('hidden');
+        $('.properties-create').removeClass('hidden');
+
+        var that = Yoda.groupManager;
+
+        var $prefixDiv = $('#f-group-create-prefix-div');
+        $prefixDiv.find('button .text').html(that.GROUP_DEFAULT_PREFIX + '&nbsp;');
+
+        $('#f-group-create-data-classification').val('unspecified').trigger('change');
+
+        $('#f-group-create-prefix-div a[data-value="' + that.GROUP_DEFAULT_PREFIX + '"]').click();
+
+        $('#f-group-create-name')       .val('');
+        $('#f-group-create-description').val('');
+
+        $('#f-group-create-prefix-datamanager').addClass('hidden');
+
+        $('#f-group-create-category')   .select2('val', '');
+        $('#f-group-create-subcategory').select2('val', '');
+        $('#f-group-create-name').focus();
+    });
+
+    // Intercept group creation submission of form
+    $('#f-group-create-submit').click(function(){
+        Yoda.groupManager.onSubmitGroupCreateOrUpdate(this);
+    });
+
+    // Intercept group update submission of form
+    $('#f-group-update-submit').click(function(){
+        Yoda.groupManager.onSubmitGroupCreateOrUpdate(this);
+    });
 
     $('.user-search-groups').click(function(){
         $('#user-search-groups').modal('show');
@@ -559,12 +595,7 @@ $(function() {
 
         updateGroupMemberCount: function(groupName) {
             var $userPanelTitle = $('.card.users .card-title');
-            $userPanelTitle.text(
-                $userPanelTitle.text().replace(
-                    /(?:\s*\(\d+\))?$/,
-                    ' (' + Object.keys(this.groups[groupName].members).length + ')'
-                )
-            );
+            $('#user-group-member-count').text('Group members (' + Object.keys(this.groups[groupName].members).length + ')');
         },
 
         /**
@@ -587,6 +618,11 @@ $(function() {
 
             this.unfoldToGroup(groupName);
 
+            // handle visibility of correct update cards.
+            $('.properties-create').addClass('hidden');
+            $('.properties-update').removeClass('hidden');
+            $('.users').removeClass('hidden');
+
             $('#group-properties-group-name').html('<strong>[' + groupName + ']</strong>');
 
             $oldGroup.removeClass('active');
@@ -596,7 +632,7 @@ $(function() {
             var that = this;
 
             var $groupPanel = $('.card.groups');
-            $groupPanel.find('.delete-button').toggleClass(
+            $('.delete-button').toggleClass(
                 'disabled',
                 !!(!userCanManage || groupName.match(that.GROUP_PREFIXES_RESERVED_RE)
                    || (groupName.match(/^datamanager-/) && !this.isRodsAdmin))
@@ -717,11 +753,10 @@ $(function() {
                 });
 
                 // Move the user creation item to the bottom of the list.
-                var $userCreateItem = $userList.find('.item-user-create');
-                $userCreateItem.appendTo($userList);
-                $userCreateItem.attr('hidden', !that.canManageGroup(groupName));
-
-                $userList.find('#f-user-create-group').val(groupName);
+                var $userList2 = $('#user-list-add-user');
+                var $userCreateItem = $userList2.find('.item-user-create');
+                $userList2.find('#f-user-create-group').val(groupName);
+                $userList2.attr('hidden', !that.canManageGroup(groupName));
 
                 var $userPanel = $('.card.users');
                 $userPanel.find('#user-list').removeClass('hidden');
@@ -766,6 +801,8 @@ $(function() {
             // Fix bad bootstrap borders caused by hidden elements.
             $userPanel.find('.card-header').css({ borderBottom: ''               });
             $userPanel.find('.card-footer').css({ borderTop:    '1px solid #ddd' });
+
+            $('#group-properties-group-name').html('');
 
             Yoda.storage.session.remove('selected-group');
         },
@@ -1095,27 +1132,22 @@ $(function() {
          * `this` is assumed to be the groupManager object, not the form element
          * that was submitted.
          *
-         * \param el the form element
-         * \param e  a submit event
+         * \param button the button that determines updating or creation of group data
          */
-        onSubmitGroupCreateOrUpdate: function(el, e) {
-            e.preventDefault();
+        onSubmitGroupCreateOrUpdate: function(button) {
 
             var action =
-                $(el).attr('id') === 'f-group-create'
+                $(button).attr('id') === 'f-group-create-submit'
                 ? 'create' : 'update';
 
-            $(el).find('input[type="submit"]')
-                .addClass('disabled')
-                .val(
+            $(button).addClass('disabled').val(
                     action === 'create'
                     ? 'Adding group...'
                     : 'Updating...'
                 );
 
             function resetSubmitButton() {
-                $(el).find('input[type="submit"]')
-                    .removeClass('disabled')
+                $(button).removeClass('disabled')
                     .val(
                         action === 'create'
                         ? 'Add group'
@@ -1123,13 +1155,14 @@ $(function() {
                     );
             }
 
+            // all now bases upon update-fields. Create dialog is discarded
             var newProperties = {
-                name:                $(el).find('#f-group-'+action+'-name'     ).attr('data-prefix')
-                                   + $(el).find('#f-group-'+action+'-name'     ).val(),
-                description:         $(el).find('#f-group-'+action+'-description').val(),
-                data_classification: $(el).find('#f-group-'+action+'-data-classification').val(),
-                category:            $(el).find('#f-group-'+action+'-category'   ).val(),
-                subcategory:         $(el).find('#f-group-'+action+'-subcategory').val(),
+                name:                $('#f-group-' + action + '-name'     ).attr('data-prefix')
+                                   + $('#f-group-' + action + '-name'     ).val(),
+                description:         $('#f-group-' + action + '-description').val(),
+                data_classification: $('#f-group-' + action + '-data-classification').val(),
+                category:            $('#f-group-' + action + '-category'   ).val(),
+                subcategory:         $('#f-group-' + action + '-subcategory').val(),
             };
 
             if (newProperties.category === '' || newProperties.subcategory === '') {
@@ -1177,7 +1210,7 @@ $(function() {
                 delete postData.group_data_classification;
 
             $.ajax({
-                url:      $(el).attr('action'),
+                url:      $(button).attr('action'),
                 type:     'post',
                 dataType: 'json',
                 data:     postData
@@ -1327,12 +1360,20 @@ $(function() {
                     };
 
                     $(el).find('#f-user-create-name').select2('val', '');
-                    $(el).addClass('hidden');
-                    $(el).parents('.list-group-item').find('.user-create-text').removeAttr('hidden');
 
                     that.deselectGroup();
                     that.selectGroup(groupName);
                     that.selectUser(userName);
+
+                    // Give a visual hint that the user was added.
+                    $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]')[0].scrollIntoView({
+                        block: "center",
+                        behavior: "smooth"
+                    });
+                    $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once');
+
+                    // open the select-user select2 for ease of use
+                    $('.selectify-user-name').select2('open');
                 } else {
                     // Something went wrong. :(
                     if ('message' in result)
@@ -1557,8 +1598,17 @@ $(function() {
                         += '&' + encodeURIComponent(Yoda.csrf.tokenName)
                          + '=' + encodeURIComponent(Yoda.csrf.tokenValue);
             });
-
             // }}}
+
+            // Set inial state of group create button {{{
+            if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
+                $('.create-button-new').removeClass('hidden');
+            }
+            else {
+                $('.create-button-new').addClass('hidden');
+            }
+            // }}}
+
             // Group list {{{
 
             $groupList.on('show.bs.collapse', function(e) {
@@ -1633,46 +1683,7 @@ $(function() {
 
             // Group creation {{{
 
-            $('#modal-group-create').on('show.bs.modal', function() {
-                var $prefixDiv = $('#f-group-create-prefix-div');
-                $prefixDiv.find('button .text').html(that.GROUP_DEFAULT_PREFIX + '&nbsp;');
-
-                $('#f-group-create-data-classification').val('unspecified').trigger('change');
-
-                // Set up the group prefix field thingy by "clicking" on the default option.
-                // (the event handler for that is below this one)
-                $('#f-group-create-prefix-div a[data-value="' + that.GROUP_DEFAULT_PREFIX + '"]').click();
-
-                $('#f-group-create-name')       .val('');
-                $('#f-group-create-description').val('');
-
-                // The 'datamanager-' prefix option becomes selectable once the
-                // user selects a category that they are allowed to create the
-                // datamanager group in.
-                $('#f-group-create-prefix-datamanager').addClass('hidden');
-
-                var $selectedGroup = $('#group-list .group.active');
-                var  selectedGroupName;
-                if (
-                    $selectedGroup.length
-                    && that.isManagerInCategory(
-                        that.groups[(selectedGroupName
-                                     = $($selectedGroup[0]).attr('data-name'))].category)
-                ) {
-                    // Fill in the (sub)category of the currently selected group.
-                    $('#f-group-create-category')   .select2('val', that.groups[selectedGroupName].category);
-                    $('#f-group-create-subcategory').select2('val', that.groups[selectedGroupName].subcategory);
-
-                    if (that.canCreateDatamanagerGroup(that.groups[selectedGroupName].category))
-                        $('#f-group-create-prefix-datamanager').removeClass('hidden');
-
-                } else {
-                    $('#f-group-create-category')   .select2('val', '');
-                    $('#f-group-create-subcategory').select2('val', '');
-                }
-            });
-
-            $('#modal-group-create #f-group-create-prefix-div a').on('click', function(e) {
+            $('#f-group-create-prefix-div a').on('click', function(e) {
                 // Select new group prefix.
                 var newPrefix = $(this).attr('data-value');
                 var oldPrefix = $('#f-group-create-name').attr('data-prefix');
@@ -1694,34 +1705,25 @@ $(function() {
 
                 if (hadDataclas != haveDataclas) {
                     if (haveDataclas) {
-                        $('#modal-group-create').find('.data-classification').show();
+                        $('.data-classification').show();
                         $('#f-group-create-data-classification').val('unspecified').trigger('change');
 
                     } else {
-                        $('#modal-group-create').find('.data-classification').hide();
+                        $('.data-classification').hide();
                     }
                 }
 
                 e.preventDefault();
             });
 
+
             // Only rodsadmin can select the 'grp-' prefix.
             if (!this.isRodsAdmin)
                 $('#f-group-create-prefix-grp').addClass('hidden');
 
-            $('#modal-group-create').on('shown.bs.modal', function() {
-                // Auto-focus group name in group add dialog.
-                $('#f-group-create-name').focus();
-            });
-
-            // Group creation / update.
-            $('#f-group-create, #f-group-update').on('submit', function(e) {
-                that.onSubmitGroupCreateOrUpdate(this, e);
-            });
-
             // Group removal.
             $('#modal-group-delete .confirm').on('click', function(e) {
-                that.onClickGroupDelete($('.groups.card .delete-button')[0]);
+                that.onClickGroupDelete($('.card.properties-update .delete-button')[0]);
                 $('#modal-group-delete').modal('hide');
             });
 
