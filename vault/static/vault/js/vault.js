@@ -161,7 +161,7 @@ $(function() {
     });
 
     $("body").on("click", "a.action-submit-for-publication-new-version", function() {
-        console.log("submit-for-publication-new-version");
+        $('#selectPreviousVersion').modal('show');
     });
 
     $("#confirmAgreementConditions").on("click", '.confirm-conditions', function() {
