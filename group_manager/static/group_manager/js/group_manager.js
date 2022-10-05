@@ -141,7 +141,7 @@ async function process_imported_row(row) {
         await Yoda.call('group_process_csv',
             {csv_header_and_data: import_row_data,
              allow_update: $('#import-allow-updates').is(':checked'),
-             delete_user: $('#import-delete-users').is(':checked')},
+             delete_users: $('#import-delete-users').is(':checked')},
             {"quiet": true}).then((data) => {
 
             // Successful import -> set correct classes and feedback to inform user
@@ -244,6 +244,10 @@ async function process_imported_row(row) {
 $(function() {
     // CSV import handling {{{
     document.getElementById('file-input').addEventListener('change', readCsvFile, false);
+
+    $('.file-input-click').click(function(){
+        $('#file-input').val(null);
+    });
 
     $('.import-groups-csv').click(function(){
         $('#dlg-import-groups-csv').modal('show');
