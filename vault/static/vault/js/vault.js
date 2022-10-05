@@ -11,6 +11,7 @@ $(document).ajaxSend(function(e, request, settings) {
 
 let preservableFormatsLists = null;
 let currentFolder;
+let dataPackage = null;
 
 $(function() {
     // Extract current location from query string (default to '').
@@ -161,7 +162,36 @@ $(function() {
     });
 
     $("body").on("click", "a.action-submit-for-publication-new-version", function() {
-        $('#selectPreviousVersion').modal('show');
+        let folder = $(this).attr('data-folder');
+        let vault = String(folder.match(/.*\//)).replace(/\/+$/, '');
+        dataPackage = null;
+        $('#selectPreviousVersion .modal-body').html('');
+        Yoda.call('vault_get_published_packages', {path: Yoda.basePath + vault}).then((data) => {
+            if (data) {
+                let i = 0;
+                $.each(data, function(key, value) {
+                    i++;
+                    $('#selectPreviousVersion .modal-body').append(`
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${htmlEncode(key)}">
+  <label class="form-check-label" for="dataPackage${i}">
+    ${htmlEncode(value)}
+  </label>
+</div>
+`);
+                });
+            } else {
+                $('#selectPreviousVersion .modal-body').html("No previously published data packages available.");
+            }
+
+            $('#selectPreviousVersion').modal('show');
+        });
+    });
+
+    $("body").on("click", "a.action-confirm-data-package-select", function() {
+        dataPackage = $('#selectPreviousVersion .modal-body input[type="radio"]:checked').val();
+        $('#selectPreviousVersion').modal('hide');
+        $('#confirmAgreementConditions').modal('show');
     });
 
     $("#confirmAgreementConditions").on("click", '.confirm-conditions', function() {
