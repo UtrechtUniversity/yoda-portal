@@ -160,6 +160,10 @@ $(function() {
         });
     });
 
+    $("body").on("click", "a.action-submit-for-publication-new-version", function() {
+        console.log("submit-for-publication-new-version");
+    });
+
     $("#confirmAgreementConditions").on("click", '.confirm-conditions', function() {
         if ($(this).prop('checked')) {
             $("#confirmAgreementConditions .action-confirm-submit-for-publication").prop('disabled', false);;
@@ -618,6 +622,7 @@ function topInformation(dir, showAlert) {
                                 actions['approve-for-publication'] = 'Approve for publication';
                             } else if (vaultStatus == 'UNPUBLISHED') {
                                 actions['submit-for-publication'] = 'Submit for publication';
+                                actions['submit-for-publication-new-version'] = 'Submit for publication as new version';
                             } else if (vaultStatus == 'PUBLISHED') {
                                 actions['depublish-publication'] = 'Depublish publication';
                             } else if (vaultStatus == 'DEPUBLISHED') {
@@ -626,6 +631,7 @@ function topInformation(dir, showAlert) {
                         } else if (hasDatamanager) {
                             if (vaultStatus == 'UNPUBLISHED') {
                                 actions['submit-for-publication'] = 'Submit for publication';
+                                actions['submit-for-publication-new-version'] = 'Submit for publication as new version';
                             } else if (vaultStatus == 'SUBMITTED_FOR_PUBLICATION') {
                                 actions['cancel-publication'] = 'Cancel publication';
                             }
@@ -701,9 +707,9 @@ function handleActionsList(actions, folder)
 {
     var html = '';
     var vaultHtml = '';
-    var possibleActions = ['submit-for-publication', 'cancel-publication',
-                           'approve-for-publication', 'depublish-publication',
-                           'republish-publication'];
+    var possibleActions = ['submit-for-publication', 'submit-for-publication-new-version',
+                           'cancel-publication',     'approve-for-publication',
+                           'depublish-publication',  'republish-publication'];
 
     var possibleVaultActions = ['grant-vault-access', 'revoke-vault-access',
                                 'copy-vault-package-to-research',
