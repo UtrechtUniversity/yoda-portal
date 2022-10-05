@@ -188,7 +188,7 @@ $(function() {
         });
     });
 
-    $("body").on("click", "a.action-confirm-data-package-select", function() {
+    $("body").on("click", "button.action-confirm-data-package-select", function() {
         dataPackage = $('#selectPreviousVersion .modal-body input[type="radio"]:checked').val();
         $('#selectPreviousVersion').modal('hide');
         $('#confirmAgreementConditions').modal('show');
@@ -779,9 +779,13 @@ async function vaultSubmitForPublication(folder)
     $('#statusBadge').html('Submit for publication <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
+    if (dataPackage) {
+        let params = {'coll': Yoda.basePath + folder, 'previous_version': dataPackage};
+    } else {
+        let params = {'coll': Yoda.basePath + folder};
+    }
     try {
-        let status = await Yoda.call('vault_submit',
-                                     {'coll': Yoda.basePath + folder})
+        let status = await Yoda.call('vault_submit', params)
         $('#statusBadge').html('');
     } catch(e) {
         $('#statusBadge').html(btnText);
