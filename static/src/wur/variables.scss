@@ -2,6 +2,8 @@
 $primary: #008A00;
 $wurgreen: #008A00;
 $wurblue: #005172;
+$black: #000000;
+$white: #ffffff;
 $navhover: #000;
 
 // Yoda Navbar
@@ -18,15 +20,16 @@ $card-cap-color: #fff;
 $card-border-color: $wurblue;
 
 // Bootstrap breadcrumb
+$breadcrumb-active-color: $white;
 $breadcrumb-bg: $wurblue;
 $breadcrumb-padding-y: 0.75rem;
 $breadcrumb-padding-x: 1rem;
 
 // Bootstrap links
-$link-color: $wurblue;
+$link-color: $black;
 
 // Bootstrap list group
-$list-group-active-color: $wurblue;
+$list-group-active-color: $black;
 
 // Bootstrap bage
 $badge-font-size: .65em;
