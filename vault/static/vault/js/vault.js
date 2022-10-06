@@ -191,7 +191,20 @@ $(function() {
     $("body").on("click", "button.action-confirm-data-package-select", function() {
         dataPackage = $('#selectPreviousVersion .modal-body input[type="radio"]:checked').val();
         $('#selectPreviousVersion').modal('hide');
-        $('#confirmAgreementConditions').modal('show');
+
+        $('#confirmAgreementConditions .modal-body').text(''); // clear it first
+
+        $('.action-confirm-submit-for-publication').attr( 'data-folder', $(this).attr('data-folder') );
+
+        Yoda.call('vault_get_publication_terms', {}).then((data) => {
+            $('#confirmAgreementConditions .modal-body').html(data);
+
+            // Set default status and show dialog.
+            $(".action-confirm-submit-for-publication").prop('disabled', true);
+            $("#confirmAgreementConditions .confirm-conditions").prop('checked', false);
+
+            $('#confirmAgreementConditions').modal('show');
+        });
     });
 
     $("#confirmAgreementConditions").on("click", '.confirm-conditions', function() {
@@ -784,6 +797,7 @@ async function vaultSubmitForPublication(folder)
     } else {
         let params = {'coll': Yoda.basePath + folder};
     }
+
     try {
         let status = await Yoda.call('vault_submit', params)
         $('#statusBadge').html('');
