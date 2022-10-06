@@ -162,6 +162,8 @@ $(function() {
     });
 
     $("body").on("click", "a.action-submit-for-publication-new-version", function() {
+        $('.action-submit-for-publication-new-version').attr( 'data-folder', $(this).attr('data-folder') );
+
         let folder = $(this).attr('data-folder');
         let vault = String(folder.match(/.*\//)).replace(/\/+$/, '');
         dataPackage = null;
@@ -193,8 +195,6 @@ $(function() {
         $('#selectPreviousVersion').modal('hide');
 
         $('#confirmAgreementConditions .modal-body').text(''); // clear it first
-
-        $('.action-confirm-submit-for-publication').attr( 'data-folder', $(this).attr('data-folder') );
 
         Yoda.call('vault_get_publication_terms', {}).then((data) => {
             $('#confirmAgreementConditions .modal-body').html(data);
