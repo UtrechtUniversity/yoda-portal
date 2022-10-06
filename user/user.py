@@ -25,6 +25,9 @@ user_bp = Blueprint('user_bp', __name__,
 
 @user_bp.route('/gate', methods=['GET', 'POST'])
 def gate() -> Response:
+    if authenticated():
+        return redirect(url_for('general_bp.index'))
+
     if request.method == 'POST':
         username: str = request.form.get('username', '').lower().strip()
 
@@ -54,6 +57,9 @@ def gate() -> Response:
 
 @user_bp.route('/login', methods=['GET', 'POST'])
 def login() -> Response:
+    if authenticated():
+        return redirect(url_for('general_bp.index'))
+
     if request.method == 'POST':
         username: str = request.form.get('username', '').lower().strip()
         password: str = request.form.get('password', '')
@@ -372,6 +378,10 @@ def irods_login(username: str, password: str) -> None:
     session['user_id'] = username
     session['password'] = password
     connman.add(session.sid, irods)
+
+
+def authenticated() -> bool:
+    return g.get('user') is not None and g.get('irods') is not None
 
 
 def original_destination() -> str:

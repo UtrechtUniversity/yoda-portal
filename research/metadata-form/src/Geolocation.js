@@ -227,7 +227,7 @@ class Geolocation extends React.Component {
                     <label>NorthWest: {northBoundLatitude}, {westBoundLongitude}</label>
                     <br />
                     <label>SouthEast: {southBoundLatitude}, {eastBoundLongitude}</label>
-                    <button className='btn btn-outline-secondary float-end' onClick={(e) => {this.openModal(e); }}>Open Map</button>
+                    <button className='btn btn-outline-secondary float-end' type="button" tabindex="-1" onClick={(e) => {this.openModal(e); }}>Open Map</button>
                 </div>
 
                 <Modal
