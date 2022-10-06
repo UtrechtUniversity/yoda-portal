@@ -1,0 +1,38 @@
+// colors
+$primary: #008A00;
+$wurgreen: #008A00;
+$wurblue: #005172;
+$navhover: #000;
+
+// Yoda Navbar
+$navbar-bg: $wurgreen;
+$navbar-dark-color: #fff;
+$navbar-dark-brand-color: #fff;
+$navbar-dark-brand-hover-color: #fff;
+$navbar-dark-hover-color: $navhover;
+$navbar-dark-active-color: $navhover;
+
+// Bootstrap card
+$card-cap-bg: $wurblue;
+$card-cap-color: #fff;
+$card-border-color: $wurblue;
+
+// Bootstrap breadcrumb
+$breadcrumb-bg: $wurblue;
+$breadcrumb-padding-y: 0.75rem;
+$breadcrumb-padding-x: 1rem;
+
+// Bootstrap links
+$link-color: $wurblue;
+
+// Bootstrap list group
+$list-group-active-color: $wurblue;
+
+// Bootstrap bage
+$badge-font-size: .65em;
+
+// Border
+$border-color: $wurblue;
+
+// Bootstrap z-index
+$zindex-dropdown: 1021;

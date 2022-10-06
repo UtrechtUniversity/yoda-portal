@@ -1,0 +1,10 @@
+// sass build_wur.scss ../../themes/wur/static/css/yoda-portal.css
+
+// Import WUR theme
+@import "wur";
+
+// Import Yoda components
+@import "components";
+
+// Import Bootstrap 5
+@import "node_modules/bootstrap/scss/bootstrap";
