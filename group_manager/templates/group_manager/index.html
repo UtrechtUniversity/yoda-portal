@@ -76,7 +76,7 @@
                     <div class="card-body" id="group-properties-create">
                         <form class="form-horizontal" id="f-group-create" action="{{ url_for('group_manager_bp.group_create') }}" method="POST">
                             <div class="mb-3 row">
-                                <label class="col-sm-4 form-control-label" for="f-group-create-name">Group name</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-name">Group name</label>
                                 <div class="col-sm-8">
                                     <div class="input-group">
                                         <div class="input-group-btn" id="f-group-create-prefix-div" title="Choose a group type">
@@ -95,21 +95,21 @@
                             </div>
 
                             <div class="mb-3 row">
-                                <label class="col-sm-4 form-control-label" for="f-group-create-category">Category</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-category">Category</label>
                                 <div class="col-sm-8">
                                     <input name="group_category" id="f-group-create-category" class="form-control selectify-category" type="hidden" placeholder="Select one or enter a new name" required data-subcategory="#f-group-create-subcategory" />
                                 </div>
                             </div>
 
                             <div class="mb-3 row">
-                                <label class="col-sm-4 form-control-label" for="f-group-create-subcategory">Subcategory</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-subcategory">Subcategory</label>
                                 <div class="col-sm-8">
                                     <input name="group_subcategory" id="f-group-create-subcategory" class="form-control selectify-subcategory" type="hidden" placeholder="Select one or enter a new name" required data-category="#f-group-create-category" />
                                 </div>
                             </div>
 
                             <div class="mb-3 row data-classification">
-                                <label class="col-sm-4 form-control-label" for="f-group-create-data-classification">Data classification</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-data-classification">Data classification</label>
                                 <div class="col-sm-8">
                                     <select name="group_data_classification" id="f-group-create-data-classification" class="selectify-data-classification">
                                         <option value="unspecified" class="unspecified-option">Unspecified</option>
@@ -122,7 +122,7 @@
                             </div>
 
                             <div class="mb-3 row">
-                                <label class="col-sm-4 form-control-label" for="f-group-create-description">Group description</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-description">Group description</label>
                                 <div class="col-sm-8">
                                     <input name="group_description" id="f-group-create-description" class="form-control" type="text" placeholder="Enter a short description" pattern="^[a-zA-Z0-9,.()_ -]*$" oninvalid="setCustomValidity('Please enter only letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')" onchange="setCustomValidity('')" />
                                 </div>
@@ -130,7 +130,7 @@
 
                             <div class="row">
                                 <div class="offset-sm-4 col-sm-8">
-                                    <input action="{{ url_for('group_manager_bp.group_create') }}" id="f-group-create-submit" class="btn btn-primary" type="button" value="Save new group">
+                                    <input action="{{ url_for('group_manager_bp.group_create') }}" id="f-group-create-submit" class="btn btn-primary" type="button" value="Add group">
 
                                 </div>
                             </div>
@@ -149,7 +149,7 @@
                     <form action="{{ url_for('group_manager_bp.group_update') }}" method="POST" id="f-group-update">
 
                         <div class="mb-3 row">
-                            <label class="col-sm-4 col-form-label" for="f-group-update-name">Group name</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-name">Group name</label>
                             <div class="col-sm-8">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -161,21 +161,21 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-4 col-form-label" for="f-group-update-category">Category</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-category">Category</label>
                             <div class="col-sm-8">
                                 <input name="group_category" id="f-group-update-category" class="form-control selectify-category" type="hidden" placeholder="Select one or enter a new name" required data-subcategory="#f-group-update-subcategory" />
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-4 col-form-label" for="f-group-update-subcategory">Subcategory</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-subcategory">Subcategory</label>
                             <div class="col-sm-8">
                                 <input name="group_subcategory" id="f-group-update-subcategory" class="form-control selectify-subcategory" type="hidden" placeholder="Select one or enter a new name" required data-category="#f-group-update-category" />
                             </div>
                         </div>
 
                         <div class="mb-3 row data-classification">
-                            <label class="col-sm-4 col-form-label" for="f-group-update-data-classification">Data classification</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-data-classification">Data classification</label>
                             <div class="col-sm-8">
                                 <select name="group_data_classification" id="f-group-update-data-classification" class="selectify-data-classification">
                                     <option value="unspecified" class="unspecified-option">Unspecified</option>
@@ -187,7 +187,7 @@
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <label class="col-sm-4 col-form-label" for="f-group-update-description">Group description</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-description">Group description</label>
                             <div class="col-sm-8">
                                 <input name="group_description" id="f-group-update-description" class="form-control" type="text" placeholder="Enter a short description" pattern="^[a-zA-Z0-9,.()_ -]*$" oninvalid="setCustomValidity('Please enter only letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')" onchange="setCustomValidity('')" />
                             </div>
