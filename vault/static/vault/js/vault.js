@@ -162,7 +162,7 @@ $(function() {
     });
 
     $("body").on("click", "a.action-submit-for-publication-new-version", function() {
-        $('.action-submit-for-publication-new-version').attr( 'data-folder', $(this).attr('data-folder') );
+        $('.action-confirm-submit-for-publication').attr( 'data-folder', $(this).attr('data-folder') );
 
         let folder = $(this).attr('data-folder');
         let vault = String(folder.match(/.*\//)).replace(/\/+$/, '');
