@@ -914,6 +914,12 @@ $(function() {
                 subcategory:         $('#f-group-' + action + '-subcategory').val(),
             };
 
+            if (!newProperties.name.match(/^(intake|research|deposit)-([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
+                alert("Group names must start with one of 'intake-' or 'research-' or 'deposit-' and may only contain lowercase letters (a-z) and hyphens (-).");
+                resetSubmitButton();
+                return;
+            }
+
             if (newProperties.category === '' || newProperties.subcategory === '') {
                 alert('Please select a category and subcategory.');
                 resetSubmitButton();
@@ -930,6 +936,8 @@ $(function() {
                 resetSubmitButton();
                 return;
             }
+
+
 
             var postData = {
                 group_name:                newProperties.name,
@@ -964,8 +972,9 @@ $(function() {
                 dataType: 'json',
                 data:     postData
             }).done(function(result) {
-                if ('status' in result)
+                if ('status' in result) {
                     console.log('Group '+action+' completed with status ' + result.status);
+                }
                 if ('status' in result && result.status === 0) {
                     // OK! Make sure the newly added group is selected after reloading the page.
                     Yoda.storage.session.set('selected-group', postData.group_name);
@@ -986,16 +995,17 @@ $(function() {
                     window.location.reload(true);
                 } else {
                     // Something went wrong.
-
                     resetSubmitButton();
 
-                    if ('message' in result)
+                    if ('message' in result) {
                         alert(result.message);
-                    else
+                    } else {
                         alert(
                               "Error: Could not "+action+" group due to an internal error.\n"
                             + "Please contact a Yoda administrator"
                         );
+                    }
+                    return;
                 }
             }).fail(function(result) {
                 that.ifRequestNotAborted(result, function() {
