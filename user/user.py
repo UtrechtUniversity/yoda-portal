@@ -33,11 +33,11 @@ def gate() -> Response:
 
         if username == '':
             flash('Missing username', 'danger')
-            return render_template('user/gate.html')
+            return render_template('user/gate.html', login_placeholder=get_login_placeholder())
 
         if len(username) > 64:
             flash('Invalid username', 'danger')
-            return render_template('user/gate.html')
+            return render_template('user/gate.html', login_placeholder=get_login_placeholder())
 
         session['login_username'] = username
 
@@ -52,7 +52,7 @@ def gate() -> Response:
         else:
             return redirect(url_for('user_bp.login'))
 
-    return render_template('user/gate.html')
+    return render_template('user/gate.html', login_placeholder=get_login_placeholder())
 
 
 @user_bp.route('/login', methods=['GET', 'POST'])
@@ -66,11 +66,11 @@ def login() -> Response:
 
         if username == '':
             flash('Missing username', 'danger')
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         if len(username) > 64:
             flash('Invalid username', 'danger')
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         session['login_username'] = username
         g.login_username = username
@@ -81,7 +81,7 @@ def login() -> Response:
 
         if password == '':
             flash('Password missing', 'danger')
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         try:
             irods_login(username, password)
@@ -89,7 +89,7 @@ def login() -> Response:
         except PAM_AUTH_PASSWORD_FAILED:
             flash('Username/password was incorrect', 'danger')
             log_error("iRODS authentication failed for user " + username)
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         except iRODSException:
             flash(
@@ -99,7 +99,7 @@ def login() -> Response:
                 'danger')
 
             log_error("iRODSException for login of user " + str(username), True)
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         except Exception:
             flash(
@@ -108,14 +108,14 @@ def login() -> Response:
                 'system administrator',
                 'danger')
             log_error("Unexpected exception for login of user " + str(username), True)
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         return redirect(original_destination())
 
     if session.get('login_username') is None:
         return redirect(url_for('user_bp.gate'))
 
-    return render_template('user/login.html')
+    return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
 
 @user_bp.route('/logout')
@@ -421,3 +421,11 @@ def prepare_user() -> None:
 def release_session(response: Response) -> Response:
     connman.release(session.sid)
     return response
+
+
+def get_login_placeholder():
+    oidc_domains = app.config.get("OIDC_DOMAINS")
+    if len(oidc_domains) == 0 or oidc_domains[0] == "":
+        return "j.a.smith@uu.nl"
+    else:
+        return "j.a.smith@" + oidc_domains[0]
