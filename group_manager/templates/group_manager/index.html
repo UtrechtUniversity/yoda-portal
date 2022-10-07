@@ -139,14 +139,14 @@
                 </div>
 
             <!---  UPDATE  -->
-            <div class="card properties-update hidden">
+            <div class="card properties-update">
                 <div class="card-header">Group properties <span class="float-end" id="group-properties-group-name"></span></div>
 
                 <div class="card-body" id="group-properties">
-                    <p class="placeholder-text hidden">
+                    <p class="placeholder-text">
                         Please select a group.
                     </p>
-                    <form action="{{ url_for('group_manager_bp.group_update') }}" method="POST" id="f-group-update">
+                    <form action="{{ url_for('group_manager_bp.group_update') }}" method="POST" id="f-group-update" class="hidden">
 
                         <div class="mb-3 row">
                             <label class="col-sm-4 form-label" for="f-group-update-name">Group name</label>
