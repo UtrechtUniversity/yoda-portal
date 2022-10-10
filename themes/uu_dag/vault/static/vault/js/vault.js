@@ -272,7 +272,7 @@ function startBrowsing(items)
                     // on how queries work prevent us from doing this
                     // correctly without significant overhead.
                     // (enabling this as is may result in duplicated results for data objects)
-                    {render: tableRenderer.size,    orderable: false, data: 'size'},
+                    {render: tableRenderer.size,    data: 'size'},
                     {render: tableRenderer.date,    orderable: false, data: 'modify_time'},
                     {render: tableRenderer.context, orderable: false }],
         "ajax": getFolderContents,
