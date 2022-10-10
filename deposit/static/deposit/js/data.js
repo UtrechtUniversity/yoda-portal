@@ -584,7 +584,7 @@ let getFolderContents = (() => {
                                           'offset':     args.start,
                                           'limit':      batchSize,
                                           'sort_order': args.order[0].dir,
-                                          'sort_on':    ['name','size','modified'][args.order[0].column],
+                                          'sort_on':    ['name','size','modified'][args.order[0].column-1],
                                           'space':      'Space.RESEARCH'});
 
             // If another requests has come while we were waiting, simply drop this one.
@@ -729,7 +729,7 @@ function startBrowsing(items)
                     // on how queries work prevent us from doing this
                     // correctly without significant overhead.
                     // (enabling this as is may result in duplicated results for data objects)
-                    {render: tableRenderer.size,    orderable: false, data: 'size'},
+                    {render: tableRenderer.size,    data: 'size'},
                     {render: tableRenderer.date,    orderable: false, data: 'modify_time'},
                     {render: tableRenderer.context, orderable: false }],
         "ajax": getFolderContents,
