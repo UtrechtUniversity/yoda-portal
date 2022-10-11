@@ -27,6 +27,10 @@ img.logo {
   height: 48px;
 }
 
+.breadcrumb_item, .breadcrumb-item a {
+  color: #fff !important;
+}
+
 .hidden {
   display: none !important;
 }
