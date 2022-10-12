@@ -162,7 +162,7 @@ $(function() {
 <div class="form-check">
   <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${htmlEncode(key)}">
   <label class="form-check-label" for="dataPackage${i}">
-    ${htmlEncode(value)} (<a taget="_blank" href="?dir=${encodeURIComponent(vault_path)}">${htmlEncode(vault_path)}</a>)
+    ${htmlEncode(value)} (<a target="_blank" href="?dir=${encodeURIComponent(vault_path)}">${htmlEncode(vault_path)}</a>)
   </label>
 </div>
 `);
