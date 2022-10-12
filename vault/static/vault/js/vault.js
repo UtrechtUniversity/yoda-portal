@@ -166,7 +166,6 @@ $(function() {
   </label>
 </div>
 `);
-                 >${text}</a>
                 });
             } else {
                 $('.previousPublications').html("No previously published data packages available.");
