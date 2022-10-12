@@ -157,7 +157,7 @@ $(function() {
                 let i = 0;
                 $.each(data, function(key, value) {
                     i++;
-                    vault_path = key.replace(Yoda.basePath, '');
+                    let vault_path = key.replace(Yoda.basePath, '');
                     $('.previousPublications').append(`
 <div class="form-check">
   <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${htmlEncode(key)}">
