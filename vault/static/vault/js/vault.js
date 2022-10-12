@@ -157,14 +157,16 @@ $(function() {
                 let i = 0;
                 $.each(data, function(key, value) {
                     i++;
+                    vault_path = key.replace(Yoda.basePath, '');
                     $('.previousPublications').append(`
 <div class="form-check">
   <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${htmlEncode(key)}">
   <label class="form-check-label" for="dataPackage${i}">
-    ${htmlEncode(value)} (${htmlEncode(key)})
+    ${htmlEncode(value)} (<a taget="_blank" href="?dir=${encodeURIComponent(vault_path)}">${htmlEncode(vault_path)}</a>)
   </label>
 </div>
 `);
+                 >${text}</a>
                 });
             } else {
                 $('.previousPublications').html("No previously published data packages available.");
