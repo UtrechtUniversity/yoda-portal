@@ -161,7 +161,7 @@ $(function() {
 <div class="form-check">
   <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${htmlEncode(key)}">
   <label class="form-check-label" for="dataPackage${i}">
-    ${htmlEncode(value)}
+    ${htmlEncode(value)} (${htmlEncode(key)})
   </label>
 </div>
 `);
