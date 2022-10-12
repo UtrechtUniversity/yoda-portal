@@ -146,34 +146,18 @@ $(function() {
     });
 
     $("body").on("click", "a.action-submit-for-publication", function() {
-        $('#confirmAgreementConditions .modal-body').text(''); // clear it first
-
-        $('.action-confirm-submit-for-publication').attr( 'data-folder', $(this).attr('data-folder') );
-
-        Yoda.call('vault_get_publication_terms', {}).then((data) => {
-            $('#confirmAgreementConditions .modal-body').html(data);
-
-            // Set default status and show dialog.
-            $(".action-confirm-submit-for-publication").prop('disabled', true);
-            $("#confirmAgreementConditions .confirm-conditions").prop('checked', false);
-
-            $('#confirmAgreementConditions').modal('show');
-        });
-    });
-
-    $("body").on("click", "a.action-submit-for-publication-new-version", function() {
         $('.action-confirm-submit-for-publication').attr( 'data-folder', $(this).attr('data-folder') );
 
         let folder = $(this).attr('data-folder');
         let vault = String(folder.match(/.*\//)).replace(/\/+$/, '');
         dataPackage = null;
-        $('#selectPreviousVersion .modal-body').html('');
+        $('.previousPublications').html('');
         Yoda.call('vault_get_published_packages', {path: Yoda.basePath + vault}).then((data) => {
             if (data) {
                 let i = 0;
                 $.each(data, function(key, value) {
                     i++;
-                    $('#selectPreviousVersion .modal-body').append(`
+                    $('.previousPublications').append(`
 <div class="form-check">
   <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${htmlEncode(key)}">
   <label class="form-check-label" for="dataPackage${i}">
@@ -183,16 +167,16 @@ $(function() {
 `);
                 });
             } else {
-                $('#selectPreviousVersion .modal-body').html("No previously published data packages available.");
+                $('.previousPublications').html("No previously published data packages available.");
             }
 
-            $('#selectPreviousVersion').modal('show');
+            $('#submitPublication').modal('show');
         });
     });
 
     $("body").on("click", "button.action-confirm-data-package-select", function() {
-        dataPackage = $('#selectPreviousVersion .modal-body input[type="radio"]:checked').val();
-        $('#selectPreviousVersion').modal('hide');
+        dataPackage = $('#submitPublication .modal-body input[type="radio"]:checked').val();
+        $('#submitPublication').modal('hide');
 
         $('#confirmAgreementConditions .modal-body').text(''); // clear it first
 
@@ -665,7 +649,6 @@ function topInformation(dir, showAlert) {
                                 actions['approve-for-publication'] = 'Approve for publication';
                             } else if (vaultStatus == 'UNPUBLISHED') {
                                 actions['submit-for-publication'] = 'Submit for publication';
-                                actions['submit-for-publication-new-version'] = 'Submit for publication as new version';
                             } else if (vaultStatus == 'PUBLISHED') {
                                 actions['depublish-publication'] = 'Depublish publication';
                             } else if (vaultStatus == 'DEPUBLISHED') {
@@ -674,7 +657,6 @@ function topInformation(dir, showAlert) {
                         } else if (hasDatamanager) {
                             if (vaultStatus == 'UNPUBLISHED') {
                                 actions['submit-for-publication'] = 'Submit for publication';
-                                actions['submit-for-publication-new-version'] = 'Submit for publication as new version';
                             } else if (vaultStatus == 'SUBMITTED_FOR_PUBLICATION') {
                                 actions['cancel-publication'] = 'Cancel publication';
                             }
@@ -750,9 +732,9 @@ function handleActionsList(actions, folder)
 {
     var html = '';
     var vaultHtml = '';
-    var possibleActions = ['submit-for-publication', 'submit-for-publication-new-version',
-                           'cancel-publication',     'approve-for-publication',
-                           'depublish-publication',  'republish-publication'];
+    var possibleActions = ['submit-for-publication', 'cancel-publication',
+                           'approve-for-publication', 'depublish-publication',
+                           'republish-publication'];
 
     var possibleVaultActions = ['grant-vault-access', 'revoke-vault-access',
                                 'copy-vault-package-to-research',
