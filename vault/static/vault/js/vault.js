@@ -153,7 +153,7 @@ $(function() {
         dataPackage = null;
         $('.previousPublications').html('');
         Yoda.call('vault_get_published_packages', {path: Yoda.basePath + vault}).then((data) => {
-            if (data) {
+            if (Object.keys(data).length > 0) {
                 let i = 0;
                 $.each(data, function(doi, path) {
                     i++;
