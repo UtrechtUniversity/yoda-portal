@@ -73,12 +73,19 @@ Yoda.call = async function(path, data={}, options={}) {
                 'method':      'POST',
                 'body':        formData,
                 'credentials': 'same-origin',
+                'redirect':    'manual',
             });
         } catch (error) {
             // Network failure / abort.
             console.error(`API Error: ${error}`);
             return errorResult('Your request could not be completed due to a network connection issue.'
                                +' Please try again in a few minutes.');
+        }
+        if (r.status == 401 || r.type == 'opaqueredirect') {
+             // API Unauthorized.
+             console.error(`API Unauthorized: HTTP status 401`);
+             location.reload();
+             return errorResult('Unauthorized. Please login.');
         }
         if (!((r.status >= 200 && r.status < 300) || r.status == 400 || r.status == 500)) {
             // API responses should either produce 200, 400 or 500.
