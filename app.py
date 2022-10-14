@@ -99,7 +99,7 @@ with app.app_context():
     if app.config.get('DATAREQUEST_ENABLED'):
         app.register_blueprint(datarequest_bp, url_prefix='/datarequest/')
 
-# XXX CSRF needs to be disabled for API testing.
+# CSRF protection.
 csrf = CSRFProtect(app)
 
 

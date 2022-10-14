@@ -95,6 +95,7 @@ def api_error_handler(error: Exception) -> Response:
     code = 500
 
     if type(error) == UnauthorizedAPIAccessError:
+        code = 401
         status_info = "Not authorized to use the API"
 
     return jsonify(
