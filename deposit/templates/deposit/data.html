@@ -90,6 +90,15 @@
                 <button type="button" class="btn btn-outline-secondary upload me-2" data-path="" title="Upload files"><i class="fa-solid fa-file-arrow-up" aria-hidden="true"></i> Upload files</button>
                 <button type="button" class="btn btn-outline-secondary upload-folder" data-path="" title="Upload folders"><i class="fa-solid fa-upload" aria-hidden="true"></i> Upload folders</button>
             </div>
+
+            <div class="btn-group ms-2">
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" title="Actions menu" id="actionMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Actions
+                    </button>
+                    <div class="dropdown-menu action-list" role="menu"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -343,6 +352,33 @@
 
             <div class="modal-footer">
                 <button id="finishMultiSelect" class="btn btn-secondary" data-bs-dismiss="modal" title="Close">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" tabindex="-1" role="dialog" id="showChecksumReport">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Checksum report for <span class="collection"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    This overview shows files and their checksums.
+                    These checksums can de used to verify data integrity.
+                    The checksum algorithm used is <a href="https://en.wikipedia.org/wiki/SHA-2" title="SHA-256 checksum algorithm">SHA-256</a>.
+                </p>
+                <div id="checksumReport"></div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-outline-secondary download-report-text">Download as text</a>
+                <a href="#" class="btn btn-outline-secondary download-report-csv">Download as CSV</a>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
