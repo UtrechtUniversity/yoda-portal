@@ -88,6 +88,7 @@ def download() -> Response:
     else:
         abort(404)
 
+
 @deposit_bp.route('/browse/download_checksum_report')
 def download_report() -> Response:
     output = ""
