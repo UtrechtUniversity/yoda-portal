@@ -797,9 +797,6 @@ let getFolderContents = (() => {
     let i = 0;                  // Keep simultaneous requests from interfering.
 
     let get = async (args) => {
-
-        console.log(args.order[0].column);
-
         // Check if we can use the cache.
         if (cache.length
          && currentFolder        === cacheFolder
