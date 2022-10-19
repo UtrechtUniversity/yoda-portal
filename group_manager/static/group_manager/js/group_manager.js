@@ -88,7 +88,7 @@ function readCsvFile(e) {
     table += '<td></td></tr></thead><tbody>';
 
     new_result.forEach(function myFunction(group_def, i) {
-        table += '<tr class="import-groupname" groupname="' + group_def['groupname'] + '" import_row_data="' + csv_header + csv_rows_corrected[i] + '">';
+        table += '<tr id="' + group_def['groupname'] + '" class="import-groupname" groupname="' + group_def['groupname'] + '" import_row_data="' + csv_header + csv_rows_corrected[i] + '">';
         table += '<td id="processed-indicator-' + group_def['groupname'] + '"></td>';
         presentation_columns.forEach(function myFunction(column) {
             table += '<td>' + group_def[column] + '</td>';
@@ -148,7 +148,17 @@ async function process_imported_row(row) {
             row.addClass('import-groupname-done');
             $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>');
             row.addClass('import-csv-group-ok');
-         });
+
+            // Solely added for test automation - splinter. 
+            // This was the only way to be able to perform an automated click work on a row.
+            // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
+            $('#processed-indicator-' + groupname).click(function(){
+                let groupName = 'research-' + groupname
+                $('#dlg-import-groups-csv').modal('hide');
+                Yoda.groupManager.unfoldToGroup(groupName);
+                Yoda.groupManager.selectGroup(groupName);
+            });
+        });
     }
     catch(error) {
         // Row processing encountered problems => inform user and add appropriate classes.
