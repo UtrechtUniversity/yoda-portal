@@ -32,6 +32,10 @@ async function getStatus()
     try {
         let status = await Yoda.call('deposit_status', {'path': path})
         if (status.data) {
+            // Retrieve system metadata of folder.
+            Yoda.call('research_system_metadata', {coll: Yoda.basePath + path}).then((data) => {
+                $('.package-size').text(data['Package size']);
+            });
             $('#data_check').removeClass('fa-times text-danger').addClass('fa-check text-success');
         } else {
             $('#data_check').removeClass('fa-check text-success').addClass('fa-times text-danger');

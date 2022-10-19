@@ -25,16 +25,19 @@ user_bp = Blueprint('user_bp', __name__,
 
 @user_bp.route('/gate', methods=['GET', 'POST'])
 def gate() -> Response:
+    if authenticated():
+        return redirect(url_for('general_bp.index'))
+
     if request.method == 'POST':
         username: str = request.form.get('username', '').lower().strip()
 
         if username == '':
             flash('Missing username', 'danger')
-            return render_template('user/gate.html')
+            return render_template('user/gate.html', login_placeholder=get_login_placeholder())
 
         if len(username) > 64:
             flash('Invalid username', 'danger')
-            return render_template('user/gate.html')
+            return render_template('user/gate.html', login_placeholder=get_login_placeholder())
 
         session['login_username'] = username
 
@@ -49,22 +52,25 @@ def gate() -> Response:
         else:
             return redirect(url_for('user_bp.login'))
 
-    return render_template('user/gate.html')
+    return render_template('user/gate.html', login_placeholder=get_login_placeholder())
 
 
 @user_bp.route('/login', methods=['GET', 'POST'])
 def login() -> Response:
+    if authenticated():
+        return redirect(url_for('general_bp.index'))
+
     if request.method == 'POST':
         username: str = request.form.get('username', '').lower().strip()
         password: str = request.form.get('password', '')
 
         if username == '':
             flash('Missing username', 'danger')
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         if len(username) > 64:
             flash('Invalid username', 'danger')
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         session['login_username'] = username
         g.login_username = username
@@ -75,7 +81,7 @@ def login() -> Response:
 
         if password == '':
             flash('Password missing', 'danger')
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         try:
             irods_login(username, password)
@@ -83,7 +89,7 @@ def login() -> Response:
         except PAM_AUTH_PASSWORD_FAILED:
             flash('Username/password was incorrect', 'danger')
             log_error("iRODS authentication failed for user " + username)
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         except iRODSException:
             flash(
@@ -93,7 +99,7 @@ def login() -> Response:
                 'danger')
 
             log_error("iRODSException for login of user " + str(username), True)
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         except Exception:
             flash(
@@ -102,14 +108,14 @@ def login() -> Response:
                 'system administrator',
                 'danger')
             log_error("Unexpected exception for login of user " + str(username), True)
-            return render_template('user/login.html')
+            return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         return redirect(original_destination())
 
     if session.get('login_username') is None:
         return redirect(url_for('user_bp.gate'))
 
-    return render_template('user/login.html')
+    return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
 
 @user_bp.route('/logout')
@@ -135,10 +141,7 @@ def settings() -> Response:
     if request.method == 'POST':
         # Build user settings dict.
         settings = {}
-        if request.form.get('mail_notifications') != 'on':
-            settings['mail_notifications'] = 'OFF'
-        else:
-            settings['mail_notifications'] = request.form.get('mail_notifications_type', "DAILY")
+        settings['mail_notifications'] = request.form.get('mail_notifications', "OFF")
 
         # Save user settings and handle API response.
         data = {"settings": settings}
@@ -160,7 +163,10 @@ def settings() -> Response:
 def data_access() -> Response:
     """Data Access Passwords overview"""
     response = api.call('token_load')
-    return render_template('user/data_access.html', tokens=response['data'])
+    token_lifetime = app.config.get('TOKEN_LIFETIME')
+    return render_template('user/data_access.html',
+                           tokens=response['data'],
+                           token_lifetime=token_lifetime)
 
 
 @user_bp.route('/callback')
@@ -358,8 +364,6 @@ def oidc_authorize_url(username: str) -> str:
 
 def irods_login(username: str, password: str) -> None:
     """Start session with iRODS."""
-    password = escape_irods_pam_password(password)
-
     irods = iRODSSession(
         host=app.config.get('IRODS_ICAT_HOSTNAME'),
         port=app.config.get('IRODS_ICAT_PORT'),
@@ -376,15 +380,8 @@ def irods_login(username: str, password: str) -> None:
     connman.add(session.sid, irods)
 
 
-def escape_irods_pam_password(password: str) -> str:
-    translation = str.maketrans({
-        "@": r"\@",
-        "=": r"\=",
-        "&": r"\&",
-        ";": r"\;"
-    })
-
-    return password.translate(translation)
+def authenticated() -> bool:
+    return g.get('user') is not None and g.get('irods') is not None
 
 
 def original_destination() -> str:
@@ -424,3 +421,11 @@ def prepare_user() -> None:
 def release_session(response: Response) -> Response:
     connman.release(session.sid)
     return response
+
+
+def get_login_placeholder():
+    oidc_domains = app.config.get("OIDC_DOMAINS")
+    if len(oidc_domains) == 0 or oidc_domains[0] == "":
+        return "j.a.smith@uu.nl"
+    else:
+        return "j.a.smith@" + oidc_domains[0]

@@ -4,11 +4,12 @@
     background-repeat: no-repeat;
     background-size: 100%;
     min-height: 600px;
+    position: relative;
 }
 
 .header-logo-text-background {
     position: absolute;
-    top: 200px;
+    top: 50px;
     background-color: rgba(0, 0, 0, .7);
     right: 5%;
     padding: 15px 30px;

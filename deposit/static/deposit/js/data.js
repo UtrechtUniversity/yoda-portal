@@ -120,6 +120,39 @@ $(function() {
         handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'));
     });
 
+    // Show checksum report
+    $("body").on("click", "a.action-show-checksum-report", function() {
+        let folder = $(this).attr('data-folder');
+        let download_url = 'browse/download_checksum_report?path=' + encodeURIComponent(folder);
+
+        $('#showChecksumReport .collection').text(folder);
+        $('#showChecksumReport .modal-body #checksumReport').html('');
+        $('#showChecksumReport .modal-footer .download-report-text').attr('href', download_url + '&format=text');
+        $('#showChecksumReport .modal-footer .download-report-csv').attr('href', download_url + '&format=csv');
+
+        Yoda.call('research_manifest',
+            {coll: Yoda.basePath + folder}).then((data) => {
+            let table = '<table class="table table-striped"><tbody>';
+
+            table += '<thead><tr><th>Filename</th><th>Checksum</th></thead>';
+            $.each(data, function( index, obj ) {
+                table += `<tr>
+                     <td>${obj.name}</td>
+                     <td>${obj.checksum}</td>
+                </tr>`;
+            });
+            table += '</tbody></table>';
+
+            $('#showChecksumReport .modal-body #checksumReport').html(table);
+            $('#showChecksumReport').modal('show');
+        });
+    });
+
+    // Handle action menu
+    let actions = [];
+    actions['show-checksum-report'] = 'Show checksum report';
+    handleActionsList(actions, dir);
+
     // Flow.js upload handler
     var r = new Flow({
         target: '/research/upload',
@@ -584,7 +617,7 @@ let getFolderContents = (() => {
                                           'offset':     args.start,
                                           'limit':      batchSize,
                                           'sort_order': args.order[0].dir,
-                                          'sort_on':    ['name','size','modified'][args.order[0].column],
+                                          'sort_on':    ['name','size','modified'][args.order[0].column-1],
                                           'space':      'Space.RESEARCH'});
 
             // If another requests has come while we were waiting, simply drop this one.
@@ -729,7 +762,7 @@ function startBrowsing(items)
                     // on how queries work prevent us from doing this
                     // correctly without significant overhead.
                     // (enabling this as is may result in duplicated results for data objects)
-                    {render: tableRenderer.size,    orderable: false, data: 'size'},
+                    {render: tableRenderer.size,    data: 'size'},
                     {render: tableRenderer.date,    orderable: false, data: 'modify_time'},
                     {render: tableRenderer.context, orderable: false }],
         "ajax": getFolderContents,
@@ -784,4 +817,19 @@ function dragEndHandler(ev)
 
 function dropHandler(ev) {
     $(this).removeClass('flow-dragover');
+}
+
+function handleActionsList(actions, folder)
+{
+    var html = '';
+
+    var possibleActions = ['show-checksum-report'];
+
+    $.each(possibleActions, function( index, value ) {
+        if (actions.hasOwnProperty(value)) {
+            html += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>';
+        }
+    });
+
+    $('.action-list').html(html);
 }

@@ -24,21 +24,22 @@
         <h1>Group manager</h1>
     </div>
     <div class="col-md-6 div-show-search-groups">
-        <button type="button" class="btn btn-primary user-search-groups float-end" title="Search groups for users"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Search groups for user</button>
+        <button type="button" class="btn btn-primary user-search-groups float-end" title="Search groups for users"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Search for user</button>
+        <button type="button" class="btn btn-primary create-button-new float-end me-2 hidden" title="Create a new group"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add group</button>
     </div>
 </div>
 
 
 <div class="row">
-	<div class="col-md-5">
-		<div class="card groups">
-			<div class="card-header">
-				Groups
-				<div class="input-group-sm has-feedback float-end">
-					<input class="form-control form-control-sm mt-1" id="group-list-search" type="text" placeholder="Filter groups" />
-				</div>
-			</div>
-			<div class="list-group" id="group-list">
+    <div class="col-md-5">
+        <div class="card groups">
+            <div class="card-header">
+                Groups
+                <div class="input-group-sm has-feedback float-end">
+                    <input class="form-control form-control-sm mt-1" id="group-list-search" type="text" placeholder="Filter groups" />
+                </div>
+            </div>
+            <div class="list-group" id="group-list">
                 {% for category, subcategories in group_hierarchy.items() %}
                 <div class="list-group-item category" id="category-{{ loop.index }}" data-name="{{ category }}">
                     <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-{{ loop.index }}" href="#category-{{ loop.index }}-ul">
@@ -62,113 +63,180 @@
                     </div>
                 </div>
                 {% endfor %}
-			</div>
-			<div class="card-footer">
-				<div class="input-group-sm float-start">
-					<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.group_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-group-delete">Remove group</a>
-				</div>
-				<div class="input-group-sm float-end">
-					<a class="btn btn-sm btn-primary create-button disabled" data-bs-toggle="modal" data-bs-target="#modal-group-create">Add group</a>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-md-7">
-		<div class="sticky-top">
-			<div class="card  properties">
-				<div class="card-header">Group properties <span class="float-end" id="group-properties-group-name"></span></div>
-				<div class="card-body" id="group-properties">
-					<p class="placeholder-text">
-						Please select a group.
-					</p>
-					<form action="{{ url_for('group_manager_bp.group_update') }}" method="POST" class=" hidden" id="f-group-update">
-						<div class="mb-3 row">
-							<label class="col-sm-4 col-form-label" for="f-group-update-category">Category</label>
-							<div class="col-sm-8">
-								<input name="group_category" id="f-group-update-category" class="form-control selectify-category" type="hidden" placeholder="Select one or enter a new name" required data-subcategory="#f-group-update-subcategory" />
-							</div>
-						</div>
-						<div class="mb-3 row">
-							<label class="col-sm-4 col-form-label" for="f-group-update-subcategory">Subcategory</label>
-							<div class="col-sm-8">
-								<input name="group_subcategory" id="f-group-update-subcategory" class="form-control selectify-subcategory" type="hidden" placeholder="Select one or enter a new name" required data-category="#f-group-update-category" />
-							</div>
-						</div>
-						<div class="mb-3 row">
-							<label class="col-sm-4 col-form-label" for="f-group-update-name">Group name</label>
-							<div class="col-sm-8">
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text" id="inputGroupPrepend">grp-</span>
-									</div>
-									<input name="group_name" id="f-group-update-name" class="form-control" type="text" pattern="^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$" required oninvalid="setCustomValidity('Please enter only lowercase letters, numbers, and hyphens (-). The group name may not start or end with a hyphen.')" onchange="setCustomValidity('')" />
-								</div>
-							</div>
-						</div>
-						<div class="mb-3 row data-classification">
-							<label class="col-sm-4 col-form-label" for="f-group-update-data-classification">Data classification</label>
-							<div class="col-sm-8">
-								<select name="group_data_classification" id="f-group-update-data-classification" class="selectify-data-classification">
-									<option value="unspecified" class="unspecified-option">Unspecified</option>
-									<option value="public">Public</option>
-									<option value="basic">Basic</option>
-									<option value="sensitive">Sensitive</option>
-									<option value="critical">Critical</option>
-								</select>
-							</div>
-						</div>
-						<div class="mb-3 row">
-							<label class="col-sm-4 col-form-label" for="f-group-update-description">Group description</label>
-							<div class="col-sm-8">
-								<input name="group_description" id="f-group-update-description" class="form-control" type="text" placeholder="Enter a short description" pattern="^[a-zA-Z0-9,.()_ -]*$" oninvalid="setCustomValidity('Please enter only letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')" onchange="setCustomValidity('')" />
-							</div>
-						</div>
-						<div class="row">
-							<div class="offset-sm-4 col-sm-8">
-								<input id="f-group-update-submit" class="btn btn-primary" type="submit" value="Update" />
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-			<div class="card users mt-2">
-				<div class="card-header">Group members
-					<div class="input-group-sm has-feedback float-end">
-						<input class="form-control form-control-sm mt-1" id="user-list-search" type="text" placeholder="Filter members" />
-					</div>
-				</div>
-				<div class="card-body">
-					<p class="placeholder-text">
-						Please select a group.
-					</p>
-				</div>
-				<div class="list-group" id="user-list">
-					<div class="list-group-item item-user-create" hidden>
-						<a class="user-create-text" href="#" onclick="return false;">
-							Click here to add a new member to this group
-						</a>
-						<form action="{{ url_for('group_manager_bp.user_create') }}" method="POST" class="form-inline hidden" id="f-user-create">
-							<input name="group_name" id="f-user-create-group" type="hidden" />
-							<div class="input-group">
-								<input name="user_name" id="f-user-create-name" class="form-control form-control-sm selectify-user-name" type="hidden" required placeholder="Enter a username" data-group="#f-user-create-group" />
-								<div class="input-group-btn">
-									<input id="f-user-create-submit" class="btn btn-primary btn-block btn-sm" type="submit" value="Add" />
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-				<div class="card-footer">
-					<div class="input-group-sm float-start">
-						Change role:
-						<a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Promote the selected member">&uarr;<i class="fa-solid fa-user-circle" aria-hidden="true"></i></a>
-						<a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Demote the selected member">&darr;<i class="fa-solid fa-eye" aria-hidden="true"></i></a>
-						<a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group">Remove member</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+            </div>
+            <div class="card-footer">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="sticky-top">
+            <!---  CREATE  -->
+            <div class="card properties-create hidden">
+                <div class="card-header">Create new group </div>
+                    <div class="card-body" id="group-properties-create">
+                        <form class="form-horizontal" id="f-group-create" action="{{ url_for('group_manager_bp.group_create') }}" method="POST">
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 form-label" for="f-group-create-name">Group name</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <div class="input-group-btn" id="f-group-create-prefix-div" title="Choose a group type">
+                                            <button type="button" id="f-group-create-prefix-button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="text">research-&nbsp;</span><span class="caret"></span></button>
+                                            <ul class="dropdown-menu">
+                                                <li id="f-group-create-prefix-grp"><a href="#" data-value="grp-">grp-&nbsp;</a></li>
+                                                <li id="f-group-create-prefix-datamanager"><a href="#" data-value="datamanager-">datamanager-&nbsp;</a></li>
+                                                <li><a href="#" data-value="research-">research-&nbsp;</a></li>
+                                                <li><a href="#" data-value="deposit-">deposit-&nbsp;</a></li>
+                                                <li><a href="#" data-value="intake-">intake-&nbsp;</a></li>
+                                            </ul>
+                                        </div>
+                                        <input name="group_name" id="f-group-create-name" class="form-control" type="text" pattern="^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$" required oninvalid="setCustomValidity('Please enter only lowercase letters, numbers, and hyphens (-). The group name may not start or end with a hyphen.')" onchange="setCustomValidity('')" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 form-label" for="f-group-create-category">Category</label>
+                                <div class="col-sm-8">
+                                    <input name="group_category" id="f-group-create-category" class="form-control selectify-category" type="hidden" placeholder="Select one or enter a new name" required data-subcategory="#f-group-create-subcategory" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 form-label" for="f-group-create-subcategory">Subcategory</label>
+                                <div class="col-sm-8">
+                                    <input name="group_subcategory" id="f-group-create-subcategory" class="form-control selectify-subcategory" type="hidden" placeholder="Select one or enter a new name" required data-category="#f-group-create-category" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 row data-classification">
+                                <label class="col-sm-4 form-label" for="f-group-create-data-classification">Data classification</label>
+                                <div class="col-sm-8">
+                                    <select name="group_data_classification" id="f-group-create-data-classification" class="selectify-data-classification">
+                                        <option value="unspecified" class="unspecified-option">Unspecified</option>
+                                        <option value="public">Public</option>
+                                        <option value="basic">Basic</option>
+                                        <option value="sensitive">Sensitive</option>
+                                        <option value="critical">Critical</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 form-label" for="f-group-create-description">Group description</label>
+                                <div class="col-sm-8">
+                                    <input name="group_description" id="f-group-create-description" class="form-control" type="text" placeholder="Enter a short description" pattern="^[a-zA-Z0-9,.()_ -]*$" oninvalid="setCustomValidity('Please enter only letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')" onchange="setCustomValidity('')" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="offset-sm-4 col-sm-8">
+                                    <input action="{{ url_for('group_manager_bp.group_create') }}" id="f-group-create-submit" class="btn btn-primary" type="button" value="Add group">
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            <!---  UPDATE  -->
+            <div class="card properties-update">
+                <div class="card-header">Group properties <span class="float-end" id="group-properties-group-name"></span></div>
+
+                <div class="card-body" id="group-properties">
+                    <p class="placeholder-text">
+                        Please select a group.
+                    </p>
+                    <form action="{{ url_for('group_manager_bp.group_update') }}" method="POST" id="f-group-update" class="hidden">
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-4 form-label" for="f-group-update-name">Group name</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="inputGroupPrepend">grp-</span>
+                                    </div>
+                                    <input name="group_name" id="f-group-update-name" class="form-control" type="text" pattern="^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$" required oninvalid="setCustomValidity('Please enter only lowercase letters, numbers, and hyphens (-). The group name may not start or end with a hyphen.')" onchange="setCustomValidity('')" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-4 form-label" for="f-group-update-category">Category</label>
+                            <div class="col-sm-8">
+                                <input name="group_category" id="f-group-update-category" class="form-control selectify-category" type="hidden" placeholder="Select one or enter a new name" required data-subcategory="#f-group-update-subcategory" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-4 form-label" for="f-group-update-subcategory">Subcategory</label>
+                            <div class="col-sm-8">
+                                <input name="group_subcategory" id="f-group-update-subcategory" class="form-control selectify-subcategory" type="hidden" placeholder="Select one or enter a new name" required data-category="#f-group-update-category" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row data-classification">
+                            <label class="col-sm-4 form-label" for="f-group-update-data-classification">Data classification</label>
+                            <div class="col-sm-8">
+                                <select name="group_data_classification" id="f-group-update-data-classification" class="selectify-data-classification">
+                                    <option value="unspecified" class="unspecified-option">Unspecified</option>
+                                    <option value="public">Public</option>
+                                    <option value="basic">Basic</option>
+                                    <option value="sensitive">Sensitive</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label class="col-sm-4 form-label" for="f-group-update-description">Group description</label>
+                            <div class="col-sm-8">
+                                <input name="group_description" id="f-group-update-description" class="form-control" type="text" placeholder="Enter a short description" pattern="^[a-zA-Z0-9,.()_ -]*$" oninvalid="setCustomValidity('Please enter only letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')" onchange="setCustomValidity('')" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="offset-sm-4 col-sm-8">
+                                <input action="{{ url_for('group_manager_bp.group_update') }}" id="f-group-update-submit" class="btn btn-primary" type="button" value="Save changes" />
+                                                                <a class="btn btn-danger disabled delete-button float-end" data-action="{{ url_for('group_manager_bp.group_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-group-delete">Remove group</a>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card users mt-2">
+                <div class="card-header">
+                                       <div class="float-start" id="user-group-member-count">Group members</div>
+                    <div class="input-group-sm has-feedback float-end">
+                        <input class="form-control form-control-sm mt-1" id="user-list-search" type="text" placeholder="Filter members" />
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="placeholder-text">
+                        Please select a group.
+                    </p>
+                </div>
+                <div class="list-group overflow-auto" id="user-list" style="max-height: 243px"></div>
+                <div class="list-group-item item-user-create" id="user-list-add-user" hidden>
+                    <form action="{{ url_for('group_manager_bp.user_create') }}" method="POST" class="form-inline" id="f-user-create">
+                        <input name="group_name" id="f-user-create-group" type="hidden" />
+                        <div class="input-group">
+                            <input name="user_name" id="f-user-create-name" class="form-control form-control-sm selectify-user-name" type="hidden" required placeholder="Click here to add a user..." data-group="#f-user-create-group" />
+                            <div class="input-group-btn">
+                                <input id="f-user-create-submit" class="btn btn-primary btn-block btn-sm ms-2" type="submit" value="Add" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <div class="input-group-sm float-start">
+                        Change role:
+                        <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Promote the selected member">&uarr;<i class="fa-solid fa-user-circle" aria-hidden="true"></i></a>
+                        <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Demote the selected member">&darr;<i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+                        <a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group">Remove member</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal" tabindex="-1" role="dialog" id="user-search-groups">
@@ -179,10 +247,10 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-				<div class="input-group mb-3">
-					<input id="input-user-search-groups" type="text" class="form-control" val="" placeholder="Enter name of user">
-					<button class="btn btn-primary btn-user-search-groups" data-path="">Find groups</button>
-				</div>
+                <div class="input-group mb-3">
+                    <input id="input-user-search-groups" type="text" class="form-control" val="" placeholder="Enter name of user">
+                    <button class="btn btn-primary btn-user-search-groups" data-path="">Find groups</button>
+                </div>
                 <div id="result-user-search-groups">Please enter a username to find groups for.</div>
             </div>
 
@@ -191,77 +259,6 @@
             </div>
         </div>
     </div>
-</div>
-
-<div class="modal fade" id="modal-group-create" role="dialog">
-	<div class="modal-dialog">
-		<div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Create a group</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-			<div class="modal-body">
-				<form class="form-horizontal" id="f-group-create" action="{{ url_for('group_manager_bp.group_create') }}" method="POST">
-					<div class="mb-3 row">
-						<label class="col-sm-4 form-control-label" for="f-group-create-category">Category</label>
-						<div class="col-sm-8">
-							<input name="group_category" id="f-group-create-category" class="form-control selectify-category" type="hidden" placeholder="Select one or enter a new name" required data-subcategory="#f-group-create-subcategory" />
-						</div>
-					</div>
-					<div class="mb-3 row">
-						<label class="col-sm-4 form-control-label" for="f-group-create-subcategory">Subcategory</label>
-						<div class="col-sm-8">
-							<input name="group_subcategory" id="f-group-create-subcategory" class="form-control selectify-subcategory" type="hidden" placeholder="Select one or enter a new name" required data-category="#f-group-create-category" />
-						</div>
-					</div>
-					<hr />
-					<div class="mb-3 row">
-						<label class="col-sm-4 form-control-label" for="f-group-create-name">Group name</label>
-						<div class="col-sm-8">
-							<div class="input-group">
-
-								<div class="input-group-btn" id="f-group-create-prefix-div" title="Choose a group type">
-									<button type="button" id="f-group-create-prefix-button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="text">research-&nbsp;</span><span class="caret"></span></button>
-									<ul class="dropdown-menu">
-										<li id="f-group-create-prefix-grp"><a href="#" data-value="grp-">grp-&nbsp;</a></li>
-										<li id="f-group-create-prefix-datamanager"><a href="#" data-value="datamanager-">datamanager-&nbsp;</a></li>
-										<li><a href="#" data-value="research-">research-&nbsp;</a></li>
-                                        <li><a href="#" data-value="deposit-">deposit-&nbsp;</a></li>
-										<li><a href="#" data-value="intake-">intake-&nbsp;</a></li>
-									</ul>
-								</div>
-								<input name="group_name" id="f-group-create-name" class="form-control" type="text" pattern="^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$" required oninvalid="setCustomValidity('Please enter only lowercase letters, numbers, and hyphens (-). The group name may not start or end with a hyphen.')" onchange="setCustomValidity('')" />
-							</div>
-						</div>
-					</div>
-					<div class="mb-3 row data-classification">
-						<label class="col-sm-4 form-control-label" for="f-group-create-data-classification">Data classification</label>
-						<div class="col-sm-8">
-							<select name="group_data_classification" id="f-group-create-data-classification" class="selectify-data-classification">
-								<option value="unspecified" class="unspecified-option">Unspecified</option>
-								<option value="public">Public</option>
-								<option value="basic">Basic</option>
-								<option value="sensitive">Sensitive</option>
-								<option value="critical">Critical</option>
-							</select>
-						</div>
-					</div>
-					<div class="mb-3 row">
-						<label class="col-sm-4 form-control-label" for="f-group-create-description">Group description</label>
-						<div class="col-sm-8">
-							<input name="group_description" id="f-group-create-description" class="form-control" type="text" placeholder="Enter a short description" pattern="^[a-zA-Z0-9,.()_ -]*$" oninvalid="setCustomValidity('Please enter only letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')" onchange="setCustomValidity('')" />
-						</div>
-					</div>
-					<div class="row">
-						<div class="offset-sm-4 col-sm-8">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <input id="f-group-create-submit" class="btn btn-primary" type="submit" value="Add group" />
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
 </div>
 
 <div class="modal fade" id="modal-group-delete" tabindex="-1">
@@ -284,28 +281,28 @@
 </div>
 
 <div class="modal fade" id="modal-user-delete" tabindex="-1">
-	<div class="modal-dialog">
-		<div class="modal-content">
+    <div class="modal-dialog">
+        <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">Confirm member removal</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-			<div class="modal-body">
-				<p>Are you sure you want to remove <strong class="user"></strong> from group <strong class="group"></strong>?</p>
-			</div>
-			<div class="modal-footer">
-				<div class="input-group float-start">
-					<div class="checkbox">
-						<label for="f-user-delete-no-confirm">
-							<input id="f-user-delete-no-confirm" type="checkbox" /> Don't ask again during this session.
-						</label>
-					</div>
-				</div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove <strong class="user"></strong> from group <strong class="group"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <div class="input-group float-start">
+                    <div class="checkbox">
+                        <label for="f-user-delete-no-confirm">
+                            <input id="f-user-delete-no-confirm" type="checkbox" /> Don't ask again during this session.
+                        </label>
+                    </div>
+                </div>
 
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button id="f-user-delete" type="button" class="btn btn-danger confirm">Remove</button>
-			</div>
-		</div>
-	</div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock content %}

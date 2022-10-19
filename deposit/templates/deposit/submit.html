@@ -31,7 +31,7 @@
 <div class="card mt-4">
     <div class="card-body">
         <div class="form-check">
-            <p>Data uploaded? <i id="data_check" aria-hidden="true" class="fa-solid fa-times text-danger"></i></p>
+            <p>Data uploaded? <i id="data_check" aria-hidden="true" class="fa-solid fa-times text-danger"></i> <span class="package-size"></span></p>
             <p>Data documented? <i id="metadata_check" aria-hidden="true" class="fa-solid fa-times text-danger"></i></p>
             <p class="mt-4">
             You understand that:
@@ -46,9 +46,10 @@
             </p>
         </div>
     </div>
-    <div class="modal-footer">
+    <div class="card-footer">
         <a href="/deposit/metadata?dir={{ path|urlencode }}" class="btn btn-secondary btn-document-data" title="Go back to document data"><i class="fa-solid fa-chevron-left"></i> Add metadata</a>
         <button id="submit" type="submit" class="btn btn-primary float-end btn-submit-data" title="Submit data" disabled>Submit datapackage</button>
+
     </div>
 </div>
 {% endblock content %}
