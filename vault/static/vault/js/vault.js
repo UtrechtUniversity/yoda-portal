@@ -11,6 +11,7 @@ $(document).ajaxSend(function(e, request, settings) {
 
 let preservableFormatsLists = null;
 let currentFolder;
+let dataPackage = null;
 
 $(function() {
     // Extract current location from query string (default to '').
@@ -145,9 +146,40 @@ $(function() {
     });
 
     $("body").on("click", "a.action-submit-for-publication", function() {
-        $('#confirmAgreementConditions .modal-body').text(''); // clear it first
-
         $('.action-confirm-submit-for-publication').attr( 'data-folder', $(this).attr('data-folder') );
+
+        let folder = $(this).attr('data-folder');
+        let vault = String(folder.match(/.*\//)).replace(/\/+$/, '');
+        dataPackage = null;
+        $('.previousPublications').html('');
+        Yoda.call('vault_get_published_packages', {path: Yoda.basePath + vault}).then((data) => {
+            if (Object.keys(data).length > 0) {
+                let i = 0;
+                $.each(data, function(doi, path) {
+                    i++;
+                    let vault_path = path.replace(Yoda.basePath, '');
+                    $('.previousPublications').append(`
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${htmlEncode(path)}">
+  <label class="form-check-label" for="dataPackage${i}">
+    ${htmlEncode(doi)} (<a target="_blank" href="?dir=${encodeURIComponent(vault_path)}">${htmlEncode(vault_path)}</a>)
+  </label>
+</div>
+`);
+                });
+            } else {
+                $('.previousPublications').html("No previously published data packages available.");
+            }
+
+            $('#submitPublication').modal('show');
+        });
+    });
+
+    $("body").on("click", "button.action-confirm-data-package-select", function() {
+        dataPackage = $('#submitPublication .modal-body input[type="radio"]:checked').val();
+        $('#submitPublication').modal('hide');
+
+        $('#confirmAgreementConditions .modal-body').text(''); // clear it first
 
         Yoda.call('vault_get_publication_terms', {}).then((data) => {
             $('#confirmAgreementConditions .modal-body').html(data);
@@ -744,8 +776,11 @@ async function vaultSubmitForPublication(folder)
     $('.btn-group button.folder-status').prop("disabled", true).next().prop("disabled", true);
 
     try {
-        let status = await Yoda.call('vault_submit',
-                                     {'coll': Yoda.basePath + folder})
+        if (dataPackage) {
+            let status = await Yoda.call('vault_submit', {'coll': Yoda.basePath + folder, 'previous_version': dataPackage})
+        } else {
+            let status = await Yoda.call('vault_submit', {'coll': Yoda.basePath + folder})
+        }
         $('#statusBadge').html('');
     } catch(e) {
         $('#statusBadge').html(btnText);

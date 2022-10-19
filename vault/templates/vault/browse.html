@@ -65,6 +65,33 @@
     </div>
 </div>
 
+<div class="modal" tabindex="-1" id="submitPublication">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Submit for publication</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Submit this data package as a new publication or submit it as a new version of an existing publication from this vault.</p>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage" value="" checked="checked">
+          <label class="form-check-label" for="dataPackage">
+            New publication
+          </label>
+        </div>
+        <hr />
+        <p>Existing publications:</p>
+        <div class="previousPublications"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary action-confirm-data-package-select">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal" tabindex="-1" role="dialog" id="confirmAgreementConditions">
     <div class="modal-dialog">
         <div class="modal-content">
