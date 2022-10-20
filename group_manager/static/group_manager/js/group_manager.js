@@ -29,7 +29,7 @@ function readCsvFile(e) {
     const csv_rows = contents.slice(contents.indexOf("\n") + 1).split("\n");
     var csv_rows_corrected = [];
 
-    // parse the csv file data to be able to present in a table 
+    // parse the csv file data to be able to present in a table
     var result = csvToArray(contents);
 
     // first row will contain fixed definion
@@ -103,7 +103,7 @@ function readCsvFile(e) {
     // now have user choose to actually process the uploaded data.
     $('.div-process-results-import').removeClass('hidden');
 
-    // enable processing again after successful reading 
+    // enable processing again after successful reading
     $('.process-csv').prop('disabled', false);
   };
   reader.readAsText(file);
@@ -125,12 +125,6 @@ function csvToArray(str, delimiter = ",") {
       return arr;
 }
 
-function htmlEncode(value){
-    //create a in-memory div, set it's inner text(which jQuery automatically encodes)
-    //then grab the encoded contents back out.  The div never exists on the page.
-    return $('<div/>').text(value).html().replace('"', '&quot;');
-}
-
 
 async function process_imported_row(row) {
     // Row specific processing of the imported csv
@@ -149,7 +143,7 @@ async function process_imported_row(row) {
             $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>');
             row.addClass('import-csv-group-ok');
 
-            // Solely added for test automation - splinter. 
+            // Solely added for test automation - splinter.
             // This was the only way to be able to perform an automated click work on a row.
             // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
             $('#processed-indicator-' + groupname).click(function(){
@@ -1769,7 +1763,6 @@ $(function() {
             $('#f-user-create-name').on('select2-close', function() {
                 // Remove the new user name input on unfocus if nothing was entered.
                 if ($(this).val().length === 0) {
-                    // $(this).parents('form').attr('hidden', 'true');
                     $(this).parents('.list-group-item').find('.user-create-text').removeAttr('hidden');
                 }
             });

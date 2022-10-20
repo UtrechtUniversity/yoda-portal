@@ -3,11 +3,9 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-
 from flask import Blueprint, make_response, render_template, request, Response
 
 import api
-
 
 group_manager_bp = Blueprint('group_manager_bp', __name__,
                              template_folder='templates',
