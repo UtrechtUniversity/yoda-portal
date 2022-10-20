@@ -8,7 +8,266 @@
 
 "use strict";
 
+function readCsvFile(e) {
+  var file = e.target.files[0];
+  if (!file) {
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var contents = e.target.result;
+
+    //remove unwanted characters
+    contents = contents.replaceAll('"', '').replaceAll("'", '').replaceAll(' ', '');
+
+    // ensure correct seperator ','
+    contents = contents.replaceAll(';', ',');
+
+    // required to be able to, in a simple manner, add header and data row to the tr's in the table to pass to the backend
+    const csv_header = contents.slice(0, contents.indexOf("\n"));
+    const csv_rows = contents.slice(contents.indexOf("\n") + 1).split("\n");
+    var csv_rows_corrected = [];
+
+    // parse the csv file data to be able to present in a table
+    var result = csvToArray(contents);
+
+    // first row will contain fixed definion
+    var ar_keys = result[0];
+
+    // First compress all columns to  keys: category, subcategory, groupname and usercount
+    const presentation_columns = ['groupname', 'category', 'subcategory', 'users'];
+    const all_csv_columns = ['groupname', 'category', 'subcategory', 'manager', 'member', 'viewer']
+
+    var new_result = [];
+    var row_nr = 0;
+    result.forEach(function myFunction(group_def) {
+        // initialise all columns that must be present in the view
+        var row = [];
+        presentation_columns.forEach(function myFunction(column) {
+            row[column] = '';
+        });
+
+        // now loop through the received rows and put them in the right columns
+        for (const key of Object.keys(ar_keys)) {
+            all_csv_columns.forEach(function myFunction(column) {
+                if (key == column) {
+                    row[column] = group_def[key];
+                }
+                else if (key.startsWith(column)) {
+                    if (group_def[key] != '\r') {
+                        if (row['users'] == '') {
+                            row['users'] = '1';
+                        }
+                        else {
+                            row['users'] = (parseInt(row['users']) + 1).toString();
+                        }
+                    }
+                }
+            });
+        }
+        // only show row when all required data is present.
+        var row_error = false;
+        presentation_columns.forEach(function myFunction(column) {
+            if (!row_error && (row[column] === undefined || row[column] == '')) {
+                row_error = true;
+            }
+        });
+        if (row_error == false) {
+            new_result.push(row);
+            csv_rows_corrected.push(csv_rows[row_nr]);
+        }
+        row_nr += 1;
+    });
+
+    // build the header row of the table
+    let table = '<table class="table table-striped"><thead><tr><th></th>'
+    presentation_columns.forEach(function myFunction(column) {
+        table += '<th>' + column + '</th>';
+    });
+    table += '<td></td></tr></thead><tbody>';
+
+    new_result.forEach(function myFunction(group_def, i) {
+        table += '<tr id="' + group_def['groupname'] + '" class="import-groupname" groupname="' + group_def['groupname'] + '" import_row_data="' + csv_header + csv_rows_corrected[i] + '">';
+        table += '<td id="processed-indicator-' + group_def['groupname'] + '"></td>';
+        presentation_columns.forEach(function myFunction(column) {
+            table += '<td>' + group_def[column] + '</td>';
+        });
+        table += '<td id="error-import-' + group_def['groupname'] + '"></td>';
+        table += '</tr>';
+    });
+
+    table += '</tbody></table>';
+    $('#result-import-groups-csv').html(table);
+
+    // now have user choose to actually process the uploaded data.
+    $('.div-process-results-import').removeClass('hidden');
+
+    // enable processing again after successful reading
+    $('.process-csv').prop('disabled', false);
+  };
+  reader.readAsText(file);
+}
+
+function csvToArray(str, delimiter = ",") {
+      const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+      const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+
+      const arr = rows.map(function (row) {
+        const values = row.split(delimiter);
+        const el = headers.reduce(function (object, header, index) {
+          object[header] = values[index];
+          return object;
+        }, {});
+        return el;
+      });
+
+      return arr;
+}
+
+
+async function process_imported_row(row) {
+    // Row specific processing of the imported csv
+    var groupname = row.attr('groupname');
+    var import_row_data = row.attr('import_row_data');
+
+    try {
+        await Yoda.call('group_process_csv',
+            {csv_header_and_data: import_row_data,
+             allow_update: $('#import-allow-updates').is(':checked'),
+             delete_users: $('#import-delete-users').is(':checked')},
+            {"quiet": true}).then((data) => {
+
+            // Successful import -> set correct classes and feedback to inform user
+            row.addClass('import-groupname-done');
+            $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>');
+            row.addClass('import-csv-group-ok');
+
+            // Solely added for test automation - splinter.
+            // This was the only way to be able to perform an automated click work on a row.
+            // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
+            $('#processed-indicator-' + groupname).click(function(){
+                let groupName = 'research-' + groupname
+                $('#dlg-import-groups-csv').modal('hide');
+                Yoda.groupManager.unfoldToGroup(groupName);
+                Yoda.groupManager.selectGroup(groupName);
+            });
+        });
+    }
+    catch(error) {
+        // Row processing encountered problems => inform user and add appropriate classes.
+        row.addClass('import-groupname-done');
+
+        $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>');
+        row.addClass('table-danger');
+        // collect error messages and maken 1 string to present to user.
+        var error_html = '';
+        error.status_info.forEach(function myFunction(item) {
+            error_html += item + '<br/>';
+        });
+        $('#error-import-' + groupname).html(error_html);
+    }
+    // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
+    if ($('.import-groupname').length == $('.import-groupname-done').length) {
+        // only enable new groups that have been successfully added
+        $('.import-csv-group-ok').click(function() {
+            let groupName = 'research-' + $(this).attr('groupname');
+            $('#dlg-import-groups-csv').modal('hide');
+            Yoda.groupManager.unfoldToGroup(groupName);
+            Yoda.groupManager.selectGroup(groupName);
+        });
+
+        // Renew the data of the left pane as new groups have been added not yet loaded.
+        Yoda.call('group_data').then((groupdata) => {
+            Yoda.groupManager.groupHierarchy = groupdata['group_hierarchy']
+
+            // Collect the latest data and bring into Yoda.groupManager.groups
+            Yoda.groupManager.groups = (function(hier) {
+                var groups = { };
+                for (var categoryName in hier) {
+                    for (var subcategoryName in hier[categoryName]) {
+                        for (var groupName in hier[categoryName][subcategoryName]) {
+                            groups[groupName] = {
+                                category:    categoryName,
+                                subcategory: subcategoryName,
+                                name:        groupName,
+                                description: hier[categoryName][subcategoryName][groupName].description,
+                                data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
+                                members:     hier[categoryName][subcategoryName][groupName].members
+                            };
+
+                        }
+                    }
+                }
+                return groups;
+            })(groupdata['group_hierarchy']);
+
+            var cat_idx = 1;
+            var html = '';
+            var subcat_idx = 1;
+            var grp_idx = 1;
+            for (var category in groupdata['group_hierarchy']) {
+                            html += `<div class="list-group-item category" id="category-${ cat_idx }" data-name="${ category }">
+                                        <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-${ cat_idx }" href="#category-${ cat_idx }-ul">
+                                            <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ category }
+                                        </a>
+                                        <div class="list-group collapse category-ul" id="category-${ cat_idx }-ul">`;
+                            subcat_idx = 1;
+                            for (var subcat in groupdata['group_hierarchy'][category]) {
+                                html +=
+
+                                `<div class="list-group-item subcategory" data-name="${ subcat }">
+                                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-${ subcat_idx }" href="#subcategory-${ subcat_idx }-ul">
+                                        <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ subcat }
+                                    </a>
+                                    <div class="list-group collapse subcategory-ul" id="subcategory-${ subcat_idx }-ul">`;
+
+                                grp_idx = 1;
+                                for (var group in groupdata['group_hierarchy'][category][subcat]) {
+                                    html +=
+                                        `<a class="list-group-item list-group-item-action group" id="group-${ grp_idx }" data-name="${ group }">
+                                            ${ group }
+                                        </a>`;
+
+                                    grp_idx += 1
+                                }
+
+                                html += '</div></div>';
+                                subcat_idx = subcat_idx + 1;
+                            }
+
+                            html += '</div></div>';
+                            cat_idx = cat_idx + 1;
+            }
+            $('#group-list').html(html);
+        });
+    }
+}
+
+
 $(function() {
+    // CSV import handling {{{
+    document.getElementById('file-input').addEventListener('change', readCsvFile, false);
+
+    $('.file-input-click').click(function(){
+        $('#file-input').val(null);
+    });
+
+    $('.import-groups-csv').click(function(){
+        $('#dlg-import-groups-csv').modal('show');
+    });
+
+    $('.process-csv').click(function(){
+        // First disable the button
+        $(this).prop('disabled', true);
+
+        // loop through the rows in the table and, if successful, add a click handler to be able to jump to a group in the groupmananger
+        $('.import-groupname').each(function myFunction() {
+            process_imported_row($(this));
+        });
+    });
+    // }}}
+
     // When allowed to add groups the fields have to be initialized
     $('.create-button-new').click(function(){
         $('.properties-update').addClass('hidden');
@@ -344,7 +603,6 @@ $(function() {
 
         updateGroupMemberCount: function(groupName) {
             var $userPanelTitle = $('.card.users .card-title');
-            console.log(Object.keys(this.groups[groupName].members).length);
             $('#user-group-member-count').text('Group members (' + Object.keys(this.groups[groupName].members).length + ')');
         },
 
@@ -833,6 +1091,7 @@ $(function() {
                             var query   = $el.data('select2').search.val().toLowerCase();
                             var results = [];
                             var inputMatches = false;
+
                             users.forEach(function(userName) {
                                 // Exclude users already in the group.
                                 if (!(userName in that.groups[$($el.attr('data-group')).val()].members)) {
@@ -1451,6 +1710,8 @@ $(function() {
                 $('#f-group-create-name').attr('data-prefix', newPrefix);
 
                 if (newPrefix === 'datamanager-') {
+                    // Autofill the group name - the user cannot customize the
+                    // name of a datamanager group.
                     $('#f-group-create-name').val($('#f-group-create-category').val());
                     $('#f-group-create-name').prop('readonly', true);
                 } else {
@@ -1501,6 +1762,21 @@ $(function() {
                     that.selectUser($(this).attr('data-name'));
             });
 
+            $userList.on('click', '.list-group-item:has(.user-create-text:not(.hidden))', function() {
+                // Show the user add form.
+                that.deselectUser();
+                $(this).find('.user-create-text').attr('hidden', '');
+                $(this).find('form').removeClass('hidden');
+                $(this).find('form').find('#f-user-create-name').select2('open');
+            });
+
+            $('#f-user-create-name').on('select2-close', function() {
+                // Remove the new user name input on unfocus if nothing was entered.
+                if ($(this).val().length === 0) {
+                    $(this).parents('.list-group-item').find('.user-create-text').removeAttr('hidden');
+                }
+            });
+
             // Adding users to groups.
             $('#f-user-create').on('submit', function(e) {
                 that.onSubmitUserCreate(this, e);
@@ -1549,6 +1825,11 @@ $(function() {
             if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
                 var $groupPanel = $('.card.groups');
                 $groupPanel.find('.create-button').removeClass('disabled');
+            }
+
+            if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
+                // show import button only for rodsadmin and members of priv-group-add
+                $('.import-groups-csv').removeClass('hidden');
             }
 
             // Indicate which groups are managed by this user.

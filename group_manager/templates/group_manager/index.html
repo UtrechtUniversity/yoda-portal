@@ -25,6 +25,7 @@
     </div>
     <div class="col-md-6 div-show-search-groups">
         <button type="button" class="btn btn-primary user-search-groups float-end" title="Search groups for users"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Search for user</button>
+        <button type="button" class="btn btn-primary import-groups-csv float-end me-2 hidden" title="Import groups from CSV"><i class="fa-solid fa-file-csv" aria-hidden="true"></i> Import groups</button>
         <button type="button" class="btn btn-primary create-button-new float-end me-2 hidden" title="Create a new group"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add group</button>
     </div>
 </div>
@@ -234,6 +235,81 @@
                         <a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group">Remove member</a>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="dlg-import-groups-csv">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Import group definitions in CSV file</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h6>Step 1. Upload the csv file</h6>
+                  <p class="placeholder-text">Select a CSV file containing group definions (format described below).</p>
+                </div>
+                <div class='col-sm-6 div-process-results-import hidden'>
+                  <div class="div-process-results-import">
+                    <h6>Step 2. Process the uploaded csv file</h6>
+                    <p class="placeholder-text">Check the options you prefer and click the process button.</p>
+                    <input class="form-check-input" type="checkbox" id="import-allow-updates"> Allow updates
+                    <input class="form-check-input ms-3" type="checkbox" id="import-delete-users"> Delete users
+                    <br>
+                    <br>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <input type="file" id="file-input" name="file-input" class="csv-import-file" accept=".csv" title="Upload CSV with group definition" />
+                  <label for="file-input" class="btn btn-primary file-input-click"><i class="fa-solid fa-upload" aria-hidden="true"></i> Upload CSV with group definitions</label>
+                </div>
+                <div class='col-sm-6 div-process-results-import hidden'>
+                  <button type="button" class="btn btn-primary process-csv" title="Process CSV with group definition(s)"><i class="fa-solid fa-user-group" aria-hidden="true"></i> Process CSV</button>
+                </div>
+              </div>
+              <div class="row">
+                <div id="result-import-groups-csv">
+                  <br />
+                  <h5>Group definition CSV format</h5>
+
+                  <p>The CSV file is expected to include the following labels in its header (the first row):</p>
+                  <dl class="row">
+                    <dt class="col-sm-2">category</dt>
+                    <dd class="col-sm-10">Category for the group</dd>
+                    <dt class="col-sm-2">subcategory</dt>
+                    <dd class="col-sm-10">Subcategory for the group</dd>
+                    <dt class="col-sm-2">groupname</dt>
+                    <dd class="col-sm-10">Name of the group (without the "research-" prefix)</dd>
+                  </dl>
+
+                  <p>
+                    The remainder of the columns should have a label that starts with a prefix which indicates the role of each group member.
+                    Columns may appear in any order and empty data cells are ignored: groups can differ in number of members.
+                  </p>
+                  <dl class="row">
+                    <dt class="col-sm-2">manager:</dt>
+                    <dd class="col-sm-10">User that will be given the role of manager</dd>
+                    <dt class="col-sm-2">member:</dt>
+                    <dd class="col-sm-10">User that will be given the role of member with read/write</dd>
+                    <dt class="col-sm-2">viewer:</dt>
+                    <dd class="col-sm-10">User that will be given the role of viewer with read</dd>
+                  </dl>
+
+                  <h5>Example:</h5>
+<pre>category,subcategory,groupname,manager:manager,member:member1,member:member2
+departmentx,teama,groupteama,m.manager@example.com,m.member@example.com,n.member@example.com
+departmentx,teamb,groupteamb,m.manager@example.com,p.member@example.com,</pre>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
