@@ -68,11 +68,9 @@ def get_subcategories() -> Response:
 @group_manager_bp.route('/get_schemas', methods=['POST'])
 def get_schemas() -> Response:
     response = api.call('get_schemas', data={})
-    # filter = request.form['query']
 
     schemas = []
     for schema in response['data']:
-        #if filter in category:
         schemas.append(schema)
 
     output = make_response({'schemas': schemas})
