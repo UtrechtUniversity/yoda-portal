@@ -21,8 +21,12 @@ def index() -> Response:
     user_type = response['data']['user_type']
     user_zone = response['data']['user_zone']
 
+    response = api.call('get_schemas', data={})
+    schema_ids = response['data']
+
     return render_template('group_manager/index.html',
                            group_hierarchy=group_hierarchy,
+                           schema_ids=schema_ids,
                            user_type=user_type,
                            user_zone=user_zone)
 
@@ -61,6 +65,21 @@ def get_subcategories() -> Response:
     return output
 
 
+@group_manager_bp.route('/get_schemas', methods=['POST'])
+def get_schemas() -> Response:
+    response = api.call('get_schemas', data={})
+    # filter = request.form['query']
+
+    schemas = []
+    for schema in response['data']:
+        #if filter in category:
+        schemas.append(schema)
+
+    output = make_response({'schemas': schemas})
+    output.headers["Content-type"] = "application/json"
+    return output
+
+
 @group_manager_bp.route('/get_users', methods=['POST'])
 def get_users() -> Response:
     response = api.call('group_search_users', data={'pattern': request.form['query']})
@@ -77,6 +96,7 @@ def group_create() -> Response:
     response = api.call('group_create', data={'group_name': request.form['group_name'],
                                               'category': request.form['group_category'],
                                               'subcategory': request.form['group_subcategory'],
+                                              'schema_id': request.form['group_schema_id'],
                                               'description': request.form['group_description'],
                                               'data_classification': data_classification})
 

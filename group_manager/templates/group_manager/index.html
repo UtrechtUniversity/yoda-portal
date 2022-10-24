@@ -13,7 +13,7 @@
     <script src="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.min.js') }}"></script>
     <script>
     $(function() {
-        Yoda.groupManager.load({{ group_hierarchy | safe }}, '{{ user_type }}', '{{ user_zone }}');
+        Yoda.groupManager.load({{ group_hierarchy | safe }}, {{ schema_ids | safe }}, '{{ user_type }}', '{{ user_zone }}');
     });
     </script>
 {% endblock scripts %}
@@ -109,6 +109,16 @@
                                 </div>
                             </div>
 
+
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 form-label" for="f-group-create-schema-id">Schema</label>
+                                <div class="col-sm-8">
+                                    <input name="group_schema_id" id="f-group-create-schema-id" class="form-control selectify-schema-id" placeholder="Select a schema" required />
+                                </div>
+
+                                </div>
+                            </div>
+
                             <div class="mb-3 row data-classification">
                                 <label class="col-sm-4 form-label" for="f-group-create-data-classification">Data classification</label>
                                 <div class="col-sm-8">
@@ -174,6 +184,14 @@
                                 <input name="group_subcategory" id="f-group-update-subcategory" class="form-control selectify-subcategory" type="hidden" placeholder="Select one or enter a new name" required data-category="#f-group-update-category" />
                             </div>
                         </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-4 form-label" for="f-group-update-schema-id">Schema-id</label>
+                            <div class="col-sm-8">
+                                <input name="group_schema_id" id="f-group-update-schema-id" class="form-control" disabled/>
+                            </div>
+                        </div>
+
 
                         <div class="mb-3 row data-classification">
                             <label class="col-sm-4 form-label" for="f-group-update-data-classification">Data classification</label>

@@ -125,7 +125,6 @@ function csvToArray(str, delimiter = ",") {
       return arr;
 }
 
-
 async function process_imported_row(row) {
     // Row specific processing of the imported csv
     var groupname = row.attr('groupname');
@@ -192,6 +191,7 @@ async function process_imported_row(row) {
                                 subcategory: subcategoryName,
                                 name:        groupName,
                                 description: hier[categoryName][subcategoryName][groupName].description,
+                                schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
                                 data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
                                 members:     hier[categoryName][subcategoryName][groupName].members
                             };
@@ -415,6 +415,9 @@ $(function() {
             'normal':  'Regular member with write access',
             'manager': 'Group manager',
         },
+
+        // All possible schema-id's
+        schemaIDs: [],
 
         /// Get the name of an access level one lower than the current one for
         /// the given group.
@@ -674,6 +677,9 @@ $(function() {
 
                 var prefix = that.getPrefix(groupName);
 
+                // For now this is a disabled field.
+                $('#f-group-update-schema-id').val(group.schema_id)
+
                 $groupProperties.find('#f-group-update-name')
                     .val(groupName.replace(that.GROUP_PREFIXES_RE, ''))
                     .prop('readonly', true)
@@ -897,6 +903,7 @@ $(function() {
 
             $(sel).filter('.selectify-category').each(function() {
                 var $el = $(this);
+                console.log('selectify category');
 
                 $el.attr(
                     'placeholder',
@@ -984,6 +991,11 @@ $(function() {
                 }).on('change', function() {
                     $($(this).attr('data-subcategory')).select2('val', '');
 
+                    // bring over the category value to the schema-id if exists.
+                    if (that.schemaIDs.includes($(this).select2('val'))) {
+                        $('#f-group-create-schema-id').select2('val', $(this).select2('val'));
+                    }
+
                     if (this.id === 'f-group-create-category') {
                         if (that.canCreateDatamanagerGroup(this.value))
                             $('#f-group-create-prefix-datamanager').removeClass('hidden');
@@ -1005,7 +1017,7 @@ $(function() {
 
             $(sel).filter('.selectify-subcategory').each(function() {
                 var $el = $(this);
-
+                console.log('selectify subcat')
                 $el.select2({
                     ajax: {
                         quietMillis: 200,
@@ -1066,9 +1078,69 @@ $(function() {
                 });
             });
 
-            // }}}
-            // Username fields {{{
 
+            // }}}
+
+            // Schema-id {{{
+            $(sel).filter('.selectify-schema-id').each(function() {
+                var $el = $(this);
+
+                $el.select2({
+                    ajax: {
+                        quietMillis: 200,
+                        url:      '/group_manager/get_schemas',
+                        type:     'post',
+                        dataType: 'json',
+                        data: function (term, page) {
+                            return { query: term };
+                        },
+
+                        results: function (data) {
+                            var schemas = data.schemas
+                            var results = [];
+                            var query   = $el.data('select2').search.val();
+                            var inputMatches = false;
+
+                            schemas.forEach(function(schema) {
+                                if (schema.startsWith(query)) {
+                                    results.push({
+                                        id:   schema,
+                                        text: schema,
+                                    });
+                                 }
+                            });
+
+                            results.sort(function(a, b) {
+                                return (a.id === b.id  ?  0 :
+                                        a.id === query ? -1 :
+                                        b.id === query ?  1 :
+                                        a.id >=  b.id  ?  1 : -1);
+                            });
+
+                            return { results: results };
+                        },
+                    },
+                    formatResult: function(result, $container, query, escaper) {
+                        return escaper(result.text)
+                            + (
+                                'exists' in result && !result.exists
+                                ? ' <span class="grey">(create)</span>'
+                                : ''
+                            );
+                    },
+                    initSelection: function($el, callback) {
+                        callback({ id: $el.val(), text: $el.val() });
+                    },
+                }).on('open', function() {
+                    $(this).select2('val', '');
+                }).on('change', function() {
+                });
+            });
+
+
+            // }}}
+
+            // Username fields {{{
             $(sel).filter('.selectify-user-name').each(function() {
                 var $el = $(this);
 
@@ -1196,8 +1268,6 @@ $(function() {
                 return;
             }
 
-
-
             var postData = {
                 group_name:                newProperties.name,
                 group_description:         newProperties.description,
@@ -1205,6 +1275,18 @@ $(function() {
                 group_category:            newProperties.category,
                 group_subcategory:         newProperties.subcategory,
             };
+            // Schema id is added solely for creation of a new group
+            if (action == 'create') {
+                // Validation here
+                if (this.schemaIDs.includes($('#f-group-create-schema-id').val()) {
+                    postData['group_schema_id'] = $('#f-group-create-schema-id').val();
+                }
+                else {
+                    alert('Please select a schema as it is a required field');
+                    resetSubmitButton();
+                    return;
+                }
+            }   
 
             if (action === 'update') {
                 var selectedGroup = this.groups[$($('#group-list .group.active')[0]).attr('data-name')];
@@ -1578,8 +1660,9 @@ $(function() {
          *
          * \todo Generate the group list in JS just like the user list.
          */
-        load: function(groupHierarchy, userType, userZone) {
+        load: function(groupHierarchy, schemaIDs, userType, userZone) {
             this.groupHierarchy = groupHierarchy;
+            this.schemaIDs      = schemaIDs
             this.isRodsAdmin    = userType == 'rodsadmin';
             this.zone           = userZone;
             this.userNameFull   = Yoda.user.username + '#' + userZone;
@@ -1594,6 +1677,7 @@ $(function() {
                                 subcategory: subcategoryName,
                                 name:        groupName,
                                 description: hier[categoryName][subcategoryName][groupName].description,
+                                schema_id:   hier[categoryName][subcategoryName][groupName].schema_id,
                                 data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
                                 members:     hier[categoryName][subcategoryName][groupName].members
                             };
@@ -1819,7 +1903,7 @@ $(function() {
             // }}}
             // }}}
 
-            this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-user-name');
+            this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-schema-id, .selectify-user-name');
             $('.selectify-data-classification').select2();
 
             if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
