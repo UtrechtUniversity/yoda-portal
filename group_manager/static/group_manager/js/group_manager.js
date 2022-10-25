@@ -1278,7 +1278,7 @@ $(function() {
             // Schema id is added solely for creation of a new group
             if (action == 'create') {
                 // Validation here
-                if (this.schemaIDs.includes($('#f-group-create-schema-id').val()) {
+                if (this.schemaIDs.includes($('#f-group-create-schema-id').val())) {
                     postData['group_schema_id'] = $('#f-group-create-schema-id').val();
                 }
                 else {
