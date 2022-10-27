@@ -209,8 +209,12 @@ function convertToHumanReadableStatus(status) {
             return "Preregistration confirmed";
         case "DTA_READY":
             return "DTA ready";
-        case "DTA_SIGNED":
-            return "DTA signed";
+        case "DTA_SIGNED_BY_RESEARCHER":
+            return "DTA signed by researcher";
+        case "DTA_AWAITING_MANDATEE_APPROVAL":
+            return "DTA awaiting mandatee approval";
+        case "DTA_SIGNED_BY_MANDATEES":
+            return "DTA signed by mandatees";
         case "DATA_READY":
             return "Data ready";
         default:

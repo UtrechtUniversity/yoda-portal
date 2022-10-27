@@ -58,7 +58,9 @@ class human_readable_status(Enum):
     PREREGISTRATION_SUBMITTED = 'Preregistration submitted'
     PREREGISTRATION_CONFIRMED = 'Preregistration confirmed'
     DTA_READY = 'DTA ready'
-    DTA_SIGNED = 'DTA signed'
+    DTA_SIGNED_BY_RESEARCHER = 'DTA signed by researcher'
+    DTA_AWAITING_MANDATEE_APPROVAL = 'DTA awaiting mandatee approval'
+    DTA_SIGNED_BY_MANDATEES = 'DTA signed by mandatees'
     DATA_READY = 'Data ready'
 
 
@@ -101,11 +103,13 @@ def view(request_id: str) -> Response:
     is_project_manager  = 'PM' in roles
     is_datamanager      = 'DM' in roles
     is_dac_member       = 'DAC' in roles
+    is_pi               = 'PI' in roles
+    is_fd               = 'FD' in roles
     is_request_owner    = 'OWN' in roles
     is_reviewer         = 'REV' in roles
     is_pending_reviewer = 'PENREV' in roles
 
-    if not is_project_manager and not is_datamanager and not is_dac_member and not is_request_owner:
+    if not is_project_manager and not is_datamanager and not is_dac_member and not is_pi and not is_fd and not is_request_owner:
         abort(403)
 
     request_info         = api.call('datarequest_get', {'request_id': request_id})['data']
@@ -134,6 +138,8 @@ def view(request_id: str) -> Response:
                            is_project_manager=is_project_manager,
                            is_datamanager=is_datamanager,
                            is_dac_member=is_dac_member,
+                           is_pi=is_pi,
+                           is_fd=is_fd,
                            is_request_owner=is_request_owner,
                            is_reviewer=is_reviewer,
                            is_pending_reviewer=is_pending_reviewer,
@@ -396,8 +402,8 @@ def download_dta(request_id: str) -> Response:
         return send_file(io.BytesIO(file), as_attachment=True, attachment_filename=file_path.split('/')[-1])
 
 
-@datarequest_bp.route('upload_signed_dta/<request_id>', methods=['POST'])
-def upload_signed_dta(request_id: str) -> Response:
+@datarequest_bp.route('upload_researcher_dta/<request_id>', methods=['POST'])
+def upload_researcher_dta(request_id: str) -> Response:
     if not permission_check(request_id, ['OWN'], ['DTA_READY']):
         abort(403)
 
@@ -446,7 +452,7 @@ def upload_signed_dta(request_id: str) -> Response:
 
 @datarequest_bp.route('data_ready/<request_id>')
 def data_ready(request_id: str) -> Response:
-    if not permission_check(request_id, ['DM'], ['DTA_SIGNED']):
+    if not permission_check(request_id, ['DM'], ['DTA_SIGNED_BY_FD']):
         abort(403)
 
     result = api.call('datarequest_data_ready', {'request_id': request_id})

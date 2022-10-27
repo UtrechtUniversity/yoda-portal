@@ -66,9 +66,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     datarequestStatusInt = 4;
                     break;
                 case 'DTA_READY':
+                case 'DTA_AWAITING_MANDATEE_APPROVAL':
                     datarequestStatusInt = 5;
                     break;
-                case 'DTA_SIGNED':
+                case 'DTA_SIGNED_BY_RESEARCHER':
+                case 'DTA_SIGNED_BY_MANDATEES':
                     datarequestStatusInt = 6;
                     break;
                 case 'DATA_READY':
@@ -86,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 case 'DTA_READY':
                     datarequestStatusInt = 2;
                     break;
-                case 'DTA_SIGNED':
+                case 'DTA_SIGNED_BY_RESEARCHER':
                     datarequestStatusInt = 3;
                     break;
                 case 'DATA_READY':
@@ -354,30 +356,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         xhr.send(fd);
     });
 
-    // Render and show the modal for uploading a signed DTA
-    $("body").on("click", "button.upload_signed_dta", () => {
-        $("#uploadSignedDTA").modal("show");
+    // Render and show the modal for uploading the researcher's signed DTA
+    $("body").on("click", "button.upload_researcher_dta", () => {
+        $("#uploadResearcherDTA").modal("show");
     });
 
-    $("body").on("click", "button.submit_signed_dta", data => {
+    $("body").on("click", "button.submit_researcher_dta", data => {
         // Prepare form data
-        var fd = new FormData(document.getElementById('signed_dta'));
+        var fd = new FormData(document.getElementById('researcher_dta'));
         fd.append(Yoda.csrf.tokenName, Yoda.csrf.tokenValue);
 
         // Prepare XHR
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/datarequest/upload_signed_dta/" + config.request_id);
+        xhr.open("POST", "/datarequest/upload_researcher_dta/" + config.request_id);
         // Check if file has PDF mimetype. Reload page if upload has succeeded
         xhr.onload = function () {
             if (this.status == 400) {
-                $("#signed-dta-non-pdf-warning").removeClass("hidden");
+                $("#researcher-dta-non-pdf-warning").removeClass("hidden");
             } else if (this.status == 200) {
-                $("#uploadSignedDTA").modal("hide");
+                $("#uploadResearcherDTA").modal("hide");
                 xhr.onload = location.reload();
             }
         }
 
-        // Send signed DTA
+        // Send researcher's signed DTA
         xhr.send(fd);
     });
 });
