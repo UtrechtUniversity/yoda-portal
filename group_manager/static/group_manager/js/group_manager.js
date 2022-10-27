@@ -903,7 +903,6 @@ $(function() {
 
             $(sel).filter('.selectify-category').each(function() {
                 var $el = $(this);
-                console.log('selectify category');
 
                 $el.attr(
                     'placeholder',
@@ -1017,7 +1016,7 @@ $(function() {
 
             $(sel).filter('.selectify-subcategory').each(function() {
                 var $el = $(this);
-                console.log('selectify subcat')
+
                 $el.select2({
                     ajax: {
                         quietMillis: 200,
