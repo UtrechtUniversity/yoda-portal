@@ -88,7 +88,7 @@ function readCsvFile(e) {
     table += '<td></td></tr></thead><tbody>';
 
     new_result.forEach(function myFunction(group_def, i) {
-        table += '<tr id="' + group_def['groupname'] + '" class="import-groupname" groupname="' + group_def['groupname'] + '" import_row_data="' + csv_header + csv_rows_corrected[i] + '">';
+        table += '<tr id="' + group_def['groupname'] + '" class="import-groupname" groupname="' + group_def['groupname'] + '" import_row_data="' + csv_header + "\n" + csv_rows_corrected[i] + '">';
         table += '<td id="processed-indicator-' + group_def['groupname'] + '"></td>';
         presentation_columns.forEach(function myFunction(column) {
             table += '<td>' + group_def[column] + '</td>';
