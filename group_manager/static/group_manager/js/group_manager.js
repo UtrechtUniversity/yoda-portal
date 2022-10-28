@@ -385,7 +385,7 @@ $(function() {
 
         GROUP_PREFIXES_WITH_DATA_CLASSIFICATION: ['research-', 'intake-'],
 
-        GROUP_PREFIXES_WITH_SCHEMA_ID: ['research-', 'deposit-', 'intake-'],
+        GROUP_PREFIXES_WITH_SCHEMA_ID: ['research-', 'deposit-'],
 
         /// The default prefix when adding a new group.
         GROUP_DEFAULT_PREFIX:       'research-',
@@ -1289,7 +1289,7 @@ $(function() {
             var postData = {
                 group_name:                newProperties.name,
                 group_description:         newProperties.description,
-                group_schema_id:           newProperties.group_schema_id,
+                group_schema_id:           newProperties.schema_id,
                 group_data_classification: newProperties.data_classification,
                 group_category:            newProperties.category,
                 group_subcategory:         newProperties.subcategory,
