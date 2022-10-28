@@ -111,11 +111,9 @@
 
 
                             <div class="mb-3 row">
-                                <label class="col-sm-4 form-label" for="f-group-create-schema-id">Schema</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-schema-id">Metadata schema</label>
                                 <div class="col-sm-8">
                                     <input name="group_schema_id" id="f-group-create-schema-id" class="form-control selectify-schema-id" placeholder="Select a schema" required />
-                                </div>
-
                                 </div>
                             </div>
 
@@ -166,7 +164,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="inputGroupPrepend">grp-</span>
                                     </div>
-                                    <input name="group_name" id="f-group-update-name" class="form-control" type="text" pattern="^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$" required oninvalid="setCustomValidity('Please enter only lowercase letters, numbers, and hyphens (-). The group name may not start or end with a hyphen.')" onchange="setCustomValidity('')" />
+                                    <input name="group_name" id="f-group-update-name" class="form-control" type="text" pattern="^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$" required oninvalid="setCustomValidity('Please enter only lowercase letters, numbers, and hyphens (-). The group name may not start or end with a hyphen.')" onchange="setCustomValidity('')" disabled />
                                 </div>
                             </div>
                         </div>
@@ -186,12 +184,11 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-4 form-label" for="f-group-update-schema-id">Schema-id</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-schema-id">Metadata schema</label>
                             <div class="col-sm-8">
-                                <input name="group_schema_id" id="f-group-update-schema-id" class="form-control" disabled/>
+                                <input name="group_schema_id" id="f-group-update-schema-id" class="form-control" disabled />
                             </div>
                         </div>
-
 
                         <div class="mb-3 row data-classification">
                             <label class="col-sm-4 form-label" for="f-group-update-data-classification">Data classification</label>
