@@ -385,6 +385,8 @@ $(function() {
 
         GROUP_PREFIXES_WITH_DATA_CLASSIFICATION: ['research-', 'intake-'],
 
+        GROUP_PREFIXES_WITH_SCHEMA_ID: ['research-', 'deposit-', 'intake-'],
+
         /// The default prefix when adding a new group.
         GROUP_DEFAULT_PREFIX:       'research-',
 
@@ -455,6 +457,10 @@ $(function() {
 
         prefixHasDataClassification: function(prefix) {
             return this.GROUP_PREFIXES_WITH_DATA_CLASSIFICATION.indexOf(prefix) >= 0;
+        },
+
+        prefixHasSchemaId: function(prefix) {
+            return this.GROUP_PREFIXES_WITH_SCHEMA_ID.indexOf(prefix) >= 0;
         },
 
         // Functions that check membership / access status of the
@@ -677,8 +683,13 @@ $(function() {
 
                 var prefix = that.getPrefix(groupName);
 
-                // For now this is a disabled field.
-                $('#f-group-update-schema-id').val(group.schema_id)
+                if (that.prefixHasSchemaId(prefix)) {
+                    $groupProperties.find('.schema-id').show();
+                    // For now this is a disabled field.
+                    $('#f-group-update-schema-id').val(group.schema_id);
+                } else {
+                    $groupProperties.find('.schema-id').hide();
+                }
 
                 $groupProperties.find('#f-group-update-name')
                     .val(groupName.replace(that.GROUP_PREFIXES_RE, ''))
@@ -1239,6 +1250,7 @@ $(function() {
                 name:                $('#f-group-' + action + '-name'     ).attr('data-prefix')
                                    + $('#f-group-' + action + '-name'     ).val(),
                 description:         $('#f-group-' + action + '-description').val(),
+                schema_id:           $('#f-group-' + action + '-schema-id').val(),
                 data_classification: $('#f-group-' + action + '-data-classification').val(),
                 category:            $('#f-group-' + action + '-category'   ).val(),
                 subcategory:         $('#f-group-' + action + '-subcategory').val(),
@@ -1267,25 +1279,26 @@ $(function() {
                 return;
             }
 
+            // Check if schema id is valid.
+            if (!this.schemaIDs.includes(newProperties.schema_id)) {
+                alert('Please select a valid metadata schema as it is a required field');
+                resetSubmitButton();
+                return;
+            }
+
             var postData = {
                 group_name:                newProperties.name,
                 group_description:         newProperties.description,
+                group_schema_id:           newProperties.group_schema_id,
                 group_data_classification: newProperties.data_classification,
                 group_category:            newProperties.category,
                 group_subcategory:         newProperties.subcategory,
             };
-            // Schema id is added solely for creation of a new group
-            if (action == 'create') {
-                // Validation here
-                if (this.schemaIDs.includes($('#f-group-create-schema-id').val())) {
-                    postData['group_schema_id'] = $('#f-group-create-schema-id').val();
-                }
-                else {
-                    alert('Please select a schema as it is a required field');
-                    resetSubmitButton();
-                    return;
-                }
-            }   
+
+            // Avoid trying to set a schema id for groups that
+            // can't have one.
+            if (!this.prefixHasSchemaId(this.getPrefix(newProperties.name)))
+                delete postData.group_schema_id;
 
             if (action === 'update') {
                 var selectedGroup = this.groups[$($('#group-list .group.active')[0]).attr('data-name')];
@@ -1801,16 +1814,27 @@ $(function() {
                     $('#f-group-create-name').prop('readonly', false);
                 }
 
-                var  hadDataclas = that.prefixHasDataClassification(oldPrefix);
-                var haveDataclas = that.prefixHasDataClassification(newPrefix);
+                var hadDataClass = that.prefixHasDataClassification(oldPrefix);
+                var haveDataClass = that.prefixHasDataClassification(newPrefix);
 
-                if (hadDataclas != haveDataclas) {
-                    if (haveDataclas) {
+                if (hadDataClass != haveDataClass) {
+                    if (haveDataClass) {
                         $('.data-classification').show();
                         $('#f-group-create-data-classification').val('unspecified').trigger('change');
 
                     } else {
                         $('.data-classification').hide();
+                    }
+                }
+
+                var hadSchemaId = that.prefixHasSchemaId(oldPrefix);
+                var haveSchemaId = that.prefixHasSchemaId(newPrefix);
+
+                if (hadSchemaId != haveSchemaId) {
+                    if (haveSchemaId) {
+                        $('.schema-id').show();
+                    } else {
+                        $('.schema-id').hide();
                     }
                 }
 
