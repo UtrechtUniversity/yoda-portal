@@ -1256,7 +1256,13 @@ $(function() {
                 subcategory:         $('#f-group-' + action + '-subcategory').val(),
             };
 
-            if (!newProperties.name.match(/^(intake|research|deposit)-([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
+            if (newProperties.name.startsWith("datamanager-") && !this.canCreateDatamanagerGroup(newProperties.category)) {
+                alert("Datamanager group names may only contain lowercase letters (a-z) and hyphens (-).");
+                resetSubmitButton();
+                return;
+            }
+
+            if (!newProperties.name.startsWith("datamanager-") && !newProperties.name.match(/^(intake|research|deposit)-([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
                 alert("Group names must start with one of 'intake-' or 'research-' or 'deposit-' and may only contain lowercase letters (a-z) and hyphens (-).");
                 resetSubmitButton();
                 return;
