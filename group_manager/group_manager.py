@@ -21,7 +21,7 @@ def index() -> Response:
     user_type = response['data']['user_type']
     user_zone = response['data']['user_zone']
 
-    response = api.call('schemas_get_schemas', data={})
+    response = api.call('schema_get_schemas', data={})
     schema_ids = response['data']
 
     return render_template('group_manager/index.html',
@@ -67,7 +67,7 @@ def get_subcategories() -> Response:
 
 @group_manager_bp.route('/get_schemas', methods=['POST'])
 def get_schemas() -> Response:
-    response = api.call('schemas_get_schemas', data={})
+    response = api.call('schema_get_schemas', data={})
 
     schemas = []
     for schema in response['data']:
