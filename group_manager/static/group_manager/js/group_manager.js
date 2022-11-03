@@ -1286,7 +1286,7 @@ $(function() {
             }
 
             // Check if schema id is valid.
-            if (!this.schemaIDs.includes(newProperties.schema_id)) {
+            if (this.prefixHasSchemaId(this.getPrefix(newProperties.name)) && !this.schemaIDs.includes(newProperties.schema_id)) {
                 alert('Please select a valid metadata schema as it is a required field');
                 resetSubmitButton();
                 return;
