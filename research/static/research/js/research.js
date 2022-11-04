@@ -1178,7 +1178,7 @@ function topInformation(dir, showAlert)
             }
 
             // Check if folder is writable.
-            if (hasWriteRights && (status == '' || status == 'SECURED')) {
+            if (hasWriteRights && (status == '' || status == 'REJECTED' || status == 'SECURED')) {
                 // Enable uploads.
                 $('.btn-group button.upload').attr('data-path', dir);
                 $('.btn-group button.upload').prop("disabled", false);
