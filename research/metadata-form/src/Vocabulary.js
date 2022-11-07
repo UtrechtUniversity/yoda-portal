@@ -43,6 +43,7 @@ class Vocabulary extends React.Component {
                 <Select
                     className={'select-box'}
                     options={this.state.options}
+                    isDisabled={this.props.readonly}
                     placeholder={this.state.placeholder}
                     onChange={(event) => this.props.onChange(event.value)}/>
             </div>
