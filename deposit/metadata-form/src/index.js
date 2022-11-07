@@ -3,6 +3,7 @@ import { render } from "react-dom";
 import Form from "@rjsf/bootstrap-4";
 import Select from 'react-select';
 import Geolocation from "./Geolocation";
+import Vocabulary from "./Vocabulary";
 
 const path = $('#form').attr('data-path');
 
@@ -110,7 +111,8 @@ const widgets = {
 };
 
 const fields = {
-    geo: Geolocation
+    geo: Geolocation,
+    vocabulary: Vocabulary
 };
 
 const onSubmit = ({formData}) => submitData(formData);
