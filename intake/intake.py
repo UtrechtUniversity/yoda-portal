@@ -42,15 +42,17 @@ def index() -> Response:
             if study_id is None or len(study_id) == 0:
                 alert_nr = 100  # NO ACCESS
 
-    # check whether user is part of the study-group.
+    # check whether user is part of the study-group but only of a study id has been found
     # if not, stop access
-    permissions = get_intake_study_permissions(study_id)
+    qualified_study_id = ""
+    if alert_nr != 100:
+        permissions = get_intake_study_permissions(study_id)
 
-    # determine whether group prefix is intake or grp-intake
-    qualified_study_id = permissions['group_path'] + study_id
+        # determine whether group prefix is intake or grp-intake
+        qualified_study_id = permissions['group_path'] + study_id
 
-    if not (permissions['manager'] or permissions['assistant']):
-        alert_nr = 100  # NO ACCESS
+        if not (permissions['manager'] or permissions['assistant']):
+            alert_nr = 100  # NO ACCESS
 
     if alert_nr == 100:
         permissions = {}
