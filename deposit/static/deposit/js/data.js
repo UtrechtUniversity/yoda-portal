@@ -722,7 +722,7 @@ const tableRenderer = {
             };
             let ext = row.name.replace(/.*\./, '').toLowerCase();
 
-            actions.append(`<a class="dropdown-item" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file">Download</a>`);
+            actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Download this file">Download</a>`);
 
             // Generate dropdown "view" actions for different media types.
             for (let type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
