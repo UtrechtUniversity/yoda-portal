@@ -244,8 +244,11 @@
                 <div class="card-footer">
                     <div class="input-group-sm float-start">
                         Change role:
-                        <a class="btn btn-sm btn-primary disabled update-button promote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Promote the selected member">&uarr;<i class="fa-solid fa-user-circle" aria-hidden="true"></i></a>
-                        <a class="btn btn-sm btn-primary disabled update-button demote-button" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Demote the selected member">&darr;<i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+
+                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="reader" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Viewer rights"><i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="normal" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Member rights"><i class="fa-solid fa-user" aria-hidden="true"></i></a>
+                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="manager" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Manager rights"><i class="fa-solid fa-user-circle" aria-hidden="true"></i></a>
+
                         <a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group">Remove member</a>
                     </div>
                 </div>

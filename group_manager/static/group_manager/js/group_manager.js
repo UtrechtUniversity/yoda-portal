@@ -245,7 +245,80 @@ async function process_imported_row(row) {
 }
 
 
+async function process_userrole_change(row, newRole, groupName) {
+    // Process one user at a time to change userrole
+    var userName = row.attr('data-name');
+
+    console.log(groupName);
+    console.log(userName);
+    row.addClass('update-done');
+
+    Yoda.groupManager.groups[groupName].members[userName].access = newRole
+
+    // when update-done length is equal to active length, all has been dealt with.
+    // => Data must be reloaded
+    if ($('#user-list .active').length == $('#user-list .update-done').length){
+        console.log('ALL USER ROLES ARE UPDATED');
+
+        // Force-regenerate the user list after completion of the entire process
+        Yoda.groupManager.deselectGroup();
+        Yoda.groupManager.selectGroup(groupName);
+
+        Yoda.set_message('success', 'User roles were updated successfully.');
+    } 
+}
+
+
+async function remove_user_from_group(row, groupName) {
+    // Remove a user from the indicated group as part of mutiple selection of users. 
+    console.log('---------------------------');
+    var userName = row.attr('data-name');
+
+    console.log(groupName);
+    console.log(userName);
+    row.addClass('remove-done');
+
+    delete Yoda.groupManager.groups[groupName].members[userName];
+
+    if ($('#user-list .active').length == $('#user-list .remove-done').length){
+        console.log('ALL USERS ARE REMOVED');
+
+        // Force-regenerate the user list after completion of entire process
+        Yoda.groupManager.deselectGroup();
+        Yoda.groupManager.selectGroup(groupName);
+
+        Yoda.set_message('success', 'Users were removed successfully.');
+    }
+}
+
+
 $(function() {
+    // Multiple user role change
+    $('.users.card .update-button').on('click', function(e) {
+        var newRole = $(this).attr('data-target-role');
+        var groupName = $('#group-list .group.active').attr('data-name');
+
+        // Step through selected users and update per row
+        $('#user-list .active.user').each(function myFunction() {
+             process_userrole_change($(this), newRole, groupName);
+        });
+    });
+
+    // Remove multiple users from group
+    $('#modal-user-delete .confirm').on('click', function(e) {
+        // that.onClickUserDelete($('.users.card .delete-button')[0]);
+        $('#modal-user-delete').modal('hide');
+
+        var groupName = $('#group-list .group.active').attr('data-name');
+
+        // Step through selected users and update per row
+        $('#user-list .active.user').each(function myFunction() {
+            remove_user_from_group($(this), groupName);
+        });
+    });
+
+
+
     // CSV import handling {{{
     document.getElementById('file-input').addEventListener('change', readCsvFile, false);
 
@@ -825,6 +898,7 @@ $(function() {
 
             // Fix bad bootstrap borders caused by hidden elements.
             $userPanel.find('.card-header').css({ borderBottom: ''               });
+
             $userPanel.find('.card-footer').css({ borderTop:    '1px solid #ddd' });
 
             $('#group-properties-group-name').html('');
@@ -837,53 +911,30 @@ $(function() {
          *
          * \param groupName
          */
-        selectUser: function(userName) {
-            var $userList = $('#user-list');
+        selectUserHdR: function(item) {
+            // !! ER moet er altijd eentje overblijven!!???????? je kan jezelf niet verwijderen.
+            // var $userList = $('#user-list');
+            // var $user    = $userList.find('.user[data-name="' + Yoda.escapeQuotes(userName) + '"]');
+            if ($(item).hasClass('active')) {
+                $(item).removeClass('active');
+            } else {
+                $(item).addClass('active');
+            }
 
-            var $user    = $userList.find('.user[data-name="' + Yoda.escapeQuotes(userName) + '"]');
-            var $oldUser = $userList.find('.active');
-
-            if ($user.is($oldUser))
-                return;
-
-            this.deselectUser();
-
-            $userList.find('.active').removeClass('active');
-            $user.addClass('active');
-
+            var count_selected = $('#user-list .active').length
             if (this.canManageGroup($('#group-list .active.group').attr('data-name'))) {
                 var $userPanel = $('.card.users');
-
-                var $promoteButton = $userPanel.find('.promote-button');
-                var $demoteButton  = $userPanel.find('.demote-button');
-
-                var selectedGroupName = $($('#group-list .group.active')[0]).attr('data-name');
-                var selectedGroup = this.groups[selectedGroupName];
-                var selectedUser = selectedGroup.members[userName];
-
-                var promoteTitle = 'Promote the selected member';
-                var demoteTitle  = 'Demote the selected member';
-
-                var prevAccess = this.prevAccessLevel(selectedUser.access, selectedGroupName);
-                var nextAccess = this.nextAccessLevel(selectedUser.access, selectedGroupName);
-
-                if (prevAccess) {
-                    $demoteButton.find('i').addClass('fa-solid ' + this.accessIcons[prevAccess]);
-                    $demoteButton.removeClass('disabled');
-                    $demoteButton.attr('data-target-role', prevAccess);
-                    demoteTitle += ' to ' + this.accessNames[prevAccess].toLowerCase();
+                if (count_selected>0) {
+                    $userPanel.find('.delete-button').removeClass('disabled');
+                    $userPanel.find('.update-button').removeClass('disabled');
+                    return;
                 }
-                if (nextAccess) {
-                    $promoteButton.find('i').addClass('fa-solid ' + this.accessIcons[nextAccess]);
-                    $promoteButton.removeClass('disabled');
-                    $promoteButton.attr('data-target-role', nextAccess);
-                    promoteTitle += ' to ' + this.accessNames[nextAccess].toLowerCase();
-                }
-
-                $promoteButton.attr('title', promoteTitle);
-                $demoteButton .attr('title',  demoteTitle);
-                $userPanel.find('.delete-button').removeClass('disabled');
             }
+            // Disable all buttons
+            $userPanel.find('.delete-button').addClass('disabled');
+            $userPanel.find('.update-button').addClass('disabled');
+
+            return;
         },
 
         /**
@@ -894,14 +945,6 @@ $(function() {
             var $userList  = $('#user-list');
             $userList.find('.active').removeClass('active');
             $userPanel.find('.update-button, .delete-button').addClass('disabled');
-            var $promoteButton = $userPanel.find('.promote-button');
-            var $demoteButton  = $userPanel.find('.demote-button');
-            $promoteButton.attr('title', 'Promote the selected member');
-            $demoteButton .attr('title', 'Demote the selected member');
-            $promoteButton.removeAttr('data-target-role');
-            $demoteButton .removeAttr('data-target-role');
-            $promoteButton.find('i').removeClass();
-            $demoteButton .find('i').removeClass();
         },
 
         /**
@@ -1515,7 +1558,15 @@ $(function() {
         /**
          * \brief Remove the confirmation step for removing users from groups.
          */
-        removeUserDeleteConfirmationModal: function() {
+        /** removeUserDeleteConfirmationModal: function() {
+            console.log('KOMT IE OOIT HIER???');
+            $('#user-list .user.active').forEach(function(item, i){
+                console.log(item.attr('data-name'));
+            })
+
+
+            return;
+
             var that = this;
             $('.users.card .delete-button').off('click').on('click', function(e) {
                 e.preventDefault();
@@ -1523,6 +1574,7 @@ $(function() {
                 that.onClickUserDelete(this);
             });
         },
+        */
 
         /**
          * \brief Handle a change role button click event.
@@ -1599,6 +1651,16 @@ $(function() {
          * that was submitted.
          */
         onClickUserDelete: function(el) {
+
+            alert('blablablablabla');
+
+            $('#user-list .user.active').each(function(){
+                console.log($(this).attr('data-name'));
+            })
+
+
+            return;
+
             if ($('#f-user-delete-no-confirm').prop('checked')) {
                 $('#f-user-delete-no-confirm').prop('checked', false);
                 Yoda.storage.session.set('confirm-user-delete', false);
@@ -1869,10 +1931,11 @@ $(function() {
 
             var $userList = $('#user-list');
             $userList.on('click', 'a.user:not(.disabled)', function() {
-                if ($(this).is($userList.find('.active')))
-                    that.deselectUser();
-                else
-                    that.selectUser($(this).attr('data-name'));
+                that.selectUserHdR(this);
+                // if ($(this).is($userList.find('.active')))
+                //    that.deselectUser();
+                //else
+                //    that.selectUser($(this).attr('data-name'));
             });
 
             $userList.on('click', '.list-group-item:has(.user-create-text:not(.hidden))', function() {
@@ -1895,16 +1958,22 @@ $(function() {
                 that.onSubmitUserCreate(this, e);
             });
 
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////// HdR
             // Changing user roles.
-            $('.users.card .update-button').on('click', function(e) {
-                that.onClickUserUpdate(this, e);
-            });
+            // $('.users.card .update-button').on('click', function(e) {
+            //    // that.onClickUserUpdate(this, e);
+            //    that.onClickUserUpdateHdR(this, e);
+            // });
+            /////////////////////////////////////////////////////////
 
-            // Remove users from groups.
-            $('#modal-user-delete .confirm').on('click', function(e) {
-                that.onClickUserDelete($('.users.card .delete-button')[0]);
-                $('#modal-user-delete').modal('hide');
-            });
+//////
+//            // Remove users from groups.
+//            $('#modal-user-delete .confirm').on('click', function(e) {
+//                that.onClickUserDelete($('.users.card .delete-button')[0]);
+//                $('#modal-user-delete').modal('hide');
+//            });
+///////
 
             $('#modal-user-delete').on('show.bs.modal', function() {
                 var groupName = $('#group-list .group.active').attr('data-name');
