@@ -370,7 +370,7 @@ const tableRenderer2 = {
             if (row.type === 'coll') {
                 return '';
             } else {
-                let szs = ['B', 'kiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'];
+                let szs = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'];
                 let szi = 0;
                 while (size >= 1024 && szi < szs.length-1) {
                     size /= 1024;
@@ -648,7 +648,7 @@ function rawurlencode (str) {
 }
 
 function human_filesize(size) {
-    var szs = ['B', 'kiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'],
+    var szs = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'],
         szi = 0;
     while (size >= 1024 && szi < szs.length-1) {
         size /= 1024;

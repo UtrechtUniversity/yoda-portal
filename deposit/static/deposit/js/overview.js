@@ -204,7 +204,7 @@ const tableRenderer = {
         return `${htmlEncode(row.deposit_access)}`;
     },
     size: (deposit_size, _, row) => {
-        let szs = ['B', 'kiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'];
+        let szs = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'];
         let szi = 0;
         while (row.deposit_size >= 1024 && szi < szs.length-1) {
             row.deposit_size /= 1024;
