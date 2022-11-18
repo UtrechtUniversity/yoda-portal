@@ -249,7 +249,7 @@
                         <a class="btn btn-sm btn-primary disabled update-button" data-target-role="normal" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Member rights"><i class="fa-solid fa-user" aria-hidden="true"></i></a>
                         <a class="btn btn-sm btn-primary disabled update-button" data-target-role="manager" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Manager rights"><i class="fa-solid fa-user-circle" aria-hidden="true"></i></a>
 
-                        <a class="btn btn-sm btn-danger disabled delete-button" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group">Remove member</a>
+                        <a class="btn btn-sm btn-danger disabled delete-button" id="btn-remove-user-from-group" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group">Remove member</a>
                     </div>
                 </div>
             </div>

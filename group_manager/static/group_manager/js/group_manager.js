@@ -245,50 +245,114 @@ async function process_imported_row(row) {
 }
 
 
-async function process_userrole_change(row, newRole, groupName) {
+async function process_userrole_change(row, actionUrl, newRole, groupName) {
     // Process one user at a time to change userrole
     var userName = row.attr('data-name');
 
-    console.log(groupName);
-    console.log(userName);
-    row.addClass('update-done');
+    $.ajax({
+        url:      actionUrl,
+        type:     'post',
+        dataType: 'json',
+        data: {
+            group_name: groupName,
+            user_name:  userName,
+            new_role:   newRole
+        },
+    }).done(function(result) {
+        if ('status' in result)
+            console.log('User update completed with status ' + result.status);
+        if ('status' in result && result.status === 0) {
+            // Keep track of which rows have been 
+            row.addClass('update-done');
 
-    Yoda.groupManager.groups[groupName].members[userName].access = newRole
+            // Set the internal administration with latest situation without having to reach for the dbs
+            Yoda.groupManager.groups[groupName].members[userName].access = newRole
 
-    // when update-done length is equal to active length, all has been dealt with.
-    // => Data must be reloaded
-    if ($('#user-list .active').length == $('#user-list .update-done').length){
-        console.log('ALL USER ROLES ARE UPDATED');
+            // when update-done length is equal to active length, all has been dealt with.
+            // => Data must be reloaded
+            if ($('#user-list .active').length == $('#user-list .update-done').length){
+                // Force-regenerate the user list after completion of the entire process
+                Yoda.groupManager.deselectGroup();
+                Yoda.groupManager.selectGroup(groupName);
 
-        // Force-regenerate the user list after completion of the entire process
-        Yoda.groupManager.deselectGroup();
-        Yoda.groupManager.selectGroup(groupName);
+                Yoda.set_message('success', 'User roles were updated successfully.');
+            }
 
-        Yoda.set_message('success', 'User roles were updated successfully.');
-    } 
+                    
+            // ???? hoe dit nu doen?? Give a visual hint that the user was updated.
+            // ??? $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once');
+
+        } else {
+            // Something went wrong
+            $('#user-list .user.update-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]')
+                .removeClass('update-pending disabled')
+                .attr('title', '');
+
+            if ('message' in result)
+                alert(result.message);
+            else
+                alert(
+                      "Error: Could not change the role for the selected member due to an internal error.\n"
+                    + "Please contact a Yoda administrator"
+                );
+        }
+    }).fail(function(result) {
+        Yoda.groupManager.ifRequestNotAborted(result, function() {
+            alert("Error: Could not change the role for the selected member due to an internal error.\nPlease contact a Yoda administrator");
+        });
+    });
 }
 
 
-async function remove_user_from_group(row, groupName) {
+async function remove_user_from_group(row, actionUrl, groupName) {
     // Remove a user from the indicated group as part of mutiple selection of users. 
-    console.log('---------------------------');
     var userName = row.attr('data-name');
 
-    console.log(groupName);
-    console.log(userName);
-    row.addClass('remove-done');
+    $.ajax({
+        url:      actionUrl,
+        type:     'post',
+        dataType: 'json',
+        data: {
+            group_name: groupName,
+            user_name:  userName,
+        },
+    }).done(function(result) {
+        if ('status' in result)
+            console.log('User remove completed with status ' + result.status);
+        if ('status' in result && result.status === 0) {
+            // SUCCESS!!
+            // Mark row as done
+            row.addClass('remove-done');
 
-    delete Yoda.groupManager.groups[groupName].members[userName];
+            // Update internal administration 
+            delete Yoda.groupManager.groups[groupName].members[userName];
 
-    if ($('#user-list .active').length == $('#user-list .remove-done').length){
-        console.log('ALL USERS ARE REMOVED');
+            if ($('#user-list .active').length == $('#user-list .remove-done').length){
+                // Force-regenerate the user list after completion of entire process
+                Yoda.groupManager.deselectGroup();
+                Yoda.groupManager.selectGroup(groupName);
 
-        // Force-regenerate the user list after completion of entire process
-        Yoda.groupManager.deselectGroup();
-        Yoda.groupManager.selectGroup(groupName);
+                Yoda.set_message('success', 'Users were removed successfully.');
+            }
+        } else {
+            // Something went wrong
 
-        Yoda.set_message('success', 'Users were removed successfully.');
-    }
+            // Re-enable user list entry.
+            // ???? $('#user-list .user.delete-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]').removeClass('delete-pending disabled').attr('title', '');
+
+            if ('message' in result)
+                alert(result.message);
+            else
+                alert(
+                      "Error: Could not remove the selected member from the group due to an internal error.\n"
+                    + "Please contact a Yoda administrator"
+                );
+        }
+    }).fail(function(result) {
+        Yoda.groupManager.ifRequestNotAborted(result, function() {
+            alert("Error: Could not remove the selected member from the group due to an internal error.\nPlease contact a Yoda administrator");
+        });
+    });
 }
 
 
@@ -296,11 +360,12 @@ $(function() {
     // Multiple user role change
     $('.users.card .update-button').on('click', function(e) {
         var newRole = $(this).attr('data-target-role');
+        var actionUrl = $(this).attr('data-action');
         var groupName = $('#group-list .group.active').attr('data-name');
 
         // Step through selected users and update per row
         $('#user-list .active.user').each(function myFunction() {
-             process_userrole_change($(this), newRole, groupName);
+             process_userrole_change($(this), actionUrl, newRole, groupName);
         });
     });
 
@@ -309,14 +374,14 @@ $(function() {
         // that.onClickUserDelete($('.users.card .delete-button')[0]);
         $('#modal-user-delete').modal('hide');
 
+        var actionUrl = $('#btn-remove-user-from-group').attr('data-action');
         var groupName = $('#group-list .group.active').attr('data-name');
 
         // Step through selected users and update per row
         $('#user-list .active.user').each(function myFunction() {
-            remove_user_from_group($(this), groupName);
+            remove_user_from_group($(this), actionUrl, groupName);
         });
     });
-
 
 
     // CSV import handling {{{
@@ -840,7 +905,8 @@ $(function() {
                     if (nameAndZone[1] == that.zone)
                         displayName = nameAndZone[0];
 
-                    $user.html('<i class="fa-solid '
+                    // that.canManageGroup(groupName))
+                    $user.html('<input class="form-check-input" type="checkbox" value=""> <i class="fa-solid '
                                + that.accessIcons[user.access]
                                + '" aria-hidden="true" title="'
                                + that.accessNames[user.access]
@@ -909,16 +975,15 @@ $(function() {
         /**
          * \brief Select the given user in the user list.
          *
-         * \param groupName
+         * \param item: the row that was clicked in the userlist
          */
-        selectUserHdR: function(item) {
-            // !! ER moet er altijd eentje overblijven!!???????? je kan jezelf niet verwijderen.
-            // var $userList = $('#user-list');
-            // var $user    = $userList.find('.user[data-name="' + Yoda.escapeQuotes(userName) + '"]');
+        selectUser: function(item) {
             if ($(item).hasClass('active')) {
                 $(item).removeClass('active');
+                $(item).find('.form-check-input').prop('checked', false);
             } else {
                 $(item).addClass('active');
+                $(item).find('.form-check-input').prop('checked', true);
             }
 
             var count_selected = $('#user-list .active').length
@@ -930,11 +995,9 @@ $(function() {
                     return;
                 }
             }
-            // Disable all buttons
+            // Disable user management buttons
             $userPanel.find('.delete-button').addClass('disabled');
             $userPanel.find('.update-button').addClass('disabled');
-
-            return;
         },
 
         /**
@@ -1931,11 +1994,7 @@ $(function() {
 
             var $userList = $('#user-list');
             $userList.on('click', 'a.user:not(.disabled)', function() {
-                that.selectUserHdR(this);
-                // if ($(this).is($userList.find('.active')))
-                //    that.deselectUser();
-                //else
-                //    that.selectUser($(this).attr('data-name'));
+                that.selectUser(this);
             });
 
             $userList.on('click', '.list-group-item:has(.user-create-text:not(.hidden))', function() {
