@@ -220,6 +220,7 @@
             <div class="card users mt-2">
                 <div class="card-header">
                                        <div class="float-start" id="user-group-member-count">Group members</div>
+                                       <div class="float-start" id="user-group-member-selected-count"></div>
                     <div class="input-group-sm has-feedback float-end">
                         <input class="form-control form-control-sm mt-1" id="user-list-search" type="text" placeholder="Filter members" />
                     </div>
@@ -384,14 +385,6 @@ departmentx,teamb,groupteamb,m.manager@example.com,p.member@example.com,</pre>
                 <p>Are you sure you want to remove <strong class="user"></strong> from group <strong class="group"></strong>?</p>
             </div>
             <div class="modal-footer">
-                <div class="input-group float-start">
-                    <div class="checkbox">
-                        <label for="f-user-delete-no-confirm">
-                            <input id="f-user-delete-no-confirm" type="checkbox" /> Don't ask again during this session.
-                        </label>
-                    </div>
-                </div>
-
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button id="f-user-delete" type="button" class="btn btn-danger confirm">Remove</button>
             </div>

@@ -750,7 +750,14 @@ $(function() {
 
         updateGroupMemberCount: function(groupName) {
             var $userPanelTitle = $('.card.users .card-title');
-            $('#user-group-member-count').text('Group members (' + Object.keys(this.groups[groupName].members).length + ')');
+            var count_selected = $('#user-list .active').length
+            var selected = '';
+            if (count_selected) {
+                selected = ' / ' + count_selected.toString();
+            }
+
+            $('#user-group-member-count').text('Group members (' + Object.keys(this.groups[groupName].members).length + selected + ')');
+            // $('#user-group-member-selected-count').html('');
         },
 
         /**
@@ -985,6 +992,9 @@ $(function() {
                 $(item).addClass('active');
                 $(item).find('.form-check-input').prop('checked', true);
             }
+
+            // inform users of member count and selection count
+            this.updateGroupMemberCount($('#group-list .active.group').attr('data-name'));
 
             var count_selected = $('#user-list .active').length
             if (this.canManageGroup($('#group-list .active.group').attr('data-name'))) {
@@ -1619,27 +1629,6 @@ $(function() {
         },
 
         /**
-         * \brief Remove the confirmation step for removing users from groups.
-         */
-        /** removeUserDeleteConfirmationModal: function() {
-            console.log('KOMT IE OOIT HIER???');
-            $('#user-list .user.active').forEach(function(item, i){
-                console.log(item.attr('data-name'));
-            })
-
-
-            return;
-
-            var that = this;
-            $('.users.card .delete-button').off('click').on('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                that.onClickUserDelete(this);
-            });
-        },
-        */
-
-        /**
          * \brief Handle a change role button click event.
          *
          * `this` is assumed to be the groupManager object, not the form element
@@ -1703,77 +1692,6 @@ $(function() {
             }).fail(function(result) {
                 that.ifRequestNotAborted(result, function() {
                     alert("Error: Could not change the role for the selected member due to an internal error.\nPlease contact a Yoda administrator");
-                });
-            });
-        },
-
-        /**
-         * \brief Handle a user delete button click event.
-         *
-         * `this` is assumed to be the groupManager object, not the form element
-         * that was submitted.
-         */
-        onClickUserDelete: function(el) {
-
-            alert('blablablablabla');
-
-            $('#user-list .user.active').each(function(){
-                console.log($(this).attr('data-name'));
-            })
-
-
-            return;
-
-            if ($('#f-user-delete-no-confirm').prop('checked')) {
-                $('#f-user-delete-no-confirm').prop('checked', false);
-                Yoda.storage.session.set('confirm-user-delete', false);
-                this.removeUserDeleteConfirmationModal();
-            }
-
-            var groupName = $('#group-list .group.active').attr('data-name');
-            var  userName = $('#user-list   .user.active').attr('data-name');
-
-            $('#user-list .user.active')
-                .addClass('delete-pending disabled')
-                .attr('title', 'Removal pending');
-            this.deselectUser();
-
-            var that = this;
-
-            $.ajax({
-                url:      $(el).attr('data-action'),
-                type:     'post',
-                dataType: 'json',
-                data: {
-                    group_name: groupName,
-                     user_name: userName,
-                },
-            }).done(function(result) {
-                if ('status' in result)
-                    console.log('User remove completed with status ' + result.status);
-                if ('status' in result && result.status === 0) {
-                    delete that.groups[groupName].members[userName];
-
-                    // Force-regenerate the user list.
-                    that.deselectGroup();
-                    that.selectGroup(groupName);
-                } else {
-                    // Something went wrong. :(
-
-                    // Re-enable user list entry.
-                    $('#user-list .user.delete-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]').removeClass('delete-pending disabled').attr('title', '');
-
-                    if ('message' in result)
-                        alert(result.message);
-                    else
-                        alert(
-                              "Error: Could not remove the selected member from the group due to an internal error.\n"
-                            + "Please contact a Yoda administrator"
-                        );
-                }
-            }).fail(function(result) {
-                that.ifRequestNotAborted(result, function() {
-                    alert("Error: Could not remove the selected member from the group due to an internal error.\nPlease contact a Yoda administrator");
                 });
             });
         },
@@ -2016,33 +1934,6 @@ $(function() {
             $('#f-user-create').on('submit', function(e) {
                 that.onSubmitUserCreate(this, e);
             });
-
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////// HdR
-            // Changing user roles.
-            // $('.users.card .update-button').on('click', function(e) {
-            //    // that.onClickUserUpdate(this, e);
-            //    that.onClickUserUpdateHdR(this, e);
-            // });
-            /////////////////////////////////////////////////////////
-
-//////
-//            // Remove users from groups.
-//            $('#modal-user-delete .confirm').on('click', function(e) {
-//                that.onClickUserDelete($('.users.card .delete-button')[0]);
-//                $('#modal-user-delete').modal('hide');
-//            });
-///////
-
-            $('#modal-user-delete').on('show.bs.modal', function() {
-                var groupName = $('#group-list .group.active').attr('data-name');
-                var  userName = $('#user-list  .user.active').attr('data-name');
-                $(this).find('.group').text(groupName);
-                $(this).find('.user').text(userName.split('#')[0]);
-            });
-
-            if (!Yoda.storage.session.get('confirm-user-delete', true))
-                this.removeUserDeleteConfirmationModal();
 
             // User list search.
             $('#user-list-search').on('keyup', function() {
