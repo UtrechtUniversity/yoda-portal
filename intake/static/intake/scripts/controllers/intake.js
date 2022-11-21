@@ -40,11 +40,15 @@ $(function() {
 
     $('#btn-start-scan').click(function(){
         var study_id = $('#studyID').val();
-
+        var study_folder = $("#studyFolder").val();
+        var collection_to_scan = Yoda.basePath + '/' + study_id;
+        if (study_folder) {
+            collection_to_scan += "/" + study_folder;
+        }
         $(this).prop('disabled', true).addClass('disabled');
         inProgressStart('Scanning in progress...');
         Yoda.call('intake_scan_for_datasets',
-                  {coll: Yoda.basePath + '/' + study_id}).then((data) => {
+                  {coll: collection_to_scan }).then((data) => {
             console.log(data);
             if (data.proc_status=='OK') {
                 reload_page_with_alert('5');
