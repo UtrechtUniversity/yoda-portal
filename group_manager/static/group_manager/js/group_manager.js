@@ -262,7 +262,7 @@ async function process_userrole_change(row, actionUrl, newRole, groupName) {
         if ('status' in result)
             console.log('User update completed with status ' + result.status);
         if ('status' in result && result.status === 0) {
-            // Keep track of which rows have been 
+            // Keep track of which rows have been
             row.addClass('update-done');
 
             // Set the internal administration with latest situation without having to reach for the dbs
@@ -278,7 +278,7 @@ async function process_userrole_change(row, actionUrl, newRole, groupName) {
                 Yoda.set_message('success', 'User roles were updated successfully.');
             }
 
-                    
+
             // ???? hoe dit nu doen?? Give a visual hint that the user was updated.
             // ??? $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once');
 
@@ -305,7 +305,7 @@ async function process_userrole_change(row, actionUrl, newRole, groupName) {
 
 
 async function remove_user_from_group(row, actionUrl, groupName) {
-    // Remove a user from the indicated group as part of mutiple selection of users. 
+    // Remove a user from the indicated group as part of mutiple selection of users.
     var userName = row.attr('data-name');
 
     $.ajax({
@@ -324,7 +324,7 @@ async function remove_user_from_group(row, actionUrl, groupName) {
             // Mark row as done
             row.addClass('remove-done');
 
-            // Update internal administration 
+            // Update internal administration
             delete Yoda.groupManager.groups[groupName].members[userName];
 
             if ($('#user-list .active').length == $('#user-list .remove-done').length){
@@ -545,7 +545,7 @@ $(function() {
         accessIcons: {
             'reader':  'fa-eye',
             'normal':  'fa-user',
-            'manager': 'fa-user-circle',
+            'manager': 'fa-crown',
         },
 
         /// Human-readable descriptions of access levels.
@@ -1974,7 +1974,7 @@ $(function() {
             for (var groupName in this.groups) {
                 if (this.isManagerOfGroup(groupName)) {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                        '<i class="float-end fa-regular fa-user-circle mt-1" title="You manage this group"></i>'
+                        '<i class="float-end fa-regular fa-crown mt-1" title="You manage this group"></i>'
                     );
                 } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
