@@ -985,12 +985,12 @@ $(function() {
          * \param item: the row that was clicked in the userlist
          */
         selectUser: function(item) {
-            if ($(item).hasClass('active')) {
-                $(item).removeClass('active');
-                $(item).find('.form-check-input').prop('checked', false);
+            if (item.hasClass('active')) {
+                item.removeClass('active');
+                item.find('.form-check-input').prop('checked', false);
             } else {
-                $(item).addClass('active');
-                $(item).find('.form-check-input').prop('checked', true);
+                item.addClass('active');
+                item.find('.form-check-input').prop('checked', true);
             }
 
             // inform users of member count and selection count
@@ -1597,7 +1597,12 @@ $(function() {
 
                     that.deselectGroup();
                     that.selectGroup(groupName);
-                    that.selectUser(userName);
+
+                    var $userList = $('#user-list');
+                    var $user = $userList.find('.user[data-name="' + Yoda.escapeQuotes(userName) + '"]');
+
+                    // that.selectUser(userName);
+                    that.selectUser($user);
 
                     // Give a visual hint that the user was added.
                     $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]')[0].scrollIntoView({
@@ -1910,9 +1915,10 @@ $(function() {
             // }}}
             // User list {{{
 
+            // HdR dit is vergemakkelijkt - dit is goed
             var $userList = $('#user-list');
             $userList.on('click', 'a.user:not(.disabled)', function() {
-                that.selectUser(this);
+                that.selectUser($(this));
             });
 
             $userList.on('click', '.list-group-item:has(.user-create-text:not(.hidden))', function() {
