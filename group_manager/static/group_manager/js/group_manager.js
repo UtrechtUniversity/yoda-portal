@@ -1973,7 +1973,7 @@ $(function() {
             for (var groupName in this.groups) {
                 if (this.isManagerOfGroup(groupName)) {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                        '<i class="float-end fa-regular fa-crown mt-1" title="You manage this group"></i>'
+                        '<i class="float-end fa fa-crown mt-1" title="You manage this group"></i>'
                     );
                 } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
