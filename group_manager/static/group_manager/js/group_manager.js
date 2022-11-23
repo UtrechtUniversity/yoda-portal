@@ -1967,7 +1967,7 @@ $(function() {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
                         '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator."></i>'
                     );
-                } else if (isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access == 'reader') {
+                } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access == 'reader') {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
                         '<i class="float-end fa-solid fa-eye mt-1" title="You have read access to this group"></i>'
                     );
