@@ -1808,7 +1808,7 @@ $(function() {
 
                 if ($(this).val().length) {
                     // Filter all group not matching search value.
-                    var quotedVal = Yoda.escapeQuotes($(this).val());
+                    var quotedVal = Yoda.escapeQuotes($(this).val().toLowerCase());
                     $groups.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered');
                     $groups.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered');
 
@@ -1933,7 +1933,7 @@ $(function() {
                 var $users  = $('.card.users .user');
 
                 if ($(this).val().length) {
-                    var quotedVal = Yoda.escapeQuotes($(this).val());
+                    var quotedVal = Yoda.escapeQuotes($(this).val().toLowerCase());
                     $users.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered');
                     $users.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered');
                 } else {
