@@ -277,8 +277,6 @@ async function process_userrole_change(row, actionUrl, newRole, groupName) {
 
                 Yoda.set_message('success', 'User roles were updated successfully.');
             }
-
-            $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once');
         } else {
             // Something went wrong
             $('#user-list .user.update-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]')
@@ -1905,8 +1903,6 @@ $(function() {
             // }}}
             // }}}
             // User list {{{
-
-            // HdR dit is vergemakkelijkt - dit is goed
             var $userList = $('#user-list');
             $userList.on('click', 'a.user:not(.disabled)', function() {
                 that.selectUser($(this));
@@ -1971,7 +1967,7 @@ $(function() {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
                         '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator."></i>'
                     );
-                } else if (this.groups[groupName].members[this.userNameFull].access == 'reader') {
+                } else if (isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access == 'reader') {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
                         '<i class="float-end fa-solid fa-eye mt-1" title="You have read access to this group"></i>'
                     );
