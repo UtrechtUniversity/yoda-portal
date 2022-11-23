@@ -321,7 +321,7 @@ $(function() {
     });
     $('.btn-user-search-groups').click(function(){
         var hier = Yoda.groupManager.groupHierarchy;
-        let username = $('#input-user-search-groups').val() + '#' + Yoda.groupManager.zone;
+        let username = ($('#input-user-search-groups').val()).toLowerCase() + '#' + Yoda.groupManager.zone;
         var isDatamanager = false;
         var data = []
         for (var categoryName in hier) {
