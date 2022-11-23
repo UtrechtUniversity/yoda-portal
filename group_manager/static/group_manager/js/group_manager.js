@@ -753,11 +753,10 @@ $(function() {
             var count_selected = $('#user-list .active').length
             var selected = '';
             if (count_selected) {
-                selected = ' / ' + count_selected.toString();
+                selected = ' / ' + count_selected.toString() + 'selected';
             }
 
             $('#user-group-member-count').text('Group members (' + Object.keys(this.groups[groupName].members).length + selected + ')');
-            // $('#user-group-member-selected-count').html('');
         },
 
         /**
