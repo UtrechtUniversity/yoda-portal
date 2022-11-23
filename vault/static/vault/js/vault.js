@@ -155,14 +155,14 @@ $(function() {
         Yoda.call('vault_get_published_packages', {path: Yoda.basePath + vault}).then((data) => {
             if (Object.keys(data).length > 0) {
                 let i = 0;
-                $.each(data, function(doi, path) {
+                $.each(data, function(doi, publication) {
                     i++;
-                    let vault_path = path.replace(Yoda.basePath, '');
+                    let vault_path = publication.path.replace(Yoda.basePath, '');
                     $('.previousPublications').append(`
 <div class="form-check">
-  <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${htmlEncode(path)}">
+  <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${htmlEncode(publication.path)}">
   <label class="form-check-label" for="dataPackage${i}">
-    ${htmlEncode(doi)} (<a target="_blank" href="?dir=${encodeURIComponent(vault_path)}">${htmlEncode(vault_path)}</a>)
+    ${htmlEncode(doi)} (<a target="_blank" href="?dir=${encodeURIComponent(vault_path)}">${htmlEncode(publication.title)}</a>)
   </label>
 </div>
 `);
