@@ -244,9 +244,8 @@ async function process_imported_row(row) {
     }
 }
 
-
 async function process_userrole_change(row, actionUrl, newRole, groupName) {
-    // Process one user at a time to change userrole
+    // Process one user at a time to change userrole.
     var userName = row.attr('data-name');
 
     $.ajax({
@@ -259,8 +258,9 @@ async function process_userrole_change(row, actionUrl, newRole, groupName) {
             new_role:   newRole
         },
     }).done(function(result) {
-        if ('status' in result)
+        if ('status' in result) {
             console.log('User update completed with status ' + result.status);
+        }
         if ('status' in result && result.status === 0) {
             // Keep track of which rows have been
             row.addClass('update-done');
@@ -278,10 +278,7 @@ async function process_userrole_change(row, actionUrl, newRole, groupName) {
                 Yoda.set_message('success', 'User roles were updated successfully.');
             }
 
-
-            // ???? hoe dit nu doen?? Give a visual hint that the user was updated.
-            // ??? $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once');
-
+            $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once');
         } else {
             // Something went wrong
             $('#user-list .user.update-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]')
@@ -320,7 +317,6 @@ async function remove_user_from_group(row, actionUrl, groupName) {
         if ('status' in result)
             console.log('User remove completed with status ' + result.status);
         if ('status' in result && result.status === 0) {
-            // SUCCESS!!
             // Mark row as done
             row.addClass('remove-done');
 
@@ -336,10 +332,6 @@ async function remove_user_from_group(row, actionUrl, groupName) {
             }
         } else {
             // Something went wrong
-
-            // Re-enable user list entry.
-            // ???? $('#user-list .user.delete-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]').removeClass('delete-pending disabled').attr('title', '');
-
             if ('message' in result)
                 alert(result.message);
             else
