@@ -74,7 +74,12 @@ function getGroupDetails(group) {
                       if ($.inArray(month, labels) === -1) {
                           labels.push(months[month]);
                       }
-                      storageChartData.push(storageData[month]);
+                      // data.months contains month-numbers. I.e. [12,1,2,3,4,5,6,7,8,9,10,11]
+                      // The order is in presentation order.
+                      // The storageData, month based, is zero-based however. And in ascending order.
+                      // 0=Jan,..., 10=nov, 11=dec                      
+                      // Therefore, a correction has to take place shift by 1 to have the values coincide with the actual month
+                      storageChartData.push(storageData[month-1]);
                   });
 
                   var tierObject = {
