@@ -359,6 +359,22 @@ $(function() {
         });
     });
 
+    // Set attributes in modal
+    $('#modal-user-delete').on('show.bs.modal', function () {
+        let groupName = $('#group-list .group.active').attr('data-name');
+        let users = [];
+        // Get all selected users
+        $('#user-list .active.user').each(function myFunction() {
+            let name = $(this).attr('data-name');
+            name = name.substring(0, name.lastIndexOf('#'));
+            users.push(name);
+        });
+
+        // Fill modal
+        $('#modal-user-delete .user').text(users.join(', '));
+        $('#modal-user-delete .group').text(groupName);
+    });
+
     // Remove multiple users from group
     $('#modal-user-delete .confirm').on('click', function(e) {
         // that.onClickUserDelete($('.users.card .delete-button')[0]);
@@ -743,7 +759,7 @@ $(function() {
             var count_selected = $('#user-list .active').length
             var selected = '';
             if (count_selected) {
-                selected = ' / ' + count_selected.toString() + 'selected';
+                selected = ' / ' + count_selected.toString() + ' selected';
             }
 
             $('#user-group-member-count').text('Group members (' + Object.keys(this.groups[groupName].members).length + selected + ')');
@@ -1436,9 +1452,6 @@ $(function() {
                 dataType: 'json',
                 data:     postData
             }).done(function(result) {
-                if ('status' in result) {
-                    console.log('Group '+action+' completed with status ' + result.status);
-                }
                 if ('status' in result && result.status === 0) {
                     // OK! Make sure the newly added group is selected after reloading the page.
                     Yoda.storage.session.set('selected-group', postData.group_name);
@@ -1500,8 +1513,6 @@ $(function() {
                     group_name: groupName,
                 },
             }).done(function(result) {
-                if ('status' in result)
-                    console.log('Group remove completed with status ' + result.status);
                 if ('status' in result && result.status === 0) {
                     // Give the user some feedback.
                     Yoda.storage.session.set('messages',
