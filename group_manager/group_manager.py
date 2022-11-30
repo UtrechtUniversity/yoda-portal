@@ -96,6 +96,7 @@ def group_create() -> Response:
                                               'category': request.form['group_category'],
                                               'subcategory': request.form['group_subcategory'],
                                               'schema_id': schema_id,
+                                              'retention_period': request.form['group_retention_period'],
                                               'description': request.form['group_description'],
                                               'data_classification': data_classification})
 
@@ -106,7 +107,7 @@ def group_create() -> Response:
 
 @group_manager_bp.route('/group_update', methods=['POST'])
 def group_update() -> Response:
-    properties = ['description', 'data_classification', 'category', 'subcategory']
+    properties = ['description', 'data_classification', 'category', 'subcategory', 'retention_period']
 
     property_updated = False
     for property in properties:

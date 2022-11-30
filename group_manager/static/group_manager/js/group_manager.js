@@ -192,6 +192,7 @@ async function process_imported_row(row) {
                                 name:        groupName,
                                 description: hier[categoryName][subcategoryName][groupName].description,
                                 schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
+                                retention_period:    hier[categoryName][subcategoryName][groupName].retention_period,
                                 data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
                                 members:     hier[categoryName][subcategoryName][groupName].members
                             };
@@ -849,6 +850,10 @@ $(function() {
                 $groupProperties.find('#f-group-update-description')
                     .val(group.description)
                     .prop('readonly', !userCanManage);
+                $groupProperties.find('#f-group-update-retention-period')
+                    .val(group.retention_period)
+                    .prop('readonly', !userCanManage);
+
 
                 if (that.prefixHasDataClassification(prefix)) {
                     $groupProperties.find('.data-classification').show();
@@ -1375,6 +1380,7 @@ $(function() {
                 data_classification: $('#f-group-' + action + '-data-classification').val(),
                 category:            $('#f-group-' + action + '-category'   ).val(),
                 subcategory:         $('#f-group-' + action + '-subcategory').val(),
+                retention_period:    $('#f-group-' + action + '-retention-period').val()
             };
 
             if (newProperties.name.startsWith("datamanager-") && !this.canCreateDatamanagerGroup(newProperties.category)) {
@@ -1417,6 +1423,7 @@ $(function() {
                 group_name:                newProperties.name,
                 group_description:         newProperties.description,
                 group_schema_id:           newProperties.schema_id,
+                group_retention_period:    newProperties.retention_period,
                 group_data_classification: newProperties.data_classification,
                 group_category:            newProperties.category,
                 group_subcategory:         newProperties.subcategory,
@@ -1727,6 +1734,7 @@ $(function() {
          * \todo Generate the group list in JS just like the user list.
          */
         load: function(groupHierarchy, schemaIDs, userType, userZone) {
+            console.log(groupHierarchy);
             this.groupHierarchy = groupHierarchy;
             this.schemaIDs      = schemaIDs
             this.isRodsAdmin    = userType == 'rodsadmin';
@@ -1744,6 +1752,7 @@ $(function() {
                                 name:        groupName,
                                 description: hier[categoryName][subcategoryName][groupName].description,
                                 schema_id:   hier[categoryName][subcategoryName][groupName].schema_id,
+                                retention_period:    hier[categoryName][subcategoryName][groupName].retention_period,
                                 data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
                                 members:     hier[categoryName][subcategoryName][groupName].members
                             };
