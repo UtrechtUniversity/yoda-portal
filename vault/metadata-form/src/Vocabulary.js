@@ -36,6 +36,7 @@ class Vocabulary extends React.Component {
 
     render() {
         let title = this.props.schema.title || this.props.uiSchema["ui:title"];
+        let help = this.props.uiSchema["ui:help"];
 
         return (
             <div>
@@ -45,7 +46,12 @@ class Vocabulary extends React.Component {
                     options={this.state.options}
                     isDisabled={this.props.readonly}
                     placeholder={this.state.placeholder}
-                    onChange={(event) => this.props.onChange(event.value)}/>
+                    onChange={(event) => this.props.onChange(event.value)} />
+                {help && (
+                    <small className="text-muted form-text">
+                        <p className="help-block">{help}</p>
+                    </small>
+                )}
             </div>
         );
     }
