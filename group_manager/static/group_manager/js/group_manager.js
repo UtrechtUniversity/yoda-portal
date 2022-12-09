@@ -532,6 +532,8 @@ $(function() {
 
         GROUP_PREFIXES_WITH_SCHEMA_ID: ['research-', 'deposit-'],
 
+        GROUP_PREFIXES_WITH_RETENTION_PERIOD: ['research-'],
+
         /// The default prefix when adding a new group.
         GROUP_DEFAULT_PREFIX:       'research-',
 
@@ -606,6 +608,10 @@ $(function() {
 
         prefixHasSchemaId: function(prefix) {
             return this.GROUP_PREFIXES_WITH_SCHEMA_ID.indexOf(prefix) >= 0;
+        },
+
+        prefixHasRetentionPeriod: function(prefix) {
+            return this.GROUP_PREFIXES_WITH_RETENTION_PERIOD.indexOf(prefix) >= 0;
         },
 
         // Functions that check membership / access status of the
@@ -842,6 +848,15 @@ $(function() {
                     $groupProperties.find('.schema-id').hide();
                 }
 
+                if (that.prefixHasRetentionPeriod(prefix)) {
+                    $groupProperties.find('.retention_period').show();
+                    $groupProperties.find('#f-group-update-retention-period')
+                        .val(group.retention_period)
+                        .prop('readonly', !userCanManage);
+                } else {
+                    $groupProperties.find('.retention_period').hide();
+                }
+
                 $groupProperties.find('#f-group-update-name')
                     .val(groupName.replace(that.GROUP_PREFIXES_RE, ''))
                     .prop('readonly', true)
@@ -850,10 +865,6 @@ $(function() {
                 $groupProperties.find('#f-group-update-description')
                     .val(group.description)
                     .prop('readonly', !userCanManage);
-                $groupProperties.find('#f-group-update-retention-period')
-                    .val(group.retention_period)
-                    .prop('readonly', !userCanManage);
-
 
                 if (that.prefixHasDataClassification(prefix)) {
                     $groupProperties.find('.data-classification').show();
@@ -1438,6 +1449,7 @@ $(function() {
                 var selectedGroup = this.groups[$($('#group-list .group.active')[0]).attr('data-name')];
                 ['description',
                  'data_classification',
+                 'retention_period',
                  'category',
                  'subcategory'].forEach(function(item) {
                     // Filter out fields that have not changed.
@@ -1452,6 +1464,11 @@ $(function() {
             // can't have one.
             if (!this.prefixHasDataClassification(this.getPrefix(newProperties.name)))
                 delete postData.group_data_classification;
+
+            // Avoid trying to set/update a retention period for groups that
+            // can't have one.
+            if (!this.prefixHasRetentionPeriod(this.getPrefix(newProperties.name)))
+                delete postData.group_retention_period;
 
             $.ajax({
                 url:      $(button).attr('action'),
@@ -1897,6 +1914,17 @@ $(function() {
                         $('.schema-id').show();
                     } else {
                         $('.schema-id').hide();
+                    }
+                }
+
+                var hadRetentionPeriod = that.prefixHasRetentionPeriod(oldPrefix);
+                var haveRetentionPeriod = that.prefixHasRetentionPeriod(newPrefix);
+
+                if (hadRetentionPeriod != haveRetentionPeriod) {
+                    if (haveRetentionPeriod) {
+                        $('.retention-period').show();
+                    } else {
+                        $('.retention-period').hide();
                     }
                 }
 
