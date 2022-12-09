@@ -849,12 +849,12 @@ $(function() {
                 }
 
                 if (that.prefixHasRetentionPeriod(prefix)) {
-                    $groupProperties.find('.retention_period').show();
+                    $groupProperties.find('.retention-period').show();
                     $groupProperties.find('#f-group-update-retention-period')
                         .val(group.retention_period)
                         .prop('readonly', !userCanManage);
                 } else {
-                    $groupProperties.find('.retention_period').hide();
+                    $groupProperties.find('.retention-period').hide();
                 }
 
                 $groupProperties.find('#f-group-update-name')
