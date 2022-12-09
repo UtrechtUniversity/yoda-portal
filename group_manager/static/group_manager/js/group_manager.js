@@ -1734,7 +1734,6 @@ $(function() {
          * \todo Generate the group list in JS just like the user list.
          */
         load: function(groupHierarchy, schemaIDs, userType, userZone) {
-            console.log(groupHierarchy);
             this.groupHierarchy = groupHierarchy;
             this.schemaIDs      = schemaIDs
             this.isRodsAdmin    = userType == 'rodsadmin';
