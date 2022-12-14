@@ -374,7 +374,8 @@ function loadForm() {
                 $('.transformation-accept').attr('disabled', true);
 
                 await Yoda.call('transform_metadata',
-                    {coll: Yoda.basePath+path},
+                    {coll: Yoda.basePath+path,
+                     make_metadata_backup: $('#cb-make-metadata-backup').is(":checked")},
                     {errorPrefix: 'Metadata could not be transformed'});
 
                 window.location.reload();
