@@ -699,12 +699,30 @@ $(function() {
 
             return (// if the category name can legally be translated to a group name ...
                        categoryName.match(/^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)
-                    // ... and the datamanager group does not yet exist ...
+                    // ... and the datamanager group DOES NOT yet exist ...
                     && !(('datamanager-' + categoryName) in this.groups)
                     // ... and the user is rodsadmin.
                     && this.isRodsAdmin);
 
             // (previously, priv-category-add was sufficient where we now require rodsadmin)
+        },
+
+
+        /**
+         * \brief Check whether the user is allowed to update the datamanager
+         *        group in the given category.
+         *
+         * \param categoryName
+         *
+         * \return
+         */
+        canUpdateDatamanagerGroup: function(categoryName) {
+            return (// if the category name can legally be translated to a group name ...
+                       categoryName.match(/^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)
+                    // ... and the datamanager group DOES exist ...
+                    && (('datamanager-' + categoryName) in this.groups)
+                    // ... and the user is rodsadmin.
+                    && this.isRodsAdmin);
         },
 
         // }}}
@@ -1394,10 +1412,21 @@ $(function() {
                 retention_period:    $('#f-group-' + action + '-retention-period').val()
             };
 
-            if (newProperties.name.startsWith("datamanager-") && !this.canCreateDatamanagerGroup(newProperties.category)) {
-                alert("Datamanager group names may only contain lowercase letters (a-z) and hyphens (-).");
-                resetSubmitButton();
-                return;
+            // specific datamanager-group testing dependent on mode
+            if (newProperties.name.startsWith("datamanager-")) {
+                if (action == 'create') {
+                    if (!this.canCreateDatamanagerGroup(newProperties.category)) {
+                        alert("Datamanager group names may only contain lowercase letters (a-z) and hyphens (-).");
+                        resetSubmitButton();
+                        return;
+                    }
+                } else if (action == 'update') {
+                    if (!this.canUpdateDatamanagerGroup(newProperties.category)) {
+                        alert("Insufficient permissions to update this datamanager group.");
+                        resetSubmitButton();
+                        return;
+                    }
+                }
             }
 
             if (!newProperties.name.startsWith("datamanager-") && !newProperties.name.match(/^(intake|research|deposit)-([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
