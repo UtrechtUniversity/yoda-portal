@@ -370,11 +370,12 @@ function loadForm() {
             } else {
                 $('#transformation .close-button').removeClass('hide')
             }
+
             $('.transformation-accept').on('click', async () => {
                 $('.transformation-accept').attr('disabled', true);
-
                 await Yoda.call('transform_metadata',
-                    {coll: Yoda.basePath+path},
+                    {coll: Yoda.basePath+path,
+                     keep_metadata_backup: $('#cb-make-metadata-backup').is(":checked")},
                     {errorPrefix: 'Metadata could not be transformed'});
 
                 window.location.reload();

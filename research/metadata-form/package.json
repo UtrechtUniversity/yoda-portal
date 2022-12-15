@@ -20,7 +20,7 @@
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.0.1",
     "react-leaflet-draw": "^0.20.1",
-    "react-modal": "^3.15.1",
+    "react-modal": "^3.16.1",
     "react-select": "^5.4.0",
     "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2"
