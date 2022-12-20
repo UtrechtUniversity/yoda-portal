@@ -77,7 +77,9 @@
                     <div class="card-body" id="group-properties-create">
                         <form class="form-horizontal" id="f-group-create" action="{{ url_for('group_manager_bp.group_create') }}" method="POST">
                             <div class="mb-3 row">
-                                <label class="col-sm-4 form-label" for="f-group-create-name">Group name</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-name">Group name
+                                   <i class="fa-solid fa-question-circle" aria-hidden="true" title="Name and type for this group"></i>
+                               </label>
                                 <div class="col-sm-8">
                                     <div class="input-group">
                                         <div class="input-group-btn" id="f-group-create-prefix-div" title="Choose a group type">
@@ -96,28 +98,36 @@
                             </div>
 
                             <div class="mb-3 row">
-                                <label class="col-sm-4 form-label" for="f-group-create-category">Category</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-category">Category
+                                    <i class="fa-solid fa-question-circle" aria-hidden="true" title="Add category for this group"></i>
+                                </label>
                                 <div class="col-sm-8">
                                     <input name="group_category" id="f-group-create-category" class="form-control selectify-category" type="hidden" placeholder="Select one or enter a new name" required data-subcategory="#f-group-create-subcategory" />
                                 </div>
                             </div>
 
                             <div class="mb-3 row">
-                                <label class="col-sm-4 form-label" for="f-group-create-subcategory">Subcategory</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-subcategory">Subcategory
+                                    <i class="fa-solid fa-question-circle" aria-hidden="true" title="Add subcategory for this group"></i>
+                                </label>
                                 <div class="col-sm-8">
                                     <input name="group_subcategory" id="f-group-create-subcategory" class="form-control selectify-subcategory" type="hidden" placeholder="Select one or enter a new name" required data-category="#f-group-create-category" />
                                 </div>
                             </div>
 
                             <div class="mb-3 row schema-id">
-                                <label class="col-sm-4 form-label" for="f-group-create-schema-id">Metadata schema</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-schema-id">Metadata schema
+                                    <i class="fa-solid fa-question-circle" aria-hidden="true" title="Metadata schema that will be used for this group"></i>
+                                </label>
                                 <div class="col-sm-8">
                                     <input name="group_schema_id" id="f-group-create-schema-id" class="form-control selectify-schema-id" placeholder="Select a schema" required />
                                 </div>
                             </div>
 
                             <div class="mb-3 row data-classification">
-                                <label class="col-sm-4 form-label" for="f-group-create-data-classification">Data classification</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-data-classification">Data classification
+                                    <i class="fa-solid fa-question-circle" aria-hidden="true" title="Classification of data package with regard to information security policy"></i>
+                                </label>
                                 <div class="col-sm-8">
                                     <select name="group_data_classification" id="f-group-create-data-classification" class="selectify-data-classification">
                                         <option value="unspecified" class="unspecified-option">Unspecified</option>
@@ -130,14 +140,18 @@
                             </div>
 
                             <div class="mb-3 row">
-                                <label class="col-sm-4 form-label" for="f-group-create-retention-period">Retention period</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-retention-period">Group expiration date
+                                    <i class="fa-solid fa-question-circle" aria-hidden="true" title="Date indicating when this group is expected to have become obsolete. When passing this date, datamanagers will automatically reveive notifications suggesting group removal"></i>
+                                </label>
                                 <div class="col-sm-8">
                                     <input name="group_retention_period" id="f-group-create-retention-period" type="date" class="form-control" />
                                 </div>
                             </div>
 
                             <div class="mb-3 row">
-                                <label class="col-sm-4 form-label" for="f-group-create-description">Group description</label>
+                                <label class="col-sm-4 form-label" for="f-group-create-description">Group description
+                                    <i class="fa-solid fa-question-circle" aria-hidden="true" title="Add a description for this group"></i>
+                                </label>
                                 <div class="col-sm-8">
                                     <input name="group_description" id="f-group-create-description" class="form-control" type="text" placeholder="Enter a short description" pattern="^[a-zA-Z0-9,.()_ -]*$" oninvalid="setCustomValidity('Please enter only letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')" onchange="setCustomValidity('')" />
                                 </div>
@@ -164,7 +178,9 @@
                     <form action="{{ url_for('group_manager_bp.group_update') }}" method="POST" id="f-group-update" class="hidden">
 
                         <div class="mb-3 row">
-                            <label class="col-sm-4 form-label" for="f-group-update-name">Group name</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-name">Group name
+                                <i class="fa-solid fa-question-circle" aria-hidden="true" title="Name and type for this group"></i>
+                            </label>
                             <div class="col-sm-8">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -176,28 +192,36 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-4 form-label" for="f-group-update-category">Category</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-category">Category
+                                <i class="fa-solid fa-question-circle" aria-hidden="true" title="Update the category for this group"></i>
+                            </label>
                             <div class="col-sm-8">
                                 <input name="group_category" id="f-group-update-category" class="form-control selectify-category" type="hidden" placeholder="Select one or enter a new name" required data-subcategory="#f-group-update-subcategory" />
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-4 form-label" for="f-group-update-subcategory">Subcategory</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-subcategory">Subcategory
+                                <i class="fa-solid fa-question-circle" aria-hidden="true" title="Update the subcategory for this group"></i>
+                            </label>
                             <div class="col-sm-8">
                                 <input name="group_subcategory" id="f-group-update-subcategory" class="form-control selectify-subcategory" type="hidden" placeholder="Select one or enter a new name" required data-category="#f-group-update-category" />
                             </div>
                         </div>
 
                         <div class="mb-3 row schema-id">
-                            <label class="col-sm-4 form-label" for="f-group-update-schema-id">Metadata schema</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-schema-id">Metadata schema
+                                <i class="fa-solid fa-question-circle" aria-hidden="true" title="The metadata schema that will be used for this group"></i>
+                            </label>
                             <div class="col-sm-8">
                                 <input name="group_schema_id" id="f-group-update-schema-id" class="form-control" disabled />
                             </div>
                         </div>
 
                         <div class="mb-3 row data-classification">
-                            <label class="col-sm-4 form-label" for="f-group-update-data-classification">Data classification</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-data-classification">Data classification 
+                                <i class="fa-solid fa-question-circle" aria-hidden="true" title="Classification of data package with regard to information security policy"></i>
+                            </label>
                             <div class="col-sm-8">
                                 <select name="group_data_classification" id="f-group-update-data-classification" class="selectify-data-classification">
                                     <option value="unspecified" class="unspecified-option">Unspecified</option>
@@ -209,14 +233,18 @@
                             </div>
                         </div>
                         <div class="mb-3 row retention-period">
-                            <label class="col-sm-4 form-label" for="f-group-update-retention-period">Retention period</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-retention-period">Group expiration date
+                                <i class="fa-solid fa-question-circle" aria-hidden="true" title="Date indicating when this group is expected to have become obsolete. When passing this date, datamanagers will automatically reveive notifications suggesting group removal"></i>
+                            </label>
                             <div class="col-sm-8">
                                 <input name="group_retention_period" id="f-group-update-retention-period" type="date" class="form-control" />
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <label class="col-sm-4 form-label" for="f-group-update-description">Group description</label>
+                            <label class="col-sm-4 form-label" for="f-group-update-description">Group description
+                                <i class="fa-solid fa-question-circle" aria-hidden="true" title="Update the description for this group"></i>
+                            </label>
                             <div class="col-sm-8">
                                 <input name="group_description" id="f-group-update-description" class="form-control" type="text" placeholder="Enter a short description" pattern="^[a-zA-Z0-9,.()_ -]*$" oninvalid="setCustomValidity('Please enter only letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')" onchange="setCustomValidity('')" />
                             </div>
