@@ -192,7 +192,7 @@ async function process_imported_row(row) {
                                 name:        groupName,
                                 description: hier[categoryName][subcategoryName][groupName].description,
                                 schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
-                                retention_period:    hier[categoryName][subcategoryName][groupName].retention_period,
+                                expiration_date:    hier[categoryName][subcategoryName][groupName].expiration_date,
                                 data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
                                 members:     hier[categoryName][subcategoryName][groupName].members
                             };
@@ -532,7 +532,7 @@ $(function() {
 
         GROUP_PREFIXES_WITH_SCHEMA_ID: ['research-', 'deposit-'],
 
-        GROUP_PREFIXES_WITH_RETENTION_PERIOD: ['research-'],
+        GROUP_PREFIXES_WITH_EXPIRATION_DATE: ['research-'],
 
         /// The default prefix when adding a new group.
         GROUP_DEFAULT_PREFIX:       'research-',
@@ -610,8 +610,8 @@ $(function() {
             return this.GROUP_PREFIXES_WITH_SCHEMA_ID.indexOf(prefix) >= 0;
         },
 
-        prefixHasRetentionPeriod: function(prefix) {
-            return this.GROUP_PREFIXES_WITH_RETENTION_PERIOD.indexOf(prefix) >= 0;
+        prefixHasExpirationDate: function(prefix) {
+            return this.GROUP_PREFIXES_WITH_EXPIRATION_DATE.indexOf(prefix) >= 0;
         },
 
         // Functions that check membership / access status of the
@@ -866,13 +866,13 @@ $(function() {
                     $groupProperties.find('.schema-id').hide();
                 }
 
-                if (that.prefixHasRetentionPeriod(prefix)) {
-                    $groupProperties.find('.retention-period').show();
-                    $groupProperties.find('#f-group-update-retention-period')
-                        .val(group.retention_period)
+                if (that.prefixHasExpirationDate(prefix)) {
+                    $groupProperties.find('.expiration-date').show();
+                    $groupProperties.find('#f-group-update-expiration-date')
+                        .val(group.expiration_date)
                         .prop('readonly', !userCanManage);
                 } else {
-                    $groupProperties.find('.retention-period').hide();
+                    $groupProperties.find('.expiration-date').hide();
                 }
 
                 $groupProperties.find('#f-group-update-name')
@@ -1409,7 +1409,7 @@ $(function() {
                 data_classification: $('#f-group-' + action + '-data-classification').val(),
                 category:            $('#f-group-' + action + '-category'   ).val(),
                 subcategory:         $('#f-group-' + action + '-subcategory').val(),
-                retention_period:    $('#f-group-' + action + '-retention-period').val()
+                expiration_date:    $('#f-group-' + action + '-expiration-date').val()
             };
 
             // specific datamanager-group testing dependent on mode
@@ -1463,7 +1463,7 @@ $(function() {
                 group_name:                newProperties.name,
                 group_description:         newProperties.description,
                 group_schema_id:           newProperties.schema_id,
-                group_retention_period:    newProperties.retention_period,
+                group_expiration_date:    newProperties.expiration_date,
                 group_data_classification: newProperties.data_classification,
                 group_category:            newProperties.category,
                 group_subcategory:         newProperties.subcategory,
@@ -1478,7 +1478,7 @@ $(function() {
                 var selectedGroup = this.groups[$($('#group-list .group.active')[0]).attr('data-name')];
                 ['description',
                  'data_classification',
-                 'retention_period',
+                 'expiration_date',
                  'category',
                  'subcategory'].forEach(function(item) {
                     // Filter out fields that have not changed.
@@ -1494,10 +1494,10 @@ $(function() {
             if (!this.prefixHasDataClassification(this.getPrefix(newProperties.name)))
                 delete postData.group_data_classification;
 
-            // Avoid trying to set/update a retention period for groups that
+            // Avoid trying to set/update a expiration date for groups that
             // can't have one.
-            if (!this.prefixHasRetentionPeriod(this.getPrefix(newProperties.name)))
-                delete postData.group_retention_period;
+            if (!this.prefixHasExpirationDate(this.getPrefix(newProperties.name)))
+                delete postData.group_expiration_date;
 
             $.ajax({
                 url:      $(button).attr('action'),
@@ -1797,7 +1797,7 @@ $(function() {
                                 name:        groupName,
                                 description: hier[categoryName][subcategoryName][groupName].description,
                                 schema_id:   hier[categoryName][subcategoryName][groupName].schema_id,
-                                retention_period:    hier[categoryName][subcategoryName][groupName].retention_period,
+                                expiration_date:    hier[categoryName][subcategoryName][groupName].expiration_date,
                                 data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
                                 members:     hier[categoryName][subcategoryName][groupName].members
                             };
@@ -1946,14 +1946,14 @@ $(function() {
                     }
                 }
 
-                var hadRetentionPeriod = that.prefixHasRetentionPeriod(oldPrefix);
-                var haveRetentionPeriod = that.prefixHasRetentionPeriod(newPrefix);
+                var hadRetentionPeriod = that.prefixHasExpirationDate(oldPrefix);
+                var haveRetentionPeriod = that.prefixHasExpirationDate(newPrefix);
 
                 if (hadRetentionPeriod != haveRetentionPeriod) {
                     if (haveRetentionPeriod) {
-                        $('.retention-period').show();
+                        $('.expiration-date').show();
                     } else {
-                        $('.retention-period').hide();
+                        $('.expiration-date').hide();
                     }
                 }
 
