@@ -3,10 +3,12 @@
 {% block title %}{{ super() }} &dash; Statistics{% endblock title %}
 
 {% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('stats_bp.static', filename='lib/select2/css/select2.min.css') }}">
 {% endblock style %}
 
 {% block scripts %}
+    <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-2.7.3/chart.min.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='js/stats.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='lib/select2/js/select2.full.min.js') }}"></script>
@@ -91,6 +93,7 @@
     </div>
     {% endif %}
 
+
     {% if groups %}
     <div class="row">
         <div class="col-md-5">
@@ -98,20 +101,25 @@
                 <div class="card-header">
                     Groups
                 </div>
-                <div class="list-group" id="groups-list">
-                    {% for group in groups %}
-                    <a class="list-group-item list-group-item-action group" data-name="{{ group[0] }}">
-                        {{ group[0] }} ({{ group[1] }})
-                    </a>
-                    {% endfor %}
-                </div>
+
+        <div class="row d-block">
+            <table id="group-browser" class="table yoda-table table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Size</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+
                 <div class="card-footer"></div>
             </div>
         </div>
         <div class="col-md-7">
             <div class="group-details">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header" id="selected-group">
                         Group
                     </div>
                     <div class="card-body" id="storage-chart">
