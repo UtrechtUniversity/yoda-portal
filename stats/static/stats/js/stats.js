@@ -80,7 +80,7 @@ function getGroupDetails(group) {
                       // data.months contains month-numbers. I.e. [12,1,2,3,4,5,6,7,8,9,10,11]
                       // The order is in presentation order.
                       // The storageData, month based, is zero-based however. And in ascending order.
-                      // 0=Jan,..., 10=nov, 11=dec                      
+                      // 0=Jan,..., 10=nov, 11=dec
                       // Therefore, a correction has to take place shift by 1 to have the values coincide with the actual month
                       storageChartData.push(storageData[month-1]);
                   });
@@ -305,7 +305,7 @@ let getFolderContents = (() => {
         } else {
             // Nope, load new data via the API.
             let j = ++i;
-            let result = await Yoda.call('browse_group_data', // 'browse_folder',
+            let result = await Yoda.call('resource_browse_group_data',
                                          {'offset':     args.start,
                                           'limit':      batchSize,
                                           'sort_order': args.order[0].dir,
@@ -373,4 +373,3 @@ function htmlEncode(value){
     //then grab the encoded contents back out.  The div never exists on the page.
     return $('<div/>').text(value).html().replace('"', '&quot;');
 }
-
