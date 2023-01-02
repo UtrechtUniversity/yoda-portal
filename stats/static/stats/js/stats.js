@@ -22,6 +22,10 @@ $(document).ready(function() {
     if ($('#group-browser').length) {
         startBrowsing(10);
     }
+
+    $('#search-group-table').on( 'keyup', function () {
+        $('#group-browser').DataTable().search( $('#search-group-table').val() ).draw();
+    } );
 });
 
 function makeItemActive(currentItem)
@@ -227,7 +231,7 @@ function htmlDecode(inp){
 function startBrowsing(pageLength)
 {
     $('#group-browser').DataTable({
-        "bFilter": false,
+        //"bFilter": true,
         "bInfo": false,
         "bLengthChange": true,
         "language": {
@@ -235,46 +239,30 @@ function startBrowsing(pageLength)
             "lengthMenu": "_MENU_"
         },
         "dom": '<"top">frt<"bottom"lp><"clear">',
-        'columns': [//{render: tableRenderer.multiselect,    orderable: false, data: 'name'},
-                    {render: tableRenderer.name,    data: 'name', searchable: true},
-                    // Size and date should be orderable, but limitations
-                    // on how queries work prevent us from doing this
-                    // correctly without significant overhead.
-                    // (enabling this as is may result in duplicated results for data objects)
+        'columns': [{render: tableRenderer.name,    data: 'name', bSearchable: true},
                     {render: tableRenderer.size,    data: 'size'}],
-                    //{render: tableRenderer.date,    orderable: false, data: 'modify_time'},
-                    //{render: tableRenderer.state,   orderable: false},
-                    //{render: tableRenderer.context, orderable: false }],
         "ajax": getFolderContents,
         "processing": true,
         "serverSide": true,
         "iDeferLoading": 0,
         "order": [[ 0, "asc" ]],
         "pageLength": pageLength,
-//        "searching": true,
+        // "searching": true,
         "fnDrawCallback": function() {
              $("#group-browser td").click(function() {
                  var groupName = $(this).parent().find('.list-group-item').attr('data-name');
                  getGroupDetails(groupName);
                  $('#selected-group').html('Group [' + groupName + ']');
-                 //$('#group-browser').DataTable().search( 'pilot' ).draw();
              });
         }
     });
-    browse();
-}
 
-
-function browse()
-{
-    buildFileBrowser();
-}
-
-
-function buildFileBrowser() {
     let groupBrowser = $('#group-browser').DataTable();
     getFolderContents.dropCache();
     groupBrowser.ajax.reload();
+
+    // to prevent dtatables own search field from showing
+    $('#group-browser_filter').addClass('hidden');
 
     return true;
 }
@@ -301,6 +289,7 @@ let getFolderContents = (() => {
     let cacheStart     = null;  // Row number of the first cache entry.
     let cacheSortCol   = null;  // Cached sort column nr.
     let cacheSortOrder = null;  // Cached sort order.
+    let cacheSearch    = "";  // Cached searching criterium.
     let i = 0;                  // Keep simultaneous requests from interfering.
 
     let get = async (args) => {
@@ -308,6 +297,7 @@ let getFolderContents = (() => {
         if (cache.length
          && args.order[0].dir    === cacheSortOrder
          && args.order[0].column === cacheSortCol
+         && $('#search-group-table').val() === cacheSearch
          && args.start               >= cacheStart
          && args.start + args.length <= cacheStart + batchSize) {
 
@@ -319,7 +309,8 @@ let getFolderContents = (() => {
                                          {'offset':     args.start,
                                           'limit':      batchSize,
                                           'sort_order': args.order[0].dir,
-                                          'sort_on':    ['name','size'][args.order[0].column]});
+                                          'sort_on':    ['name','size'][args.order[0].column],
+                                          'search_groups': $('#search-group-table').val()});
 
             // If another requests has come while we were waiting, simply drop this one.
             if (i !== j) return null;
@@ -329,6 +320,7 @@ let getFolderContents = (() => {
             cacheStart     = args.start;
             cache          = result.items;
             // cacheFolder    = currentFolder;
+            cacheSearch    =  $('#search-group-table').val();
             cacheSortCol   = args.order[0].column;
             cacheSortOrder = args.order[0].dir;
 
@@ -381,7 +373,4 @@ function htmlEncode(value){
     //then grab the encoded contents back out.  The div never exists on the page.
     return $('<div/>').text(value).html().replace('"', '&quot;');
 }
-
-
-
 
