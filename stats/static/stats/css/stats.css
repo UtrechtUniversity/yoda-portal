@@ -2,3 +2,7 @@
     float: left;
     padding-top: 2px;
 }
+
+#group-browser_wrapper .bottom {
+    margin: 5px;
+}
