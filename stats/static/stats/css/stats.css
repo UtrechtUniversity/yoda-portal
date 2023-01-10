@@ -6,3 +6,7 @@
 #group-browser_wrapper .bottom {
     margin: 5px;
 }
+
+#group-browser tbody {
+    cursor: pointer;
+}
