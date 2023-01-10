@@ -16,6 +16,7 @@ from irods.message import iRODSMessage
 from werkzeug.utils import secure_filename
 
 import api
+from util import log_error
 
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
@@ -188,6 +189,7 @@ def upload_post() -> Response:
             obj_desc.seek(int(flow_chunk_size * (flow_chunk_number - 1)))
             obj_desc.write(encode_unicode_content)
     except Exception:
+        log_error("Chunk upload failed for {}".format(object_path))
         response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
         response.headers["Content-Type"] = "application/json"
         return response
