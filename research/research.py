@@ -194,7 +194,10 @@ def upload_post() -> Response:
         response.headers["Content-Type"] = "application/json"
         return response
     finally:
-        obj_desc.close()
+        try:
+            obj_desc.close()
+        except Exception:
+            pass
 
     # Rename partial file name when complete for chunked uploads.
     if flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
