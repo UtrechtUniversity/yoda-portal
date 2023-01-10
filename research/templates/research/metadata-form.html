@@ -60,8 +60,12 @@
             <div class="card-body">
                 <div id="transformation-text"></div>
                 <div id="transformation-buttons" class="hide">
+                    <input class="form-check-input" type="checkbox" value="" id="cb-keep-metadata-backup" checked>
+                    <label class="form-check-label" for="cb-keep-metadata-backup">
+                         Keep a backup of the original metadata
+                    </label>
                     <a class="transformation-reject btn btn-danger float-end" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Postpone transformation</a>
-                    <button class="transformation-accept btn btn-success float-end">Accept transformation</button>
+                    <button class="transformation-accept btn btn-success float-end me-1">Accept transformation</button>
                 </div>
             </div>
         </div>
