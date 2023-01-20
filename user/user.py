@@ -376,6 +376,8 @@ def irods_login(username: str, password: str) -> None:
 
     if app.config.get('INTAKE_ENABLED'):
         irods.connection_timeout = app.config.get('INTAKE_EXT_TIMEOUT', 120)
+
+    # This implicitly creates connections, and raises an exception on failure
     _ = irods.server_version
 
     session['user_id'] = username
