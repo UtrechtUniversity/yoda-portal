@@ -202,11 +202,11 @@
                         <button class="btn btn-outline-secondary" id="btn-unlock"><span class="fa-solid fa-check"></span> Unlock datasets</button>
                 </div>
                 <div class="btn-group">
-                    <a href="reports" class="btn btn-info btn-goto-reports"><span class="fa-solid fa-signal"></span> Reports</a>
+                    <a href="{{ url_for('intake_bp.reports') }}" class="btn btn-info btn-goto-reports"><span class="fa-solid fa-signal"></span> Reports</a>
                 </div>
             {% endif %}
 
-            <input type="hidden" id="studyID" value="{{ study_id }}">
+            <input type="hidden" id="studyID" value="{{ qualified_study_id }}">
             <input type="hidden" id="studyFolder" value="{{ study_folder }}">
             <input type="hidden" id="collection" value="{{ study_folder }}">
 
