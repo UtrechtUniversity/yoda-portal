@@ -175,6 +175,11 @@ $(function() {
         });
     });
 
+    $("body").on("click", "a.action-vault-archival", function() {
+        $('.action-confirm-vault-archival').attr( 'data-folder', $(this).attr('data-folder') );
+        $('#vaultArchival').modal('show');
+    });
+
     $("body").on("click", "button.action-confirm-data-package-select", function() {
         dataPackage = $('#submitPublication .modal-body input[type="radio"]:checked').val();
         $('#submitPublication').modal('hide');
@@ -259,6 +264,11 @@ $(function() {
     $("#confirmRepublish").on("click", ".action-confirm-republish-publication", function() {
         $('#confirmRepublish').modal('hide');
         vaultRepublishPublication($(this).attr('data-folder'));
+    });
+
+    $("#vaultArchival").on("click", ".action-confirm-vault-archival", function() {
+        $('#vaultArchival').modal('hide');
+        vaultArchival($(this).attr('data-folder'));
     });
 
     $("body").on("click", "a.action-go-to-research", function() {
@@ -612,6 +622,7 @@ function topInformation(dir, showAlert) {
             var researchGroupAccess = data.research_group_access;
             var researchPath = data.research_path;
             var actions = [];
+            var archive = data.archive;
 
             $('.btn-group button.metadata-form').hide();
             $('.top-information').hide();
@@ -667,6 +678,18 @@ function topInformation(dir, showAlert) {
                     // Show metadata button.
                     $('.btn-group button.metadata-form').attr('data-path', dir);
                     $('.btn-group button.metadata-form').show();
+
+                    // Archival vault
+                    var archiveBadge = '';
+                    if (isDatamanager && archive['archivable']) {
+                        actions['vault-archival'] = 'Archive on tape';
+                    }
+
+                    if (archive['status'] != false) {
+                        var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-primary text-black">' + archive['status'] + '</span>';
+                    } else {
+                        var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-primary text-black hide"></span>';
+                    }
                 }
 
                 // Datamanager sees access buttons in vault.
@@ -716,7 +739,7 @@ function topInformation(dir, showAlert) {
             $('.btn-group button.folder-status').prop("disabled", false).next().prop("disabled", false);
 
             // Folder buttons
-            $('.top-information h2').html(`${statusBadge}${systemMetadataIcon}${actionLogIcon}`);
+            $('.top-information h2').html(`${statusBadge}${archiveBadge}${systemMetadataIcon}${actionLogIcon}`);
 
             // Show top information and buttons.
             if (typeof vaultStatus != 'undefined') {
@@ -735,7 +758,7 @@ function handleActionsList(actions, folder)
     var vaultHtml = '';
     var possibleActions = ['submit-for-publication', 'cancel-publication',
                            'approve-for-publication', 'depublish-publication',
-                           'republish-publication'];
+                           'republish-publication', 'vault-archival'];
 
     var possibleVaultActions = ['grant-vault-access', 'revoke-vault-access',
                                 'copy-vault-package-to-research',
@@ -850,6 +873,17 @@ async function vaultRepublishPublication(folder)
         $('#statusBadge').html(btnText);
     }
     topInformation(folder, false);
+}
+
+async function vaultArchival(folder)
+{
+    try {
+        let status = await Yoda.call('vault_archive',
+            {'coll': Yoda.basePath + folder})
+    } catch(e) {
+        //
+    }
+    //topInformation(folder, false);
 }
 
 function vaultAccess(action, folder)
