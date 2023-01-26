@@ -20,21 +20,24 @@ $(document).ready(function() {
         let button = document.getElementById('generateButton');
         button.setAttribute("hidden", true);
 
-        Yoda.call("token_generate", {"label": label}, {"quiet": true}).then(
-            (data) => {
-                $('#f-token').val(data);
-                let p = document.getElementById('passwordOk');
-                p.removeAttribute("hidden");
-            },
-            (error) => {
-                let error_id = "passwordGenerateError";
-                if (error.status === "error_TokenExistsError") {
-                    error_id = "passwordLabelError";
+        Yoda.call("token_delete_expired",{}).then(response => {
+            return Yoda.call("token_generate", {"label": label}, {"quiet": true}).then(
+                (data) => {
+                    $('#f-token').val(data);
+                    let p = document.getElementById('passwordOk');
+                    p.removeAttribute("hidden");
+                },
+                (error) => {
+                    let error_id = "passwordGenerateError";
+                    if (error.status === "error_TokenExistsError") {
+                        error_id = "passwordLabelError";
+                    }
+                    let p = document.getElementById(error_id);
+                    p.removeAttribute("hidden");
+                    button.removeAttribute("hidden");
                 }
-                let p = document.getElementById(error_id);
-                p.removeAttribute("hidden");
-                button.removeAttribute("hidden");
-            });
+            );
+        });
     });
 
     $('.btn-copy-to-clipboard').click(function(event){
