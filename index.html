@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+    <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+
+            <title>Yoda Metadata Editor</title>
+            <link rel="shortcut icon" href="static/img/favicon.ico">
+
+            <link rel="stylesheet" href="static/css/yoda-portal.css">
+            <link rel="stylesheet" href="static/css/metadata/form.css">
+            <link rel="stylesheet" href="static/css/metadata/leaflet.css">
+
+            <script src="static/lib/jquery-1.12.4/js/jquery.min.js"></script>
+            <script src="static/js/metadata-form.js" async></script>
+    </head>
+
+    <body class="d-flex flex-column min-vh-100">
+        <header class="py-3">
+            <div class="container d-flex flex-wrap justify-content-center">
+                <a href="/" class="mb-lg-0 me-lg-auto text-dark text-decoration-none">
+                    <img class="logo" src="static/img/logo.svg" alt="Logo">
+                </a>
+            </div>
+        </header>
+
+        <nav class="navbar navbar-dark navbar-expand-md mb-3">
+            <div class="container">
+                <a class="navbar-brand" href="#">Yoda Metadata Editor</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#yodaNavbar" aria-controls="yodaNavbar" aria-expanded="true" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse" id="yodaNavbar">
+                    <div class="nav navbar-nav">
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="page">
+            <div class="container">
+                <div id="metadata-form" class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title float-start">
+                                    Metadata form
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="form">
+                                    <p>Loading metadata...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </body>
+</html>
