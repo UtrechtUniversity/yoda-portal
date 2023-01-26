@@ -460,7 +460,7 @@ function ArrayFieldTemplate(props) {
                     {(!readonly && props.canAdd) && (
                         <p className={buttonClass}>
                             <button className="btn btn-outline-secondary btn-sm" onClick={props.onAddClick} type="button">
-                                <i className="fa-solid fa-plus" aria-hidden="true"></i>
+                                +
                             </button>
                         </p>
                     )}
@@ -482,7 +482,7 @@ function ArrayFieldTemplate(props) {
                                                         el.index,
                                                         el.index - 1
                                                     )}>
-                                                <i className="fa-solid fa-arrow-up" aria-hidden="true"></i>
+                                                &uarr;
                                             </button>
                                         </div>
                                     )}
@@ -494,7 +494,7 @@ function ArrayFieldTemplate(props) {
                                                         el.index,
                                                         el.index + 1
                                                     )}>
-                                                <i className="fa-solid fa-arrow-down" aria-hidden="true"></i>
+                                                &darr;
                                             </button>
                                         </div>
                                     )}
@@ -503,7 +503,7 @@ function ArrayFieldTemplate(props) {
                                         <div className="m-0 p-0">
                                             <button className="btn btn-light btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onDropIndexClick(el.index)}>
-                                                <i className="fa-solid fa-trash" aria-hidden="true"></i>
+                                                -
                                             </button>
                                         </div>
                                     )}
