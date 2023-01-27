@@ -39,12 +39,16 @@ $(function() {
     });
 
     $('#btn-start-scan').click(function(){
-        var study_id = 'grp-intake-' + $('#studyID').val();
-
+        var study_id = $('#studyID').val();
+        var study_folder = $("#studyFolder").val();
+        var collection_to_scan = Yoda.basePath + '/' + study_id;
+        if (study_folder) {
+            collection_to_scan += "/" + study_folder;
+        }
         $(this).prop('disabled', true).addClass('disabled');
         inProgressStart('Scanning in progress...');
         Yoda.call('intake_scan_for_datasets',
-                  {coll: Yoda.basePath + '/' + study_id}).then((data) => {
+                  {coll: collection_to_scan }).then((data) => {
             console.log(data);
             if (data.proc_status=='OK') {
                 reload_page_with_alert('5');
@@ -58,7 +62,7 @@ $(function() {
     // datamanager only
     $('#btn-lock').click(function(){
         var datasets = [],
-            intake_path = Yoda.basePath + '/' + 'grp-intake-' + $('#studyID').val();
+            intake_path = Yoda.basePath + '/' + $('#studyID').val();
         inProgressStart('Locking in progress...');
 
         $('.cbDataSet').each(function(){
@@ -72,7 +76,7 @@ $(function() {
     // datamanager only
     $('#btn-unlock').click(function(){
         var datasets = [],
-            intake_path = Yoda.basePath + '/' + 'grp-intake-' + $('#studyID').val();
+            intake_path = Yoda.basePath + '/' + $('#studyID').val();
         inProgressStart('Locking in progress...');
 
         $('.cbDataSet').each(function(){
@@ -85,8 +89,10 @@ $(function() {
 
     async function handleLockingAndAlerts(intake_path, dataset_ids)
     {
-        result = await Yoda.call('intake_lock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
+        let result = await Yoda.call('intake_lock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
+        console.log(result);
         if (result.proc_status!='OK') {
+            alert(result.error_msg);
             reload_page_with_alert('2');
             return;
         }
@@ -95,7 +101,8 @@ $(function() {
 
     async function handleUnlockingAndAlerts(intake_path, dataset_ids)
     {
-        result = await Yoda.call('intake_unlock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
+        let result = await Yoda.call('intake_unlock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
+        console.log(result);
         if (result.proc_status!='OK') {
             reload_page_with_alert('4');
             return;
@@ -235,7 +242,10 @@ function reload_page_with_alert(alertNr) {
     var studyID = $("#studyID").val(),
         studyFolder= $("#studyFolder").val();
 
-    params = '?studyID=' + studyID;
+    // bring back to study-id alone without group qualification
+    parts = studyID.split('-');
+    // take last only to get to study
+    params = '?studyID=' + parts[parts.length-1]
     if (studyFolder) {
         params += '&studyFolder=' + studyFolder;
     }
