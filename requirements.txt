@@ -1,4 +1,4 @@
-python-irodsclient==1.1.5
+python-irodsclient==1.1.6
 Flask==2.0.3
 flask-session==0.4
 Flask-WTF==1.0.1
