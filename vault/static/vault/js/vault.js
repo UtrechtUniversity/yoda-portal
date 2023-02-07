@@ -627,6 +627,7 @@ function topInformation(dir, showAlert) {
             $('.btn-group button.metadata-form').hide();
             $('.top-information').hide();
             $('.top-info-buttons').hide();
+            $('#messages .alert').remove();
 
             // is vault package
             if (typeof vaultStatus != 'undefined') {
@@ -681,14 +682,22 @@ function topInformation(dir, showAlert) {
 
                     // Archival vault
                     var archiveBadge = '';
-                    if (isDatamanager && archive['archivable']) {
+                    if ((isDatamanager && archive['archivable']) && archive['status'] == false) {
                         actions['vault-archival'] = 'Archive on tape';
                     }
 
                     if (archive['status'] != false) {
-                        var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-primary text-black">' + archive['status'] + '</span>';
+                        let archiveText = archive['status'];
+                        if (archive['status'] == 'archive') {
+                            archiveText = 'Submitted for archive';
+                        } else if (archive['status'] == 'archived') {
+                            archiveText = 'Archived';
+                            Yoda.set_message('info', 'This data package is archived on tape. Unarchive this data package to access the contents of this data package.');
+                        }
+
+                        var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white">' + archiveText + '</span>';
                     } else {
-                        var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-primary text-black hide"></span>';
+                        var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white hide"></span>';
                     }
                 }
 
@@ -877,13 +886,22 @@ async function vaultRepublishPublication(folder)
 
 async function vaultArchival(folder)
 {
-    try {
-        let status = await Yoda.call('vault_archive',
-            {'coll': Yoda.basePath + folder})
-    } catch(e) {
-        //
+    $('#archiveBadge').html('Submit for archive <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
+    $('#archiveBadge').removeClass('hide');
+
+    let result = await Yoda.call('vault_archive',
+        {'coll': Yoda.basePath + folder},
+        {'quiet': true, 'rawResult': true}
+    );
+
+    if (result.status == 'ok') {
+        Yoda.set_message('success', 'Successfully submitted for archive');
     }
-    //topInformation(folder, false);
+    else {
+        Yoda.set_message('error', 'Failed to archive data package');
+        $('#archiveBadge').hide();
+    }
+    topInformation(folder, false);
 }
 
 function vaultAccess(action, folder)
