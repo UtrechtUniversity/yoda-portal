@@ -218,8 +218,12 @@ class YodaButtons extends React.Component {
         super(props);
     }
 
+    renderUploadButton() {
+        return (<button onClick={this.props.uploadMetadata} type="submit" className="btn btn-primary float-start">Upload</button>);
+    }
+
     renderDownloadButton() {
-        return (<button onClick={this.props.downloadMetadata} type="submit" className="btn btn-primary float-start">Download</button>);
+        return (<button onClick={this.props.downloadMetadata} type="submit" className="btn btn-primary float-start ms-3">Download</button>);
     }
 
     renderFormCompleteness() {
@@ -229,6 +233,7 @@ class YodaButtons extends React.Component {
     renderButtons() {
         let buttons = [];
 
+        buttons.push(this.renderUploadButton());
         buttons.push(this.renderDownloadButton());
         buttons.push(this.renderFormCompleteness());
 
@@ -252,7 +257,31 @@ class YodaButtons extends React.Component {
 class Container extends React.Component {
     constructor(props) {
         super(props);
+        this.uploadMetadata = this.uploadMetadata.bind(this);
         this.downloadMetadata = this.downloadMetadata.bind(this);
+    }
+
+    uploadMetadata() {
+        // Create file input.
+        let file_input = document.createElement('input');
+        file_input.type = 'file';
+        let metadata = {};
+
+        // Retrieve file when file is selected.
+        file_input.onchange = _ => {
+            let file = file_input.files[0];
+            var that = this;
+
+            // Read Yoda metadata file.
+            let reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = function() {
+                metadata = JSON.parse(reader.result);
+                that.form.setState({ formData: metadata });
+            };
+        };
+
+        file_input.click();
     }
 
     downloadMetadata() {
@@ -263,9 +292,9 @@ class Container extends React.Component {
     render() {
         return (
             <div>
-                <YodaButtons downloadMetadata={this.downloadMetadata} />
+                <YodaButtons uploadMetadata={this.uploadMetadata} downloadMetadata={this.downloadMetadata} />
                 <YodaForm ref={(form) => {this.form=form;}}/>
-                <YodaButtons downloadMetadata={this.downloadMetadata} />
+                <YodaButtons uploadMetadata={this.uploadMetadata} downloadMetadata={this.downloadMetadata} />
             </div>
         );
     }
@@ -280,6 +309,7 @@ async function loadForm() {
     uiSchema = await uiSchemaResponse.json();
 
     render(<Container/>, document.getElementById('form'));
+    updateCompleteness();
 }
 
 $(_ => loadForm());
