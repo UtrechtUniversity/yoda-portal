@@ -10,51 +10,13 @@
 
 {% block scripts %}
     <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
-    <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-2.7.3/chart.min.js') }}"></script>
+    <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-4.2.0/chart.min.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='js/stats.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='lib/select2/js/select2.full.min.js') }}"></script>
 {% endblock scripts %}
 
 {% block content %}
     <h1>Statistics</h1>
-
-    {% if resources %}
-    <div class="row mb-4">
-        <div class="col-md-5">
-            <div class="card resources">
-                <div class="card-header">
-                    Resources
-                </div>
-                <div class="list-group" id="resource-list">
-                    {% for resource in resources %}
-                        <a class="list-group-item list-group-item-action resource" data-name="{{ resource['name'] }}">
-                            {{ resource['name'] }}
-                            <small class="float-right resource-tier" title="<{{ resource['tier'] }}">
-                                {{ resource['tier'] }}
-                            </small>
-                        </a>
-                    {% endfor %}
-                </div>
-                <div class="card-footer">
-                </div>
-            </div>
-        </div>
-        <div class="col-md-7">
-            <div class="resource-details">
-                <div class="card">
-                    <div class="card-header">
-                        Resource properties
-                    </div>
-                    <div class="card-body">
-                        <p class="placeholder-text">
-                            Please select a resource.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
     {% if categories %}
     <div class="row mb-4">
@@ -67,13 +29,11 @@
                     <table class="table table-striped storage-table">
                         <tr>
                             <th>Category</th>
-                            <th>Tier</th>
                             <th>Storage</th>
                         </tr>
                         {% for category in categories %}
                             <tr>
                                 <td>{{ category.category }}</td>
-                                <td>{{ category.tier }}</td>
                                 <td>{{ category.storage }} TB</td>
                             </tr>
                         {% endfor %}
@@ -117,10 +77,21 @@
                     <div class="card-header" id="selected-group">
                         Group
                     </div>
-                    <div class="card-body" id="storage-chart">
-                        <p class="placeholder-text">
-                            Please select a group.
-                        </p>
+                    <div class="card-body">
+                        <div id="storage-chart-message">
+                            <p class="placeholder-text">
+                                Please select a group.
+                            </p>
+                        </div>
+                        <div id="storage-chart" class="hidden">
+                            <canvas id="myChart"></canvas>
+                            <input onchange="chartFilterDate()" type="date" id="startdate" value="2023-01-25">
+                            <input onchange="chartFilterDate()" type="date" id="enddate" value="2023-01-31">
+
+                            <button class="item" id="legend-research" onClick="chartToggleData(0)">&nbsp;Research&nbsp;</button>
+                            <button class="item" id="legend-vault" onClick="chartToggleData(1)">&nbsp;Vault&nbsp;</button>
+                            <button class="item" id="legend-revisions" onClick="chartToggleData(2)">&nbsp;Revisions&nbsp;</button>
+                        </div>
                     </div>
                 </div>
             </div>

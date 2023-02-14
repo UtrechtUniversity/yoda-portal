@@ -17,35 +17,18 @@ stats_bp = Blueprint('stats_bp', __name__,
 
 @stats_bp.route('/')
 def index() -> Response:
-    resource_tiers_response = api.call('resource_resource_and_tier_data', data={})
+    # resource_tiers_response = api.call('resource_resource_and_tier_data', data={})
     category_response = api.call('resource_category_stats', data={})
 
     return render_template('stats/stats.html',
-                           resources=resource_tiers_response['data'],
                            categories=category_response['data'])
-
-
-@stats_bp.route('get_tiers', methods=['GET'])
-def get_tiers() -> Response:
-    result = api.call('resource_get_tiers', data={})
-    return jsonify(result['data'])
-
-
-@stats_bp.route('resource_details', methods=['GET'])
-def get_resource_details() -> Response:
-    resource = request.args.get('resource')
-    result = api.call('resource_tier', {'res_name': resource})
-    html = render_template('stats/resource_tier_mgmt.html',
-                           name=resource,
-                           tier=result['data'])
-    return {'status': 'success', 'html': html}
 
 
 @stats_bp.route('/export')
 def export() -> Response:
     response = api.call('resource_monthly_category_stats', data={})
 
-    csv = "category;subcategory;groupname;tier;"
+    csv = "category;subcategory;groupname;"
 
     months = ['January', 'February', 'March', 'April',
               'May', 'June', 'July', 'August',
@@ -57,7 +40,7 @@ def export() -> Response:
     csv += "\n"
 
     for stat in response['data']:
-        csv += f"{stat['category']};{stat['subcategory']};{stat['groupname']};{stat['tier']};"
+        csv += f"{stat['category']};{stat['subcategory']};{stat['groupname']};"
         for month in stat['storage']:
             csv += f"{month};"
         csv += "\n"
