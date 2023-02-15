@@ -5,7 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 from datetime import datetime
 
-from flask import Blueprint, jsonify, make_response, render_template, request, Response
+from flask import Blueprint, make_response, render_template, Response
 
 import api
 
@@ -30,16 +30,11 @@ def export() -> Response:
 
     csv = "category;subcategory;groupname;"
 
-    months = ['January', 'February', 'March', 'April',
-              'May', 'June', 'July', 'August',
-              'September', 'October', 'November', 'December']
-    current_month = datetime.now().month
-    for i in range(11, -1, -1):
-        month = (current_month - i) + 12 if (current_month - i) < 0 else current_month - i
-        csv += f"{months[month - 1]};"
-    csv += "\n"
+    periods = ";".join(response['data']['dates'])
 
-    for stat in response['data']:
+    csv += periods + "\n"
+
+    for stat in response['data']['storage']:
         csv += f"{stat['category']};{stat['subcategory']};{stat['groupname']};"
         for month in stat['storage']:
             csv += f"{month};"

@@ -30,11 +30,17 @@
                         <tr>
                             <th>Category</th>
                             <th>Storage</th>
+                            <th>Research</th>
+                            <th>Vault</th>
+                            <th>Revision</th>
                         </tr>
                         {% for category in categories %}
                             <tr>
                                 <td>{{ category.category }}</td>
-                                <td>{{ category.storage }} TB</td>
+                                <td>{{ category.storage.total }}</td>
+                                <td>{{ category.storage.research }}</td>
+                                <td>{{ category.storage.vault }}</td>
+                                <td>{{ category.storage.revision }}</td>
                             </tr>
                         {% endfor %}
                     </table>
