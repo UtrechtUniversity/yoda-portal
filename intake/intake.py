@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 
 import time
-from typing import Dict
+from typing import Any, Dict
 
 from flask import Blueprint, g, make_response, render_template, request, Response, session
 
@@ -122,7 +122,7 @@ def index() -> Response:
                            title='Study ' + study_title)
 
 
-def get_intake_study_permissions(study_id: str) -> Dict[str, str]:
+def get_intake_study_permissions(study_id: str) -> Dict[str, Any]:
     # Two types of groupnames 1) grp-intake- and 2) intake-
     group_path = 'grp-intake-'
     assistant_access = False

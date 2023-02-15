@@ -428,7 +428,7 @@ def release_session(response: Response) -> Response:
     return response
 
 
-def get_login_placeholder():
+def get_login_placeholder() -> str:
     oidc_domains = app.config.get("OIDC_DOMAINS")
     if len(oidc_domains) == 0 or oidc_domains[0] == "":
         return "j.a.smith@uu.nl"
