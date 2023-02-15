@@ -3,8 +3,6 @@
 __copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from datetime import datetime
-
 from flask import Blueprint, make_response, render_template, Response
 
 import api
