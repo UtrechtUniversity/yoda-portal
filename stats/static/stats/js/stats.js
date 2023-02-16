@@ -43,26 +43,13 @@ var chart_visibility_status = [true, true, true];
 
 // Handling of new chart
 function getGroupDetails(group) {
-    // when data is present show chart including the date buttons and legend.
-
-    console.log(group);
-
-    Yoda.call('resource_full_year_differentiated_group_storage', //'resource_full_year_group_data',
+    // When data is present show chart including the date buttons and legend.
+    Yoda.call('resource_full_year_differentiated_group_storage',
               {group_name: group}).then((data) => {
-
-        // when here:
-        // 
-
-        console.log(data);
-
-        // CHART DATA VARIABLES
-        // Dataset labels - this order is essential
-        //////////const dataset_labels = ['Research', 'Vault', 'Revisions', 'Total'];
-
         // Labels on the x-axis -> dates
         chart_date_labels = data.labels;
-        // 4 dimensional array holding all data for research, vault, revisions and total
 
+        // 4 dimensional array holding all data for research, vault, revisions and total
         var nr_of_points = 0;
         var chart_totals = [];
         while (nr_of_points < data.research.length) {
@@ -72,37 +59,27 @@ function getGroupDetails(group) {
 
         chart_datapoints = [data.research, data.vault, data.revision, chart_totals];
 
-        console.log(chart_dataset_labels);
-        console.log(chart_date_labels);
-        console.log(chart_datapoints);
-
-
         if (nr_of_points > 0) {
-            // Take over the min/max date range based upon the actual dataset minimum and maximum
+            // Take over the min/max date range based upon the actual dataset minimum and maximum.
             document.getElementById('startdate').value = chart_date_labels[0];
             document.getElementById('enddate').value = chart_date_labels[nr_of_points-1];
 
-            // set chart the buttons to the initial text again
+            // Set chart the buttons to the initial text again.
             document.getElementById('legend-' + chart_dataset_labels[0].toLowerCase()).innerHTML = '&nbsp;' + chart_dataset_labels[0] + '&nbsp;';
             document.getElementById('legend-' + chart_dataset_labels[1].toLowerCase()).innerHTML = '&nbsp;' + chart_dataset_labels[1] + '&nbsp;';
             document.getElementById('legend-' + chart_dataset_labels[2].toLowerCase()).innerHTML = '&nbsp;' + chart_dataset_labels[2] + '&nbsp;';
 
-            // Reset the representation of visibilty of each dataset (research, vault, revisions)
+            // Reset the representation of visibilty of each dataset (research, vault, revisions).
             chart_visibility_status = [true, true, true];
-            // myChart.show(0);
-            // myChart.show(1);
-            // myChart.show(2);
 
-            // Make chart visible and hide messaging part
+            // Make chart visible and hide messaging part.
             $('#storage-chart').removeClass('hidden');
             $('#storage-chart-message').addClass('hidden');
 
-            chartShow(); // dit is een create of een update van de chart.
-
+            chartShow(); // Create or update of chart.
         }
         else {
             $("#storage-chart-message").html("<p>No storage information found.</p>");
-
             $('#storage-chart').addClass('hidden');
             $('#storage-chart-message').removeClass('hidden');
         }
@@ -112,76 +89,70 @@ function getGroupDetails(group) {
 
 function chartShow() {
     if (myChart) {
-        console.log('UPDATE');
-        console.log(chart_date_labels);
-         myChart.config.data.labels = chart_date_labels;
-         myChart.config.data.datasets[0].data = chart_datapoints[0];
-         myChart.config.data.datasets[1].data = chart_datapoints[1];
-         myChart.config.data.datasets[2].data = chart_datapoints[2];
-         myChart.config.data.datasets[3].data = chart_datapoints[3];
+        myChart.config.data.labels = chart_date_labels;
+        myChart.config.data.datasets[0].data = chart_datapoints[0];
+        myChart.config.data.datasets[1].data = chart_datapoints[1];
+        myChart.config.data.datasets[2].data = chart_datapoints[2];
+        myChart.config.data.datasets[3].data = chart_datapoints[3];
 
-            myChart.show(0);
-            myChart.show(1);
-            myChart.show(2);
+        myChart.show(0);
+        myChart.show(1);
+        myChart.show(2);
 
-
-         myChart.update();
-    }
-    else {
-
-
-    const data = {
-      labels: chart_date_labels,
-      datasets: [{
-        label: chart_dataset_labels[0],
-        data: chart_datapoints[0],
-        borderWidth: 1,
-        backgroundColor: 'rgba(255, 26, 104, 0.2)',
-        borderColor: 'rgba(255, 26, 104, 1)'
-      },
-      {
-        label: chart_dataset_labels[1],
-        data: chart_datapoints[1],
-        borderWidth: 1,
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgba(54, 162, 235, 1)'
-      },
-      {
-        label: chart_dataset_labels[2],
-        data: chart_datapoints[2],
-        borderWidth: 1,
-        backgroundColor: 'rgba(255, 159, 64, 0.2)',
-        borderColor: 'rgba(255, 159, 64, 1)'
-      },
-      {
-        label: chart_dataset_labels[3],
-        data: chart_datapoints[3],
-        type: 'line',
-        borderWidth: 1,
-        borderColor: '#ff0000'
-      }]
-    };
-
-    // config
-    const config = {
-      type: 'bar',
-      data,
-      options: {
-          scales: {
-              x: {
-                  stacked: true,
-              },
-              y: {
-                  stacked: true
-              }
+        myChart.update();
+    } else {
+        const data = {
+          labels: chart_date_labels,
+          datasets: [{
+            label: chart_dataset_labels[0],
+            data: chart_datapoints[0],
+            borderWidth: 1,
+            backgroundColor: 'rgba(255, 26, 104, 0.2)',
+            borderColor: 'rgba(255, 26, 104, 1)'
           },
-          plugins: {
-              legend: {
-                  display: false,
+          {
+            label: chart_dataset_labels[1],
+            data: chart_datapoints[1],
+            borderWidth: 1,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)'
+          },
+          {
+            label: chart_dataset_labels[2],
+            data: chart_datapoints[2],
+            borderWidth: 1,
+            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+            borderColor: 'rgba(255, 159, 64, 1)'
+          },
+          {
+            label: chart_dataset_labels[3],
+            data: chart_datapoints[3],
+            type: 'line',
+            borderWidth: 1,
+            borderColor: '#ff0000'
+          }]
+        };
+
+        // config
+        const config = {
+          type: 'bar',
+          data,
+          options: {
+              scales: {
+                  x: {
+                      stacked: true,
+                  },
+                  y: {
+                      stacked: true
+                  }
+              },
+              plugins: {
+                  legend: {
+                      display: false,
+                  }
               }
-          }
-       }
-    };
+           }
+        };
 
         // render chart initialization block
         myChart = new Chart(
@@ -190,7 +161,7 @@ function chartShow() {
         );
     }
 
-    // Have the buttons have the same color as the corresponding dataset bars
+    // Have the buttons have the same color as the corresponding dataset bars.
     document.getElementById('legend-research').style.backgroundColor = myChart.data.datasets[0].backgroundColor;
     document.getElementById('legend-vault').style.backgroundColor = myChart.data.datasets[1].backgroundColor;
     document.getElementById('legend-revisions').style.backgroundColor = myChart.data.datasets[2].backgroundColor;
@@ -216,7 +187,7 @@ function chartToggleData(legend_button) {
 	}
         i++;
     }
-		
+
     if(visibilityData) {
         myChart.config.data.datasets[3].data = new_totals;
         myChart.hide(legend_button);
@@ -235,19 +206,13 @@ function chartToggleData(legend_button) {
 
 // Filter data based on the start and end date datepickers in the frontend
 function chartFilterDate() {
-    console.log('Change date');
     const dates = [...chart_date_labels];
 
     const startdate = document.getElementById("startdate");
     const enddate = document.getElementById("enddate");
-		
+
     const indexstartdate = dates.indexOf(startdate.value);
     const indexenddate = dates.indexOf(enddate.value);
-
-    console.log(startdate.value);
-    console.log(indexstartdate);
-    console.log(enddate.value)
-    console.log(indexenddate);
 
     if (indexstartdate == -1 || indexenddate == -1) {
         console.log('invalid period');
@@ -259,18 +224,6 @@ function chartFilterDate() {
 
     const ar_all_datapoints = [[...chart_datapoints[0]],[...chart_datapoints[1]], [...chart_datapoints[2]], [...chart_datapoints[3]]];
     const filterDatapoints = [];
-/*
-    filterDatapoints[0] = ar_all_datapoints[0].slice(indexstartdate, indexenddate + 1);
-    filterDatapoints[1] = ar_all_datapoints[1].slice(indexstartdate, indexenddate + 1);
-    filterDatapoints[2] = ar_all_datapoints[2].slice(indexstartdate, indexenddate + 1);
-    filterDatapoints[3] = ar_all_datapoints[3].slice(indexstartdate, indexenddate + 1);
-		
-    myChart.config.data.datasets[0].data = filterDatapoints[0]
-    myChart.config.data.datasets[1].data = filterDatapoints[1]
-    myChart.config.data.datasets[2].data = filterDatapoints[2]
-    myChart.config.data.datasets[3].data = filterDatapoints[3]
-*/
-
 
     // Split into relevant data only.
     var i = 0;
@@ -283,7 +236,7 @@ function chartFilterDate() {
     // New totalization per day.
     filterDatapoints[3] = [];
     var day = 0;
-    console.log(filterDatapoints[0].length);
+
     while (day < filterDatapoints[0].length) {
         filterDatapoints[3][day] = filterDatapoints[0][day] + filterDatapoints[1][day] + filterDatapoints[2][day];
         new_total = 0;
@@ -369,7 +322,7 @@ function getGroupDetailsOld(group) {
                   datasets.push(spaceObject);
 
 /*
-                  // Add the collected data 
+                  // Add the collected data
                   datasets.push({
                       label: 'Research space',
                       data: storageResearch,
@@ -390,13 +343,9 @@ function getGroupDetailsOld(group) {
                       data: storageTotal,
                       backgroundColor: darkColorGenerator()
                   });
-*/                  
+*/
 
               });
-
-
-              console.log(labels);
-              console.log(datasets);
 
               var chartData = {
                   labels: labels,
