@@ -180,6 +180,11 @@ $(function() {
         $('#vaultArchival').modal('show');
     });
 
+    $("body").on("click", "a.action-vault-unarchive", function() {
+        $('.action-confirm-vault-unarchive').attr( 'data-folder', $(this).attr('data-folder') );
+        $('#vaultUnarchive').modal('show');
+    });
+
     $("body").on("click", "button.action-confirm-data-package-select", function() {
         dataPackage = $('#submitPublication .modal-body input[type="radio"]:checked').val();
         $('#submitPublication').modal('hide');
@@ -269,6 +274,11 @@ $(function() {
     $("#vaultArchival").on("click", ".action-confirm-vault-archival", function() {
         $('#vaultArchival').modal('hide');
         vaultArchival($(this).attr('data-folder'));
+    });
+
+    $("#vaultUnarchive").on("click", ".action-confirm-vault-unarchive", function() {
+        $('#vaultUnarchive').modal('hide');
+        vaultUnarchive($(this).attr('data-folder'));
     });
 
     $("body").on("click", "a.action-go-to-research", function() {
@@ -627,7 +637,6 @@ function topInformation(dir, showAlert) {
             $('.btn-group button.metadata-form').hide();
             $('.top-information').hide();
             $('.top-info-buttons').hide();
-            $('#messages .alert').remove();
 
             // is vault package
             if (typeof vaultStatus != 'undefined') {
@@ -681,23 +690,31 @@ function topInformation(dir, showAlert) {
                     $('.btn-group button.metadata-form').show();
 
                     // Archival vault
-                    var archiveBadge = '';
-                    if ((isDatamanager && archive['archivable']) && archive['status'] == false) {
-                        actions['vault-archival'] = 'Archive on tape';
-                    }
-
-                    if (archive['status'] != false) {
-                        let archiveText = archive['status'];
-                        if (archive['status'] == 'archive') {
-                            archiveText = 'Submitted for archive';
-                        } else if (archive['status'] == 'archived') {
-                            archiveText = 'Archived';
-                            Yoda.set_message('info', 'This data package is archived on tape. Unarchive this data package to access the contents of this data package.');
+                    if (typeof archive != 'undefined') {
+                        var archiveBadge = '';
+                        if ((isDatamanager && archive['archivable']) && archive['status'] == false) {
+                            actions['vault-archival'] = 'Archive on tape';
                         }
 
-                        var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white">' + archiveText + '</span>';
-                    } else {
-                        var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white hide"></span>';
+                        $('.alert.is-archived').hide();
+                        if (archive['status'] != false) {
+                            let archiveText = archive['status'];
+                            if (archive['status'] == 'archive' || archive['status'] == 'archiving') {
+                                archiveText = 'Scheduled for archive';
+                            } else if (archive['status'] == 'archived') {
+                                archiveText = 'Archived';
+                                if (isDatamanager) {
+                                    actions['vault-unarchive'] = 'Unarchive from tape';
+                                }
+                                $('.alert.is-archived').show();
+                            } else if (archive['status'] == 'extract') {
+                                archiveText = 'Scheduled for unarchive';
+                            }
+
+                            var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white">' + archiveText + '</span>';
+                        } else {
+                            var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white hide"></span>';
+                        }
                     }
                 }
 
@@ -767,7 +784,8 @@ function handleActionsList(actions, folder)
     var vaultHtml = '';
     var possibleActions = ['submit-for-publication', 'cancel-publication',
                            'approve-for-publication', 'depublish-publication',
-                           'republish-publication', 'vault-archival'];
+                           'republish-publication', 'vault-archival',
+                           'vault-unarchive'];
 
     var possibleVaultActions = ['grant-vault-access', 'revoke-vault-access',
                                 'copy-vault-package-to-research',
@@ -886,7 +904,7 @@ async function vaultRepublishPublication(folder)
 
 async function vaultArchival(folder)
 {
-    $('#archiveBadge').html('Submit for archive <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
+    $('#archiveBadge').html('Schedule for archive <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
     $('#archiveBadge').removeClass('hide');
 
     let result = await Yoda.call('vault_archive',
@@ -895,13 +913,32 @@ async function vaultArchival(folder)
     );
 
     if (result.status == 'ok') {
-        Yoda.set_message('success', 'Successfully submitted for archive');
+        topInformation(folder, false);
     }
     else {
         Yoda.set_message('error', 'Failed to archive data package');
         $('#archiveBadge').hide();
+        topInformation(folder, true);
     }
-    topInformation(folder, false);
+}
+
+async function vaultUnarchive(folder)
+{
+    $('#archiveBadge').html('Schedule for unarchiving <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
+    $('#archiveBadge').removeClass('hide');
+
+    let result = await Yoda.call('vault_extract',
+        {'coll': Yoda.basePath + folder},
+        {'quiet': true, 'rawResult': true}
+    );
+
+    if (result.status == 'ok') {
+        topInformation(folder, false);
+    }
+    else {
+        Yoda.set_message('error', 'Failed to unarchive data package');
+        topInformation(folder, true);
+    }
 }
 
 function vaultAccess(action, folder)
@@ -938,6 +975,7 @@ function metadataInfo(dir) {
     // Do not show metadata outside data package.
     if (pathParts.length < 3) {
         $('.metadata-info').hide();
+        $('.alert.is-archived').hide();
         return;
     } else {
         pathParts.length = 3;
