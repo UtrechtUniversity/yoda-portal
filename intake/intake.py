@@ -75,7 +75,7 @@ def index() -> Response:
                                                  'sort_on': 'name',
                                                  'sort_order': 'asc',
                                                  'offset': 0,
-                                                 'limit': 10,
+                                                 'limit': 1000,
                                                  'space': 'Space.INTAKE'})
 
         valid_folders = result['data']['items']
