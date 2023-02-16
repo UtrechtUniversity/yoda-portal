@@ -70,7 +70,7 @@ $(function() {
                 datasets.push($(this).parent().parent().data('dataset-id'));
             }
         });
-        handleLockingAndAlerts(intake_path, datasets.toString());
+        handleLockingAndAlerts(intake_path, datasets);
     });
 
     // datamanager only
@@ -84,29 +84,38 @@ $(function() {
                 datasets.push($(this).parent().parent().data('dataset-id'));
             }
         });
-        handleUnlockingAndAlerts(intake_path, datasets.toString());
+        handleUnlockingAndAlerts(intake_path, datasets);
     });
 
     async function handleLockingAndAlerts(intake_path, dataset_ids)
     {
-        let result = await Yoda.call('intake_lock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
-        console.log(result);
-        if (result.proc_status!='OK') {
-            alert(result.error_msg);
-            reload_page_with_alert('2');
-            return;
-        }
+        const batchSize = 50;
+        for (let i = 0; i < dataset_ids.length; i += batchSize) {
+            const batch = dataset_ids.slice(i, i + batchSize).toString();
+            let result = await Yoda.call('intake_lock_dataset', {"path": intake_path, "dataset_ids": batch });
+            console.log(result);
+            if (result.proc_status!='OK') {
+                alert(result.error_msg);
+                reload_page_with_alert('2');
+                return;
+            }
+        }
         reload_page_with_alert('1');
     }
 
     async function handleUnlockingAndAlerts(intake_path, dataset_ids)
     {
-        let result = await Yoda.call('intake_unlock_dataset', {"path": intake_path, "dataset_ids": dataset_ids});
-        console.log(result);
-        if (result.proc_status!='OK') {
-            reload_page_with_alert('4');
-            return;
-        }
+        const batchSize = 50;
+        for (let i = 0; i < dataset_ids.length; i += batchSize) {
+            const batch = dataset_ids.slice(i, i + batchSize).toString();
+            let result = await Yoda.call('intake_unlock_dataset', {"path": intake_path, "dataset_ids": batch });
+            console.log(result);
+            if (result.proc_status!='OK') {
+                alert(result.error_msg);
+                reload_page_with_alert('4');
+                return;
+            }
+        }
         reload_page_with_alert('3');
     }
 
