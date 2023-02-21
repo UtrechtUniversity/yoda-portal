@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 
 import time
-from typing import Dict
+from typing import Any, Dict
 
 from flask import Blueprint, g, make_response, render_template, request, Response, session
 
@@ -42,11 +42,17 @@ def index() -> Response:
             if study_id is None or len(study_id) == 0:
                 alert_nr = 100  # NO ACCESS
 
-    # check whether user is part of the study-group.
+    # check whether user is part of the study-group but only of a study id has been found
     # if not, stop access
-    permissions = get_intake_study_permissions(study_id)
-    if not (permissions['manager'] or permissions['assistant']):
-        alert_nr = 100  # NO ACCESS
+    qualified_study_id = ""
+    if alert_nr != 100:
+        permissions = get_intake_study_permissions(study_id)
+
+        # determine whether group prefix is intake or grp-intake
+        qualified_study_id = permissions['group_path'] + study_id
+
+        if not (permissions['manager'] or permissions['assistant']):
+            alert_nr = 100  # NO ACCESS
 
     if alert_nr == 100:
         permissions = {}
@@ -63,13 +69,13 @@ def index() -> Response:
         # Store in current session for purpose when study_id is missing in requests
         session['study_id'] = study_id
 
-        intake_path = '/' + g.irods.zone + '/home/grp-intake-' + study_id
+        intake_path = '/' + g.irods.zone + '/home/' + qualified_study_id  # permissions['group_path'] + study_id
 
         result = api.call('browse_collections', {'coll': intake_path,
                                                  'sort_on': 'name',
                                                  'sort_order': 'asc',
                                                  'offset': 0,
-                                                 'limit': 10,
+                                                 'limit': 1000,
                                                  'space': 'Space.INTAKE'})
 
         valid_folders = result['data']['items']
@@ -110,14 +116,26 @@ def index() -> Response:
                            totalErrorCount=len(data_erroneous_files),
                            totalFileCount=total_file_count,
                            study_id=study_id,
+                           qualified_study_id=qualified_study_id,
                            study_folder=study_folder,
                            full_path=full_path,
                            title='Study ' + study_title)
 
 
-def get_intake_study_permissions(study_id: str) -> Dict[str, str]:
-    return {'assistant': api.call('group_user_is_member',
-                                  {'username': g.user, 'group_name': 'grp-intake-' + study_id})['data'],
+def get_intake_study_permissions(study_id: str) -> Dict[str, Any]:
+    # Two types of groupnames 1) grp-intake- and 2) intake-
+    group_path = 'grp-intake-'
+    assistant_access = False
+    if api.call('group_user_is_member',
+                {'username': g.user, 'group_name': 'grp-intake-' + study_id})['data']:
+        assistant_access = True
+    elif api.call('group_user_is_member',
+                  {'username': g.user, 'group_name': 'intake-' + study_id})['data']:
+        assistant_access = True
+        group_path = 'intake-'
+
+    return {'assistant': assistant_access,
+            'group_path': group_path,
             'manager': api.call('group_user_is_member',
                                 {'username': g.user, 'group_name': 'grp-datamanager-' + study_id})['data']}
 

@@ -3,9 +3,7 @@
 __copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from datetime import datetime
-
-from flask import Blueprint, jsonify, make_response, render_template, request, Response
+from flask import Blueprint, make_response, render_template, Response
 
 import api
 
@@ -17,47 +15,25 @@ stats_bp = Blueprint('stats_bp', __name__,
 
 @stats_bp.route('/')
 def index() -> Response:
-    resource_tiers_response = api.call('resource_resource_and_tier_data', data={})
+    # resource_tiers_response = api.call('resource_resource_and_tier_data', data={})
     category_response = api.call('resource_category_stats', data={})
 
     return render_template('stats/stats.html',
-                           resources=resource_tiers_response['data'],
                            categories=category_response['data'])
-
-
-@stats_bp.route('get_tiers', methods=['GET'])
-def get_tiers() -> Response:
-    result = api.call('resource_get_tiers', data={})
-    return jsonify(result['data'])
-
-
-@stats_bp.route('resource_details', methods=['GET'])
-def get_resource_details() -> Response:
-    resource = request.args.get('resource')
-    result = api.call('resource_tier', {'res_name': resource})
-    html = render_template('stats/resource_tier_mgmt.html',
-                           name=resource,
-                           tier=result['data'])
-    return {'status': 'success', 'html': html}
 
 
 @stats_bp.route('/export')
 def export() -> Response:
     response = api.call('resource_monthly_category_stats', data={})
 
-    csv = "category;subcategory;groupname;tier;"
+    csv = "category;subcategory;groupname;"
 
-    months = ['January', 'February', 'March', 'April',
-              'May', 'June', 'July', 'August',
-              'September', 'October', 'November', 'December']
-    current_month = datetime.now().month
-    for i in range(11, -1, -1):
-        month = (current_month - i) + 12 if (current_month - i) < 0 else current_month - i
-        csv += f"{months[month - 1]};"
-    csv += "\n"
+    periods = ";".join(response['data']['dates'])
 
-    for stat in response['data']:
-        csv += f"{stat['category']};{stat['subcategory']};{stat['groupname']};{stat['tier']};"
+    csv += periods + "\n"
+
+    for stat in response['data']['storage']:
+        csv += f"{stat['category']};{stat['subcategory']};{stat['groupname']};"
         for month in stat['storage']:
             csv += f"{month};"
         csv += "\n"

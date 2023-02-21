@@ -373,6 +373,11 @@ def irods_login(username: str, password: str) -> None:
         configure=True,
         **app.config.get('IRODS_SESSION_OPTIONS')
     )
+
+    if app.config.get('INTAKE_ENABLED'):
+        irods.connection_timeout = app.config.get('INTAKE_EXT_TIMEOUT', 120)
+
+    # This implicitly creates connections, and raises an exception on failure
     _ = irods.server_version
 
     session['user_id'] = username
@@ -423,7 +428,7 @@ def release_session(response: Response) -> Response:
     return response
 
 
-def get_login_placeholder():
+def get_login_placeholder() -> str:
     oidc_domains = app.config.get("OIDC_DOMAINS")
     if len(oidc_domains) == 0 or oidc_domains[0] == "":
         return "j.a.smith@uu.nl"
