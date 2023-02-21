@@ -23,20 +23,15 @@ $(document).ready(function() {
     } );
 
     $('#startdate_min').on('click', function() {
-        // console.log($(this).data('min-date'));
-        // console.log(chart_date_labels[0]);
         $('#startdate').val(chart_date_labels[0]);
         chartFilterDate();
     });
     $('#enddate_max').on('click', function() {
-        // console.log($(this).data('min-date'));
-        // console.log(chart_date_labels[0]);
         $('#enddate').val(chart_date_labels[chart_date_labels.length-1]);
         chartFilterDate();
     });
 
 });
-
 
 // CHART DATA VARIABLES
 // Dataset labels - this order is essential
@@ -51,9 +46,6 @@ var myChart;
 
 // Representation of visibilty of each dataset (research, vault, revisions)
 var chart_visibility_status = [true, true, true];
-
-
-
 
 // Handling of new chart
 function getGroupDetails(group) {
@@ -78,11 +70,6 @@ function getGroupDetails(group) {
 
         chart_datapoints = [data.research, data.vault, data.revision, chart_totals];
 
-        // console.log(chart_dataset_labels);
-        // console.log(chart_date_labels);
-        // console.log(chart_datapoints);
-
-
         if (nr_of_points > 0) {
             // Take over the min/max date range based upon the actual dataset minimum and maximum
             document.getElementById('startdate').value = chart_date_labels[0];
@@ -95,16 +82,12 @@ function getGroupDetails(group) {
 
             // Reset the representation of visibilty of each dataset (research, vault, revisions)
             chart_visibility_status = [true, true, true];
-            // myChart.show(0);
-            // myChart.show(1);
-            // myChart.show(2);
 
             // Make chart visible and hide messaging part
             $('#storage-chart').removeClass('hidden');
             $('#storage-chart-message').addClass('hidden');
 
             chartShow(); // dit is een create of een update van de chart.
-
         }
         else {
             $("#storage-chart-message").html("<p>No storage information found.</p>");
@@ -118,20 +101,17 @@ function getGroupDetails(group) {
 
 function chartShow() {
     if (myChart) {
-        console.log('UPDATE');
-        console.log(chart_date_labels);
-         myChart.config.data.labels = chart_date_labels;
-         myChart.config.data.datasets[0].data = chart_datapoints[0];
-         myChart.config.data.datasets[1].data = chart_datapoints[1];
-         myChart.config.data.datasets[2].data = chart_datapoints[2];
-         myChart.config.data.datasets[3].data = chart_datapoints[3];
+        myChart.config.data.labels = chart_date_labels;
+        myChart.config.data.datasets[0].data = chart_datapoints[0];
+        myChart.config.data.datasets[1].data = chart_datapoints[1];
+        myChart.config.data.datasets[2].data = chart_datapoints[2];
+        myChart.config.data.datasets[3].data = chart_datapoints[3];
 
-            myChart.show(0);
-            myChart.show(1);
-            myChart.show(2);
+        myChart.show(0);
+        myChart.show(1);
+        myChart.show(2);
 
-
-         myChart.update();
+        myChart.update();
     }
     else {
 
@@ -263,18 +243,6 @@ function chartFilterDate() {
 
     const ar_all_datapoints = [[...chart_datapoints[0]],[...chart_datapoints[1]], [...chart_datapoints[2]], [...chart_datapoints[3]]];
     const filterDatapoints = [];
-/*
-    filterDatapoints[0] = ar_all_datapoints[0].slice(indexstartdate, indexenddate + 1);
-    filterDatapoints[1] = ar_all_datapoints[1].slice(indexstartdate, indexenddate + 1);
-    filterDatapoints[2] = ar_all_datapoints[2].slice(indexstartdate, indexenddate + 1);
-    filterDatapoints[3] = ar_all_datapoints[3].slice(indexstartdate, indexenddate + 1);
-		
-    myChart.config.data.datasets[0].data = filterDatapoints[0]
-    myChart.config.data.datasets[1].data = filterDatapoints[1]
-    myChart.config.data.datasets[2].data = filterDatapoints[2]
-    myChart.config.data.datasets[3].data = filterDatapoints[3]
-*/
-
 
     // Split into relevant data only.
     var i = 0;
@@ -287,7 +255,7 @@ function chartFilterDate() {
     // New totalization per day.
     filterDatapoints[3] = [];
     var day = 0;
-    // console.log(filterDatapoints[0].length);
+
     while (day < filterDatapoints[0].length) {
         filterDatapoints[3][day] = filterDatapoints[0][day] + filterDatapoints[1][day] + filterDatapoints[2][day];
         new_total = 0;
@@ -369,38 +337,8 @@ function getGroupDetailsOld(group) {
                       backgroundColor: darkColorGenerator()
                   };
 
-
                   datasets.push(spaceObject);
-
-/*
-                  // Add the collected data 
-                  datasets.push({
-                      label: 'Research space',
-                      data: storageResearch,
-                      backgroundColor: darkColorGenerator()
-                  });
-                  datasets.push({
-                      label: 'Vault',
-                      data: storageVault,
-                      backgroundColor: darkColorGenerator()
-                  });
-                  datasets.push({
-                      label: 'Revision space',
-                      data: storageRevision,
-                      backgroundColor: darkColorGenerator()
-                  });
-                  datasets.push({
-                      label: 'Total',
-                      data: storageTotal,
-                      backgroundColor: darkColorGenerator()
-                  });
-*/                  
-
               });
-
-
-              //  console.log(labels);
-              // console.log(datasets);
 
               var chartData = {
                   labels: labels,
@@ -461,10 +399,12 @@ var darkColorGenerator = function () {
     return color;
 };
 
+
 Number.prototype.countDecimals = function () {
     if(Math.floor(this.valueOf()) === this.valueOf()) return 0;
     return this.toString().split(".")[1].length || 0;
 }
+
 
 function startBrowsing(pageLength)
 {
@@ -619,44 +559,7 @@ function htmlEncode(value){
 }
 
 
-/*
-var dates2 = [
-    'Aug 18, 2018 03:24:00',
-    'August 19, 2018 03:24:00',
-    'September 17, 2018 03:24:00',
-    'September 14, 2018 03:24:00',
-    'August 18, 2018 03:24:00',
-    'July 16, 2018 03:24:00',
-    'July 15, 2018 03:24:00',
-    'December 15, 2018 03:24:00',
-    'July 13, 2018 03:24:00',
-];
-
-
-var dates = [
-    '2023-01-31',
-    '2023-02-07',
-    '2023-02-19',
-    '2023-02-24',
-    '2023-02-27'
-];
-
-
-
-var now = new Date('2023-02-15');
-
-var [ closest ] = dates.sort((a,b) => {
-
-  const [aDate, bDate] = [a,b].map(d => Math.abs(new Date(d) - now));
-
-  return aDate - bDate;
-
-});
-
-*/
-
-
-function getNearestDate(find_date) { 
+function getNearestDate(find_date) {
     // Find the nearest date in chart_date_labels
     const dates = [...chart_date_labels];
 
@@ -668,7 +571,5 @@ function getNearestDate(find_date) {
        return aDate - bDate;
 
      });
-     return closest;     
-
+     return closest;
 }
-
