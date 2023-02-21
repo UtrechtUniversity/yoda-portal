@@ -392,8 +392,9 @@ function startBrowsing(pageLength)
             "lengthMenu": "_MENU_"
         },
         "dom": '<"top">frt<"bottom"lp><"clear">',
-        'columns': [{render: tableRenderer.name,    data: 'name', bSearchable: true},
-                    {render: tableRenderer.size,    data: 'size'}],
+        'columns': [{render: tableRenderer.name,         data: 'name', bSearchable: true},
+                    {render: tableRenderer.size,         data: 'size'},
+                    {render: tableRenderer.member_count, data: 'member_count'}],
         "ajax": getFolderContents,
         "processing": true,
         "serverSide": true,

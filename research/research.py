@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
 import os
 from typing import Iterator
 
-from flask import abort, Blueprint, g, jsonify, make_response, render_template, request, Response, stream_with_context
+from flask import (
+    abort, Blueprint, current_app as app, g, jsonify, make_response,
+    render_template, request, Response, stream_with_context
+)
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
 from werkzeug.utils import secure_filename
 
 import api
+from util import log_error
 
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
@@ -179,22 +183,21 @@ def upload_post() -> Response:
     chunk_data = request.files['file']
     encode_unicode_content = iRODSMessage.encode_unicode(chunk_data.stream.read())
 
+    # Write chunk data.
     try:
-        if flow_chunk_number == 1:
-            with session.data_objects.open(object_path, 'w') as obj_desc:
-                obj_desc.write(encode_unicode_content)
-
-            obj_desc.close()
-        else:
-            with session.data_objects.open(object_path, 'a') as obj_desc:
-                obj_desc.seek(int(flow_chunk_size * (flow_chunk_number - 1)))
-                obj_desc.write(encode_unicode_content)
-
-            obj_desc.close()
+        with session.data_objects.open(object_path, 'a', rescName=app.config.get('IRODS_DEFAULT_RESC')) as obj_desc:
+            obj_desc.seek(int(flow_chunk_size * (flow_chunk_number - 1)))
+            obj_desc.write(encode_unicode_content)
     except Exception:
+        log_error("Chunk upload failed for {}".format(object_path))
         response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
         response.headers["Content-Type"] = "application/json"
         return response
+    finally:
+        try:
+            obj_desc.close()
+        except Exception:
+            pass
 
     # Rename partial file name when complete for chunked uploads.
     if flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:

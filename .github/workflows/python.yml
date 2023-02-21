@@ -27,7 +27,7 @@ jobs:
 
       - name: Check static typing
         run: |
-          mypy . || true
+          mypy . --explicit-package-bases || true
 
       - name: Check code for common misspellings
         run: |
