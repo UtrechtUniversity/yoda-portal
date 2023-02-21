@@ -21,6 +21,20 @@ $(document).ready(function() {
     $('#search-group-table').on( 'keyup', function () {
         $('#group-browser').DataTable().search( $('#search-group-table').val() ).draw();
     } );
+
+    $('#startdate_min').on('click', function() {
+        // console.log($(this).data('min-date'));
+        // console.log(chart_date_labels[0]);
+        $('#startdate').val(chart_date_labels[0]);
+        chartFilterDate();
+    });
+    $('#enddate_max').on('click', function() {
+        // console.log($(this).data('min-date'));
+        // console.log(chart_date_labels[0]);
+        $('#enddate').val(chart_date_labels[chart_date_labels.length-1]);
+        chartFilterDate();
+    });
+
 });
 
 
@@ -44,16 +58,8 @@ var chart_visibility_status = [true, true, true];
 // Handling of new chart
 function getGroupDetails(group) {
     // when data is present show chart including the date buttons and legend.
-
-    console.log(group);
-
     Yoda.call('resource_full_year_differentiated_group_storage', //'resource_full_year_group_data',
               {group_name: group}).then((data) => {
-
-        // when here:
-        // 
-
-        console.log(data);
 
         // CHART DATA VARIABLES
         // Dataset labels - this order is essential
@@ -72,9 +78,9 @@ function getGroupDetails(group) {
 
         chart_datapoints = [data.research, data.vault, data.revision, chart_totals];
 
-        console.log(chart_dataset_labels);
-        console.log(chart_date_labels);
-        console.log(chart_datapoints);
+        // console.log(chart_dataset_labels);
+        // console.log(chart_date_labels);
+        // console.log(chart_datapoints);
 
 
         if (nr_of_points > 0) {
@@ -235,19 +241,17 @@ function chartToggleData(legend_button) {
 
 // Filter data based on the start and end date datepickers in the frontend
 function chartFilterDate() {
-    console.log('Change date');
     const dates = [...chart_date_labels];
 
-    const startdate = document.getElementById("startdate");
-    const enddate = document.getElementById("enddate");
-		
-    const indexstartdate = dates.indexOf(startdate.value);
-    const indexenddate = dates.indexOf(enddate.value);
+    const startdate = document.getElementById("startdate").value;
+    const enddate = document.getElementById("enddate").value;
 
-    console.log(startdate.value);
-    console.log(indexstartdate);
-    console.log(enddate.value)
-    console.log(indexenddate);
+    // check datepicker values against the values in the array of dates present and select the nearest to the picked date.
+    const nearstartdate = getNearestDate(startdate);
+    const nearenddate = getNearestDate(enddate);
+
+    const indexstartdate = dates.indexOf(nearstartdate);
+    const indexenddate = dates.indexOf(nearenddate);
 
     if (indexstartdate == -1 || indexenddate == -1) {
         console.log('invalid period');
@@ -283,7 +287,7 @@ function chartFilterDate() {
     // New totalization per day.
     filterDatapoints[3] = [];
     var day = 0;
-    console.log(filterDatapoints[0].length);
+    // console.log(filterDatapoints[0].length);
     while (day < filterDatapoints[0].length) {
         filterDatapoints[3][day] = filterDatapoints[0][day] + filterDatapoints[1][day] + filterDatapoints[2][day];
         new_total = 0;
@@ -395,8 +399,8 @@ function getGroupDetailsOld(group) {
               });
 
 
-              console.log(labels);
-              console.log(datasets);
+              //  console.log(labels);
+              // console.log(datasets);
 
               var chartData = {
                   labels: labels,
@@ -587,19 +591,25 @@ const tableRenderer = {
         return `<div class="list-group-item group" data-name="${name}" >${htmlEncode(name)}</div>`;
     },
     size: (size, _, row) => {
-        if (row.type === 'coll') {
-            return '';
-        } else {
-            let szs = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'];
-            let szi = 0;
+        return `${ human_readable_size(size[0])} <i class="fa-solid fa-circle-info" aria-hidden="true" title="` + 
+            `Research: ${human_readable_size(size[1])} (${size[1]}), ` +
+            `Vault: ${human_readable_size(size[2])} (${size[2]}), ` +
+            `Revision: ${human_readable_size(size[3])} (${size[3]}), ` +
+                `TOTAL: ${human_readable_size(size[0])} (${size[0]}), ` +
+            `"'>`;
+    }
+};
+
+
+function human_readable_size(size) {
+            var szs = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'];
+            var szi = 0;
             while (size >= 1024 && szi < szs.length-1) {
                 size /= 1024;
                 szi++;
             }
-            return (Math.floor(size*10)/10+'') + '&nbsp;' + szs[szi];
-        }
-    }
-};
+    return (Math.floor(size*10)/10+'') + '&nbsp;' + szs[szi]
+}
 
 
 function htmlEncode(value){
@@ -607,3 +617,58 @@ function htmlEncode(value){
     //then grab the encoded contents back out.  The div never exists on the page.
     return $('<div/>').text(value).html().replace('"', '&quot;');
 }
+
+
+/*
+var dates2 = [
+    'Aug 18, 2018 03:24:00',
+    'August 19, 2018 03:24:00',
+    'September 17, 2018 03:24:00',
+    'September 14, 2018 03:24:00',
+    'August 18, 2018 03:24:00',
+    'July 16, 2018 03:24:00',
+    'July 15, 2018 03:24:00',
+    'December 15, 2018 03:24:00',
+    'July 13, 2018 03:24:00',
+];
+
+
+var dates = [
+    '2023-01-31',
+    '2023-02-07',
+    '2023-02-19',
+    '2023-02-24',
+    '2023-02-27'
+];
+
+
+
+var now = new Date('2023-02-15');
+
+var [ closest ] = dates.sort((a,b) => {
+
+  const [aDate, bDate] = [a,b].map(d => Math.abs(new Date(d) - now));
+
+  return aDate - bDate;
+
+});
+
+*/
+
+
+function getNearestDate(find_date) { 
+    // Find the nearest date in chart_date_labels
+    const dates = [...chart_date_labels];
+
+    find_me = new Date(find_date);
+    var [ closest ] = dates.sort((a,b) => {
+
+       const [aDate, bDate] = [a,b].map(d => Math.abs(new Date(d) - find_me));
+
+       return aDate - bDate;
+
+     });
+     return closest;     
+
+}
+

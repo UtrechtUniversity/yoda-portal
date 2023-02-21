@@ -91,12 +91,21 @@
                         </div>
                         <div id="storage-chart" class="hidden">
                             <canvas id="myChart"></canvas>
-                            <input onchange="chartFilterDate()" type="date" id="startdate" value="2023-01-25">
-                            <input onchange="chartFilterDate()" type="date" id="enddate" value="2023-01-31">
-
-                            <button class="item" id="legend-research" onClick="chartToggleData(0)">&nbsp;Research&nbsp;</button>
-                            <button class="item" id="legend-vault" onClick="chartToggleData(1)">&nbsp;Vault&nbsp;</button>
-                            <button class="item" id="legend-revisions" onClick="chartToggleData(2)">&nbsp;Revisions&nbsp;</button>
+                            <div class="row">
+                                <div class="btn-group" role="group"">
+                                    <button class="form-control item btn btn-sm" id="legend-research" onClick="chartToggleData(0)">&nbsp;Research&nbsp;</button>
+                                    <button class="form-control item btn btn-sm" id="legend-vault" onClick="chartToggleData(1)">&nbsp;Vault&nbsp;</button>
+                                    <button class="form-control item btn btn-sm" id="legend-revisions" onClick="chartToggleData(2)">&nbsp;Revisions&nbsp;</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="btn-group" role="group"">
+                                    <button class="form-control btn btn-sm btn-secondary" id="startdate_min"><i class="fa-solid fa-chevrons-left"></i>Earliest</button>
+                                    <input class="form-control" onchange="chartFilterDate()" type="date" id="startdate" value="2023-01-25">
+                                    <input class="form-control" onchange="chartFilterDate()" type="date" id="enddate" value="2023-01-31">
+                                    <button class="form-control btn btn-sm btn-secondary" id="enddate_max"><i class="fa-solid fa-chevrons-right"></i>Latest</button>
+                               </div>
+                            </div>
                         </div>
                     </div>
                 </div>
