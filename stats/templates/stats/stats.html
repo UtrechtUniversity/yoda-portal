@@ -10,51 +10,13 @@
 
 {% block scripts %}
     <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
-    <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-2.7.3/chart.min.js') }}"></script>
+    <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-4.2.0/chart.min.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='js/stats.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='lib/select2/js/select2.full.min.js') }}"></script>
 {% endblock scripts %}
 
 {% block content %}
     <h1>Statistics</h1>
-
-    {% if resources %}
-    <div class="row mb-4">
-        <div class="col-md-5">
-            <div class="card resources">
-                <div class="card-header">
-                    Resources
-                </div>
-                <div class="list-group" id="resource-list">
-                    {% for resource in resources %}
-                        <a class="list-group-item list-group-item-action resource" data-name="{{ resource['name'] }}">
-                            {{ resource['name'] }}
-                            <small class="float-right resource-tier" title="<{{ resource['tier'] }}">
-                                {{ resource['tier'] }}
-                            </small>
-                        </a>
-                    {% endfor %}
-                </div>
-                <div class="card-footer">
-                </div>
-            </div>
-        </div>
-        <div class="col-md-7">
-            <div class="resource-details">
-                <div class="card">
-                    <div class="card-header">
-                        Resource properties
-                    </div>
-                    <div class="card-body">
-                        <p class="placeholder-text">
-                            Please select a resource.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
     {% if categories %}
     <div class="row mb-4">
@@ -67,14 +29,18 @@
                     <table class="table table-striped storage-table">
                         <tr>
                             <th>Category</th>
-                            <th>Tier</th>
                             <th>Storage</th>
+                            <th>Research</th>
+                            <th>Vault</th>
+                            <th>Revision</th>
                         </tr>
                         {% for category in categories %}
                             <tr>
                                 <td>{{ category.category }}</td>
-                                <td>{{ category.tier }}</td>
-                                <td>{{ category.storage }} TB</td>
+                                <td>{{ category.storage.total }}</td>
+                                <td>{{ category.storage.research }}</td>
+                                <td>{{ category.storage.vault }}</td>
+                                <td>{{ category.storage.revision }}</td>
                             </tr>
                         {% endfor %}
                     </table>
@@ -118,10 +84,30 @@
                     <div class="card-header" id="selected-group">
                         Group
                     </div>
-                    <div class="card-body" id="storage-chart">
-                        <p class="placeholder-text">
-                            Please select a group.
-                        </p>
+                    <div class="card-body">
+                        <div id="storage-chart-message">
+                            <p class="placeholder-text">
+                                Please select a group.
+                            </p>
+                        </div>
+                        <div id="storage-chart" class="hidden">
+                            <canvas id="myChart"></canvas>
+                            <div class="row">
+                                <div class="btn-group" role="group"">
+                                    <button class="form-control item btn btn-sm" id="legend-research" onClick="chartToggleData(0)">Research</button>
+                                    <button class="form-control item btn btn-sm" id="legend-vault" onClick="chartToggleData(1)">Vault</button>
+                                    <button class="form-control item btn btn-sm" id="legend-revisions" onClick="chartToggleData(2)">Revisions</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="btn-group" role="group"">
+                                    <button class="form-control btn btn-sm btn-secondary" id="startdate_min"><i class="fa-solid fa-angles-left"></i> Earliest</button>
+                                    <input class="form-control" onchange="chartFilterDate()" type="date" id="startdate" value="2023-01-25">
+                                    <input class="form-control" onchange="chartFilterDate()" type="date" id="enddate" value="2023-01-31">
+                                    <button class="form-control btn btn-sm btn-secondary" id="enddate_max">Latest <i class="fa-solid fa-angles-right"></i></button>
+                               </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
