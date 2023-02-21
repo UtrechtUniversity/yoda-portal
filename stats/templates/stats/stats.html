@@ -93,17 +93,17 @@
                             <canvas id="myChart"></canvas>
                             <div class="row">
                                 <div class="btn-group" role="group"">
-                                    <button class="form-control item btn btn-sm" id="legend-research" onClick="chartToggleData(0)">&nbsp;Research&nbsp;</button>
-                                    <button class="form-control item btn btn-sm" id="legend-vault" onClick="chartToggleData(1)">&nbsp;Vault&nbsp;</button>
-                                    <button class="form-control item btn btn-sm" id="legend-revisions" onClick="chartToggleData(2)">&nbsp;Revisions&nbsp;</button>
+                                    <button class="form-control item btn btn-sm" id="legend-research" onClick="chartToggleData(0)">Research</button>
+                                    <button class="form-control item btn btn-sm" id="legend-vault" onClick="chartToggleData(1)">Vault</button>
+                                    <button class="form-control item btn btn-sm" id="legend-revisions" onClick="chartToggleData(2)">Revisions</button>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="btn-group" role="group"">
-                                    <button class="form-control btn btn-sm btn-secondary" id="startdate_min"><i class="fa-solid fa-chevrons-left"></i>Earliest</button>
+                                    <button class="form-control btn btn-sm btn-secondary" id="startdate_min"><i class="fa-regular fa-angles-left"></i> Earliest</button>
                                     <input class="form-control" onchange="chartFilterDate()" type="date" id="startdate" value="2023-01-25">
                                     <input class="form-control" onchange="chartFilterDate()" type="date" id="enddate" value="2023-01-31">
-                                    <button class="form-control btn btn-sm btn-secondary" id="enddate_max"><i class="fa-solid fa-chevrons-right"></i>Latest</button>
+                                    <button class="form-control btn btn-sm btn-secondary" id="enddate_max">Latest <i class="fa-solid fa-angles-right"></i></button>
                                </div>
                             </div>
                         </div>

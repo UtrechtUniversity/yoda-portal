@@ -296,25 +296,7 @@ function getGroupDetailsOld(group) {
               $.each(data.spaces, function (name, storageData) {
                   var storageChartData = [];
 
-                  // var storageResearch = [];
-                  // var storageVault = [];
-                  // var storageRevision = [];
-                  // var storageTotal = [];
-/*
-                  var storageResearch = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-                  var storageVault = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-                  var storageRevision = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-
-                  // Moet hier worden gesommeerd?? of al in backend worden voorbereid ook ivm 0.1T
-                  for (let i = 0; i < 12; i++) {
-                      storageTotal[i] = storageResearch[i] + storageVault[i] + storageRevision[i]
-                  }
-*/
                   $.each(data.months, function (index, month) {
-                      //if ($.inArray(month, labels) === -1) {
-                      //    labels.push(months[month]);
-                      //}
-
                       // data.months contains month-numbers. I.e. [12,1,2,3,4,5,6,7,8,9,10,11]
                       // The order is in presentation order.
                       // The storageData, month based, is zero-based however. And in ascending order.
@@ -524,11 +506,11 @@ const tableRenderer = {
         return `<div class="list-group-item group" data-name="${name}" >${htmlEncode(name)}</div>`;
     },
     size: (size, _, row) => {
-        return `${ human_readable_size(size[0])} <i class="fa-solid fa-circle-info" aria-hidden="true" title="` + 
+        return `${ human_readable_size(size[0])} <i class="fa-solid fa-circle-info" aria-hidden="true" title="` +
             `Research: ${human_readable_size(size[1])} (${size[1]}), ` +
             `Vault: ${human_readable_size(size[2])} (${size[2]}), ` +
             `Revision: ${human_readable_size(size[3])} (${size[3]}), ` +
-                `TOTAL: ${human_readable_size(size[0])} (${size[0]}), ` +
+            `Total: ${human_readable_size(size[0])} (${size[0]})` +
             `"'>`;
     }
 };
