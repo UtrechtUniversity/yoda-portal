@@ -5,11 +5,9 @@
             <td><strong>Path</strong></td>
             <td>{{ datasetPath | e }}</td>
         </tr>
-        {# if($scannedByWhen AND is_array($scannedByWhen) AND count($scannedByWhen)==2) #}
         <tr>
             <td><strong>Scanned by</strong></td>
             <td>
-                {# <?php echo htmlentities($scannedByWhen[0]) . ' (' . date('Y-m-d H:i:s', intval($scannedByWhen[1])) . ')'; ?> #}
                 {{ scannedByWhen.0 }} {{ scannedByWhen.1 }}
             </td>
         </tr>
