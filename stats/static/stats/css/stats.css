@@ -14,3 +14,18 @@
 #group-browser tbody {
     cursor: pointer;
 }
+
+#group-browser tr > :nth-child(1) {
+    min-width: 60%;
+    word-break: break-all;
+}
+
+#group-browser tr > :nth-child(2) {
+    max-width: 40px;
+    text-align: right;
+}
+
+#group-browser tr > :nth-child(3) {
+    max-width: 30px;
+    text-align: right;
+}
