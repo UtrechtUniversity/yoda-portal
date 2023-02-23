@@ -158,9 +158,13 @@ function chartShow() {
                       stacked: true,
                       title: {
                           display: true,
-                          text: 'Month'
+                          text: 'Storage'
                       }
                   }
+              },
+              interaction: {
+                  intersect: false,
+                  mode: 'index',
               },
               plugins: {
                   legend: {
