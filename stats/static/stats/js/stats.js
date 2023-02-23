@@ -519,12 +519,12 @@ const tableRenderer = {
         return `<div class="list-group-item group" data-name="${name}" >${htmlEncode(name)}</div>`;
     },
     size: (size, _, row) => {
-        return `${ human_readable_size(size[0])} <i class="fa-solid fa-circle-info" aria-hidden="true" title="` +
+        return `<span aria-hidden="true" title="` +
             `Research: ${human_readable_size(size[1])} (${size[1]}), ` +
             `Vault: ${human_readable_size(size[2])} (${size[2]}), ` +
             `Revision: ${human_readable_size(size[3])} (${size[3]}), ` +
             `Total: ${human_readable_size(size[0])} (${size[0]})` +
-            `"'>`;
+            `"'>${ human_readable_size(size[0])} </span>`;
     }
 };
 
