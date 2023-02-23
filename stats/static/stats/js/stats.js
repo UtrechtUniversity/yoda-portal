@@ -149,9 +149,17 @@ function chartShow() {
               scales: {
                   x: {
                       stacked: true,
+                      title: {
+                          display: true,
+                          text: 'Date'
+                      }
                   },
                   y: {
-                      stacked: true
+                      stacked: true,
+                      title: {
+                          display: true,
+                          text: 'Month'
+                      }
                   }
               },
               plugins: {
