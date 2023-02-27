@@ -8,6 +8,68 @@
 
 "use strict";
 
+function groupListView(username) {
+        // List (flat) view of groups a user is allowed to see.
+
+        var hier = Yoda.groupManager.groupHierarchy;
+
+        var isAdmin = (Yoda.groupManager.isMemberOfGroup('priv-group-add') || Yoda.groupManager.isRodsAdmin);
+        var data = []
+        for (var categoryName in hier) {
+            for (var subcategoryName in hier[categoryName]) {
+                for (var groupName in hier[categoryName][subcategoryName]) {
+
+                    if (!isAdmin) {
+                        // Common users do not have the possibility to search for users in the flat list.
+                        // Therefore, present groups with member-permissions (for user itself) directly when
+                        data.push([groupName, hier[categoryName][subcategoryName][groupName].members[Yoda.groupManager.userNameFull]['access'], categoryName, subcategoryName]);
+                    }
+                    else {
+                        // een niet-admin kan niet zoeken. dus die mag gelijk al zicht hebben op de permissions??
+                        if (username == '') {  // initiele lijst - er wordt nog niet gefilterd op een gebruiker.
+                            data.push([groupName, false, categoryName, subcategoryName]);
+                        }
+                        else {
+
+                            if (hier[categoryName][subcategoryName][groupName].members[username] != undefined) {
+                                data.push([groupName, hier[categoryName][subcategoryName][groupName].members[username]['access'], categoryName, subcategoryName]);
+                            }
+                            else if (username == Yoda.groupManager.userNameFull) {  // dit gaat om jezelf zoeken in de lijst. de output moet hetzelfde zijn als de initiele lijst
+                                data.push([groupName, false, categoryName, subcategoryName]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Build result table.
+        let table = '<table class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th></tr></thead><tbody>';
+        $.each(data, function(index, usergroup) {
+            table += `<tr>
+                 <td class="user-search-result-group" style="cursor: pointer"  user-search-result-group="${usergroup[0]}">
+                    ${usergroup[0]}
+                 </td>
+                 <td>${usergroup[2]}</td>
+                 <td>${usergroup[3]}</td>`;
+            if (usergroup[1]=='manager') {
+                table += `<td><i class="fa-solid ${Yoda.groupManager.accessIcons[usergroup[1]]}" title="${Yoda.groupManager.accessNames[usergroup[1]]}"></i></td>`;
+            } else {
+                 table += '<td></td>';
+            }
+            table += '</tr>';
+        });
+        table += '</tbody></table>';
+        $('#result-user-search-groups').html(table);
+
+        $('.user-search-result-group').click(function() {
+             $('#user-search-groups').modal('hide');
+             let groupName = $(this).attr('user-search-result-group');
+             Yoda.groupManager.unfoldToGroup(groupName);
+             Yoda.groupManager.selectGroup(groupName);
+        });
+}
+
 function readCsvFile(e) {
   var file = e.target.files[0];
   if (!file) {
@@ -446,70 +508,6 @@ $(function() {
     // Intercept group update submission of form
     $('#f-group-update-submit').click(function(){
         Yoda.groupManager.onSubmitGroupCreateOrUpdate(this);
-    });
-
-    $('.user-search-groups').click(function(){
-        $('#user-search-groups').modal('show');
-        if ($('#input-user-search-groups').val().length==0) {
-            $('#result-user-search-groups').html('Please enter a username to find groups for.');
-            $('#input-user-search-groups').focus();
-        }
-        else {
-            $('#input-user-search-groups').focus().select();
-        }
-    });
-    $('#input-user-search-groups').keypress(function (e) {
-        if (e.which == 13) {
-            $('.btn-user-search-groups').trigger('click');
-            return false;
-        }
-    });
-    $('.btn-user-search-groups').click(function(){
-        var hier = Yoda.groupManager.groupHierarchy;
-        let username = ($('#input-user-search-groups').val()).toLowerCase() + '#' + Yoda.groupManager.zone;
-        var isDatamanager = false;
-        var data = []
-        for (var categoryName in hier) {
-            for (var subcategoryName in hier[categoryName]) {
-                for (var groupName in hier[categoryName][subcategoryName]) {
-                    if (hier[categoryName][subcategoryName][groupName].members[username] != undefined) {
-                        data.push([groupName, hier[categoryName][subcategoryName][groupName].members[username]['access'], categoryName, subcategoryName]);
-                    }
-                }
-            }
-        }
-        $('#result-user-search-groups').html('');
-        if (data.length==0){
-            if ($('#input-user-search-groups').val().length==0) {
-                $('#result-user-search-groups').html('Please enter a username to find groups for.');
-            }
-            else {
-                $('#result-user-search-groups').html("No groups found for user '" + $('#input-user-search-groups').val() + "'");
-            }
-            return;
-        }
-
-        // Build result table.
-        let table = '<table class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th></tr></thead><tbody>';
-        $.each(data, function(index, usergroup) {
-            table += `<tr>
-                 <td class="user-search-result-group" style="cursor: pointer"  user-search-result-group="${usergroup[0]}">
-                    <i class="fa-solid ${Yoda.groupManager.accessIcons[usergroup[1]]}" title="${Yoda.groupManager.accessNames[usergroup[1]]}"></i>
-                    ${usergroup[0]}
-                 </td>
-                 <td>${usergroup[2]}</td>
-                 <td>${usergroup[3]}</td>
-            </tr>`;
-        });
-        table += '</tbody></table>';
-        $('#result-user-search-groups').html(table);
-
-        $('.user-search-result-group').click(function() {
-             $('#user-search-groups').modal('hide');
-             let groupName = $(this).attr('user-search-result-group');
-             Yoda.groupManager.unfoldToGroup(groupName);
-             Yoda.groupManager.selectGroup(groupName);
-        });
     });
 
     Yoda.groupManager = {
@@ -1369,6 +1367,67 @@ $(function() {
             });
 
             // }}}
+
+            // Search username field {{{
+            $(sel).filter('.selectify-search-user').each(function() {
+                // Permissions required to perform this action.
+                if (!(Yoda.groupManager.isMemberOfGroup('priv-group-add') || Yoda.groupManager.isRodsAdmin)) {
+                    return;
+                }
+
+                var $el = $(this);
+
+                $el.select2({
+                    allowClear:  true,
+                    openOnEnter: false,
+                    minimumInputLength: 3,
+                    ajax: {
+                        quietMillis: 400,
+                        url:      '/group_manager/get_users',
+                        type:     'post',
+                        dataType: 'json',
+                        data: function (term, page) {
+                            return {
+                                query: term.toLowerCase()
+                            };
+                        },
+                        results: function (data) {
+                            var users = data.users
+                            var query   = $el.data('select2').search.val().toLowerCase();
+                            var results = [];
+                            var inputMatches = false;
+
+                            console.log(users);
+                            users.forEach(function(userName) {
+                                var nameAndZone = userName.split('#');
+                                results.push({
+                                        id:   userName,
+                                        text: nameAndZone[1] === that.zone ? nameAndZone[0] : userName
+                                });
+                            });
+
+                            return { results: results };
+                        },
+                    },
+                    formatResult: function(result, $container, query, escaper) {
+                        return escaper(result.text)
+                            + (
+                                'exists' in result && !result.exists
+                                ? ' <span class="grey">(create)</span>'
+                                : ''
+                            );
+                    },
+                    initSelection: function($el, callback) {
+                        callback({ id: $el.val(), text: $el.val() });
+                    },
+                }).on('open', function() {
+                    $(this).select2('val', '');
+                }).on('change', function() {
+                    groupListView($(this).select2('val'));
+                });
+            });
+
+            // }}}
         },
 
         /**
@@ -1807,6 +1866,11 @@ $(function() {
                 }
                 return groups;
             })(this.groupHierarchy);
+
+
+            // Unfiltered flattened group list
+            groupListView('');
+
             var that = this;
             var $groupList = $('#group-list');
 
@@ -2020,7 +2084,7 @@ $(function() {
             // }}}
             // }}}
 
-            this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-schema-id, .selectify-user-name');
+            this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-schema-id, .selectify-user-name, .selectify-search-user');
             $('.selectify-data-classification').select2();
 
             if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
@@ -2031,6 +2095,11 @@ $(function() {
             if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
                 // show import button only for rodsadmin and members of priv-group-add
                 $('.import-groups-csv').removeClass('hidden');
+            }
+
+            if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
+                // show search functionality in flattened group list only for rodsadmin and members of priv-group-add
+                $('.div-group-list-search-user').removeClass('hidden');
             }
 
             // Indicate which groups are managed by this user.
