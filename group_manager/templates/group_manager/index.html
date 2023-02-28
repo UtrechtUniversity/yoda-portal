@@ -29,103 +29,71 @@
     </div>
 </div>
 
-
 <div class="row">
     <div class="col-md-5">
-
-
-<div class="card groups">
-     <div class="card-header">
-      
-                Groups
-<!--- <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">  -->
-<ul class="nav nav-pills float-end" id="pills-tab" role="tablist">
-
-  <li class="nav-item" role="presentation">
-    <button class="nav-link {% if show_list == "TREE" %} active {% endif %}" id="pills-tree-tab" data-bs-toggle="pill" data-bs-target="#pills-tree" type="button" role="tab" aria-controls="pills-tree" aria-selected="{% if show_list == "TREE" %} true {% else %} false {% endif %}">Tree view</button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link {% if show_list == "LIST" %} active {% endif %}" id="pills-list-tab" data-bs-toggle="pill" data-bs-target="#pills-list" type="button" role="tab" aria-controls="pills-list" aria-selected="{% if show_list == "LIST" %} true {% else %} false {% endif %}">List</button>
-  </li>
-</ul>
-
-
-  
-</div>
-
-
-<div class="tab-content" id="pills-tabContent">
-  <div class="tab-pane fade {% if show_list == "TREE" %} show active {% endif %}" id="pills-tree" role="tabpanel" aria-labelledby="pills-tree-tab">
-
-
         <div class="card groups">
-<!---            <div class="card-header">
-                Groups - Tree view
-
-                <div class="input-group-sm has-feedback float-end">
-                    <input class="form-control form-control-sm mt-1" id="group-list-search" type="text" placeholder="Filter groups" />
-                </div>
+            <div class="card-header">
+                Groups
+                <ul class="nav nav-pills float-end" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if show_list == "TREE" %} active {% endif %}" id="pills-tree-tab" data-bs-toggle="pill" data-bs-target="#pills-tree" type="button" role="tab" aria-controls="pills-tree" aria-selected="{% if show_list == "TREE" %} true {% else %} false {% endif %}">Tree view</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if show_list == "LIST" %} active {% endif %}" id="pills-list-tab" data-bs-toggle="pill" data-bs-target="#pills-list" type="button" role="tab" aria-controls="pills-list" aria-selected="{% if show_list == "LIST" %} true {% else %} false {% endif %}">List</button>
+                    </li>
+                </ul>
             </div>
--->
-            <div class="list-group" id="group-list">
-                <div class="input-group-sm has-feedback float-end">
-                    <input class="form-control form-control-sm mt-1" id="group-list-search" type="text" placeholder="Search groups" />
-                </div>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade {% if show_list == "TREE" %} show active {% endif %}" id="pills-tree" role="tabpanel" aria-labelledby="pills-tree-tab">
 
-                {% for category, subcategories in group_hierarchy.items() %}
-                <div class="list-group-item category" id="category-{{ loop.index }}" data-name="{{ category }}">
-                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-{{ loop.index }}" href="#category-{{ loop.index }}-ul">
-                        <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> {{ category }}
-                    </a>
-                    <div class="list-group collapse category-ul" id="category-{{ loop.index }}-ul">
-                    {% for subcategory, groups in subcategories.items() %}
-                    <div class="list-group-item subcategory" data-name="{{ subcategory }}">
-                        <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-{{ loop.index }}" href="#subcategory-{{ loop.index }}-ul">
-                                <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> {{ subcategory }}
-                        </a>
-                        <div class="list-group collapse subcategory-ul" id="subcategory-{{ loop.index }}-ul">
-                        {% for group, properties in groups.items() %}
-                        <a class="list-group-item list-group-item-action group" id="group-{{ loop.index }}" data-name="{{ group }}">
-                                {{ group }}
-                        </a>
-                        {% endfor %}
+
+                    <div class="card groups">
+                        <div class="list-group" id="group-list">
+                            <div class="input-group-sm has-feedback float-end">
+                                <input class="form-control form-control-sm mt-1" id="group-list-search" type="text" placeholder="Search groups" />
+                            </div>
+
+                            {% for category, subcategories in group_hierarchy.items() %}
+                            <div class="list-group-item category" id="category-{{ loop.index }}" data-name="{{ category }}">
+                                <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-{{ loop.index }}" href="#category-{{ loop.index }}-ul">
+                                    <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> {{ category }}
+                                </a>
+                                <div class="list-group collapse category-ul" id="category-{{ loop.index }}-ul">
+
+                                {% for subcategory, groups in subcategories.items() %}
+                                <div class="list-group-item subcategory" data-name="{{ subcategory }}">
+                                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-{{ loop.index }}" href="#subcategory-{{ loop.index }}-ul">
+                                        <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> {{ subcategory }}
+                                    </a>
+                                    <div class="list-group collapse subcategory-ul" id="subcategory-{{ loop.index }}-ul">
+                                    {% for group, properties in groups.items() %}
+                                    <a class="list-group-item list-group-item-action group" id="group-{{ loop.index }}" data-name="{{ group }}">
+                                        {{ group }}
+                                    </a>
+                                    {% endfor %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
-                    {% endfor %}
+                </div>
+            </div>
+            <div class="tab-pane fade  {% if show_list == "LIST" %} show active {% endif %}" id="pills-list" role="tabpanel" aria-labelledby="pills-list-tab">
+
+                <div class="card groups">
+                    <div class="card-body">
+                        <div class="input-group-sm has-feedback hidden div-group-list-search-user">
+                            <input name="user_name" id="f-user-search-name" class="form-control form-control-sm selectify-search-user mt-1" type="hidden" required placeholder="Click here to search for a user..."/>
+                        </div>
+                        <div id="result-user-search-groups"></div>
                     </div>
                 </div>
-                {% endfor %}
-            </div>
-            <div class="card-footer">
-            </div>
+           </div>
         </div>
-    </div>
-
-
-  </div>
-  <div class="tab-pane fade  {% if show_list == "LIST" %} show active {% endif %}" id="pills-list" role="tabpanel" aria-labelledby="pills-list-tab">
-
-        <div class="card groups">
-            <div class="card-body">
-                <div class="input-group-sm has-feedback hidden div-group-list-search-user">
-                    <input name="user_name" id="f-user-search-name" class="form-control form-control-sm selectify-search-user mt-1" type="hidden" required placeholder="Click here to search for a user..."/>
-                </div>
-                <div id="result-user-search-groups"></div>
-            </div>
-        </div>
-
-
-   </div>
-
-</div>
-
-
-</div>
-
-
-
-
-
+    </div>   
     <div class="col-md-7">
         <div class="sticky-top">
             <!---  CREATE  -->
