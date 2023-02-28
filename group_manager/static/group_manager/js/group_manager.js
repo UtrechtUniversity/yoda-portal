@@ -22,7 +22,12 @@ function groupListView(username) {
                     if (!isAdmin) {
                         // Common users do not have the possibility to search for users in the flat list.
                         // Therefore, present groups with member-permissions (for user itself) directly when
-                        data.push([groupName, hier[categoryName][subcategoryName][groupName].members[Yoda.groupManager.userNameFull]['access'], categoryName, subcategoryName]);
+                        if (hier[categoryName][subcategoryName][groupName].members[Yoda.groupManager.userNameFull] != undefined) {
+                            data.push([groupName, hier[categoryName][subcategoryName][groupName].members[Yoda.groupManager.userNameFull]['access'], categoryName, subcategoryName]);
+                        }
+                        else {
+                            data.push([groupName, false, categoryName, subcategoryName]);
+                        }
                     }
                     else {
                         // een niet-admin kan niet zoeken. dus die mag gelijk al zicht hebben op de permissions??
