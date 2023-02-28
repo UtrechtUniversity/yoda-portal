@@ -44,7 +44,7 @@
                 </ul>
             </div>
             <div class="tab-content" id="pills-tabContent">
-                <div class="tab-pane fade {% if show_list == "TREE" %} show active {% endif %}" id="pills-tree" role="tabpanel" aria-labelledby="pills-tree-tab">
+                <div class="tab-pane {% if show_list == "TREE" %} show active {% endif %}" id="pills-tree" role="tabpanel" aria-labelledby="pills-tree-tab">
                     <div class="card groups">
                         <div class="list-group" id="group-list">
                             <div class="input-group-sm has-feedback float-end">
@@ -78,15 +78,15 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="tab-pane fade  {% if show_list == "LIST" %} show active {% endif %}" id="pills-list" role="tabpanel" aria-labelledby="pills-list-tab">
-                <div class="card groups">
-                    <div class="input-group-sm has-feedback hidden div-group-list-search-user">
-                        <input name="user_name" id="f-user-search-name" class="form-control form-control-sm selectify-search-user mt-1" type="hidden" required placeholder="Click here to search for a user..."/>
+                <div class="tab-pane {% if show_list == "LIST" %} show active {% endif %}" id="pills-list" role="tabpanel" aria-labelledby="pills-list-tab">
+                    <div class="card groups">
+                        <div class="input-group-sm has-feedback hidden div-group-list-search-user">
+                            <input name="user_name" id="f-user-search-name" class="form-control form-control-sm selectify-search-user mt-1" type="hidden" required placeholder="Click here to search for a user..."/>
+                        </div>
+                        <div id="result-user-search-groups"></div>
                     </div>
-                    <div id="result-user-search-groups"></div>
-                </div>
-           </div>
+               </div>
+            </div>
         </div>
     </div>
     <div class="col-md-7">
