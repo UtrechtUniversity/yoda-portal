@@ -48,6 +48,7 @@
 
 
                     <div class="card groups">
+<!---                      <div class="card-body">  -->
                         <div class="list-group" id="group-list">
                             <div class="input-group-sm has-feedback float-end">
                                 <input class="form-control form-control-sm mt-1" id="group-list-search" type="text" placeholder="Search groups" />
@@ -78,17 +79,17 @@
                             </div>
                             {% endfor %}
                         </div>
+<!---                      </div> -->
                     </div>
                 </div>
             </div>
             <div class="tab-pane fade  {% if show_list == "LIST" %} show active {% endif %}" id="pills-list" role="tabpanel" aria-labelledby="pills-list-tab">
-
                 <div class="card groups">
                     <div class="card-body">
                         <div class="input-group-sm has-feedback hidden div-group-list-search-user">
                             <input name="user_name" id="f-user-search-name" class="form-control form-control-sm selectify-search-user mt-1" type="hidden" required placeholder="Click here to search for a user..."/>
                         </div>
-                        <div id="result-user-search-groups"></div>
+                        <div id="result-user-search-groups" class="overflow-auto" style="max-height: 600px"></div>
                     </div>
                 </div>
            </div>
