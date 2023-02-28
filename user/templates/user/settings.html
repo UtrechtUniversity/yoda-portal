@@ -25,13 +25,13 @@
                 </div>
 
 
-                <label for="group_manager_view" class="form-label"></label>
+                <label for="group_manager_view" class="form-label">Group manager view</label>
                 <select class="form-select" id="group_manager_view" name="group_manager_view" aria-describedby="group_manager_view_help">
-                    <option value="TREE" {% if group_manager_view == 'TREE' %}selected{% else %}{% endif %}>Show groups in hierarchical tree view</option>
-                    <option value="LIST" {% if group_manager_view == 'LIST' %}selected{% else %}{% endif %}>Show flat list of groups</option>
+                    <option value="TREE" {% if group_manager_view == 'TREE' %}selected{% else %}{% endif %}>Hierarchical tree view</option>
+                    <option value="LIST" {% if group_manager_view == 'LIST' %}selected{% else %}{% endif %}>Flat list view</option>
                 </select>
                 <div id="group_manager_view" class="form-text">
-                    Initial view on groups in group manager.
+                    Default view on groups in group manager.
                 </div>
 
                 <div class="input-group mt-3 mb-3">
