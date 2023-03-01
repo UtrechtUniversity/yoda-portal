@@ -8,8 +8,11 @@
 
 "use strict";
 
-function groupListView(username) {
-        // List (flat) view of groups a user is allowed to see.
+function flatListGroups() {
+        // Create flat list o groups including filter handling on username and groupname.
+        // Centralized handling of contents of fields in the frontend related to this functionality.
+        var username = $('#flatlist-search-user').val();
+        var find_group = $('#flatlist-search-group').val();
 
         var hier = Yoda.groupManager.groupHierarchy;
         var isAdmin = (Yoda.groupManager.isMemberOfGroup('priv-group-add') || Yoda.groupManager.isRodsAdmin);
@@ -34,19 +37,21 @@ function groupListView(username) {
 
         // Build result table.
         let table = '<table class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th></tr></thead><tbody>';
-        $.each(data, function(index, usergroup) {
-            table += `<tr>
-                 <td class="user-search-result-group" style="cursor: pointer"  user-search-result-group="${usergroup[0]}">
-                    ${usergroup[0]}
-                 </td>
-                 <td>${usergroup[2]}</td>
-                 <td>${usergroup[3]}</td>`;
-            if (usergroup[1]=='manager') {
-                table += `<td><i class="fa-solid ${Yoda.groupManager.accessIcons[usergroup[1]]}" title="${Yoda.groupManager.accessNames[usergroup[1]]}"></i></td>`;
-            } else {
-                 table += '<td></td>';
+        $.each(data, function(index, usergroup) { 
+            if (usergroup[0].includes(find_group)){
+                table += `<tr>
+                     <td class="user-search-result-group" style="cursor: pointer"  user-search-result-group="${usergroup[0]}">
+                        ${usergroup[0]}
+                     </td>
+                     <td>${usergroup[2]}</td>
+                     <td>${usergroup[3]}</td>`;
+                if (usergroup[1]=='manager') {
+                    table += `<td><i class="fa-solid ${Yoda.groupManager.accessIcons[usergroup[1]]}" title="${Yoda.groupManager.accessNames[usergroup[1]]}"></i></td>`;
+                } else {
+                    table += '<td></td>';
+                }
+                table += '</tr>';
             }
-            table += '</tr>';
         });
         table += '</tbody></table>';
         $('#result-user-search-groups').html(table);
@@ -1412,7 +1417,7 @@ $(function() {
                 }).on('open', function() {
                     $(this).select2('val', '');
                 }).on('change', function() {
-                    groupListView($(this).select2('val'));
+                    flatListGroups();
                 });
             });
 
@@ -1858,7 +1863,7 @@ $(function() {
 
 
             // Unfiltered flattened group list
-            groupListView('');
+            flatListGroups();
 
             var that = this;
             var $groupList = $('#group-list');
@@ -1955,6 +1960,12 @@ $(function() {
                     });
                 }
             });
+
+            // Group list search.
+            $('#flatlist-search-group').on('keyup', function() {
+                flatListGroups();
+            });
+
 
             // Group creation {{{
 
