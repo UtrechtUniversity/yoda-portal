@@ -12,37 +12,21 @@ function groupListView(username) {
         // List (flat) view of groups a user is allowed to see.
 
         var hier = Yoda.groupManager.groupHierarchy;
-
         var isAdmin = (Yoda.groupManager.isMemberOfGroup('priv-group-add') || Yoda.groupManager.isRodsAdmin);
-        var data = []
+        var data = [];
+        // prepare the search argument (for finding a user) dependent on being admin 
+        var user = (isAdmin)  ? (username=='' ? Yoda.groupManager.userNameFull : username) : Yoda.groupManager.userNameFull;
+
         for (var categoryName in hier) {
             for (var subcategoryName in hier[categoryName]) {
                 for (var groupName in hier[categoryName][subcategoryName]) {
 
-                    if (!isAdmin) {
-                        // Common users do not have the possibility to search for users in the flat list.
-                        // Therefore, present groups with member-permissions (for user itself) directly when
-                        if (hier[categoryName][subcategoryName][groupName].members[Yoda.groupManager.userNameFull] != undefined) {
-                            data.push([groupName, hier[categoryName][subcategoryName][groupName].members[Yoda.groupManager.userNameFull]['access'], categoryName, subcategoryName]);
-                        }
-                        else {
-                            data.push([groupName, false, categoryName, subcategoryName]);
-                        }
+                    // find the user within the group array
+                    if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
+                        data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
                     }
-                    else {
-                        // een niet-admin kan niet zoeken. dus die mag gelijk al zicht hebben op de permissions??
-                        if (username == '') {  // initiele lijst - er wordt nog niet gefilterd op een gebruiker.
-                            data.push([groupName, false, categoryName, subcategoryName]);
-                        }
-                        else {
-
-                            if (hier[categoryName][subcategoryName][groupName].members[username] != undefined) {
-                                data.push([groupName, hier[categoryName][subcategoryName][groupName].members[username]['access'], categoryName, subcategoryName]);
-                            }
-                            else if (username == Yoda.groupManager.userNameFull) {  // dit gaat om jezelf zoeken in de lijst. de output moet hetzelfde zijn als de initiele lijst
-                                data.push([groupName, false, categoryName, subcategoryName]);
-                            }
-                        }
+                    else if (!isAdmin || user == Yoda.groupManager.userNameFull) {
+                        data.push([groupName, false, categoryName, subcategoryName]);
                     }
                 }
             }
