@@ -26,7 +26,6 @@ function flatListGroups() {
             for (var subcategoryName in hier[categoryName]) {
                 for (var groupName in hier[categoryName][subcategoryName]) {
 
-
                     if (user == '' || user == Yoda.groupManager.userNameFull) { // er is geen filter => alle groepen toevoegen
                         if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
                             data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
@@ -46,11 +45,11 @@ function flatListGroups() {
         }
 
         // Build result table.
-        let table = '<table class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th></tr></thead><tbody>';
+        let table = '<table id="tbl-list-groups" class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th></tr></thead><tbody>';
         $.each(data, function(index, usergroup) { 
             if (usergroup[0].includes(find_group)){
-                table += `<tr>
-                     <td class="user-search-result-group" style="cursor: pointer"  user-search-result-group="${usergroup[0]}">
+                table += `<tr style="cursor: pointer" class="user-search-result-group"  user-search-result-group="${usergroup[0]}">
+                     <td>
                         ${usergroup[0]}
                      </td>
                      <td>${usergroup[2]}</td>
@@ -66,8 +65,9 @@ function flatListGroups() {
         table += '</tbody></table>';
         $('#result-user-search-groups').html(table);
 
+        // Clicking a row must highlite rows in in both tree/flat list and present details in the corresponding panel
         $('.user-search-result-group').click(function() {
-             $('#user-search-groups').modal('hide');
+             // $('#user-search-groups').modal('hide');
              let groupName = $(this).attr('user-search-result-group');
              Yoda.groupManager.unfoldToGroup(groupName);
              Yoda.groupManager.selectGroup(groupName);
@@ -856,9 +856,14 @@ $(function() {
             var group = this.groups[groupName];
             var userCanManage = this.canManageGroup(groupName);
 
+            // TRee
             var $groupList = $('#group-list');
             var $group     = $groupList.find('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]');
             var $oldGroup  = $groupList.find('.active');
+
+            //group list handling row activation
+            var listgroup = $('#tbl-list-groups tr[user-search-result-group="' + Yoda.escapeQuotes(groupName) + '"]');
+            listgroup.addClass('active').siblings().removeClass('active');
 
             if ($group.is($oldGroup))
                 return;
