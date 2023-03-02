@@ -90,13 +90,15 @@
                 </div>
                 <div class="tab-pane {% if show_list == "LIST" %} show active {% endif %}" id="pills-list" role="tabpanel" aria-labelledby="pills-list-tab">
                     <div class="card groups">
-                        <div class="has-feedback w-50">
-                            <input class="form-control form-control-sm mt-1" id="flatlist-search-group" type="text" placeholder="Search for groups..." />
+                        <div class="input-group-sm has-feedback float-end">
+                            <input class="form-control form-control-sm mt-1" id="flatlist-search-group" type="text" placeholder="Search groups..." />
                         </div>
 
-                        <div class="has-feedback w-50">
+
+                        <div class="input-group-sm has-feedback float-end">
                             <input name="user_name" id="flatlist-search-user" class="form-control form-control-sm selectify-search-user mt-1" type="hidden" required placeholder="Click here to search users..."/>
                         </div>
+
                         <div id="result-user-search-groups"></div>
                     </div>
                </div>
