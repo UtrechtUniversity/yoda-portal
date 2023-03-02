@@ -18,18 +18,28 @@ function flatListGroups() {
         var isAdmin = (Yoda.groupManager.isMemberOfGroup('priv-group-add') || Yoda.groupManager.isRodsAdmin);
         var data = [];
         // prepare the search argument (for finding a user) dependent on being admin 
-        var user = (isAdmin)  ? (username=='' ? Yoda.groupManager.userNameFull : username) : Yoda.groupManager.userNameFull;
+        // var user = (isAdmin)  ? (username=='' ? Yoda.groupManager.userNameFull : username) : Yoda.groupManager.userNameFull;
+
+        var user = (username=='' ? Yoda.groupManager.userNameFull : username);
 
         for (var categoryName in hier) {
             for (var subcategoryName in hier[categoryName]) {
                 for (var groupName in hier[categoryName][subcategoryName]) {
 
-                    // find the user within the group array
-                    if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
-                        data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
+
+                    if (user == '' || user == Yoda.groupManager.userNameFull) { // er is geen filter => alle groepen toevoegen
+                        if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
+                            data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
+                        }
+                        else {
+                            data.push([groupName, false, categoryName, subcategoryName]);
+                        }
                     }
-                    else if (!isAdmin || user == Yoda.groupManager.userNameFull) {
-                        data.push([groupName, false, categoryName, subcategoryName]);
+                    else {
+                        // find the user within the group array
+                        if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
+                            data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
+                        }
                     }
                 }
             }
@@ -62,6 +72,61 @@ function flatListGroups() {
              Yoda.groupManager.unfoldToGroup(groupName);
              Yoda.groupManager.selectGroup(groupName);
         });
+}
+
+function treeListGroups() {
+    // Create tree of groups including filter handling on username and groupname.
+    // Get filter arguments for user and group(s)
+    var username = $('#treelist-search-user').val(); // $('#flatlist-search-user').val();
+    var find_group = $('#treelist-search-group').val();
+
+    var $groupList  = $('#group-list');
+
+    // Reset all filters first and re-evaluate the entire situation
+    var $filtered = $groupList.find('.filtered');
+    $filtered.each(function() {
+        $(this).removeClass('filtered');
+    });
+
+    // Filter on groups
+    if (find_group.length) {
+        var $groups       = $groupList.find('.group');
+        // Filter all group not matching search value.
+        var quotedVal = Yoda.escapeQuotes(find_group.toLowerCase());
+        $groups.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered');
+        $groups.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered');
+    }
+    // Filter on username but only when username is not current user. Then show the initial list (i.e. unfiltered on username)
+    if (username.length && username != Yoda.groupManager.userNameFull) {
+        var group, subcat, cat, user;
+        // look at the ones not yet filtered out.
+        $groupList.find('.group:not(.filtered)').each(function(){
+            group = $(this).data('name');
+            subcat = $(this).parent().parent().data('name');
+            cat = $(this).parent().parent().parent().parent().data('name');
+
+            if (Yoda.groupManager.groupHierarchy[cat][subcat][group].members[username] == undefined) {
+                $(this).addClass('filtered');
+            }
+        });
+    }
+    // Loop through categories and filter out empty categories.
+    var $categories   = $groupList.find('.category');
+    $categories.each(function() {
+        var $subcategories = $(this).find('.subcategory-ul');
+        var emptyCategory = true;
+        // Loop through subcategories and filter out empty subcategories.
+        $subcategories.each(function() {
+            if($(this).children(':not(.filtered)').length == 0) {
+                $(this).parent().addClass('filtered');
+            } else {
+                emptyCategory = false;
+            }
+        });
+        if (emptyCategory) {
+            $(this).addClass('filtered');
+        }
+    });
 }
 
 function readCsvFile(e) {
@@ -1364,11 +1429,54 @@ $(function() {
 
             // Search username field {{{
             $(sel).filter('.selectify-search-user').each(function() {
-                // Permissions required to perform this action.
+                // If not member of priv-group-add => only allowed to see co-members in your own groups
                 if (!(Yoda.groupManager.isMemberOfGroup('priv-group-add') || Yoda.groupManager.isRodsAdmin)) {
+
+                    // Build array with co-members to be used by select2.
+                    var hier = Yoda.groupManager.groupHierarchy;
+
+                    var usernames = [];
+                    for (var categoryName in hier) {
+                        for (var subcategoryName in hier[categoryName]) {
+                            for (var groupName in hier[categoryName][subcategoryName]) {
+
+                                // find the user within the group array
+                                for (var mem in hier[categoryName][subcategoryName][groupName].members) {
+                                    usernames.push(mem);
+                                }
+                            }
+                        }
+                    }
+
+                    // only unique usernames
+                    var uniq = [...new Set(usernames)];
+                    uniq.sort();
+                    var data = []
+                    for (var val in uniq) {
+                        data.push({id: uniq[val],text: uniq[val].split('#')[0]});
+                    }
+
+                    // var test = [{id: 'ablc',text: 'test1'}, {id: 'blabla',text: 'test2'}, {id: 'asdasdasdas',text: 'test3'} ]
+
+                    // initialize select2 without an API-call
+                    var $el = $(this);
+                    $el.select2({
+                        data: data,
+                        allowClear:  true,
+                        openOnEnter: false,
+                        minimumInputLength: 3
+                    }).on('open', function() {
+                        $(this).select2('val', '');
+                    }).on('change', function() {
+                        if ($(this).attr('id')=='treelist-search-user') {
+                            treeListGroups();
+                        } else if ($(this).attr('id')=='flatlist-search-user') {
+                            flatListGroups();
+                        }
+                    });
                     return;
                 }
-
+                // Build select2-search field based on API-call
                 var $el = $(this);
 
                 $el.select2({
@@ -1391,7 +1499,6 @@ $(function() {
                             var results = [];
                             var inputMatches = false;
 
-                            console.log(users);
                             users.forEach(function(userName) {
                                 var nameAndZone = userName.split('#');
                                 results.push({
@@ -1404,12 +1511,7 @@ $(function() {
                         },
                     },
                     formatResult: function(result, $container, query, escaper) {
-                        return escaper(result.text)
-                            + (
-                                'exists' in result && !result.exists
-                                ? ' <span class="grey">(create)</span>'
-                                : ''
-                            );
+                        return escaper(result.text);
                     },
                     initSelection: function($el, callback) {
                         callback({ id: $el.val(), text: $el.val() });
@@ -1417,7 +1519,11 @@ $(function() {
                 }).on('open', function() {
                     $(this).select2('val', '');
                 }).on('change', function() {
-                    flatListGroups();
+                    if ($(this).attr('id')=='treelist-search-user') {
+                        treeListGroups();
+                    } else if ($(this).attr('id')=='flatlist-search-user') {
+                        flatListGroups();
+                    }
                 });
             });
 
@@ -1922,46 +2028,12 @@ $(function() {
                     that.selectGroup($(this).attr('data-name'));
             });
 
-            // Group list search.
-            $('#group-list-search').on('keyup', function() {
-                $groupList  = $('#group-list');
-
-                var $categories   = $groupList.find('.category');
-                var $groups       = $groupList.find('.group');
-
-                if ($(this).val().length) {
-                    // Filter all group not matching search value.
-                    var quotedVal = Yoda.escapeQuotes($(this).val().toLowerCase());
-                    $groups.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered');
-                    $groups.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered');
-
-                    // Loop through categories and filter out empty categories.
-                    $categories.each(function() {
-                        var $subcategories = $(this).find('.subcategory-ul');
-                        var emptyCategory = true;
-                        // Loop through subcategories and filter out empty subcategories.
-                        $subcategories.each(function() {
-                            if($(this).children(':not(.filtered)').length == 0) {
-                                $(this).parent().addClass('filtered');
-                            } else {
-                                emptyCategory = false;
-                            }
-                        });
-
-                        if (emptyCategory) {
-                            $(this).addClass('filtered');
-                        }
-                    });
-                } else {
-                    // Reset all filters.
-                    var $filtered = $groupList.find('.filtered');
-                    $filtered.each(function() {
-                        $(this).removeClass('filtered');
-                    });
-                }
+            // Search for group in tree
+            $('#treelist-search-group').on('keyup', function() {
+                treeListGroups();
             });
 
-            // Group list search.
+            // Search for group in flat list
             $('#flatlist-search-group').on('keyup', function() {
                 flatListGroups();
             });
@@ -2095,11 +2167,6 @@ $(function() {
             if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
                 // show import button only for rodsadmin and members of priv-group-add
                 $('.import-groups-csv').removeClass('hidden');
-            }
-
-            if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
-                // show search functionality in flattened group list only for rodsadmin and members of priv-group-add
-                $('.div-group-list-search-user').removeClass('hidden');
             }
 
             // Indicate which groups are managed by this user.
