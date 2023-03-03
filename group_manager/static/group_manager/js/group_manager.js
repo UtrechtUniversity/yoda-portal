@@ -11,8 +11,9 @@
 function flatListGroups() {
         // Create flat list o groups including filter handling on username and groupname.
         // Centralized handling of contents of fields in the frontend related to this functionality.
-        var username = $('#flatlist-search-user').val();
-        var find_group = $('#flatlist-search-group').val();
+
+        var username = $('#treelist-search-user').val();
+        var find_group = $('#treelist-search-group').val();
 
         var hier = Yoda.groupManager.groupHierarchy;
         var isAdmin = (Yoda.groupManager.isMemberOfGroup('priv-group-add') || Yoda.groupManager.isRodsAdmin);
@@ -77,7 +78,7 @@ function flatListGroups() {
 function treeListGroups() {
     // Create tree of groups including filter handling on username and groupname.
     // Get filter arguments for user and group(s)
-    var username = $('#treelist-search-user').val(); // $('#flatlist-search-user').val();
+    var username = $('#treelist-search-user').val();
     var find_group = $('#treelist-search-group').val();
 
     var $groupList  = $('#group-list');
@@ -1473,11 +1474,8 @@ $(function() {
                     }).on('open', function() {
                         $(this).select2('val', '');
                     }).on('change', function() {
-                        if ($(this).attr('id')=='treelist-search-user') {
-                            treeListGroups();
-                        } else if ($(this).attr('id')=='flatlist-search-user') {
-                            flatListGroups();
-                        }
+                        treeListGroups();
+                        flatListGroups();
                     });
                     return;
                 }
@@ -1524,11 +1522,8 @@ $(function() {
                 }).on('open', function() {
                     $(this).select2('val', '');
                 }).on('change', function() {
-                    if ($(this).attr('id')=='treelist-search-user') {
-                        treeListGroups();
-                    } else if ($(this).attr('id')=='flatlist-search-user') {
-                        flatListGroups();
-                    }
+                    treeListGroups();
+                    flatListGroups();
                 });
             });
 
@@ -2036,10 +2031,6 @@ $(function() {
             // Search for group in tree
             $('#treelist-search-group').on('keyup', function() {
                 treeListGroups();
-            });
-
-            // Search for group in flat list
-            $('#flatlist-search-group').on('keyup', function() {
                 flatListGroups();
             });
 

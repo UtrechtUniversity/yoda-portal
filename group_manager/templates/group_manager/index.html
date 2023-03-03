@@ -49,17 +49,16 @@
                     </li>
                 </ul>
             </div>
+            <div class="input-group-sm has-feedback float-end">
+                <input class="form-control form-control-sm mt-1" id="treelist-search-group" type="text" placeholder="Search groups..." />
+            </div>
+            <div class="input-group-sm has-feedback float-end">
+                <input name="user_name" id="treelist-search-user" class="form-control form-control-sm selectify-search-user mt-1" type="hidden" required placeholder="Click here to search users..."/>
+            </div>
             <div class="tab-content" id="pills-tabContent">
                 <div class="tab-pane {% if show_list == "TREE" %} show active {% endif %}" id="pills-tree" role="tabpanel" aria-labelledby="pills-tree-tab">
                     <div class="card groups">
                         <div class="list-group" id="group-list">
-                            <div class="input-group-sm has-feedback float-end">
-                                <input class="form-control form-control-sm mt-1" id="treelist-search-group" type="text" placeholder="Search groups..." />
-                            </div>
-
-                            <div class="input-group-sm has-feedback float-end">
-                                <input name="user_name" id="treelist-search-user" class="form-control form-control-sm selectify-search-user mt-1" type="hidden" required placeholder="Click here to search users..."/>
-                            </div>
 
                             {% for category, subcategories in group_hierarchy.items() %}
                             <div class="list-group-item category" id="category-{{ loop.index }}" data-name="{{ category }}">
@@ -90,14 +89,6 @@
                 </div>
                 <div class="tab-pane {% if show_list == "LIST" %} show active {% endif %}" id="pills-list" role="tabpanel" aria-labelledby="pills-list-tab">
                     <div class="card groups">
-                        <div class="input-group-sm has-feedback float-end">
-                            <input class="form-control form-control-sm mt-1" id="flatlist-search-group" type="text" placeholder="Search groups..." />
-                        </div>
-
-
-                        <div class="input-group-sm has-feedback float-end">
-                            <input name="user_name" id="flatlist-search-user" class="form-control form-control-sm selectify-search-user mt-1" type="hidden" required placeholder="Click here to search users..."/>
-                        </div>
 
                         <div id="result-user-search-groups"></div>
                     </div>
