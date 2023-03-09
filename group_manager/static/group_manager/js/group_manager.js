@@ -40,25 +40,6 @@ function flatListGroups() {
             }
         }
 
-
-        // Indicate which groups are managed by this user.
-        for (var groupName in this.groups) {
-            if (this.isManagerOfGroup(groupName)) {
-                $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                    '<i class="float-end fa fa-crown mt-1" title="You manage this group"></i>'
-                );
-            } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
-                $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                    '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator."></i>'
-                );
-            } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access == 'reader') {
-                $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                    '<i class="float-end fa-solid fa-eye mt-1" title="You have read access to this group"></i>'
-                );
-            }
-        }
-
-
         // Build result table.
         let table = '<table id="tbl-list-groups" class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th></tr></thead><tbody>';
         $.each(data, function(index, usergroup) {
