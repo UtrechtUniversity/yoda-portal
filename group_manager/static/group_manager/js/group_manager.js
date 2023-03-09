@@ -1,40 +1,36 @@
 "use strict";
 
 function flatListGroups() {
-        // Create flat list o groups including filter handling on username and groupname.
+        // Create flat list of groups including filter handling on username and groupname.
         // Centralized handling of contents of fields in the frontend related to this functionality.
         var search = $('#search').val();
         var username = '';
-        var find_group = '';
+        var groupname = '';
 
         if (search.startsWith('user:')) {
 	    username = search.substr(5);
-            find_group = '';
+            groupname = '';
         } else if (search.startsWith('group:')) {
-            find_group = search.substr(6);
+            groupname = search.substr(6);
             username = '';
         }
 
         var hier = Yoda.groupManager.groupHierarchy;
-        var isAdmin = (Yoda.groupManager.isMemberOfGroup('priv-group-add') || Yoda.groupManager.isRodsAdmin);
         var data = [];
-        // prepare the search argument (for finding a user) dependent on being admin
-        // var user = (isAdmin)  ? (username=='' ? Yoda.groupManager.userNameFull : username) : Yoda.groupManager.userNameFull;
 
+        // Prepare the search argument (for finding a user).
         var user = (username=='' ? Yoda.groupManager.userNameFull : username);
 
         for (var categoryName in hier) {
             for (var subcategoryName in hier[categoryName]) {
                 for (var groupName in hier[categoryName][subcategoryName]) {
-
                     if (user == '' || user == Yoda.groupManager.userNameFull) { // er is geen filter => alle groepen toevoegen
                         if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
                             data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
                         } else {
                             data.push([groupName, false, categoryName, subcategoryName]);
                         }
-                    }
-                    else {
+                    } else {
                         // find the user within the group array
                         if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
                             data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
@@ -44,19 +40,42 @@ function flatListGroups() {
             }
         }
 
+
+        // Indicate which groups are managed by this user.
+        for (var groupName in this.groups) {
+            if (this.isManagerOfGroup(groupName)) {
+                $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
+                    '<i class="float-end fa fa-crown mt-1" title="You manage this group"></i>'
+                );
+            } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
+                $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
+                    '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator."></i>'
+                );
+            } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access == 'reader') {
+                $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
+                    '<i class="float-end fa-solid fa-eye mt-1" title="You have read access to this group"></i>'
+                );
+            }
+        }
+
+
         // Build result table.
         let table = '<table id="tbl-list-groups" class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th></tr></thead><tbody>';
         $.each(data, function(index, usergroup) {
-            if (usergroup[0].includes(find_group)){
-                table += `<tr style="cursor: pointer" class="user-search-result-group"  user-search-result-group="${usergroup[0]}">
+            if (usergroup[0].includes(groupname)){
+                table += `<tr style="cursor: pointer" class="user-search-result-group" user-search-result-group="${usergroup[0]}">
                      <td>${usergroup[0]}</td>
                      <td>${usergroup[2]}</td>
                      <td>${usergroup[3]}</td>`;
-                if (usergroup[1]=='manager') {
-                    table += `<td><i class="fa-solid ${Yoda.groupManager.accessIcons[usergroup[1]]}" title="${Yoda.groupManager.accessNames[usergroup[1]]}"></i></td>`;
+
+                if (usergroup[1] == 'manager') {
+                    table += `<td><i class="fa-solid fa-crown" title="You manage this group"></i></td>`;
+                } else if (usergroup[1] == 'reader') {
+                    table += `<td><i class="fa-solid fa-crown" title="You have read access to this group"></i></td>`;
                 } else {
                     table += '<td></td>';
                 }
+
                 table += '</tr>';
             }
         });
@@ -75,13 +94,13 @@ function flatListGroups() {
 function treeListGroups() {
     var search = $('#search').val();
     var username = '';
-    var find_group = '';
+    var groupname = '';
 
     if (search.startsWith('user:')) {
         username = search.substr(5);
-        find_group = '';
+        groupname = '';
     } else if (search.startsWith('group:')) {
-        find_group = search.substr(6);
+        groupname = search.substr(6);
         username = '';
     }
 
@@ -94,10 +113,10 @@ function treeListGroups() {
     });
 
     // Filter on groups
-    if (find_group.length) {
+    if (groupname.length) {
         var $groups       = $groupList.find('.group');
         // Filter all group not matching search value.
-        var quotedVal = Yoda.escapeQuotes(find_group.toLowerCase());
+        var quotedVal = Yoda.escapeQuotes(groupname.toLowerCase());
         $groups.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered');
         $groups.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered');
     }
@@ -152,7 +171,7 @@ function readCsvFile(e) {
 
     // required to be able to, in a simple manner, add header and data row to the tr's in the table to pass to the backend
     const csv_header = contents.slice(0, contents.indexOf("\n"));
-    const csv_rows = contents.slice(contents.indexOfsearch("\n") + 1).split("\n");
+    const csv_rows = contents.slice(contents.indexOf("\n") + 1).split("\n");
     var csv_rows_corrected = [];
 
     // parse the csv file data to be able to present in a table
