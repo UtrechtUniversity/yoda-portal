@@ -52,7 +52,9 @@ function flatListGroups() {
                 if (usergroup[1] == 'manager') {
                     table += `<td><i class="fa-solid fa-crown" title="You manage this group"></i></td>`;
                 } else if (usergroup[1] == 'reader') {
-                    table += `<td><i class="fa-solid fa-crown" title="You have read access to this group"></i></td>`;
+                    table += `<td><i class="fa-solid fa-eye" title="You have read access to this group"></i></td>`;
+                } else if (Yoda.groupManager.isRodsAdmin && usergroup[1] != 'normal') {
+                    table += `<td><i class="fa-solid fa-wrench" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i></td>`;
                 } else {
                     table += '<td></td>';
                 }
@@ -2134,7 +2136,7 @@ $(function() {
                     );
                 } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                        '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator."></i>'
+                        '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>'
                     );
                 } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access == 'reader') {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
