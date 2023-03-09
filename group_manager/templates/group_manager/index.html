@@ -30,7 +30,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-md-6">
         <div class="card groups">
             <div class="card-header">
                 Groups
@@ -43,11 +43,8 @@
                     </li>
                 </ul>
             </div>
-            <div class="input-group-sm has-feedback float-end">
-                <input class="form-control form-control-sm mt-1" id="search-group" type="text" placeholder="Search groups..." />
-            </div>
-            <div class="input-group-sm has-feedback float-end">
-                <input name="user_name" id="search-user" class="form-control form-control-sm selectify-search-user mt-1" type="hidden" required placeholder="Click here to search users..."/>
+            <div class="mb-1">
+                <input name="user_name" id="search" class="form-control form-control-sm selectify-search mt-1" type="hidden" required placeholder="Click here to search..."/>
             </div>
             <div class="tab-content" id="pills-tabContent">
                 <div class="tab-pane {% if show_list == "TREE" %} show active {% endif %}" id="pills-tree" role="tabpanel" aria-labelledby="pills-tree-tab">
@@ -90,7 +87,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-7">
+    <div class="col-md-6">
         <div class="sticky-top">
             <!---  CREATE  -->
             <div class="card properties-create hidden">

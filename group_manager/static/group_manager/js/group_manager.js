@@ -3,8 +3,17 @@
 function flatListGroups() {
         // Create flat list o groups including filter handling on username and groupname.
         // Centralized handling of contents of fields in the frontend related to this functionality.
-        var username = $('#search-user').val();
-        var find_group = $('#search-group').val();
+        var search = $('#search').val();
+        var username = '';
+        var find_group = '';
+
+        if (search.startsWith('user:')) {
+	    username = search.substr(5);
+            find_group = '';
+        } else if (search.startsWith('group:')) {
+            find_group = search.substr(6);
+            username = '';
+        }
 
         var hier = Yoda.groupManager.groupHierarchy;
         var isAdmin = (Yoda.groupManager.isMemberOfGroup('priv-group-add') || Yoda.groupManager.isRodsAdmin);
@@ -64,10 +73,17 @@ function flatListGroups() {
 }
 
 function treeListGroups() {
-    // Create tree of groups including filter handling on username and groupname.
-    // Get filter arguments for user and group(s)
-    var username = $('#search-user').val();
-    var find_group = $('#search-group').val();
+    var search = $('#search').val();
+    var username = '';
+    var find_group = '';
+
+    if (search.startsWith('user:')) {
+        username = search.substr(5);
+        find_group = '';
+    } else if (search.startsWith('group:')) {
+        find_group = search.substr(6);
+        username = '';
+    }
 
     var $groupList  = $('#group-list');
 
@@ -1422,91 +1438,50 @@ $(function() {
             // }}}
 
             // Search username field {{{
-            $(sel).filter('.selectify-search-user').each(function() {
-                // If not member of priv-group-add => only allowed to see co-members in your own groups
-                if (!(Yoda.groupManager.isMemberOfGroup('priv-group-add') || Yoda.groupManager.isRodsAdmin)) {
+            $(sel).filter('.selectify-search').each(function() {
 
-                    // Build array with co-members to be used by select2.
-                    var hier = Yoda.groupManager.groupHierarchy;
+                // Build array with co-members to be used by select2.
+                var hier = Yoda.groupManager.groupHierarchy;
 
-                    var usernames = [];
-                    for (var categoryName in hier) {
-                        for (var subcategoryName in hier[categoryName]) {
-                            for (var groupName in hier[categoryName][subcategoryName]) {
-
-                                // find the user within the group array
-                                for (var mem in hier[categoryName][subcategoryName][groupName].members) {
-                                    usernames.push(mem);
-                                }
+                var usernames = [];
+                var groupnames = [];
+                for (var categoryName in hier) {
+                    for (var subcategoryName in hier[categoryName]) {
+                        for (var groupName in hier[categoryName][subcategoryName]) {
+                            groupnames.push(groupName);
+                            // find the user within the group array
+                            for (var mem in hier[categoryName][subcategoryName][groupName].members) {
+                                usernames.push(mem);
                             }
                         }
                     }
-
-                    // only unique usernames
-                    var uniq = [...new Set(usernames)];
-                    uniq.sort();
-                    var data = []
-                    for (var val in uniq) {
-                        data.push({id: uniq[val],text: uniq[val].split('#')[0]});
-                    }
-
-                    // var test = [{id: 'ablc',text: 'test1'}, {id: 'blabla',text: 'test2'}, {id: 'asdasdasdas',text: 'test3'} ]
-
-                    // initialize select2 without an API-call
-                    var $el = $(this);
-                    $el.select2({
-                        data: data,
-                        allowClear:  true,
-                        openOnEnter: false,
-                        minimumInputLength: 3
-                    }).on('open', function() {
-                        $(this).select2('val', '');
-                    }).on('change', function() {
-                        treeListGroups();
-                        flatListGroups();
-                    });
-                    return;
                 }
-                // Build select2-search field based on API-call
-                var $el = $(this);
 
+                // only unique usernames
+                var unique_users = [...new Set(usernames)];
+                unique_users.sort();
+                var user_list = []
+                for (var val in unique_users) {
+                    user_list.push({id: "user:" + unique_users[val],text: unique_users[val].split('#')[0]});
+                }
+
+                // only unique usernames
+                var unique_groups = [...new Set(groupnames)];
+                unique_groups.sort();
+                var group_list = []
+                for (var val in unique_groups) {
+                    group_list.push({id: "group:" + unique_groups[val], text: unique_groups[val]});
+                }
+
+                var data = [{"text": "Groups", "children": group_list}, {"text": "Users", "children": user_list}]
+
+                // Initialize Select2.
+                var $el = $(this);
                 $el.select2({
+                    data: data,
                     allowClear:  true,
                     openOnEnter: false,
-                    minimumInputLength: 3,
-                    ajax: {
-                        quietMillis: 400,
-                        url:      '/group_manager/get_users',
-                        type:     'post',
-                        dataType: 'json',
-                        data: function (term, page) {
-                            return {
-                                query: term.toLowerCase()
-                            };
-                        },
-                        results: function (data) {
-                            var users = data.users
-                            var query   = $el.data('select2').search.val().toLowerCase();
-                            var results = [];
-                            var inputMatches = false;
-
-                            users.forEach(function(userName) {
-                                var nameAndZone = userName.split('#');
-                                results.push({
-                                        id:   userName,
-                                        text: nameAndZone[1] === that.zone ? nameAndZone[0] : userName
-                                });
-                            });
-
-                            return { results: results };
-                        },
-                    },
-                    formatResult: function(result, $container, query, escaper) {
-                        return escaper(result.text);
-                    },
-                    initSelection: function($el, callback) {
-                        callback({ id: $el.val(), text: $el.val() });
-                    },
+                    minimumInputLength: 3
                 }).on('open', function() {
                     $(this).select2('val', '');
                 }).on('change', function() {
@@ -2138,7 +2113,7 @@ $(function() {
             // }}}
             // }}}
 
-            this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-schema-id, .selectify-user-name, .selectify-search-user');
+            this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-schema-id, .selectify-user-name, .selectify-search');
             $('.selectify-data-classification').select2();
 
             if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
