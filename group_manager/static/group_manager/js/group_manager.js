@@ -8,6 +8,12 @@
 
 "use strict";
 
+function ta_helper_selectGroup(groupName) {
+             Yoda.groupManager.unfoldToGroup(groupName);
+             Yoda.groupManager.selectGroup(groupName);
+}
+
+
 function flatListGroups() {
         // Create flat list o groups including filter handling on username and groupname.
         // Centralized handling of contents of fields in the frontend related to this functionality.
