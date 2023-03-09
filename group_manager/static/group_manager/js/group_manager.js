@@ -1,12 +1,140 @@
-/**
- * \file
- * \brief     Yoda Group Manager frontend.
- * \author    Chris Smeele
- * \copyright Copyright (c) 2015-2022, Utrecht University
- * \license   GPLv3, see LICENSE
- */
-
 "use strict";
+
+function flatListGroups() {
+        // Create flat list of groups including filter handling on username and groupname.
+        // Centralized handling of contents of fields in the frontend related to this functionality.
+        var search = $('#search').val();
+        var username = '';
+        var groupname = '';
+
+        if (search.startsWith('user:')) {
+	    username = search.substr(5);
+            groupname = '';
+        } else if (search.startsWith('group:')) {
+            groupname = search.substr(6);
+            username = '';
+        }
+
+        var hier = Yoda.groupManager.groupHierarchy;
+        var data = [];
+
+        // Prepare the search argument (for finding a user).
+        var user = (username=='' ? Yoda.groupManager.userNameFull : username);
+
+        for (var categoryName in hier) {
+            for (var subcategoryName in hier[categoryName]) {
+                for (var groupName in hier[categoryName][subcategoryName]) {
+                    if (user == '' || user == Yoda.groupManager.userNameFull) { // er is geen filter => alle groepen toevoegen
+                        if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
+                            data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
+                        } else {
+                            data.push([groupName, false, categoryName, subcategoryName]);
+                        }
+                    } else {
+                        // find the user within the group array
+                        if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
+                            data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Build result table.
+        let table = '<table id="tbl-list-groups" class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th></tr></thead><tbody>';
+        $.each(data, function(index, usergroup) {
+            if (usergroup[0].includes(groupname)){
+                table += `<tr style="cursor: pointer" class="user-search-result-group" user-search-result-group="${usergroup[0]}">
+                     <td>${usergroup[0]}</td>
+                     <td>${usergroup[2]}</td>
+                     <td>${usergroup[3]}</td>`;
+
+                if (usergroup[1] == 'manager') {
+                    table += `<td><i class="fa-solid fa-crown" title="You manage this group"></i></td>`;
+                } else if (usergroup[1] == 'reader') {
+                    table += `<td><i class="fa-solid fa-eye" title="You have read access to this group"></i></td>`;
+                } else if (Yoda.groupManager.isRodsAdmin && usergroup[1] != 'normal') {
+                    table += `<td><i class="fa-solid fa-wrench" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i></td>`;
+                } else {
+                    table += '<td></td>';
+                }
+
+                table += '</tr>';
+            }
+        });
+        table += '</tbody></table>';
+        $('#result-user-search-groups').html(table);
+
+        // Clicking a row must highlite rows in in both tree/flat list and present details in the corresponding panel
+        $('.user-search-result-group').click(function() {
+             // $('#user-search-groups').modal('hide');
+             let groupName = $(this).attr('user-search-result-group');
+             Yoda.groupManager.unfoldToGroup(groupName);
+             Yoda.groupManager.selectGroup(groupName);
+        });
+}
+
+function treeListGroups() {
+    var search = $('#search').val();
+    var username = '';
+    var groupname = '';
+
+    if (search.startsWith('user:')) {
+        username = search.substr(5);
+        groupname = '';
+    } else if (search.startsWith('group:')) {
+        groupname = search.substr(6);
+        username = '';
+    }
+
+    var $groupList  = $('#group-list');
+
+    // Reset all filters first and re-evaluate the entire situation
+    var $filtered = $groupList.find('.filtered');
+    $filtered.each(function() {
+        $(this).removeClass('filtered');
+    });
+
+    // Filter on groups
+    if (groupname.length) {
+        var $groups       = $groupList.find('.group');
+        // Filter all group not matching search value.
+        var quotedVal = Yoda.escapeQuotes(groupname.toLowerCase());
+        $groups.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered');
+        $groups.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered');
+    }
+    // Filter on username but only when username is not current user. Then show the initial list (i.e. unfiltered on username)
+    if (username.length && username != Yoda.groupManager.userNameFull) {
+        var group, subcat, cat, user;
+        // look at the ones not yet filtered out.
+        $groupList.find('.group:not(.filtered)').each(function(){
+            group = $(this).data('name');
+            subcat = $(this).parent().parent().data('name');
+            cat = $(this).parent().parent().parent().parent().data('name');
+
+            if (Yoda.groupManager.groupHierarchy[cat][subcat][group].members[username] == undefined) {
+                $(this).addClass('filtered');
+            }
+        });
+    }
+    // Loop through categories and filter out empty categories.
+    var $categories   = $groupList.find('.category');
+    $categories.each(function() {
+        var $subcategories = $(this).find('.subcategory-ul');
+        var emptyCategory = true;
+        // Loop through subcategories and filter out empty subcategories.
+        $subcategories.each(function() {
+            if($(this).children(':not(.filtered)').length == 0) {
+                $(this).parent().addClass('filtered');
+            } else {
+                emptyCategory = false;
+            }
+        });
+        if (emptyCategory) {
+            $(this).addClass('filtered');
+        }
+    });
+}
 
 function readCsvFile(e) {
   var file = e.target.files[0];
@@ -448,70 +576,6 @@ $(function() {
         Yoda.groupManager.onSubmitGroupCreateOrUpdate(this);
     });
 
-    $('.user-search-groups').click(function(){
-        $('#user-search-groups').modal('show');
-        if ($('#input-user-search-groups').val().length==0) {
-            $('#result-user-search-groups').html('Please enter a username to find groups for.');
-            $('#input-user-search-groups').focus();
-        }
-        else {
-            $('#input-user-search-groups').focus().select();
-        }
-    });
-    $('#input-user-search-groups').keypress(function (e) {
-        if (e.which == 13) {
-            $('.btn-user-search-groups').trigger('click');
-            return false;
-        }
-    });
-    $('.btn-user-search-groups').click(function(){
-        var hier = Yoda.groupManager.groupHierarchy;
-        let username = ($('#input-user-search-groups').val()).toLowerCase() + '#' + Yoda.groupManager.zone;
-        var isDatamanager = false;
-        var data = []
-        for (var categoryName in hier) {
-            for (var subcategoryName in hier[categoryName]) {
-                for (var groupName in hier[categoryName][subcategoryName]) {
-                    if (hier[categoryName][subcategoryName][groupName].members[username] != undefined) {
-                        data.push([groupName, hier[categoryName][subcategoryName][groupName].members[username]['access'], categoryName, subcategoryName]);
-                    }
-                }
-            }
-        }
-        $('#result-user-search-groups').html('');
-        if (data.length==0){
-            if ($('#input-user-search-groups').val().length==0) {
-                $('#result-user-search-groups').html('Please enter a username to find groups for.');
-            }
-            else {
-                $('#result-user-search-groups').html("No groups found for user '" + $('#input-user-search-groups').val() + "'");
-            }
-            return;
-        }
-
-        // Build result table.
-        let table = '<table class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th></tr></thead><tbody>';
-        $.each(data, function(index, usergroup) {
-            table += `<tr>
-                 <td class="user-search-result-group" style="cursor: pointer"  user-search-result-group="${usergroup[0]}">
-                    <i class="fa-solid ${Yoda.groupManager.accessIcons[usergroup[1]]}" title="${Yoda.groupManager.accessNames[usergroup[1]]}"></i>
-                    ${usergroup[0]}
-                 </td>
-                 <td>${usergroup[2]}</td>
-                 <td>${usergroup[3]}</td>
-            </tr>`;
-        });
-        table += '</tbody></table>';
-        $('#result-user-search-groups').html(table);
-
-        $('.user-search-result-group').click(function() {
-             $('#user-search-groups').modal('hide');
-             let groupName = $(this).attr('user-search-result-group');
-             Yoda.groupManager.unfoldToGroup(groupName);
-             Yoda.groupManager.selectGroup(groupName);
-        });
-    });
-
     Yoda.groupManager = {
 
         /**
@@ -799,9 +863,14 @@ $(function() {
             var group = this.groups[groupName];
             var userCanManage = this.canManageGroup(groupName);
 
+            // TRee
             var $groupList = $('#group-list');
             var $group     = $groupList.find('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]');
             var $oldGroup  = $groupList.find('.active');
+
+            //group list handling row activation
+            var listgroup = $('#tbl-list-groups tr[user-search-result-group="' + Yoda.escapeQuotes(groupName) + '"]');
+            listgroup.addClass('active').siblings().removeClass('active');
 
             if ($group.is($oldGroup))
                 return;
@@ -1369,6 +1438,61 @@ $(function() {
             });
 
             // }}}
+
+            // Search username field {{{
+            $(sel).filter('.selectify-search').each(function() {
+
+                // Build array with co-members to be used by select2.
+                var hier = Yoda.groupManager.groupHierarchy;
+
+                var usernames = [];
+                var groupnames = [];
+                for (var categoryName in hier) {
+                    for (var subcategoryName in hier[categoryName]) {
+                        for (var groupName in hier[categoryName][subcategoryName]) {
+                            groupnames.push(groupName);
+                            // find the user within the group array
+                            for (var mem in hier[categoryName][subcategoryName][groupName].members) {
+                                usernames.push(mem);
+                            }
+                        }
+                    }
+                }
+
+                // only unique usernames
+                var unique_users = [...new Set(usernames)];
+                unique_users.sort();
+                var user_list = []
+                for (var val in unique_users) {
+                    user_list.push({id: "user:" + unique_users[val],text: unique_users[val].split('#')[0]});
+                }
+
+                // only unique usernames
+                var unique_groups = [...new Set(groupnames)];
+                unique_groups.sort();
+                var group_list = []
+                for (var val in unique_groups) {
+                    group_list.push({id: "group:" + unique_groups[val], text: unique_groups[val]});
+                }
+
+                var data = [{"text": "Groups", "children": group_list}, {"text": "Users", "children": user_list}]
+
+                // Initialize Select2.
+                var $el = $(this);
+                $el.select2({
+                    data: data,
+                    allowClear:  true,
+                    openOnEnter: false,
+                    minimumInputLength: 3
+                }).on('open', function() {
+                    $(this).select2('val', '');
+                }).on('change', function() {
+                    treeListGroups();
+                    flatListGroups();
+                });
+            });
+
+            // }}}
         },
 
         /**
@@ -1807,6 +1931,10 @@ $(function() {
                 }
                 return groups;
             })(this.groupHierarchy);
+
+            // Unfiltered flattened group list
+            flatListGroups();
+
             var that = this;
             var $groupList = $('#group-list');
 
@@ -1864,43 +1992,10 @@ $(function() {
                     that.selectGroup($(this).attr('data-name'));
             });
 
-            // Group list search.
-            $('#group-list-search').on('keyup', function() {
-                $groupList  = $('#group-list');
-
-                var $categories   = $groupList.find('.category');
-                var $groups       = $groupList.find('.group');
-
-                if ($(this).val().length) {
-                    // Filter all group not matching search value.
-                    var quotedVal = Yoda.escapeQuotes($(this).val().toLowerCase());
-                    $groups.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered');
-                    $groups.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered');
-
-                    // Loop through categories and filter out empty categories.
-                    $categories.each(function() {
-                        var $subcategories = $(this).find('.subcategory-ul');
-                        var emptyCategory = true;
-                        // Loop through subcategories and filter out empty subcategories.
-                        $subcategories.each(function() {
-                            if($(this).children(':not(.filtered)').length == 0) {
-                                $(this).parent().addClass('filtered');
-                            } else {
-                                emptyCategory = false;
-                            }
-                        });
-
-                        if (emptyCategory) {
-                            $(this).addClass('filtered');
-                        }
-                    });
-                } else {
-                    // Reset all filters.
-                    var $filtered = $groupList.find('.filtered');
-                    $filtered.each(function() {
-                        $(this).removeClass('filtered');
-                    });
-                }
+            // Search for groups.
+            $('#search-group').on('keyup', function() {
+                treeListGroups();
+                flatListGroups();
             });
 
             // Group creation {{{
@@ -2020,7 +2115,7 @@ $(function() {
             // }}}
             // }}}
 
-            this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-schema-id, .selectify-user-name');
+            this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-schema-id, .selectify-user-name, .selectify-search');
             $('.selectify-data-classification').select2();
 
             if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
@@ -2041,7 +2136,7 @@ $(function() {
                     );
                 } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                        '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator."></i>'
+                        '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>'
                     );
                 } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access == 'reader') {
                     $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(

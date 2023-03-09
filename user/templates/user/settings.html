@@ -23,6 +23,17 @@
                 <div id="mail_notifications_help" class="form-text">
                     Receive e-mails of your notifications in Yoda.
                 </div>
+
+
+                <label for="group_manager_view" class="form-label">Group manager view</label>
+                <select class="form-select" id="group_manager_view" name="group_manager_view" aria-describedby="group_manager_view_help">
+                    <option value="TREE" {% if group_manager_view == 'TREE' %}selected{% else %}{% endif %}>Hierarchical tree view</option>
+                    <option value="LIST" {% if group_manager_view == 'LIST' %}selected{% else %}{% endif %}>Flat list view</option>
+                </select>
+                <div id="group_manager_view" class="form-text">
+                    Default view on groups in group manager.
+                </div>
+
                 <div class="input-group mt-3 mb-3">
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
