@@ -142,6 +142,7 @@ def settings() -> Response:
         # Build user settings dict.
         settings = {}
         settings['mail_notifications'] = request.form.get('mail_notifications', "OFF")
+        settings['number_of_items'] = request.form.get('number_of_items', "10")
 
         # Save user settings and handle API response.
         data = {"settings": settings}

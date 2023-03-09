@@ -23,6 +23,16 @@
                 <div id="mail_notifications_help" class="form-text">
                     Receive e-mails of your notifications in Yoda.
                 </div>
+                <label for="number_of_items" class="form-label">Number of items</label>
+                <select class="form-select" id="number_of_items" name="number_of_items" aria-describedby="number_of_items_help">
+                    <option value="10" {% if number_of_items == '10' %}selected{% else %}{% endif %}>10</option>
+                    <option value="25" {% if number_of_items == '25' %}selected{% else %}{% endif %}>25</option>
+                    <option value="50" {% if number_of_items == '50' %}selected{% else %}{% endif %}>50</option>
+                    <option value="100" {% if number_of_items == '100' %}selected{% else %}{% endif %}>100</option>
+                </select>
+                <div id="number_of_items_help" class="form-text">
+                    Set default number of items shown in the data tables.
+                </div>
                 <div class="input-group mt-3 mb-3">
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
