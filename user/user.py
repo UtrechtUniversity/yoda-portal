@@ -143,6 +143,7 @@ def settings() -> Response:
         settings = {}
         settings['mail_notifications'] = request.form.get('mail_notifications', "OFF")
         settings['group_manager_view'] = request.form.get('group_manager_view', "TREE")
+
         # Save user settings and handle API response.
         data = {"settings": settings}
 

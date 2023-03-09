@@ -1,30 +1,15 @@
-/**
- * \file
- * \brief     Yoda Group Manager frontend.
- * \author    Chris Smeele
- * \copyright Copyright (c) 2015-2022, Utrecht University
- * \license   GPLv3, see LICENSE
- */
-
 "use strict";
-
-function ta_helper_selectGroup(groupName) {
-             Yoda.groupManager.unfoldToGroup(groupName);
-             Yoda.groupManager.selectGroup(groupName);
-}
-
 
 function flatListGroups() {
         // Create flat list o groups including filter handling on username and groupname.
         // Centralized handling of contents of fields in the frontend related to this functionality.
-
-        var username = $('#treelist-search-user').val();
-        var find_group = $('#treelist-search-group').val();
+        var username = $('#search-user').val();
+        var find_group = $('#search-group').val();
 
         var hier = Yoda.groupManager.groupHierarchy;
         var isAdmin = (Yoda.groupManager.isMemberOfGroup('priv-group-add') || Yoda.groupManager.isRodsAdmin);
         var data = [];
-        // prepare the search argument (for finding a user) dependent on being admin 
+        // prepare the search argument (for finding a user) dependent on being admin
         // var user = (isAdmin)  ? (username=='' ? Yoda.groupManager.userNameFull : username) : Yoda.groupManager.userNameFull;
 
         var user = (username=='' ? Yoda.groupManager.userNameFull : username);
@@ -36,8 +21,7 @@ function flatListGroups() {
                     if (user == '' || user == Yoda.groupManager.userNameFull) { // er is geen filter => alle groepen toevoegen
                         if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
                             data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
-                        }
-                        else {
+                        } else {
                             data.push([groupName, false, categoryName, subcategoryName]);
                         }
                     }
@@ -53,12 +37,10 @@ function flatListGroups() {
 
         // Build result table.
         let table = '<table id="tbl-list-groups" class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th></tr></thead><tbody>';
-        $.each(data, function(index, usergroup) { 
+        $.each(data, function(index, usergroup) {
             if (usergroup[0].includes(find_group)){
                 table += `<tr style="cursor: pointer" class="user-search-result-group"  user-search-result-group="${usergroup[0]}">
-                     <td>
-                        ${usergroup[0]}
-                     </td>
+                     <td>${usergroup[0]}</td>
                      <td>${usergroup[2]}</td>
                      <td>${usergroup[3]}</td>`;
                 if (usergroup[1]=='manager') {
@@ -84,8 +66,8 @@ function flatListGroups() {
 function treeListGroups() {
     // Create tree of groups including filter handling on username and groupname.
     // Get filter arguments for user and group(s)
-    var username = $('#treelist-search-user').val();
-    var find_group = $('#treelist-search-group').val();
+    var username = $('#search-user').val();
+    var find_group = $('#search-group').val();
 
     var $groupList  = $('#group-list');
 
@@ -154,7 +136,7 @@ function readCsvFile(e) {
 
     // required to be able to, in a simple manner, add header and data row to the tr's in the table to pass to the backend
     const csv_header = contents.slice(0, contents.indexOf("\n"));
-    const csv_rows = contents.slice(contents.indexOf("\n") + 1).split("\n");
+    const csv_rows = contents.slice(contents.indexOfsearch("\n") + 1).split("\n");
     var csv_rows_corrected = [];
 
     // parse the csv file data to be able to present in a table
@@ -1973,7 +1955,6 @@ $(function() {
                 return groups;
             })(this.groupHierarchy);
 
-
             // Unfiltered flattened group list
             flatListGroups();
 
@@ -2034,12 +2015,11 @@ $(function() {
                     that.selectGroup($(this).attr('data-name'));
             });
 
-            // Search for group in tree
-            $('#treelist-search-group').on('keyup', function() {
+            // Search for groups.
+            $('#search-group').on('keyup', function() {
                 treeListGroups();
                 flatListGroups();
             });
-
 
             // Group creation {{{
 
