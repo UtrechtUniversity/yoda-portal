@@ -396,7 +396,7 @@ async function deleteFile(collection, fileName, multipleIndex = null)
     }
 }
 
-function startBrowsing2(items)  // deze draait om currentFolder
+function startBrowsing2()  // deze draait om currentFolder
 {
     if (!folderSelectBrowser) {
         folderSelectBrowser = $('#folder-select-browser').DataTable({
@@ -419,7 +419,7 @@ function startBrowsing2(items)  // deze draait om currentFolder
             "processing": true,
             "serverSide": true,
             "iDeferLoading": 0,
-            "pageLength": 25
+            "pageLength": Yoda.settings['number_of_items'] // Added Yoda settings to display the number of items chosen by the user - 13/03/2023 - S.Kaur
         });
     }
     dlgBrowse(dlgCurrentFolder);

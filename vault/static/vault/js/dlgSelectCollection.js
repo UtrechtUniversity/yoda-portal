@@ -97,7 +97,7 @@ function dlgShowFolderSelectDialog(orgPath)
 //   path = Yoda.basePath;
 
     //startBrowsingFolderSelect(path, browseDlgPageItems); //org
-    startBrowsing2(path, browseDlgPageItems);
+    startBrowsing2(path);
 
     // initialisation of alerts/warning thins -> to be taken out
     $('.mode-dlg-locked').addClass('hide');
@@ -121,7 +121,7 @@ function dlgSelectAlertHide()
     $('#dlg-select-alert-panel').addClass('hide');
 }
 
-function startBrowsing2(items)  // deze draait om currentFolder
+function startBrowsing2(path)  // deze draait om currentFolder
 {
     if (!folderSelectBrowser) {
         folderSelectBrowser = $('#folder-select-browser').DataTable({
@@ -145,10 +145,12 @@ function startBrowsing2(items)  // deze draait om currentFolder
             "processing": true,
             "serverSide": true,
             "iDeferLoading": 0,
-            "pageLength": 10
+            "pageLength": Yoda.settings['number_of_items'] // Added Yoda settings to display the number of items chosen by the user - 13/03/2023 - S.Kaur
         });
     }
-    dlgBrowse(dlgCurrentFolder);
+    dlgCurrentFolder = path;
+    browse(dlgCurrentFolder);
+    // dlgBrowse(dlgCurrentFolder);
     //browse(currentFolder);
 }
 

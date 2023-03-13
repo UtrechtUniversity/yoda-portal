@@ -20,7 +20,8 @@ $(function() {
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
 
     if ($('#file-browser').length) {
-        startBrowsing(browsePageItems);
+        // startBrowsing(browsePageItems);
+        startBrowsing();
     }
 
     // FOLDER delete
@@ -235,7 +236,7 @@ const tableRenderer = {
     }
 };
 
-function startBrowsing(items)
+function startBrowsing()
 {
     $('#file-browser').DataTable({
         "bFilter": false,
@@ -260,7 +261,7 @@ function startBrowsing(items)
         "processing": true,
         "serverSide": true,
         "iDeferLoading": 0,
-        "pageLength": items
+        "pageLength": Yoda.settings['number_of_items']  // Added Yoda settings to display the number of items chosen by the user - 13/03/2023 - S.Kaur
     });
     browse(currentFolder);
 }

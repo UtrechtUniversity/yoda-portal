@@ -10,11 +10,11 @@ var revisionTargetColl = '',
     currentSearchArg = '',
     mainTable = null;
 
-const browsePageItems = 10;
+// const browsePageItems = 10; 
 
 $( document ).ready(function() {
     // Click on file browser -> open revision details
-    startBrowsing(browsePageItems);
+    startBrowsing();
 
     $('#file-browser tbody').on('click', 'tr', function () {
         clickFileForRevisionDetails($(this), mainTable);
@@ -32,7 +32,7 @@ $( document ).ready(function() {
 });
 
 /// MAIN TABLE containing revisioned files
-function startBrowsing(items) {
+function startBrowsing() {
     var mainTable = $('#file-browser').DataTable({
         "bFilter": false,
         "bInfo": false,
@@ -50,7 +50,7 @@ function startBrowsing(items) {
         "serverSide": true,
         "iDeferLoading": 0,
         "ordering": false,
-        "pageLength": items
+        "pageLength": Yoda.settings['number_of_items'] // Added Yoda settings to display the number of items chosen by the user - 13/03/2023 - S.Kaur
     });
     browseRevisions();
 }
@@ -226,7 +226,7 @@ function showFolderSelectDialog(restorationObjectId, path, orgFileName)
 
     var decodedFileName = decodeURIComponent(orgFileName);
 
-    startBrowsing2(path, 25);
+    startBrowsing2(path);
 
     $('.mode-dlg-locked').addClass('hide');
     $('.mode-dlg-exists').addClass('hide');
@@ -243,7 +243,7 @@ function showFolderSelectDialog(restorationObjectId, path, orgFileName)
     $('#select-folder').modal('show');
 }
 
-function startBrowsing2(path, items)  // deze draait om currentFolder
+function startBrowsing2(path)  // deze draait om currentFolder
 {
     if (!folderSelectBrowser) {
         folderSelectBrowser = $('#folder-browser').DataTable({
@@ -267,7 +267,7 @@ function startBrowsing2(path, items)  // deze draait om currentFolder
             "processing": true,
             "serverSide": true,
             "iDeferLoading": 0,
-            "pageLength": 10
+            "pageLength": Yoda.settings['number_of_items']
         });
     }
     dlgCurrentFolder = path;
