@@ -27,8 +27,6 @@ research_bp = Blueprint('research_bp', __name__,
 @research_bp.route('/')
 @research_bp.route('/browse')
 def index() -> Response:
-    # Retrieving number of items from base.html - 09/03/2023 - S.Kaur
-    # items = 10
     dir = request.args.get('dir')
 
     if dir is None:
@@ -36,7 +34,6 @@ def index() -> Response:
 
     return render_template('research/browse.html',
                            activeModule='research',
-                        #    items=items, 
                            dir=dir)
 
 

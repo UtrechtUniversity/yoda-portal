@@ -10,7 +10,6 @@ var revisionTargetColl = '',
     currentSearchArg = '',
     mainTable = null;
 
-// const browsePageItems = 10; 
 
 $( document ).ready(function() {
     // Click on file browser -> open revision details
@@ -50,7 +49,7 @@ function startBrowsing() {
         "serverSide": true,
         "iDeferLoading": 0,
         "ordering": false,
-        "pageLength": Yoda.settings['number_of_items'] // Added Yoda settings to display the number of items chosen by the user - 13/03/2023 - S.Kaur
+        "pageLength": Yoda.settings['number_of_items']
     });
     browseRevisions();
 }

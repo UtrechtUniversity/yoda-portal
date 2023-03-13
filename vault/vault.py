@@ -20,8 +20,6 @@ vault_bp = Blueprint('vault_bp', __name__,
 @vault_bp.route('/')
 @vault_bp.route('/browse')
 def index() -> Response:
-    # Retrieving number of items from base.html - 09/03/2023 - S.Kaur
-    # items = 10
     dir = request.args.get('dir')
 
     if dir is None:
@@ -29,7 +27,6 @@ def index() -> Response:
 
     return render_template('vault/browse.html',
                            activeModule='vault',
-                        #    items=items,
                            dir=dir)
 
 

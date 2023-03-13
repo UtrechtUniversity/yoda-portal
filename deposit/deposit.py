@@ -32,7 +32,6 @@ def index() -> Response:
     path = "/deposit-pilot"
     return render_template('deposit/overview.html',
                            activeModule='deposit',
-                           #items=25,   Retrieving number of items from base.html - 13/03/2023 - S.Kaur
                            path=path)
 
 
@@ -50,7 +49,6 @@ def data() -> Response:
 
     return render_template('deposit/data.html',
                            activeModule='deposit',
-                           #items=25,  Retrieving number of items from base.html - 13/03/2023 - S.Kaur
                            path=path)
 
 

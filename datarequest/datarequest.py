@@ -77,8 +77,6 @@ def index_dacrequests() -> Response:
 @datarequest_bp.route('/')
 def index(archived: Optional[bool] = False, dacrequests: Optional[bool] = False) -> Response:
     # Todo: read browser-items-per-page from config
-    # Retrieving number of items from base.html - 13/03/2023 - S.Kaur
-    # items = 10
 
     roles              = api.call('datarequest_roles_get')['data']
     submission_allowed = 'PM' not in roles and 'DM' not in roles
@@ -86,7 +84,6 @@ def index(archived: Optional[bool] = False, dacrequests: Optional[bool] = False)
 
     return render_template('datarequest/index.html',
                            activeModule='datarequest',
-                        #    items=items,
                            archived=archived,
                            dacrequests=dacrequests,
                            submission_allowed=submission_allowed,

@@ -419,7 +419,7 @@ def prepare_user() -> None:
         if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
             response = api.call('notifications_load', data={})
             g.notifications = len(response['data'])
-            # Load saved settings - 09/03/2023 - S.Kaur
+            # Load saved settings
             response = api.call('settings_load', data={})
             g.settings = response['data']
     else:

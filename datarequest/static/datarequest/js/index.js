@@ -12,7 +12,6 @@ let currentFolder;
 $( document ).ready(function() {
     if ($('#file-browser').length) {
         currentFolder = '/tempZone/home/datarequests-research';
-        // startBrowsing(config.items); 
         startBrowsing();
     }
 });
@@ -156,7 +155,7 @@ function startBrowsing()
         "processing": true,
         "serverSide": true,
         "iDeferLoading": 0,
-        "pageLength": Yoda.settings['number_of_items']  // Added Yoda settings to display the number of items chosen by the user - 13/03/2023 - S.Kaur
+        "pageLength": Yoda.settings['number_of_items']
     });
 
     buildFileBrowser();

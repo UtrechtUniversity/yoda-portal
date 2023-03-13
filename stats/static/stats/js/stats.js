@@ -412,7 +412,7 @@ function startBrowsing()
         "serverSide": true,
         "iDeferLoading": 0,
         "order": [[ 0, "asc" ]],
-        "pageLength": Yoda.settings['number_of_items'], // Added Yoda settings to display the number of items chosen by the user - 13/03/2023 - S.Kaur
+        "pageLength": Yoda.settings['number_of_items'],
         // "searching": true,
         "fnDrawCallback": function() {
              $("#group-browser td").click(function() {
