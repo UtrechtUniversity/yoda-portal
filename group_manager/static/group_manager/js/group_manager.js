@@ -1037,6 +1037,10 @@ $(function() {
                 $userList2.find('#f-user-create-group').val(groupName);
                 $userList2.attr('hidden', !that.canManageGroup(groupName));
 
+                // Show or hide user actions depending on group permissions.
+                var $userActions = $('#user-actions');
+                $userActions.attr('hidden', !that.canManageGroup(groupName));
+
                 var $userPanel = $('.card.users');
                 $userPanel.find('#user-list').removeClass('hidden');
                 $userPanel.find('.card-body:has(.placeholder-text)').addClass('hidden');
