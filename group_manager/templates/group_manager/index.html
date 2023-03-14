@@ -270,8 +270,7 @@
                         <div class="row">
                             <div class="offset-sm-4 col-sm-8">
                                 <input action="{{ url_for('group_manager_bp.group_update') }}" id="f-group-update-submit" class="btn btn-primary" type="button" value="Save changes" />
-                                                                <a class="btn btn-danger disabled delete-button float-end" data-action="{{ url_for('group_manager_bp.group_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-group-delete">Remove group</a>
-
+                                <a class="btn btn-danger hidden delete-button float-end" data-action="{{ url_for('group_manager_bp.group_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-group-delete">Remove group</a>
                             </div>
                         </div>
                     </form>

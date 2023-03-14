@@ -894,7 +894,7 @@ $(function() {
 
             var $groupPanel = $('.card.groups');
             $('.delete-button').toggleClass(
-                'disabled',
+                'hidden',
                 !!(!userCanManage || groupName.match(that.GROUP_PREFIXES_RESERVED_RE)
                    || (groupName.match(/^datamanager-/) && !this.isRodsAdmin))
             );
