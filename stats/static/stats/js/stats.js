@@ -15,7 +15,7 @@ var months = {
 
 $(document).ready(function() {
     if ($('#group-browser').length) {
-        startBrowsing(10);
+        startBrowsing();
     }
 
     $('#search-group-table').on( 'keyup', function () {
@@ -393,7 +393,7 @@ Number.prototype.countDecimals = function () {
 }
 
 
-function startBrowsing(pageLength)
+function startBrowsing()
 {
     $('#group-browser').DataTable({
         //"bFilter": true,
@@ -412,7 +412,7 @@ function startBrowsing(pageLength)
         "serverSide": true,
         "iDeferLoading": 0,
         "order": [[ 0, "asc" ]],
-        "pageLength": pageLength,
+        "pageLength": Yoda.settings['number_of_items'],
         // "searching": true,
         "fnDrawCallback": function() {
              $("#group-browser td").click(function() {

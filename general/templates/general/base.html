@@ -27,6 +27,9 @@
                     username: '{{ g.user }}',
                 };
                 {% endif %}
+                {% if g.settings %}
+                    Yoda.settings = {{ g.settings | tojson}}
+                {% endif %}
             </script>
             {% block scripts %}{% endblock scripts %}
         {% endblock head %}

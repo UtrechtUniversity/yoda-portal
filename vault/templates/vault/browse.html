@@ -12,9 +12,7 @@
 <script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
 <script type="text/javascript">
-        var browsePageItems = {{ items }};
         var browseStartDir = {{ dir | tojson }};
-        var browseDlgPageItems = {{ items }};
         var view = 'browse';
 </script>
 {% endblock scripts %}
