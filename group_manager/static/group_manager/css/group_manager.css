@@ -1,11 +1,4 @@
 @charset "UTF-8";
-/**
- * \file
- * \brief     Yoda Group Manager frontend styling.
- * \author    Chris Smeele
- * \copyright Copyright (c) 2015-2020, Utrecht university. All rights reserved
- * \license   GPLv3, see LICENSE
- */
 
 .card-header .input-group-sm {
 	margin: -7px; /* Search box */
@@ -92,6 +85,10 @@
 
 #user-list .list-group-item #f-user-create {
 	margin: -5px -5px;
+}
+
+.table-striped tbody tr.active td {
+    background-color: #ffcd00;
 }
 
 .placeholder-text {
