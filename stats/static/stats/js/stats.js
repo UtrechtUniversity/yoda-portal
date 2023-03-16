@@ -412,7 +412,7 @@ function startBrowsing()
         "serverSide": true,
         "iDeferLoading": 0,
         "order": [[ 0, "asc" ]],
-        "pageLength": Yoda.settings['number_of_items'],
+        "pageLength": parseInt(Yoda.settings['number_of_items']),
         // "searching": true,
         "fnDrawCallback": function() {
              $("#group-browser td").click(function() {

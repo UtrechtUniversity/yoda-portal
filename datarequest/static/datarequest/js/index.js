@@ -155,7 +155,7 @@ function startBrowsing()
         "processing": true,
         "serverSide": true,
         "iDeferLoading": 0,
-        "pageLength": Yoda.settings['number_of_items']
+        "pageLength": parseInt(Yoda.settings['number_of_items'])
     });
 
     buildFileBrowser();

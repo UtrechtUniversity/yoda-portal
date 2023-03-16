@@ -419,7 +419,7 @@ function startBrowsing2()  // deze draait om currentFolder
             "processing": true,
             "serverSide": true,
             "iDeferLoading": 0,
-            "pageLength": Yoda.settings['number_of_items']
+            "pageLength": parseInt(Yoda.settings['number_of_items'])
         });
     }
     dlgBrowse(dlgCurrentFolder);

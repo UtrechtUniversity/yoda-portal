@@ -49,7 +49,7 @@ function startBrowsing() {
         "serverSide": true,
         "iDeferLoading": 0,
         "ordering": false,
-        "pageLength": Yoda.settings['number_of_items']
+        "pageLength": parseInt(Yoda.settings['number_of_items'])
     });
     browseRevisions();
 }
@@ -266,7 +266,7 @@ function startBrowsing2(path)  // deze draait om currentFolder
             "processing": true,
             "serverSide": true,
             "iDeferLoading": 0,
-            "pageLength": Yoda.settings['number_of_items']
+            "pageLength": parseInt(Yoda.settings['number_of_items'])
         });
     }
     dlgCurrentFolder = path;
