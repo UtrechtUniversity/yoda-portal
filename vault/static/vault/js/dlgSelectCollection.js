@@ -90,14 +90,7 @@ async function copyVaultPackageToDynamic(urlEncodedOrigin, urlEncodedTarget)
 // objectid is the Id of the revision that has to be restored
 function dlgShowFolderSelectDialog(orgPath)
 {
-    urlEncodedOrigin = orgPath;
-
-    path = ''; //start in root as user is in Vault now
-
-//   path = Yoda.basePath;
-
-    //startBrowsingFolderSelect(path, browseDlgPageItems); //org
-    startBrowsing2(path);
+    startBrowsing();
 
     // initialisation of alerts/warning thins -> to be taken out
     $('.mode-dlg-locked').addClass('hide');
@@ -121,7 +114,7 @@ function dlgSelectAlertHide()
     $('#dlg-select-alert-panel').addClass('hide');
 }
 
-function startBrowsing2(path)  // deze draait om currentFolder
+function startBrowsing()  // deze draait om currentFolder
 {
     if (!folderSelectBrowser) {
         folderSelectBrowser = $('#folder-select-browser').DataTable({
