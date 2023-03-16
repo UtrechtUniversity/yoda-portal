@@ -148,10 +148,8 @@ function startBrowsing2(path)  // deze draait om currentFolder
             "pageLength": parseInt(Yoda.settings['number_of_items'])
         });
     }
-    dlgCurrentFolder = path;
-    browse(dlgCurrentFolder);
-    // dlgBrowse(dlgCurrentFolder);
-    //browse(currentFolder);
+
+    dlgBrowse(dlgCurrentFolder);
 }
 
 // Fetches directory contents to populate the listing table.
@@ -179,7 +177,7 @@ let getFolderContents2 = (() => {
     let get = async (args) => {
         // Check if we can use the cache.
         if (cache.length
-            && dlgCurrentFolder        === cacheFolder
+            && dlgCurrentFolder     === cacheFolder
             && args.order[0].dir    === cacheSortOrder
             && args.order[0].column === cacheSortCol
             && args.start               >= cacheStart
