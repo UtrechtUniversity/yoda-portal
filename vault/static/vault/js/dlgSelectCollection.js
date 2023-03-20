@@ -97,7 +97,7 @@ function dlgShowFolderSelectDialog(orgPath)
 //   path = Yoda.basePath;
 
     //startBrowsingFolderSelect(path, browseDlgPageItems); //org
-    startBrowsing2(path, browseDlgPageItems);
+    startBrowsing2(path);
 
     // initialisation of alerts/warning thins -> to be taken out
     $('.mode-dlg-locked').addClass('hide');
@@ -121,7 +121,7 @@ function dlgSelectAlertHide()
     $('#dlg-select-alert-panel').addClass('hide');
 }
 
-function startBrowsing2(items)  // deze draait om currentFolder
+function startBrowsing2(path)  // deze draait om currentFolder
 {
     if (!folderSelectBrowser) {
         folderSelectBrowser = $('#folder-select-browser').DataTable({
@@ -145,11 +145,11 @@ function startBrowsing2(items)  // deze draait om currentFolder
             "processing": true,
             "serverSide": true,
             "iDeferLoading": 0,
-            "pageLength": 10
+            "pageLength": parseInt(Yoda.settings['number_of_items'])
         });
     }
+
     dlgBrowse(dlgCurrentFolder);
-    //browse(currentFolder);
 }
 
 // Fetches directory contents to populate the listing table.
@@ -177,7 +177,7 @@ let getFolderContents2 = (() => {
     let get = async (args) => {
         // Check if we can use the cache.
         if (cache.length
-            && dlgCurrentFolder        === cacheFolder
+            && dlgCurrentFolder     === cacheFolder
             && args.order[0].dir    === cacheSortOrder
             && args.order[0].column === cacheSortCol
             && args.start               >= cacheStart

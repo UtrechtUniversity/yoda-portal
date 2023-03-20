@@ -24,8 +24,15 @@ def index() -> Response:
     response = api.call('schema_get_schemas', data={})
     schema_ids = response['data']
 
+    # Group list view to be presented initially.
+    response = api.call('settings_load', data={})
+    show_list = "TREE"
+    if 'group_manager_view' in response['data']:
+        show_list = response['data']['group_manager_view']
+
     return render_template('group_manager/index.html',
                            group_hierarchy=group_hierarchy,
+                           show_list=show_list,
                            schema_ids=schema_ids,
                            user_type=user_type,
                            user_zone=user_zone)

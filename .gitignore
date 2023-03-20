@@ -36,3 +36,9 @@ docs/_build/
 /research/metadata-form/node_modules/
 /vault/metadata-form/node_modules/
 /deposit/metadata-form/node_modules/
+
+# Python Virtual Environment
+/venv/
+
+# Flask Secret Key
+flask_secret_key

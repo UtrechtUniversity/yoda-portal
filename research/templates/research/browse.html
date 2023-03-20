@@ -9,7 +9,6 @@
 <script src="{{ url_for('research_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
 <script>
-    var browsePageItems = {{ items }};
     var browseStartDir  = {{ dir|tojson|safe }};
     var view = 'browse';
 </script>

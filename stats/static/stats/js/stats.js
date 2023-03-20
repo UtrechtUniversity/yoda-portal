@@ -15,7 +15,7 @@ var months = {
 
 $(document).ready(function() {
     if ($('#group-browser').length) {
-        startBrowsing(10);
+        startBrowsing();
     }
 
     $('#search-group-table').on( 'keyup', function () {
@@ -72,9 +72,9 @@ function getGroupDetails(group) {
             document.getElementById('enddate').value = chart_date_labels[nr_of_points-1];
 
             // Set chart the buttons to the initial text again.
-            document.getElementById('legend-' + chart_dataset_labels[0].toLowerCase()).innerHTML = '&nbsp;' + chart_dataset_labels[0] + '&nbsp;';
-            document.getElementById('legend-' + chart_dataset_labels[1].toLowerCase()).innerHTML = '&nbsp;' + chart_dataset_labels[1] + '&nbsp;';
-            document.getElementById('legend-' + chart_dataset_labels[2].toLowerCase()).innerHTML = '&nbsp;' + chart_dataset_labels[2] + '&nbsp;';
+            document.getElementById('legend-' + chart_dataset_labels[0].toLowerCase()).innerHTML = chart_dataset_labels[0];
+            document.getElementById('legend-' + chart_dataset_labels[1].toLowerCase()).innerHTML = chart_dataset_labels[1];
+            document.getElementById('legend-' + chart_dataset_labels[2].toLowerCase()).innerHTML = chart_dataset_labels[2];
 
             // Reset the representation of visibilty of each dataset (research, vault, revisions).
             chart_visibility_status = [true, true, true];
@@ -149,10 +149,22 @@ function chartShow() {
               scales: {
                   x: {
                       stacked: true,
+                      title: {
+                          display: true,
+                          text: 'Date'
+                      }
                   },
                   y: {
-                      stacked: true
+                      stacked: true,
+                      title: {
+                          display: true,
+                          text: 'Storage'
+                      }
                   }
+              },
+              interaction: {
+                  intersect: false,
+                  mode: 'index',
               },
               plugins: {
                   legend: {
@@ -200,13 +212,13 @@ function chartToggleData(legend_button) {
         myChart.config.data.datasets[3].data = new_totals;
         myChart.hide(legend_button);
         // set the button labels correctly including strike through
-        document.getElementById('legend-' + chart_dataset_labels[legend_button].toLowerCase()).innerHTML = '&nbsp;<strike>' + chart_dataset_labels[legend_button] + '</strike>&nbsp;';
+        document.getElementById('legend-' + chart_dataset_labels[legend_button].toLowerCase()).innerHTML = '<strike>' + chart_dataset_labels[legend_button] + '</strike>';
     }
     else {
         myChart.config.data.datasets[3].data = new_totals;
         myChart.show(legend_button);
         // set the button labels correctly
-        document.getElementById('legend-' + chart_dataset_labels[legend_button].toLowerCase()).innerHTML = '&nbsp;' + chart_dataset_labels[legend_button] + '&nbsp;';
+        document.getElementById('legend-' + chart_dataset_labels[legend_button].toLowerCase()).innerHTML = chart_dataset_labels[legend_button];
     }
 }
 
@@ -381,7 +393,7 @@ Number.prototype.countDecimals = function () {
 }
 
 
-function startBrowsing(pageLength)
+function startBrowsing()
 {
     $('#group-browser').DataTable({
         //"bFilter": true,
@@ -394,13 +406,13 @@ function startBrowsing(pageLength)
         "dom": '<"top">frt<"bottom"lp><"clear">',
         'columns': [{render: tableRenderer.name,         data: 'name', bSearchable: true},
                     {render: tableRenderer.size,         data: 'size'},
-                    {render: tableRenderer.member_count, data: 'member_count'}],
+                    {render: tableRenderer.member_count, data: 'member_count', orderable: false}],
         "ajax": getFolderContents,
         "processing": true,
         "serverSide": true,
         "iDeferLoading": 0,
         "order": [[ 0, "asc" ]],
-        "pageLength": pageLength,
+        "pageLength": parseInt(Yoda.settings['number_of_items']),
         // "searching": true,
         "fnDrawCallback": function() {
              $("#group-browser td").click(function() {
@@ -507,12 +519,12 @@ const tableRenderer = {
         return `<div class="list-group-item group" data-name="${name}" >${htmlEncode(name)}</div>`;
     },
     size: (size, _, row) => {
-        return `${ human_readable_size(size[0])} <i class="fa-solid fa-circle-info" aria-hidden="true" title="` +
+        return `<span aria-hidden="true" title="` +
             `Research: ${human_readable_size(size[1])} (${size[1]}), ` +
             `Vault: ${human_readable_size(size[2])} (${size[2]}), ` +
             `Revision: ${human_readable_size(size[3])} (${size[3]}), ` +
             `Total: ${human_readable_size(size[0])} (${size[0]})` +
-            `"'>`;
+            `"'>${ human_readable_size(size[0])} </span>`;
     }
 };
 

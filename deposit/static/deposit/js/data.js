@@ -20,7 +20,7 @@ $(function() {
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '');
 
     if ($('#file-browser').length) {
-        startBrowsing(browsePageItems);
+        startBrowsing();
     }
 
     ////////////////////////////////////////////////
@@ -745,7 +745,7 @@ const tableRenderer = {
     }
 };
 
-function startBrowsing(items)
+function startBrowsing()
 {
     $('#file-browser').DataTable({
         "bFilter": false,
@@ -770,7 +770,7 @@ function startBrowsing(items)
         "serverSide": true,
         "iDeferLoading": 0,
         "order": [[ 1, "asc" ]],
-        "pageLength": items
+        "pageLength": parseInt(Yoda.settings['number_of_items'])
     });
     browse(currentFolder);
 }
