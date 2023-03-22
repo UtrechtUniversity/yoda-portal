@@ -13,7 +13,7 @@
                 <form method="post" class="form-horizontal">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="row mb-3">
-                        <label class="col-sm-3 col-form-label" for="f-login-username">Username</label>
+                        <label class="col-sm-3 col-form-label" for="f-login-username">Email address</label>
                         <div class="col-sm-6">
                             <input
                                 name="username"
@@ -26,7 +26,7 @@
                                 {% endif %}
                                 maxlength="64"
                                 required />
-                            <span id="capitals" class="hidden error text-danger">Username should not contain capital letters.</span>
+                            <span id="capitals" class="hidden error text-danger">Email address should not contain capital letters.</span>
                         </div>
                     </div>
                     <div class="row mb-3">
