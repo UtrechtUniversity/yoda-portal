@@ -10,9 +10,11 @@ class ROR extends React.Component {
         super(props);
         this.state = {
             ...props.formData,
-            options: "",
-            placeholder: props.uiSchema['ui:default']
+            // options: ""
+            // placeholder: props.uiSchema['ui:default']
         };
+
+        this.options = [];
 
         const url = props.uiSchema['ui:data'];
 
@@ -24,12 +26,14 @@ class ROR extends React.Component {
                     return arr.push({value: item.value, label: item.label});
                 });
                 // Fill options data
-                this.setState({ options: arr });
+                // this.setState({ options: arr });
+                //
+                this.options = arr;
 
                 // Find the label by the form data key
                 let option = arr.find(o => o.value === this.props.formData);
                 if (option !== undefined) {
-                    this.setState({ placeholder: option.label });
+                    // this.setState({ placeholder: option.label });
                 }
             });
         };
@@ -37,16 +41,24 @@ class ROR extends React.Component {
     }
 
     handleChange = (event) => {
-      console.log('handleChange');
-      console.log(event.label);
-      console.log(event.value);
-      $('#yoda_Creator_0_Affiliation_0_Affiliation_Identifier').attr('value', event.value);
-      $('#yoda_Creator_0_Affiliation_0_Affiliation_Identifier').attr('placeholder', event.value);
+      this.setFormData("Affiliation_Identifier", event.value);  // "fr - French");
+      this.setFormData("Affiliation_Name", event.label);
     };
 
+    handleChangeIdentifier = (event) => {
+      this.setFormData("Affiliation_Identifier", event.target.value)
+    };
+
+    setFormData(fieldName, fieldValue) {
+        this.setState({
+            [fieldName]: fieldValue
+        }, () => this.props.onChange(this.state));
+    }
+
     render() {
+        const {Affiliation_Name, Affiliation_Identifier} = this.state;
+
         let title = this.props.schema.title || this.props.uiSchema["ui:title"];
-        console.log(title);
         let label = <label className="form-label">{title}</label>
         let help = this.props.uiSchema["ui:help"];
         let customStyles = {
@@ -78,25 +90,28 @@ class ROR extends React.Component {
             label = <label className="form-label select-required select-filled">{title}*</label>
         }
 
+        this.options = [{value: 'en - English', label: 'English uni'}, {value: 'fr - French', label: 'French uni'}, {value: 'de - German uni', label: 'German'}, {value: 'https://ror.org/04pp8hn57', label: 'Utrecht University'}];
+
         return (
             <div>
                 {label}
                 <CreatableSelect
                     className={'select-box'}
-                    options={this.state.options}
+                    options={this.options}
                     required={required}
                     isDisabled={this.props.readonly}
-                    placeholder={this.state.placeholder}
-
+                    placeholder={Affiliation_Name}
                     onChange={this.handleChange}
-
-
                     styles={customStyles} />
                 {help && (
                     <small className="text-muted form-text">
                         <p className="help-block">{help}</p>
                     </small>
                 )}
+
+                <input type='text' className='Affiliation' name="Affiliation_Identifier" onChange={this.handleChangeIdentifier} value={Affiliation_Identifier}></input>
+
+
             </div>
         );
     }
