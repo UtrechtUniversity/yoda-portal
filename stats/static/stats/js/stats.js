@@ -59,13 +59,21 @@ function getGroupDetails(group) {
         // 4 dimensional array holding all data for research, vault, revisions and total
         var nr_of_points = 0;
         var chart_totals = [];
+        var totals = [];
         while (nr_of_points < data.research.length) {
             chart_totals[nr_of_points] = data.research[nr_of_points] + data.vault[nr_of_points] + data.revision[nr_of_points];
+            totals[nr_of_points] = data.total[nr_of_points];
             nr_of_points++;
         }
-
-        chart_datapoints = [data.research, data.vault, data.revision, chart_totals];
-
+        if (group.startsWith('grp') || group.startsWith('intake') || group.startsWith('datarequest')) {
+            chart_datapoints = [data.research, data.vault, data.revision, data.total];
+            console.log(chart_datapoints);
+        }
+        else {
+            chart_datapoints = [data.research, data.vault, data.revision, chart_totals];
+        }
+        
+        
         if (nr_of_points > 0) {
             // Take over the min/max date range based upon the actual dataset minimum and maximum.
             document.getElementById('startdate').value = chart_date_labels[0];
@@ -83,7 +91,7 @@ function getGroupDetails(group) {
             $('#storage-chart').removeClass('hidden');
             $('#storage-chart-message').addClass('hidden');
 
-            chartShow(); // Create or update of chart.
+            chartShow(group); // Create or update of chart.
         }
         else {
             $("#storage-chart-message").html("<p>No storage information found.</p>");
@@ -94,7 +102,8 @@ function getGroupDetails(group) {
 }
 
 
-function chartShow() {
+function chartShow(group) {
+    var chart_data = {};
     if (myChart) {
         myChart.config.data.labels = chart_date_labels;
         myChart.config.data.datasets[0].data = chart_datapoints[0];
@@ -102,44 +111,93 @@ function chartShow() {
         myChart.config.data.datasets[2].data = chart_datapoints[2];
         myChart.config.data.datasets[3].data = chart_datapoints[3];
 
+        if (group.startsWith('grp') || group.startsWith('intake') || group.startsWith('datarequest')) {
+            myChart.config.data.datasets[3].type = 'bar';
+            myChart.config.data.datasets[3].backgroundColor = 'rgba(62, 103, 20, 0.2)';
+            myChart.config.data.datasets[3].borderColor = 'rgba(62, 103, 20, 1)';
+        }
+        else {
+            myChart.config.data.datasets[3].type = 'line';
+            myChart.config.data.datasets[3].borderColor = '#ff0000';
+        }
+
         myChart.show(0);
         myChart.show(1);
         myChart.show(2);
+        myChart.show(3);
 
         myChart.update();
     }
     else {
-      const data = {
-        labels: chart_date_labels,
-        datasets: [{
-          label: chart_dataset_labels[0],
-          data: chart_datapoints[0],
-          borderWidth: 1,
-          backgroundColor: 'rgba(255, 26, 104, 0.2)',
-          borderColor: 'rgba(255, 26, 104, 1)'
-        },
-        {
-          label: chart_dataset_labels[1],
-          data: chart_datapoints[1],
-          borderWidth: 1,
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)'
-        },
-        {
-          label: chart_dataset_labels[2],
-          data: chart_datapoints[2],
-          borderWidth: 1,
-          backgroundColor: 'rgba(255, 159, 64, 0.2)',
-          borderColor: 'rgba(255, 159, 64, 1)'
-        },
-        {
-          label: chart_dataset_labels[3],
-          data: chart_datapoints[3],
-          type: 'line',
-          borderWidth: 1,
-          borderColor: '#ff0000'
-        }]
-      };
+        if (group.startsWith('grp') || group.startsWith('intake') || group.startsWith('datarequest')) {
+            chart_data = {
+                labels: chart_date_labels,
+                datasets: [{
+                  label: chart_dataset_labels[0],
+                  data: chart_datapoints[0],
+                  borderWidth: 1,
+                  backgroundColor: 'rgba(255, 26, 104, 0.2)',
+                  borderColor: 'rgba(255, 26, 104, 1)'
+                },
+                {
+                  label: chart_dataset_labels[1],
+                  data: chart_datapoints[1],
+                  borderWidth: 1,
+                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                  borderColor: 'rgba(54, 162, 235, 1)'
+                },
+                {
+                  label: chart_dataset_labels[2],
+                  data: chart_datapoints[2],
+                  borderWidth: 1,
+                  backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                  borderColor: 'rgba(255, 159, 64, 1)'
+                },
+                {
+                  label: chart_dataset_labels[3],
+                  data: chart_datapoints[3],
+                  borderWidth: 1,
+                  backgroundColor: 'rgba(62, 103, 20, 0.2)',
+                  borderColor: 'rgba(62, 103, 20, 1)'
+                }]
+            };
+        }
+        else{
+            chart_data = {
+                labels: chart_date_labels,
+                datasets: [{
+                  label: chart_dataset_labels[0],
+                  data: chart_datapoints[0],
+                  borderWidth: 1,
+                  backgroundColor: 'rgba(255, 26, 104, 0.2)',
+                  borderColor: 'rgba(255, 26, 104, 1)'
+                },
+                {
+                  label: chart_dataset_labels[1],
+                  data: chart_datapoints[1],
+                  borderWidth: 1,
+                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                  borderColor: 'rgba(54, 162, 235, 1)'
+                },
+                {
+                  label: chart_dataset_labels[2],
+                  data: chart_datapoints[2],
+                  borderWidth: 1,
+                  backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                  borderColor: 'rgba(255, 159, 64, 1)'
+                },
+                {
+                  label: chart_dataset_labels[3],
+                  data: chart_datapoints[3],
+                  type: 'line',
+                  borderWidth: 1,
+                  borderColor: '#ff0000'
+                }]
+            };
+
+        }
+        
+        const data = chart_data
 
       // config
       const config = {
@@ -185,6 +243,17 @@ function chartShow() {
     document.getElementById('legend-research').style.backgroundColor = myChart.data.datasets[0].backgroundColor;
     document.getElementById('legend-vault').style.backgroundColor = myChart.data.datasets[1].backgroundColor;
     document.getElementById('legend-revisions').style.backgroundColor = myChart.data.datasets[2].backgroundColor;
+    
+    if (group.startsWith('grp') || group.startsWith('intake') || group.startsWith('datarequest')) {
+        document.getElementById('legend-research').style.visibility = 'hidden';
+        document.getElementById('legend-vault').style.visibility = 'hidden';
+        document.getElementById('legend-revisions').style.visibility = 'hidden';;
+    }
+    else {
+        document.getElementById('legend-research').style.visibility = 'visible';
+        document.getElementById('legend-vault').style.visibility = 'visible';;
+        document.getElementById('legend-revisions').style.visibility = 'visible';;
+    }
 }
 
 
@@ -520,11 +589,11 @@ const tableRenderer = {
     },
     size: (size, _, row) => {
         return `<span aria-hidden="true" title="` +
-            `Research: ${human_readable_size(size[1])} (${size[1]}), ` +
-            `Vault: ${human_readable_size(size[2])} (${size[2]}), ` +
-            `Revision: ${human_readable_size(size[3])} (${size[3]}), ` +
-            `Total: ${human_readable_size(size[0])} (${size[0]})` +
-            `"'>${ human_readable_size(size[0])} </span>`;
+            `Research: ${human_readable_size(size[0])} (${size[0]}), ` +
+            `Vault: ${human_readable_size(size[1])} (${size[1]}), ` +
+            `Revision: ${human_readable_size(size[2])} (${size[2]}), ` +
+            `Total: ${human_readable_size(size[3])} (${size[3]})` +
+            `"'>${ human_readable_size(size[3])} </span>`;
     }
 };
 
