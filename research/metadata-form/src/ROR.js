@@ -31,6 +31,8 @@ class ROR extends React.Component {
                 //
                 this.options = arr;
 
+                console.log(this.options);
+
                 // Find the label by the form data key
                 let option = arr.find(o => o.value === this.props.formData);
                 if (option !== undefined) {
@@ -101,11 +103,11 @@ class ROR extends React.Component {
         }
 
         // When using this array definition here, the ROR-field works as it should. 
-        // this.options = [{value: 'en - English', label: 'English uni'}, {value: 'fr - French', label: 'French uni'}, {value: 'de - German uni', label: 'German'}, {value: 'https://ror.org/04pp8hn57', label: 'Utrecht University'}];
+        this.options = [{value: 'en - English', label: 'English uni'}, {value: 'fr - French', label: 'French uni'}, {value: 'de - German uni', label: 'German'}, {value: 'https://ror.org/04pp8hn57', label: 'Utrecht University'}];
 
         return (
           <div className="d-flex">
-            <div className={"col compound-field"}>
+            <div className="col compound-field">
                 {label}
                 <CreatableSelect
                     className={'select-box'}
@@ -122,7 +124,7 @@ class ROR extends React.Component {
                 )}
             </div>
 
-            <div className={"col compound-field"}>
+            <div className="col compound-field">
                <div className="mb-0 form-group">
                  <label className="form-label">{title_aff_identifier}</label>
                 <input type='text' className='form-control' name="blablaAffiliation_Identifier" onChange={this.handleChangeIdentifier} value={Affiliation_Identifier}></input>
