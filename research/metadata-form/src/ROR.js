@@ -100,7 +100,8 @@ class ROR extends React.Component {
             label = <label className="form-label select-required select-filled">{title_aff_name}*</label>
         }
 
-//        this.options = [{value: 'en - English', label: 'English uni'}, {value: 'fr - French', label: 'French uni'}, {value: 'de - German uni', label: 'German'}, {value: 'https://ror.org/04pp8hn57', label: 'Utrecht University'}];
+        // When using this array definition here, the ROR-field works as it should. 
+        // this.options = [{value: 'en - English', label: 'English uni'}, {value: 'fr - French', label: 'French uni'}, {value: 'de - German uni', label: 'German'}, {value: 'https://ror.org/04pp8hn57', label: 'Utrecht University'}];
 
         return (
           <div className="d-flex">
