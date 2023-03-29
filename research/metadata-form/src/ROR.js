@@ -55,7 +55,6 @@ class ROR extends React.Component {
     const title_aff_name = this.props.schema.properties.Affiliation_Name.title
     const title_aff_identifier = this.props.schema.properties.Affiliation_Identifier.title
 
-    const title = this.props.schema.title || this.props.uiSchema['ui:title']
     let label = <label className='form-label'>{title_aff_name}</label>
     const help = this.props.uiSchema['ui:help']
     let customStyles = {
@@ -70,9 +69,8 @@ class ROR extends React.Component {
     }
     const required = this.props.required
     const error = 'should be equal to one of the allowed values'
-
-    if ((this.props.rawErrors !== undefined && this.props.rawErrors.indexOf(error) >= 0) || (required && this.props.formData == null)) {
-      label = <label className='text-danger form-label select-required'>{title}*</label>
+    if ((this.props.rawErrors !== undefined && this.props.rawErrors.indexOf(error) >= 0) || (required && this.props.formData.Affiliation_Name == null)) {
+      label = <label className='text-danger form-label select-required'>{title_aff_name}*</label>
       customStyles = {
         control: styles => ({
           ...styles,
@@ -85,6 +83,9 @@ class ROR extends React.Component {
       }
     } else if (required) {
       label = <label className='form-label select-required select-filled'>{title_aff_name}*</label>
+    }
+    else {
+      label = <label className='form-label select-required select-filled'>{title_aff_name}</label>
     }
 
     return (
