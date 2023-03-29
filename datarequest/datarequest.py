@@ -220,7 +220,7 @@ def download_attachment(request_id: str) -> Response:
     with session.data_objects.open(file_path, 'r') as obj_desc:
         file = obj_desc.read()
         obj_desc.close()
-        return send_file(io.BytesIO(file), as_attachment=True, attachment_filename=file_name)
+        return send_file(io.BytesIO(file), as_attachment=True, download_name=file_name)
 
 
 @datarequest_bp.route('submit_attachments/<request_id>')
@@ -393,7 +393,7 @@ def download_dta(request_id: str) -> Response:
     with session.data_objects.open(file_path, 'r') as obj_desc:
         file = obj_desc.read()
         obj_desc.close()
-        return send_file(io.BytesIO(file), as_attachment=True, attachment_filename=file_path.split('/')[-1])
+        return send_file(io.BytesIO(file), as_attachment=True, download_name=file_path.split('/')[-1])
 
 
 @datarequest_bp.route('upload_signed_dta/<request_id>', methods=['POST'])
