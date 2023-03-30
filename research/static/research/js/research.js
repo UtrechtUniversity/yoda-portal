@@ -577,9 +577,9 @@ async function handleFolderRename (newFolderName, collection, orgFolderName) {
 
   const result = await Yoda.call('research_folder_rename',
     {
-      new_file_name: newFolderName,
+      new_folder_name: newFolderName,
       coll: Yoda.basePath + collection,
-      org_file_name: orgFolderName
+      org_folder_name: orgFolderName
     },
     { quiet: true, rawResult: true }
   )
