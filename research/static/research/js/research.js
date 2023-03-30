@@ -577,9 +577,9 @@ async function handleFolderRename (newFolderName, collection, orgFolderName) {
 
   const result = await Yoda.call('research_folder_rename',
     {
-      newFolderName,
+      new_file_name: newFolderName,
       coll: Yoda.basePath + collection,
-      orgFolderName
+      org_file_name: orgFolderName
     },
     { quiet: true, rawResult: true }
   )
@@ -597,7 +597,7 @@ async function handleFolderDelete (collection, folderName) {
   const result = await Yoda.call('research_folder_delete',
     {
       coll: Yoda.basePath + collection,
-      folderName
+      folder_name: folderName
     },
     { quiet: true, rawResult: true }
   )
@@ -623,7 +623,7 @@ async function handleCleanupFileDelete (collection, fileName) {
   const result = await Yoda.call('research_file_delete',
     {
       coll: collection,
-      fileName
+      file_name: fileName
     },
     { quiet: true, rawResult: true }
   )
@@ -643,9 +643,9 @@ async function handleFileRename (newFileName, collection, origFileName) {
 
   const result = await Yoda.call('research_file_rename',
     {
-      newFileName,
+      new_file_name: newFileName,
       coll: Yoda.basePath + collection,
-      origFileName
+      org_file_name: origFileName
     },
     { quiet: true, rawResult: true }
   )
@@ -663,7 +663,7 @@ async function handleFileDelete (collection, fileName) {
   const result = await Yoda.call('research_file_delete',
     {
       coll: Yoda.basePath + collection,
-      fileName
+      file_name: fileName
     },
     { quiet: true, rawResult: true }
   )
