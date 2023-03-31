@@ -65,15 +65,15 @@ function getGroupDetails(group) {
             totals[nr_of_points] = data.total[nr_of_points];
             nr_of_points++;
         }
-        if (group.startsWith('grp') || group.startsWith('intake') || group.startsWith('datarequest')) {
+        if (group.startsWith('grp') || group.startsWith('intake')) {
             chart_datapoints = [data.research, data.vault, data.revision, data.total];
             console.log(chart_datapoints);
         }
         else {
             chart_datapoints = [data.research, data.vault, data.revision, chart_totals];
         }
-        
-        
+
+
         if (nr_of_points > 0) {
             // Take over the min/max date range based upon the actual dataset minimum and maximum.
             document.getElementById('startdate').value = chart_date_labels[0];
@@ -111,7 +111,7 @@ function chartShow(group) {
         myChart.config.data.datasets[2].data = chart_datapoints[2];
         myChart.config.data.datasets[3].data = chart_datapoints[3];
 
-        if (group.startsWith('grp') || group.startsWith('intake') || group.startsWith('datarequest')) {
+        if (group.startsWith('grp') || group.startsWith('intake')) {
             myChart.config.data.datasets[3].type = 'bar';
             myChart.config.data.datasets[3].backgroundColor = 'rgba(62, 103, 20, 0.2)';
             myChart.config.data.datasets[3].borderColor = 'rgba(62, 103, 20, 1)';
@@ -129,7 +129,7 @@ function chartShow(group) {
         myChart.update();
     }
     else {
-        if (group.startsWith('grp') || group.startsWith('intake') || group.startsWith('datarequest')) {
+        if (group.startsWith('grp') || group.startsWith('intake')) {
             chart_data = {
                 labels: chart_date_labels,
                 datasets: [{
@@ -196,7 +196,7 @@ function chartShow(group) {
             };
 
         }
-        
+
         const data = chart_data
 
       // config
@@ -243,16 +243,16 @@ function chartShow(group) {
     document.getElementById('legend-research').style.backgroundColor = myChart.data.datasets[0].backgroundColor;
     document.getElementById('legend-vault').style.backgroundColor = myChart.data.datasets[1].backgroundColor;
     document.getElementById('legend-revisions').style.backgroundColor = myChart.data.datasets[2].backgroundColor;
-    
-    if (group.startsWith('grp') || group.startsWith('intake') || group.startsWith('datarequest')) {
+
+    if (group.startsWith('grp') || group.startsWith('intake')) {
         document.getElementById('legend-research').style.visibility = 'hidden';
         document.getElementById('legend-vault').style.visibility = 'hidden';
-        document.getElementById('legend-revisions').style.visibility = 'hidden';;
+        document.getElementById('legend-revisions').style.visibility = 'hidden';
     }
     else {
         document.getElementById('legend-research').style.visibility = 'visible';
-        document.getElementById('legend-vault').style.visibility = 'visible';;
-        document.getElementById('legend-revisions').style.visibility = 'visible';;
+        document.getElementById('legend-vault').style.visibility = 'visible';
+        document.getElementById('legend-revisions').style.visibility = 'visible';
     }
 }
 
