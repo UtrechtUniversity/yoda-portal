@@ -143,6 +143,7 @@ def settings() -> Response:
         settings = {}
         settings['mail_notifications'] = request.form.get('mail_notifications', "OFF")
         settings['group_manager_view'] = request.form.get('group_manager_view', "TREE")
+        settings['number_of_items'] = request.form.get('number_of_items', "10")
 
         # Save user settings and handle API response.
         data = {"settings": settings}
@@ -419,6 +420,9 @@ def prepare_user() -> None:
         if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
             response = api.call('notifications_load', data={})
             g.notifications = len(response['data'])
+            # Load saved settings
+            response = api.call('settings_load', data={})
+            g.settings = response['data']
     else:
         redirect('user_bp.login')
 

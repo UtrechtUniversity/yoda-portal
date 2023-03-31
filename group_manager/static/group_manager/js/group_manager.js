@@ -1,713 +1,703 @@
-"use strict";
+/* global FileReader */
+'use strict'
 
-function flatListGroups() {
-        // Create flat list of groups including filter handling on username and groupname.
-        // Centralized handling of contents of fields in the frontend related to this functionality.
-        var search = $('#search').val();
-        var username = '';
-        var groupname = '';
+function flatListGroups () {
+  // Create flat list of groups including filter handling on username and groupname.
+  // Centralized handling of contents of fields in the frontend related to this functionality.
+  const search = $('#search').val()
+  let username = ''
+  let groupname = ''
 
-        if (search.startsWith('user:')) {
-	    username = search.substr(5);
-            groupname = '';
-        } else if (search.startsWith('group:')) {
-            groupname = search.substr(6);
-            username = '';
-        }
-
-        var hier = Yoda.groupManager.groupHierarchy;
-        var data = [];
-
-        // Prepare the search argument (for finding a user).
-        var user = (username=='' ? Yoda.groupManager.userNameFull : username);
-
-        for (var categoryName in hier) {
-            for (var subcategoryName in hier[categoryName]) {
-                for (var groupName in hier[categoryName][subcategoryName]) {
-                    if (user == '' || user == Yoda.groupManager.userNameFull) { // er is geen filter => alle groepen toevoegen
-                        if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
-                            data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
-                        } else {
-                            data.push([groupName, false, categoryName, subcategoryName]);
-                        }
-                    } else {
-                        // find the user within the group array
-                        if (hier[categoryName][subcategoryName][groupName].members[user] != undefined) {
-                            data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user]['access'], categoryName, subcategoryName]);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Build result table.
-        let table = '<table id="tbl-list-groups" class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th></tr></thead><tbody>';
-        $.each(data, function(index, usergroup) {
-            if (usergroup[0].includes(groupname)){
-                table += `<tr style="cursor: pointer" class="user-search-result-group" user-search-result-group="${usergroup[0]}">
-                     <td>${usergroup[0]}</td>
-                     <td>${usergroup[2]}</td>
-                     <td>${usergroup[3]}</td>`;
-
-                if (usergroup[1] == 'manager') {
-                    table += `<td><i class="fa-solid fa-crown" title="You manage this group"></i></td>`;
-                } else if (usergroup[1] == 'reader') {
-                    table += `<td><i class="fa-solid fa-eye" title="You have read access to this group"></i></td>`;
-                } else if (Yoda.groupManager.isRodsAdmin && usergroup[1] != 'normal') {
-                    table += `<td><i class="fa-solid fa-wrench" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i></td>`;
-                } else {
-                    table += '<td></td>';
-                }
-
-                table += '</tr>';
-            }
-        });
-        table += '</tbody></table>';
-        $('#result-user-search-groups').html(table);
-
-        // Clicking a row must highlite rows in in both tree/flat list and present details in the corresponding panel
-        $('.user-search-result-group').click(function() {
-             // $('#user-search-groups').modal('hide');
-             let groupName = $(this).attr('user-search-result-group');
-             Yoda.groupManager.unfoldToGroup(groupName);
-             Yoda.groupManager.selectGroup(groupName);
-        });
-}
-
-function treeListGroups() {
-    var search = $('#search').val();
-    var username = '';
-    var groupname = '';
-
-    if (search.startsWith('user:')) {
-        username = search.substr(5);
-        groupname = '';
-    } else if (search.startsWith('group:')) {
-        groupname = search.substr(6);
-        username = '';
-    }
-
-    var $groupList  = $('#group-list');
-
-    // Reset all filters first and re-evaluate the entire situation
-    var $filtered = $groupList.find('.filtered');
-    $filtered.each(function() {
-        $(this).removeClass('filtered');
-    });
-
-    // Filter on groups
-    if (groupname.length) {
-        var $groups       = $groupList.find('.group');
-        // Filter all group not matching search value.
-        var quotedVal = Yoda.escapeQuotes(groupname.toLowerCase());
-        $groups.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered');
-        $groups.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered');
-    }
-    // Filter on username but only when username is not current user. Then show the initial list (i.e. unfiltered on username)
-    if (username.length && username != Yoda.groupManager.userNameFull) {
-        var group, subcat, cat, user;
-        // look at the ones not yet filtered out.
-        $groupList.find('.group:not(.filtered)').each(function(){
-            group = $(this).data('name');
-            subcat = $(this).parent().parent().data('name');
-            cat = $(this).parent().parent().parent().parent().data('name');
-
-            if (Yoda.groupManager.groupHierarchy[cat][subcat][group].members[username] == undefined) {
-                $(this).addClass('filtered');
-            }
-        });
-    }
-    // Loop through categories and filter out empty categories.
-    var $categories   = $groupList.find('.category');
-    $categories.each(function() {
-        var $subcategories = $(this).find('.subcategory-ul');
-        var emptyCategory = true;
-        // Loop through subcategories and filter out empty subcategories.
-        $subcategories.each(function() {
-            if($(this).children(':not(.filtered)').length == 0) {
-                $(this).parent().addClass('filtered');
-            } else {
-                emptyCategory = false;
-            }
-        });
-        if (emptyCategory) {
-            $(this).addClass('filtered');
-        }
-    });
-}
-
-function readCsvFile(e) {
-  var file = e.target.files[0];
-  if (!file) {
-    return;
+  if (search.startsWith('user:')) {
+    username = search.substr(5)
+    groupname = ''
+  } else if (search.startsWith('group:')) {
+    groupname = search.substr(6)
+    username = ''
   }
 
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var contents = e.target.result;
+  const hier = Yoda.groupManager.groupHierarchy
+  const data = []
 
-    //remove unwanted characters
-    contents = contents.replaceAll('"', '').replaceAll("'", '').replaceAll(' ', '');
+  // Prepare the search argument (for finding a user).
+  const user = (username === '' ? Yoda.groupManager.userNameFull : username)
+
+  for (const categoryName in hier) {
+    for (const subcategoryName in hier[categoryName]) {
+      for (const groupName in hier[categoryName][subcategoryName]) {
+        if (user === '' || user === Yoda.groupManager.userNameFull) { // er is geen filter => alle groepen toevoegen
+          if (hier[categoryName][subcategoryName][groupName].members[user] !== undefined) {
+            data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user].access, categoryName, subcategoryName])
+          } else {
+            data.push([groupName, false, categoryName, subcategoryName])
+          }
+        } else {
+          // find the user within the group array
+          if (hier[categoryName][subcategoryName][groupName].members[user] !== undefined) {
+            data.push([groupName, hier[categoryName][subcategoryName][groupName].members[user].access, categoryName, subcategoryName])
+          }
+        }
+      }
+    }
+  }
+
+  // Build result table.
+  let table = '<table id="tbl-list-groups" class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th></tr></thead><tbody>'
+  $.each(data, function (index, usergroup) {
+    if (usergroup[0].includes(groupname)) {
+      table += `<tr style="cursor: pointer" class="user-search-result-group" user-search-result-group="${usergroup[0]}">
+                     <td>${usergroup[0]}</td>
+                     <td>${usergroup[2]}</td>
+                     <td>${usergroup[3]}</td>`
+
+      if (usergroup[1] === 'manager') {
+        table += '<td><i class="fa-solid fa-crown" title="You manage this group"></i></td>'
+      } else if (usergroup[1] === 'reader') {
+        table += '<td><i class="fa-solid fa-eye" title="You have read access to this group"></i></td>'
+      } else if (Yoda.groupManager.isRodsAdmin && usergroup[1] !== 'normal') {
+        table += '<td><i class="fa-solid fa-wrench" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i></td>'
+      } else {
+        table += '<td></td>'
+      }
+
+      table += '</tr>'
+    }
+  })
+  table += '</tbody></table>'
+  $('#result-user-search-groups').html(table)
+
+  // Clicking a row must highlite rows in in both tree/flat list and present details in the corresponding panel
+  $('.user-search-result-group').click(function () {
+    // $('#user-search-groups').modal('hide');
+    const groupName = $(this).attr('user-search-result-group')
+    Yoda.groupManager.unfoldToGroup(groupName)
+    Yoda.groupManager.selectGroup(groupName)
+  })
+}
+
+function treeListGroups () {
+  const search = $('#search').val()
+  let username = ''
+  let groupname = ''
+
+  if (search.startsWith('user:')) {
+    username = search.substr(5)
+    groupname = ''
+  } else if (search.startsWith('group:')) {
+    groupname = search.substr(6)
+    username = ''
+  }
+
+  const $groupList = $('#group-list')
+
+  // Reset all filters first and re-evaluate the entire situation
+  const $filtered = $groupList.find('.filtered')
+  $filtered.each(function () {
+    $(this).removeClass('filtered')
+  })
+
+  // Filter on groups
+  if (groupname.length) {
+    const $groups = $groupList.find('.group')
+    // Filter all group not matching search value.
+    const quotedVal = Yoda.escapeQuotes(groupname.toLowerCase())
+    $groups.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered')
+    $groups.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered')
+  }
+  // Filter on username but only when username is not current user. Then show the initial list (i.e. unfiltered on username)
+  if (username.length && username !== Yoda.groupManager.userNameFull) {
+    let group, subcat, cat
+    // look at the ones not yet filtered out.
+    $groupList.find('.group:not(.filtered)').each(function () {
+      group = $(this).data('name')
+      subcat = $(this).parent().parent().data('name')
+      cat = $(this).parent().parent().parent().parent().data('name')
+
+      if (Yoda.groupManager.groupHierarchy[cat][subcat][group].members[username] === undefined) {
+        $(this).addClass('filtered')
+      }
+    })
+  }
+  // Loop through categories and filter out empty categories.
+  const $categories = $groupList.find('.category')
+  $categories.each(function () {
+    const $subcategories = $(this).find('.subcategory-ul')
+    let emptyCategory = true
+    // Loop through subcategories and filter out empty subcategories.
+    $subcategories.each(function () {
+      if ($(this).children(':not(.filtered)').length === 0) {
+        $(this).parent().addClass('filtered')
+      } else {
+        emptyCategory = false
+      }
+    })
+    if (emptyCategory) {
+      $(this).addClass('filtered')
+    }
+  })
+}
+
+function readCsvFile (e) {
+  const file = e.target.files[0]
+  if (!file) {
+    return
+  }
+
+  const reader = new FileReader()
+  reader.onload = function (e) {
+    let contents = e.target.result
+
+    // remove unwanted characters
+    contents = contents.replaceAll('"', '').replaceAll("'", '').replaceAll(' ', '')
 
     // ensure correct seperator ','
-    contents = contents.replaceAll(';', ',');
+    contents = contents.replaceAll(';', ',')
 
     // required to be able to, in a simple manner, add header and data row to the tr's in the table to pass to the backend
-    const csv_header = contents.slice(0, contents.indexOf("\n"));
-    const csv_rows = contents.slice(contents.indexOf("\n") + 1).split("\n");
-    var csv_rows_corrected = [];
+    const csvHeader = contents.slice(0, contents.indexOf('\n'))
+    const csvRows = contents.slice(contents.indexOf('\n') + 1).split('\n')
+    const csvRowsCorrected = []
 
     // parse the csv file data to be able to present in a table
-    var result = csvToArray(contents);
+    const result = csvToArray(contents)
 
     // first row will contain fixed definion
-    var ar_keys = result[0];
+    const arKeys = result[0]
 
     // First compress all columns to  keys: category, subcategory, groupname and usercount
-    const presentation_columns = ['groupname', 'category', 'subcategory', 'users'];
-    const all_csv_columns = ['groupname', 'category', 'subcategory', 'manager', 'member', 'viewer']
+    const presentationColumns = ['groupname', 'category', 'subcategory', 'users']
+    const allCsvColumns = ['groupname', 'category', 'subcategory', 'manager', 'member', 'viewer']
 
-    var new_result = [];
-    var row_nr = 0;
-    result.forEach(function myFunction(group_def) {
-        // initialise all columns that must be present in the view
-        var row = [];
-        presentation_columns.forEach(function myFunction(column) {
-            row[column] = '';
-        });
+    const newResult = []
+    let rowNr = 0
+    result.forEach(function myFunction (groupDef) {
+      // initialise all columns that must be present in the view
+      const row = []
+      presentationColumns.forEach(function myFunction (column) {
+        row[column] = ''
+      })
 
-        // now loop through the received rows and put them in the right columns
-        for (const key of Object.keys(ar_keys)) {
-            all_csv_columns.forEach(function myFunction(column) {
-                if (key == column) {
-                    row[column] = group_def[key];
-                }
-                else if (key.startsWith(column)) {
-                    if (group_def[key] != '\r') {
-                        if (row['users'] == '') {
-                            row['users'] = '1';
-                        }
-                        else {
-                            row['users'] = (parseInt(row['users']) + 1).toString();
-                        }
-                    }
-                }
-            });
-        }
-        // only show row when all required data is present.
-        var row_error = false;
-        presentation_columns.forEach(function myFunction(column) {
-            if (!row_error && (row[column] === undefined || row[column] == '')) {
-                row_error = true;
+      // now loop through the received rows and put them in the right columns
+      for (const key of Object.keys(arKeys)) {
+        allCsvColumns.forEach(function myFunction (column) {
+          if (key === column) {
+            row[column] = groupDef[key]
+          } else if (key.startsWith(column)) {
+            if (groupDef[key] !== '\r') {
+              if (row.users === '') {
+                row.users = '1'
+              } else {
+                row.users = (parseInt(row.users) + 1).toString()
+              }
             }
-        });
-        if (row_error == false) {
-            new_result.push(row);
-            csv_rows_corrected.push(csv_rows[row_nr]);
+          }
+        })
+      }
+      // only show row when all required data is present.
+      let rowError = false
+      presentationColumns.forEach(function myFunction (column) {
+        if (!rowError && (row[column] === undefined || row[column] === '')) {
+          rowError = true
         }
-        row_nr += 1;
-    });
+      })
+      if (rowError === false) {
+        newResult.push(row)
+        csvRowsCorrected.push(csvRows[rowNr])
+      }
+      rowNr += 1
+    })
 
     // build the header row of the table
     let table = '<table class="table table-striped"><thead><tr><th></th>'
-    presentation_columns.forEach(function myFunction(column) {
-        table += '<th>' + column + '</th>';
-    });
-    table += '<td></td></tr></thead><tbody>';
+    presentationColumns.forEach(function myFunction (column) {
+      table += '<th>' + column + '</th>'
+    })
+    table += '<td></td></tr></thead><tbody>'
 
-    new_result.forEach(function myFunction(group_def, i) {
-        table += '<tr id="' + group_def['groupname'] + '" class="import-groupname" groupname="' + group_def['groupname'] + '" import_row_data="' + csv_header + "\n" + csv_rows_corrected[i] + '">';
-        table += '<td id="processed-indicator-' + group_def['groupname'] + '"></td>';
-        presentation_columns.forEach(function myFunction(column) {
-            table += '<td>' + group_def[column] + '</td>';
-        });
-        table += '<td id="error-import-' + group_def['groupname'] + '"></td>';
-        table += '</tr>';
-    });
+    newResult.forEach(function myFunction (groupDef, i) {
+      table += '<tr id="' + groupDef.groupname + '" class="import-groupname" groupname="' + groupDef.groupname + '" importRowData="' + csvHeader + '\n' + csvRowsCorrected[i] + '">'
+      table += '<td id="processed-indicator-' + groupDef.groupname + '"></td>'
+      presentationColumns.forEach(function myFunction (column) {
+        table += '<td>' + groupDef[column] + '</td>'
+      })
+      table += '<td id="error-import-' + groupDef.groupname + '"></td>'
+      table += '</tr>'
+    })
 
-    table += '</tbody></table>';
-    $('#result-import-groups-csv').html(table);
+    table += '</tbody></table>'
+    $('#result-import-groups-csv').html(table)
 
     // now have user choose to actually process the uploaded data.
-    $('.div-process-results-import').removeClass('hidden');
+    $('.div-process-results-import').removeClass('hidden')
 
     // enable processing again after successful reading
-    $('.process-csv').prop('disabled', false);
-  };
-  reader.readAsText(file);
+    $('.process-csv').prop('disabled', false)
+  }
+  reader.readAsText(file)
 }
 
-function csvToArray(str, delimiter = ",") {
-      const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
-      const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+function csvToArray (str, delimiter = ',') {
+  const headers = str.slice(0, str.indexOf('\n')).split(delimiter)
+  const rows = str.slice(str.indexOf('\n') + 1).split('\n')
 
-      const arr = rows.map(function (row) {
-        const values = row.split(delimiter);
-        const el = headers.reduce(function (object, header, index) {
-          object[header] = values[index];
-          return object;
-        }, {});
-        return el;
-      });
+  const arr = rows.map(function (row) {
+    const values = row.split(delimiter)
+    const el = headers.reduce(function (object, header, index) {
+      object[header] = values[index]
+      return object
+    }, {})
+    return el
+  })
 
-      return arr;
+  return arr
 }
 
-async function process_imported_row(row) {
-    // Row specific processing of the imported csv
-    var groupname = row.attr('groupname');
-    var import_row_data = row.attr('import_row_data');
+async function processImportedRow (row) {
+  // Row specific processing of the imported csv
+  const groupname = row.attr('groupname')
+  const importRowData = row.attr('importRowData')
 
-    try {
-        await Yoda.call('group_process_csv',
-            {csv_header_and_data: import_row_data,
-             allow_update: $('#import-allow-updates').is(':checked'),
-             delete_users: $('#import-delete-users').is(':checked')},
-            {"quiet": true}).then((data) => {
+  try {
+    await Yoda.call('group_process_csv',
+      {
+        csv_header_and_data: importRowData,
+        allow_update: $('#import-allow-updates').is(':checked'),
+        delete_users: $('#import-delete-users').is(':checked')
+      },
+      { quiet: true }).then((data) => {
+      // Successful import -> set correct classes and feedback to inform user
+      row.addClass('import-groupname-done')
+      $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>')
+      row.addClass('import-csv-group-ok')
 
-            // Successful import -> set correct classes and feedback to inform user
-            row.addClass('import-groupname-done');
-            $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>');
-            row.addClass('import-csv-group-ok');
+      // Solely added for test automation - splinter.
+      // This was the only way to be able to perform an automated click work on a row.
+      // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
+      $('#processed-indicator-' + groupname).click(function () {
+        const groupName = 'research-' + groupname
+        $('#dlg-import-groups-csv').modal('hide')
+        Yoda.groupManager.unfoldToGroup(groupName)
+        Yoda.groupManager.selectGroup(groupName)
+      })
+    })
+  } catch (error) {
+    // Row processing encountered problems => inform user and add appropriate classes.
+    row.addClass('import-groupname-done')
 
-            // Solely added for test automation - splinter.
-            // This was the only way to be able to perform an automated click work on a row.
-            // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
-            $('#processed-indicator-' + groupname).click(function(){
-                let groupName = 'research-' + groupname
-                $('#dlg-import-groups-csv').modal('hide');
-                Yoda.groupManager.unfoldToGroup(groupName);
-                Yoda.groupManager.selectGroup(groupName);
-            });
-        });
-    }
-    catch(error) {
-        // Row processing encountered problems => inform user and add appropriate classes.
-        row.addClass('import-groupname-done');
+    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
+    row.addClass('table-danger')
+    // collect error messages and maken 1 string to present to user.
+    let errorHtml = ''
+    error.status_info.forEach(function myFunction (item) {
+      errorHtml += item + '<br/>'
+    })
+    $('#error-import-' + groupname).html(errorHtml)
+  }
+  // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
+  if ($('.import-groupname').length === $('.import-groupname-done').length) {
+    // only enable new groups that have been successfully added
+    $('.import-csv-group-ok').click(function () {
+      const groupName = 'research-' + $(this).attr('groupname')
+      $('#dlg-import-groups-csv').modal('hide')
+      Yoda.groupManager.unfoldToGroup(groupName)
+      Yoda.groupManager.selectGroup(groupName)
+    })
 
-        $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>');
-        row.addClass('table-danger');
-        // collect error messages and maken 1 string to present to user.
-        var error_html = '';
-        error.status_info.forEach(function myFunction(item) {
-            error_html += item + '<br/>';
-        });
-        $('#error-import-' + groupname).html(error_html);
-    }
-    // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
-    if ($('.import-groupname').length == $('.import-groupname-done').length) {
-        // only enable new groups that have been successfully added
-        $('.import-csv-group-ok').click(function() {
-            let groupName = 'research-' + $(this).attr('groupname');
-            $('#dlg-import-groups-csv').modal('hide');
-            Yoda.groupManager.unfoldToGroup(groupName);
-            Yoda.groupManager.selectGroup(groupName);
-        });
+    // Renew the data of the left pane as new groups have been added not yet loaded.
+    Yoda.call('group_data').then((groupdata) => {
+      Yoda.groupManager.groupHierarchy = groupdata.group_hierarchy
 
-        // Renew the data of the left pane as new groups have been added not yet loaded.
-        Yoda.call('group_data').then((groupdata) => {
-            Yoda.groupManager.groupHierarchy = groupdata['group_hierarchy']
+      // Collect the latest data and bring into Yoda.groupManager.groups
+      Yoda.groupManager.groups = (function (hier) {
+        const groups = { }
+        for (const categoryName in hier) {
+          for (const subcategoryName in hier[categoryName]) {
+            for (const groupName in hier[categoryName][subcategoryName]) {
+              groups[groupName] = {
+                category: categoryName,
+                subcategory: subcategoryName,
+                name: groupName,
+                description: hier[categoryName][subcategoryName][groupName].description,
+                schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
+                expiration_date: hier[categoryName][subcategoryName][groupName].expiration_date,
+                data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
+                members: hier[categoryName][subcategoryName][groupName].members
+              }
+            }
+          }
+        }
+        return groups
+      })(groupdata.group_hierarchy)
 
-            // Collect the latest data and bring into Yoda.groupManager.groups
-            Yoda.groupManager.groups = (function(hier) {
-                var groups = { };
-                for (var categoryName in hier) {
-                    for (var subcategoryName in hier[categoryName]) {
-                        for (var groupName in hier[categoryName][subcategoryName]) {
-                            groups[groupName] = {
-                                category:    categoryName,
-                                subcategory: subcategoryName,
-                                name:        groupName,
-                                description: hier[categoryName][subcategoryName][groupName].description,
-                                schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
-                                expiration_date:    hier[categoryName][subcategoryName][groupName].expiration_date,
-                                data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
-                                members:     hier[categoryName][subcategoryName][groupName].members
-                            };
-
-                        }
-                    }
-                }
-                return groups;
-            })(groupdata['group_hierarchy']);
-
-            var cat_idx = 1;
-            var html = '';
-            var subcat_idx = 1;
-            var grp_idx = 1;
-            for (var category in groupdata['group_hierarchy']) {
-                            html += `<div class="list-group-item category" id="category-${ cat_idx }" data-name="${ category }">
-                                        <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-${ cat_idx }" href="#category-${ cat_idx }-ul">
-                                            <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ category }
+      let catIdx = 1
+      let html = ''
+      let subcatIdx = 1
+      let grpIdx = 1
+      for (const category in groupdata.group_hierarchy) {
+        html += `<div class="list-group-item category" id="category-${catIdx}" data-name="${category}">
+                                        <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-${catIdx}" href="#category-${catIdx}-ul">
+                                            <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${category}
                                         </a>
-                                        <div class="list-group collapse category-ul" id="category-${ cat_idx }-ul">`;
-                            subcat_idx = 1;
-                            for (var subcat in groupdata['group_hierarchy'][category]) {
-                                html +=
+                                        <div class="list-group collapse category-ul" id="category-${catIdx}-ul">`
+        subcatIdx = 1
+        for (const subcat in groupdata.group_hierarchy[category]) {
+          html +=
 
-                                `<div class="list-group-item subcategory" data-name="${ subcat }">
-                                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-${ subcat_idx }" href="#subcategory-${ subcat_idx }-ul">
-                                        <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${ subcat }
+                                `<div class="list-group-item subcategory" data-name="${subcat}">
+                                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-${subcatIdx}" href="#subcategory-${subcatIdx}-ul">
+                                        <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${subcat}
                                     </a>
-                                    <div class="list-group collapse subcategory-ul" id="subcategory-${ subcat_idx }-ul">`;
+                                    <div class="list-group collapse subcategory-ul" id="subcategory-${subcatIdx}-ul">`
 
-                                grp_idx = 1;
-                                for (var group in groupdata['group_hierarchy'][category][subcat]) {
-                                    html +=
-                                        `<a class="list-group-item list-group-item-action group" id="group-${ grp_idx }" data-name="${ group }">
-                                            ${ group }
-                                        </a>`;
+          grpIdx = 1
+          for (const group in groupdata.group_hierarchy[category][subcat]) {
+            html +=
+                                        `<a class="list-group-item list-group-item-action group" id="group-${grpIdx}" data-name="${group}">
+                                            ${group}
+                                        </a>`
 
-                                    grp_idx += 1
-                                }
+            grpIdx += 1
+          }
 
-                                html += '</div></div>';
-                                subcat_idx = subcat_idx + 1;
-                            }
+          html += '</div></div>'
+          subcatIdx = subcatIdx + 1
+        }
 
-                            html += '</div></div>';
-                            cat_idx = cat_idx + 1;
-            }
-            $('#group-list').html(html);
-        });
+        html += '</div></div>'
+        catIdx = catIdx + 1
+      }
+      $('#group-list').html(html)
+    })
+  }
+}
+
+async function processUserroleChange (row, actionUrl, newRole, groupName) {
+  // Process one user at a time to change userrole.
+  const userName = row.attr('data-name')
+
+  $.ajax({
+    url: actionUrl,
+    type: 'post',
+    dataType: 'json',
+    data: {
+      group_name: groupName,
+      user_name: userName,
+      new_role: newRole
     }
+  }).done(function (result) {
+    if ('status' in result) {
+      console.log('User update completed with status ' + result.status)
+    }
+    if ('status' in result && result.status === 0) {
+      // Keep track of which rows have been
+      row.addClass('update-done')
+
+      // Set the internal administration with latest situation without having to reach for the dbs
+      Yoda.groupManager.groups[groupName].members[userName].access = newRole
+
+      // when update-done length is equal to active length, all has been dealt with.
+      // => Data must be reloaded
+      if ($('#user-list .active').length === $('#user-list .update-done').length) {
+        // Force-regenerate the user list after completion of the entire process
+        Yoda.groupManager.deselectGroup()
+        Yoda.groupManager.selectGroup(groupName)
+
+        Yoda.set_message('success', 'User roles were updated successfully.')
+      }
+    } else {
+      // Something went wrong
+      $('#user-list .user.update-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]')
+        .removeClass('update-pending disabled')
+        .attr('title', '')
+
+      if ('message' in result) { window.alert(result.message) } else {
+        window.alert(
+          'Error: Could not change the role for the selected member due to an internal error.\n' +
+                    'Please contact a Yoda administrator'
+        )
+      }
+    }
+  }).fail(function (result) {
+    Yoda.groupManager.ifRequestNotAborted(result, function () {
+      window.alert('Error: Could not change the role for the selected member due to an internal error.\nPlease contact a Yoda administrator')
+    })
+  })
 }
 
-async function process_userrole_change(row, actionUrl, newRole, groupName) {
-    // Process one user at a time to change userrole.
-    var userName = row.attr('data-name');
+async function removeUserFromGroup (row, actionUrl, groupName) {
+  // Remove a user from the indicated group as part of mutiple selection of users.
+  const userName = row.attr('data-name')
 
-    $.ajax({
-        url:      actionUrl,
-        type:     'post',
-        dataType: 'json',
-        data: {
-            group_name: groupName,
-            user_name:  userName,
-            new_role:   newRole
-        },
-    }).done(function(result) {
-        if ('status' in result) {
-            console.log('User update completed with status ' + result.status);
-        }
-        if ('status' in result && result.status === 0) {
-            // Keep track of which rows have been
-            row.addClass('update-done');
+  $.ajax({
+    url: actionUrl,
+    type: 'post',
+    dataType: 'json',
+    data: {
+      group_name: groupName,
+      user_name: userName
+    }
+  }).done(function (result) {
+    if ('status' in result) { console.log('User remove completed with status ' + result.status) }
+    if ('status' in result && result.status === 0) {
+      // Mark row as done
+      row.addClass('remove-done')
 
-            // Set the internal administration with latest situation without having to reach for the dbs
-            Yoda.groupManager.groups[groupName].members[userName].access = newRole
+      // Update internal administration
+      delete Yoda.groupManager.groups[groupName].members[userName]
 
-            // when update-done length is equal to active length, all has been dealt with.
-            // => Data must be reloaded
-            if ($('#user-list .active').length == $('#user-list .update-done').length){
-                // Force-regenerate the user list after completion of the entire process
-                Yoda.groupManager.deselectGroup();
-                Yoda.groupManager.selectGroup(groupName);
+      if ($('#user-list .active').length === $('#user-list .remove-done').length) {
+        // Force-regenerate the user list after completion of entire process
+        Yoda.groupManager.deselectGroup()
+        Yoda.groupManager.selectGroup(groupName)
 
-                Yoda.set_message('success', 'User roles were updated successfully.');
-            }
-        } else {
-            // Something went wrong
-            $('#user-list .user.update-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]')
-                .removeClass('update-pending disabled')
-                .attr('title', '');
-
-            if ('message' in result)
-                alert(result.message);
-            else
-                alert(
-                      "Error: Could not change the role for the selected member due to an internal error.\n"
-                    + "Please contact a Yoda administrator"
-                );
-        }
-    }).fail(function(result) {
-        Yoda.groupManager.ifRequestNotAborted(result, function() {
-            alert("Error: Could not change the role for the selected member due to an internal error.\nPlease contact a Yoda administrator");
-        });
-    });
+        Yoda.set_message('success', 'Users were removed successfully.')
+      }
+    } else {
+      // Something went wrong
+      if ('message' in result) { window.alert(result.message) } else {
+        window.alert(
+          'Error: Could not remove the selected member from the group due to an internal error.\n' +
+                    'Please contact a Yoda administrator'
+        )
+      }
+    }
+  }).fail(function (result) {
+    Yoda.groupManager.ifRequestNotAborted(result, function () {
+      window.alert('Error: Could not remove the selected member from the group due to an internal error.\nPlease contact a Yoda administrator')
+    })
+  })
 }
 
+$(function () {
+  // Multiple user role change
+  $('.users.card .update-button').on('click', function (e) {
+    const newRole = $(this).attr('data-target-role')
+    const actionUrl = $(this).attr('data-action')
+    const groupName = $('#group-list .group.active').attr('data-name')
 
-async function remove_user_from_group(row, actionUrl, groupName) {
-    // Remove a user from the indicated group as part of mutiple selection of users.
-    var userName = row.attr('data-name');
+    // Step through selected users and update per row
+    $('#user-list .active.user').each(function myFunction () {
+      processUserroleChange($(this), actionUrl, newRole, groupName)
+    })
+  })
 
-    $.ajax({
-        url:      actionUrl,
-        type:     'post',
-        dataType: 'json',
-        data: {
-            group_name: groupName,
-            user_name:  userName,
-        },
-    }).done(function(result) {
-        if ('status' in result)
-            console.log('User remove completed with status ' + result.status);
-        if ('status' in result && result.status === 0) {
-            // Mark row as done
-            row.addClass('remove-done');
+  // Set attributes in modal
+  $('#modal-user-delete').on('show.bs.modal', function () {
+    const groupName = $('#group-list .group.active').attr('data-name')
+    const users = []
+    // Get all selected users
+    $('#user-list .active.user').each(function myFunction () {
+      let name = $(this).attr('data-name')
+      name = name.substring(0, name.lastIndexOf('#'))
+      users.push(name)
+    })
 
-            // Update internal administration
-            delete Yoda.groupManager.groups[groupName].members[userName];
+    // Fill modal
+    $('#modal-user-delete .user').text(users.join(', '))
+    $('#modal-user-delete .group').text(groupName)
+  })
 
-            if ($('#user-list .active').length == $('#user-list .remove-done').length){
-                // Force-regenerate the user list after completion of entire process
-                Yoda.groupManager.deselectGroup();
-                Yoda.groupManager.selectGroup(groupName);
+  // Remove multiple users from group
+  $('#modal-user-delete .confirm').on('click', function (e) {
+    // that.onClickUserDelete($('.users.card .delete-button')[0]);
+    $('#modal-user-delete').modal('hide')
 
-                Yoda.set_message('success', 'Users were removed successfully.');
-            }
-        } else {
-            // Something went wrong
-            if ('message' in result)
-                alert(result.message);
-            else
-                alert(
-                      "Error: Could not remove the selected member from the group due to an internal error.\n"
-                    + "Please contact a Yoda administrator"
-                );
-        }
-    }).fail(function(result) {
-        Yoda.groupManager.ifRequestNotAborted(result, function() {
-            alert("Error: Could not remove the selected member from the group due to an internal error.\nPlease contact a Yoda administrator");
-        });
-    });
-}
+    const actionUrl = $('#btn-remove-user-from-group').attr('data-action')
+    const groupName = $('#group-list .group.active').attr('data-name')
 
+    // Step through selected users and update per row
+    $('#user-list .active.user').each(function myFunction () {
+      removeUserFromGroup($(this), actionUrl, groupName)
+    })
+  })
 
-$(function() {
-    // Multiple user role change
-    $('.users.card .update-button').on('click', function(e) {
-        var newRole = $(this).attr('data-target-role');
-        var actionUrl = $(this).attr('data-action');
-        var groupName = $('#group-list .group.active').attr('data-name');
+  // CSV import handling {{{
+  document.getElementById('file-input').addEventListener('change', readCsvFile, false)
 
-        // Step through selected users and update per row
-        $('#user-list .active.user').each(function myFunction() {
-             process_userrole_change($(this), actionUrl, newRole, groupName);
-        });
-    });
+  $('.file-input-click').click(function () {
+    $('#file-input').val(null)
+  })
 
-    // Set attributes in modal
-    $('#modal-user-delete').on('show.bs.modal', function () {
-        let groupName = $('#group-list .group.active').attr('data-name');
-        let users = [];
-        // Get all selected users
-        $('#user-list .active.user').each(function myFunction() {
-            let name = $(this).attr('data-name');
-            name = name.substring(0, name.lastIndexOf('#'));
-            users.push(name);
-        });
+  $('.import-groups-csv').click(function () {
+    $('#dlg-import-groups-csv').modal('show')
+  })
 
-        // Fill modal
-        $('#modal-user-delete .user').text(users.join(', '));
-        $('#modal-user-delete .group').text(groupName);
-    });
+  $('.process-csv').click(function () {
+    // First disable the button
+    $(this).prop('disabled', true)
 
-    // Remove multiple users from group
-    $('#modal-user-delete .confirm').on('click', function(e) {
-        // that.onClickUserDelete($('.users.card .delete-button')[0]);
-        $('#modal-user-delete').modal('hide');
+    // loop through the rows in the table and, if successful, add a click handler to be able to jump to a group in the groupmananger
+    $('.import-groupname').each(function myFunction () {
+      processImportedRow($(this))
+    })
+  })
+  // }}}
 
-        var actionUrl = $('#btn-remove-user-from-group').attr('data-action');
-        var groupName = $('#group-list .group.active').attr('data-name');
+  // When allowed to add groups the fields have to be initialized
+  $('.create-button-new').click(function () {
+    $('.properties-update').addClass('hidden')
+    $('.users').addClass('hidden')
+    $('.properties-create').removeClass('hidden')
 
-        // Step through selected users and update per row
-        $('#user-list .active.user').each(function myFunction() {
-            remove_user_from_group($(this), actionUrl, groupName);
-        });
-    });
+    const that = Yoda.groupManager
 
+    const $prefixDiv = $('#f-group-create-prefix-div')
+    $prefixDiv.find('button .text').html(that.GROUP_DEFAULT_PREFIX + '&nbsp;')
 
-    // CSV import handling {{{
-    document.getElementById('file-input').addEventListener('change', readCsvFile, false);
+    $('#f-group-create-data-classification').val('unspecified').trigger('change')
 
-    $('.file-input-click').click(function(){
-        $('#file-input').val(null);
-    });
+    $('#f-group-create-prefix-div a[data-value="' + that.GROUP_DEFAULT_PREFIX + '"]').click()
 
-    $('.import-groups-csv').click(function(){
-        $('#dlg-import-groups-csv').modal('show');
-    });
+    $('#f-group-create-name').val('')
+    $('#f-group-create-description').val('')
 
-    $('.process-csv').click(function(){
-        // First disable the button
-        $(this).prop('disabled', true);
+    $('#f-group-create-prefix-datamanager').addClass('hidden')
 
-        // loop through the rows in the table and, if successful, add a click handler to be able to jump to a group in the groupmananger
-        $('.import-groupname').each(function myFunction() {
-            process_imported_row($(this));
-        });
-    });
-    // }}}
+    $('#f-group-create-category').select2('val', '')
+    $('#f-group-create-subcategory').select2('val', '')
+    $('#f-group-create-name').focus()
+  })
 
-    // When allowed to add groups the fields have to be initialized
-    $('.create-button-new').click(function(){
-        $('.properties-update').addClass('hidden');
-        $('.users').addClass('hidden');
-        $('.properties-create').removeClass('hidden');
+  // Intercept group creation submission of form
+  $('#f-group-create-submit').click(function () {
+    Yoda.groupManager.onSubmitGroupCreateOrUpdate(this)
+  })
 
-        var that = Yoda.groupManager;
+  // Intercept group update submission of form
+  $('#f-group-update-submit').click(function () {
+    Yoda.groupManager.onSubmitGroupCreateOrUpdate(this)
+  })
 
-        var $prefixDiv = $('#f-group-create-prefix-div');
-        $prefixDiv.find('button .text').html(that.GROUP_DEFAULT_PREFIX + '&nbsp;');
+  Yoda.groupManager = {
 
-        $('#f-group-create-data-classification').val('unspecified').trigger('change');
-
-        $('#f-group-create-prefix-div a[data-value="' + that.GROUP_DEFAULT_PREFIX + '"]').click();
-
-        $('#f-group-create-name')       .val('');
-        $('#f-group-create-description').val('');
-
-        $('#f-group-create-prefix-datamanager').addClass('hidden');
-
-        $('#f-group-create-category')   .select2('val', '');
-        $('#f-group-create-subcategory').select2('val', '');
-        $('#f-group-create-name').focus();
-    });
-
-    // Intercept group creation submission of form
-    $('#f-group-create-submit').click(function(){
-        Yoda.groupManager.onSubmitGroupCreateOrUpdate(this);
-    });
-
-    // Intercept group update submission of form
-    $('#f-group-update-submit').click(function(){
-        Yoda.groupManager.onSubmitGroupCreateOrUpdate(this);
-    });
-
-    Yoda.groupManager = {
-
-        /**
+    /**
          * \brief If the amount of visible groups is higher than or equal to this value,
          *        categories in the group list will be folded on page load.
          */
-        CATEGORY_FOLD_THRESHOLD: 8,
+    CATEGORY_FOLD_THRESHOLD: 8,
 
-        /// Group name prefixes that can be shown in the group manager.
-        /// NB: To make group prefixes selectable in the group add dialog, the
-        /// view phtml must be edited.
-        GROUP_PREFIXES_RE:          /^(grp-|priv-|intake-|vault-|research-|deposit-|datamanager-|datarequests-)/,
+    /// Group name prefixes that can be shown in the group manager.
+    /// NB: To make group prefixes selectable in the group add dialog, the
+    /// view phtml must be edited.
+    GROUP_PREFIXES_RE: /^(grp-|priv-|intake-|vault-|research-|deposit-|datamanager-|datarequests-)/,
 
-        /// A subset of GROUP_PREFIXES_RE that cannot be selected for group creation, and that cannot be deleted.
-        GROUP_PREFIXES_RESERVED_RE: /^(priv-|vault-)/,
+    /// A subset of GROUP_PREFIXES_RE that cannot be selected for group creation, and that cannot be deleted.
+    GROUP_PREFIXES_RESERVED_RE: /^(priv-|vault-)/,
 
-        GROUP_PREFIXES_WITH_DATA_CLASSIFICATION: ['research-', 'intake-'],
+    GROUP_PREFIXES_WITH_DATA_CLASSIFICATION: ['research-', 'intake-'],
 
-        GROUP_PREFIXES_WITH_SCHEMA_ID: ['research-', 'deposit-'],
+    GROUP_PREFIXES_WITH_SCHEMA_ID: ['research-', 'deposit-'],
 
-        GROUP_PREFIXES_WITH_EXPIRATION_DATE: ['research-'],
+    GROUP_PREFIXES_WITH_EXPIRATION_DATE: ['research-'],
 
-        /// The default prefix when adding a new group.
-        GROUP_DEFAULT_PREFIX:       'research-',
+    /// The default prefix when adding a new group.
+    GROUP_DEFAULT_PREFIX: 'research-',
 
-        unloading: false, ///< Set to true when a navigation action is detected. Used for better error reporting.
+    unloading: false, /// < Set to true when a navigation action is detected. Used for better error reporting.
 
-        groupHierarchy: null, ///< A group hierarchy object. See Yoda.groupManager.load().
-        groups:         null, ///< A list of group objects with member information. See Yoda.groupManager.load().
+    groupHierarchy: null, /// < A group hierarchy object. See Yoda.groupManager.load().
+    groups: null, /// < A list of group objects with member information. See Yoda.groupManager.load().
 
-        isRodsAdmin: false, // This will be set in Yoda.groupManager.load().
+    isRodsAdmin: false, // This will be set in Yoda.groupManager.load().
 
-        zone: null,
-        userNameFull: null, ///< The username, including the zone name.
+    zone: null,
+    userNameFull: null, /// < The username, including the zone name.
 
-        /// A list of access / membership levels.
-        accessLevels: ['reader', 'normal', 'manager'],
+    /// A list of access / membership levels.
+    accessLevels: ['reader', 'normal', 'manager'],
 
-        /// Icon classes for access levels.
-        accessIcons: {
-            'reader':  'fa-eye',
-            'normal':  'fa-user',
-            'manager': 'fa-crown',
-        },
+    /// Icon classes for access levels.
+    accessIcons: {
+      reader: 'fa-eye',
+      normal: 'fa-user',
+      manager: 'fa-crown'
+    },
 
-        /// Human-readable descriptions of access levels.
-        /// These are used in title attrs of membership icons and on Change Role buttons.
-        accessNames: {
-            'reader':  'Member with read-only access',
-            'normal':  'Regular member with write access',
-            'manager': 'Group manager',
-        },
+    /// Human-readable descriptions of access levels.
+    /// These are used in title attrs of membership icons and on Change Role buttons.
+    accessNames: {
+      reader: 'Member with read-only access',
+      normal: 'Regular member with write access',
+      manager: 'Group manager'
+    },
 
-        // All possible schema-id's
-        schemaIDs: [],
+    // All possible schema-id's
+    schemaIDs: [],
 
-        /// Get the name of an access level one lower than the current one for
-        /// the given group.
-        prevAccessLevel: function(current, groupName) {
-            var prev = null;
-            var currentI = this.accessLevels.indexOf(current);
-            if (currentI)
-                prev = this.accessLevels[currentI - 1];
+    /// Get the name of an access level one lower than the current one for
+    /// the given group.
+    prevAccessLevel: function (current, groupName) {
+      let prev = null
+      const currentI = this.accessLevels.indexOf(current)
+      if (currentI) { prev = this.accessLevels[currentI - 1] }
 
-            if (prev == 'reader' && !groupName.match(/^(research|intake)-/) && current == 'normal') {
-                // The reader access level is only defined for research and intake groups.
-                prev = null;
-            }
+      if (prev === 'reader' && !groupName.match(/^(research|intake)-/) && current === 'normal') {
+        // The reader access level is only defined for research and intake groups.
+        prev = null
+      }
 
-            return prev;
-        },
+      return prev
+    },
 
-        /// Get the name of an access level one higher than the current one for
-        /// the given group.
-        nextAccessLevel: function(current, groupName) {
-            var next = null;
-            var currentI = this.accessLevels.indexOf(current);
-            if (currentI + 1 < this.accessLevels.length)
-                next = this.accessLevels[currentI + 1];
-            return next;
-        },
+    /// Get the name of an access level one higher than the current one for
+    /// the given group.
+    nextAccessLevel: function (current, groupName) {
+      let next = null
+      const currentI = this.accessLevels.indexOf(current)
+      if (currentI + 1 < this.accessLevels.length) { next = this.accessLevels[currentI + 1] }
+      return next
+    },
 
-        getPrefix: function(groupName) {
-            var matches = groupName.match(this.GROUP_PREFIXES_RE, '');
-            return matches
-                //? matches[1].slice(0, -1) // Chop off the '-' ?
-                ? matches[1]
-                : '';
-        },
+    getPrefix: function (groupName) {
+      const matches = groupName.match(this.GROUP_PREFIXES_RE, '')
+      return matches
+      // ? matches[1].slice(0, -1) // Chop off the '-' ?
+        ? matches[1]
+        : ''
+    },
 
-        prefixHasDataClassification: function(prefix) {
-            return this.GROUP_PREFIXES_WITH_DATA_CLASSIFICATION.indexOf(prefix) >= 0;
-        },
+    prefixHasDataClassification: function (prefix) {
+      return this.GROUP_PREFIXES_WITH_DATA_CLASSIFICATION.indexOf(prefix) >= 0
+    },
 
-        prefixHasSchemaId: function(prefix) {
-            return this.GROUP_PREFIXES_WITH_SCHEMA_ID.indexOf(prefix) >= 0;
-        },
+    prefixHasSchemaId: function (prefix) {
+      return this.GROUP_PREFIXES_WITH_SCHEMA_ID.indexOf(prefix) >= 0
+    },
 
-        prefixHasExpirationDate: function(prefix) {
-            return this.GROUP_PREFIXES_WITH_EXPIRATION_DATE.indexOf(prefix) >= 0;
-        },
+    prefixHasExpirationDate: function (prefix) {
+      return this.GROUP_PREFIXES_WITH_EXPIRATION_DATE.indexOf(prefix) >= 0
+    },
 
-        // Functions that check membership / access status of the
-        // client ('the user') {{{
+    // Functions that check membership / access status of the
+    // client ('the user') {{{
 
-        /**
+    /**
          * \brief Check if the user is a member of the given group.
          *
          * \param groupName
          *
          * \return
          */
-        isMemberOfGroup: function(groupName) {
-            return (groupName in this.groups
-                    && this.userNameFull in this.groups[groupName].members);
-        },
+    isMemberOfGroup: function (groupName) {
+      return (groupName in this.groups &&
+                    this.userNameFull in this.groups[groupName].members)
+    },
 
-        /**
+    /**
          * \brief Check if the user is a manager in the given group.
          *
          * \param groupName
          *
          * \return
          */
-        isManagerOfGroup: function(groupName) {
-            return (this.isMemberOfGroup(groupName)
-                    && (this.accessLevels.indexOf(this.groups[groupName]
-                                                  .members[this.userNameFull].access)
-                        >= this.accessLevels.indexOf('manager')))
-        },
+    isManagerOfGroup: function (groupName) {
+      return (this.isMemberOfGroup(groupName) &&
+                    (this.accessLevels.indexOf(this.groups[groupName]
+                      .members[this.userNameFull].access) >=
+                        this.accessLevels.indexOf('manager')))
+    },
 
-        /**
+    /**
          * \brief Check if the user is allowed to manage the given group.
          *
          * If the user is of type rodsadmin, they do not need to be a
@@ -717,11 +707,11 @@ $(function() {
          *
          * \return
          */
-        canManageGroup: function(groupName) {
-            return this.isRodsAdmin || this.isManagerOfGroup(groupName);
-        },
+    canManageGroup: function (groupName) {
+      return this.isRodsAdmin || this.isManagerOfGroup(groupName)
+    },
 
-        /**
+    /**
          * \brief Try to check if the user is a manager in the given category.
          *
          * Returns false if the user does not have access to the given
@@ -733,25 +723,24 @@ $(function() {
          *
          * \return
          */
-        isManagerInCategory: function(categoryName) {
-            if (this.isRodsAdmin)
-                return true;
+    isManagerInCategory: function (categoryName) {
+      if (this.isRodsAdmin) { return true }
 
-            var that = this;
-            try {
-                var category = this.groupHierarchy[categoryName];
-                return Object.keys(category).some(function(subcategoryName) {
-                    return Object.keys(category[subcategoryName]).some(function(groupName) {
-                        return that.isManagerOfGroup(groupName);
-                    });
-                });
-            } catch (ex) {
-                // The category is probably not visible to us.
-                return false;
-            }
-        },
+      const that = this
+      try {
+        const category = this.groupHierarchy[categoryName]
+        return Object.keys(category).some(function (subcategoryName) {
+          return Object.keys(category[subcategoryName]).some(function (groupName) {
+            return that.isManagerOfGroup(groupName)
+          })
+        })
+      } catch (ex) {
+        // The category is probably not visible to us.
+        return false
+      }
+    },
 
-        /**
+    /**
          * \brief Check whether the user is allowed to create the datamanager
          *        group in the given category.
          *
@@ -759,20 +748,18 @@ $(function() {
          *
          * \return
          */
-        canCreateDatamanagerGroup: function(categoryName) {
-
-            return (// if the category name can legally be translated to a group name ...
-                       categoryName.match(/^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)
+    canCreateDatamanagerGroup: function (categoryName) {
+      return (// if the category name can legally be translated to a group name ...
+        categoryName.match(/^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/) &&
                     // ... and the datamanager group DOES NOT yet exist ...
-                    && !(('datamanager-' + categoryName) in this.groups)
+                    !(('datamanager-' + categoryName) in this.groups) &&
                     // ... and the user is rodsadmin.
-                    && this.isRodsAdmin);
+                    this.isRodsAdmin)
 
-            // (previously, priv-category-add was sufficient where we now require rodsadmin)
-        },
+      // (previously, priv-category-add was sufficient where we now require rodsadmin)
+    },
 
-
-        /**
+    /**
          * \brief Check whether the user is allowed to update the datamanager
          *        group in the given category.
          *
@@ -780,18 +767,18 @@ $(function() {
          *
          * \return
          */
-        canUpdateDatamanagerGroup: function(categoryName) {
-            return (// if the category name can legally be translated to a group name ...
-                       categoryName.match(/^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)
+    canUpdateDatamanagerGroup: function (categoryName) {
+      return (// if the category name can legally be translated to a group name ...
+        categoryName.match(/^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/) &&
                     // ... and the datamanager group DOES exist ...
-                    && (('datamanager-' + categoryName) in this.groups)
+                    (('datamanager-' + categoryName) in this.groups) &&
                     // ... and the user is rodsadmin.
-                    && this.isRodsAdmin);
-        },
+                    this.isRodsAdmin)
+    },
 
-        // }}}
+    // }}}
 
-        /**
+    /**
          * \brief Execute a function if an AJAX request was not aborted.
          *
          * This is used to inhibit error reporting when the cause of the error
@@ -800,702 +787,706 @@ $(function() {
          * \param result the request result object
          * \param f      the function to call
          */
-        ifRequestNotAborted: function(result, f) {
-            if (!this.unloading) {
-                // Aborted requests are apparently hard to detect reliably.
-                // The closest we can get is a detection of an abort caused by
-                // navigation (e.g. refreshing the page):
-                // https://stackoverflow.com/a/15141116
-                //
-                // Checking result.status is not sufficient, because we
-                // cannot distinguish between aborted requests and network
-                // failures.
-                // The result.statusText can not be used because its behavior
-                // differs between browsers(!), e.g. Firefox will set it to
-                // 'error' either way.
-                f();
-            }
-        },
+    ifRequestNotAborted: function (result, f) {
+      if (!this.unloading) {
+        // Aborted requests are apparently hard to detect reliably.
+        // The closest we can get is a detection of an abort caused by
+        // navigation (e.g. refreshing the page):
+        // https://stackoverflow.com/a/15141116
+        //
+        // Checking result.status is not sufficient, because we
+        // cannot distinguish between aborted requests and network
+        // failures.
+        // The result.statusText can not be used because its behavior
+        // differs between browsers(!), e.g. Firefox will set it to
+        // 'error' either way.
+        f()
+      }
+    },
 
-        /**
+    /**
          * \brief Unfold the category belonging to the given group in the group list.
          *
          * \param groupName
          */
-        unfoldToGroup: function(groupName) {
-            var $groupList = $('#group-list');
+    unfoldToGroup: function (groupName) {
+      const $groupList = $('#group-list')
 
-            var $group = $groupList.find('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]');
+      const $group = $groupList.find('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]')
 
-            $group.parents('.category').children('a.name').removeClass('collapsed');
-            $group.parents('.category').children('.category-ul').removeClass('hidden');
-            $group.parents('.category').children('.category-ul').collapse('show');
+      $group.parents('.category').children('a.name').removeClass('collapsed')
+      $group.parents('.category').children('.category-ul').removeClass('hidden')
+      $group.parents('.category').children('.category-ul').collapse('show')
 
-            if ($group.parents('.category').find('.subcategory').length > 1)  {
-                // Unfold subcategory.
-                // Skip this if there is only one subcategory. In that case the
-                // subcat will be automagically expanded by a
-                // 'shown.bs.collapse' event handler.
-                // (unfolding twice looks jittery)
-                $group.parents('.subcategory').children('a.name').removeClass('collapsed');
-                $group.parents('.subcategory').children('.subcategory-ul').removeClass('hidden');
-                $group.parents('.subcategory').children('.subcategory-ul').collapse('show');
-            }
-        },
+      if ($group.parents('.category').find('.subcategory').length > 1) {
+        // Unfold subcategory.
+        // Skip this if there is only one subcategory. In that case the
+        // subcat will be automagically expanded by a
+        // 'shown.bs.collapse' event handler.
+        // (unfolding twice looks jittery)
+        $group.parents('.subcategory').children('a.name').removeClass('collapsed')
+        $group.parents('.subcategory').children('.subcategory-ul').removeClass('hidden')
+        $group.parents('.subcategory').children('.subcategory-ul').collapse('show')
+      }
+    },
 
-        updateGroupMemberCount: function(groupName) {
-            var $userPanelTitle = $('.card.users .card-title');
-            var count_selected = $('#user-list .active').length
-            var selected = '';
-            if (count_selected) {
-                selected = ' / ' + count_selected.toString() + ' selected';
-            }
+    updateGroupMemberCount: function (groupName) {
+      const countSelected = $('#user-list .active').length
+      let selected = ''
+      if (countSelected) {
+        selected = ' / ' + countSelected.toString() + ' selected'
+      }
 
-            $('#user-group-member-count').text('Group members (' + Object.keys(this.groups[groupName].members).length + selected + ')');
-        },
+      $('#user-group-member-count').text('Group members (' + Object.keys(this.groups[groupName].members).length + selected + ')')
+    },
 
-        /**
+    /**
          * \brief Select the given group in the group list.
          *
          * \param groupName
          */
-        selectGroup: function(groupName) {
-            var group = this.groups[groupName];
-            var userCanManage = this.canManageGroup(groupName);
+    selectGroup: function (groupName) {
+      const group = this.groups[groupName]
+      const userCanManage = this.canManageGroup(groupName)
 
-            // TRee
-            var $groupList = $('#group-list');
-            var $group     = $groupList.find('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]');
-            var $oldGroup  = $groupList.find('.active');
+      // TRee
+      const $groupList = $('#group-list')
+      const $group = $groupList.find('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]')
+      const $oldGroup = $groupList.find('.active')
 
-            //group list handling row activation
-            var listgroup = $('#tbl-list-groups tr[user-search-result-group="' + Yoda.escapeQuotes(groupName) + '"]');
-            listgroup.addClass('active').siblings().removeClass('active');
+      // group list handling row activation
+      const listgroup = $('#tbl-list-groups tr[user-search-result-group="' + Yoda.escapeQuotes(groupName) + '"]')
+      listgroup.addClass('active').siblings().removeClass('active')
 
-            if ($group.is($oldGroup))
-                return;
+      if ($group.is($oldGroup)) { return }
 
-            this.deselectGroup();
+      this.deselectGroup()
 
-            this.unfoldToGroup(groupName);
+      this.unfoldToGroup(groupName)
 
-            // handle visibility of correct update cards.
-            $('.properties-create').addClass('hidden');
-            $('.properties-update').removeClass('hidden');
-            $('.users').removeClass('hidden');
+      // handle visibility of correct update cards.
+      $('.properties-create').addClass('hidden')
+      $('.properties-update').removeClass('hidden')
+      $('.users').removeClass('hidden')
 
-            $('#group-properties-group-name').html('<strong>[' + groupName + ']</strong>');
+      $('#group-properties-group-name').html('<strong>[' + groupName + ']</strong>')
 
-            $oldGroup.removeClass('active');
-            $group.addClass('active');
-            Yoda.storage.session.set('selected-group', groupName);
+      $oldGroup.removeClass('active')
+      $group.addClass('active')
+      Yoda.storage.session.set('selected-group', groupName)
 
-            var that = this;
+      const that = this
 
-            var $groupPanel = $('.card.groups');
-            $('.delete-button').toggleClass(
-                'disabled',
-                !!(!userCanManage || groupName.match(that.GROUP_PREFIXES_RESERVED_RE)
-                   || (groupName.match(/^datamanager-/) && !this.isRodsAdmin))
-            );
+      $('#group-properties .delete-button').toggleClass(
+        'hidden',
+        !!(!userCanManage || groupName.match(that.GROUP_PREFIXES_RESERVED_RE) ||
+                   (groupName.match(/^datamanager-/) && !this.isRodsAdmin))
+      )
 
-            // The category of a datamanager group cannot be changed - the
-            // category name is part of the group name.
-            var canEditCategory = userCanManage && !groupName.match(/^datamanager-/);
+      // The category of a datamanager group cannot be changed - the
+      // category name is part of the group name.
+      const canEditCategory = userCanManage && !groupName.match(/^datamanager-/);
 
-            // Build the group properties panel {{{
+      // Build the group properties panel {{{
 
-            (function(){
-                var $groupProperties = $('#group-properties');
+      (function () {
+        const $groupProperties = $('#group-properties')
 
-                $groupProperties.find('.placeholder-text').addClass('hidden');
-                $groupProperties.find('form').removeClass('hidden');
+        $groupProperties.find('.placeholder-text').addClass('hidden')
+        $groupProperties.find('form').removeClass('hidden')
 
-                $groupProperties.find('#f-group-update-category')
-                    .select2('data', { id: group.category, text: group.category })
-                    .select2('readonly', !canEditCategory);
-                $groupProperties.find('#f-group-update-subcategory')
-                    .select2('data', { id: group.subcategory, text: group.subcategory })
-                    .select2('readonly', !userCanManage);
-                $groupProperties.find('#inputGroupPrepend')
-                    .html(function() {
-                        var matches = groupName.match(that.GROUP_PREFIXES_RE, '');
-                        return matches
-                            ? matches[1]
-                            : '&nbsp;&nbsp;';
-                    });
+        $groupProperties.find('#f-group-update-category')
+          .select2('data', { id: group.category, text: group.category })
+          .select2('readonly', !canEditCategory)
+        $groupProperties.find('#f-group-update-subcategory')
+          .select2('data', { id: group.subcategory, text: group.subcategory })
+          .select2('readonly', !userCanManage)
+        $groupProperties.find('#inputGroupPrepend')
+          .html(function () {
+            const matches = groupName.match(that.GROUP_PREFIXES_RE, '')
+            return matches
+              ? matches[1]
+              : '&nbsp;&nbsp;'
+          })
 
-                var prefix = that.getPrefix(groupName);
+        const prefix = that.getPrefix(groupName)
 
-                if (that.prefixHasSchemaId(prefix)) {
-                    $groupProperties.find('.schema-id').show();
-                    // For now this is a disabled field.
-                    $('#f-group-update-schema-id').val(group.schema_id);
-                } else {
-                    $groupProperties.find('.schema-id').hide();
-                }
+        if (that.prefixHasSchemaId(prefix)) {
+          $groupProperties.find('.schema-id').show()
+          // For now this is a disabled field.
+          $('#f-group-update-schema-id').val(group.schema_id)
+        } else {
+          $groupProperties.find('.schema-id').hide()
+        }
 
-                if (that.prefixHasExpirationDate(prefix)) {
-                    $groupProperties.find('.expiration-date').show();
-                    $groupProperties.find('#f-group-update-expiration-date')
-                        .val(group.expiration_date)
-                        .prop('readonly', !userCanManage);
-                } else {
-                    $groupProperties.find('.expiration-date').hide();
-                }
+        if (that.prefixHasExpirationDate(prefix)) {
+          $groupProperties.find('.expiration-date').show()
+          $groupProperties.find('#f-group-update-expiration-date')
+            .val(group.expiration_date)
+            .prop('readonly', !userCanManage)
+        } else {
+          $groupProperties.find('.expiration-date').hide()
+        }
 
-                $groupProperties.find('#f-group-update-name')
-                    .val(groupName.replace(that.GROUP_PREFIXES_RE, ''))
-                    .prop('readonly', true)
-                    .attr('title', 'Group names cannot be changed')
-                    .attr('data-prefix', prefix);
-                $groupProperties.find('#f-group-update-description')
-                    .val(group.description)
-                    .prop('readonly', !userCanManage);
+        $groupProperties.find('#f-group-update-name')
+          .val(groupName.replace(that.GROUP_PREFIXES_RE, ''))
+          .prop('readonly', true)
+          .attr('title', 'Group names cannot be changed')
+          .attr('data-prefix', prefix)
+        $groupProperties.find('#f-group-update-description')
+          .val(group.description)
+          .prop('readonly', !userCanManage)
 
-                if (that.prefixHasDataClassification(prefix)) {
-                    $groupProperties.find('.data-classification').show();
-                    $('#f-group-update-data-classification')
-                        .select2('readonly', !userCanManage);
-                } else {
-                    $groupProperties.find('.data-classification').hide();
-                    $('#f-group-update-data-classification').select2('readonly', true);
-                }
+        if (that.prefixHasDataClassification(prefix)) {
+          $groupProperties.find('.data-classification').show()
+          $('#f-group-update-data-classification')
+            .select2('readonly', !userCanManage)
+        } else {
+          $groupProperties.find('.data-classification').hide()
+          $('#f-group-update-data-classification').select2('readonly', true)
+        }
 
-                if (group.data_classification === null)
-                    $('#f-group-update-data-classification')
-                        .val('unspecified').trigger('change');
-                else
-                    $('#f-group-update-data-classification')
-                        .val(group.data_classification).trigger('change');
+        if (group.data_classification === null) {
+          $('#f-group-update-data-classification')
+            .val('unspecified').trigger('change')
+        } else {
+          $('#f-group-update-data-classification')
+            .val(group.data_classification).trigger('change')
+        }
 
-                $groupProperties.find('#f-group-update-submit')
-                    .attr('hidden', !userCanManage);
-            })();
+        $groupProperties.find('#f-group-update-submit')
+          .attr('hidden', !userCanManage)
+      })()
 
-            // }}}
-            // Build the user list panel {{{
+      // }}}
+      // Build the user list panel {{{
 
-            that.updateGroupMemberCount(groupName);
+      that.updateGroupMemberCount(groupName);
 
-            (function(){
-                var users = that.groups[groupName].members;
+      (function () {
+        const users = that.groups[groupName].members
 
-                var $userList = $('#user-list');
-                $userList.find('.list-group-item.user').remove();
+        const $userList = $('#user-list')
+        $userList.find('.list-group-item.user').remove()
 
-                Object.keys(users).slice().sort(function(a, b) {
-                    function cmp(a, b) {
-                        // For lack of a built-in '<=>' compare operator...
-                        return (  a < b ? -1
-                                : a > b ?  1
-                                : 0);
-                    }
+        Object.keys(users).slice().sort(function (a, b) {
+          function cmp (a, b) {
+            // For lack of a built-in '<=>' compare operator...
+            return (a < b
+              ? -1
+              : a > b
+                ? 1
+                : 0)
+          }
 
-                    // Sort based on access level first (more rights => higher in the list).
-                    return (cmp(that.accessLevels.indexOf(users[b].access),
-                                that.accessLevels.indexOf(users[a].access))
+          // Sort based on access level first (more rights => higher in the list).
+          return (cmp(that.accessLevels.indexOf(users[b].access),
+            that.accessLevels.indexOf(users[a].access)) ||
                             // ... then sort alphabetically on username.
-                            || cmp(a, b));
+                            cmp(a, b))
+        }).forEach(function (userName, i) {
+          // Loop through the sorted user list and generate the #userList element.
+          const user = users[userName]
 
-                }).forEach(function(userName, i){
-                    // Loop through the sorted user list and generate the #userList element.
-                    var user = users[userName];
+          const $user = $('<a class="list-group-item list-group-item-action user">')
+          $user.attr('id', 'user-' + i)
+          $user.addClass('user-access-' + user.access)
+          $user.attr('data-name', userName)
+          if (userName === that.userNameFull) {
+            $user.addClass('self')
+            if (!that.isRodsAdmin) {
+              $user.addClass('disabled')
+                .attr('title', 'You cannot change your own role or remove yourself from this group.')
+            }
+          }
 
-                    var $user = $('<a class="list-group-item list-group-item-action user">');
-                    $user.attr('id', 'user-' + i);
-                    $user.addClass('user-access-' + user.access);
-                    $user.attr('data-name', userName);
-                    if (userName === that.userNameFull) {
-                        $user.addClass('self');
-                        if (!that.isRodsAdmin)
-                            $user.addClass('disabled')
-                                 .attr('title', 'You cannot change your own role or remove yourself from this group.');
-                    }
+          let displayName = userName
+          const nameAndZone = userName.split('#')
+          // Only display a user's zone if it differs
+          // from the client's zone.
+          if (nameAndZone[1] === that.zone) { displayName = nameAndZone[0] }
 
-                    var displayName = userName;
-                    var nameAndZone = userName.split('#');
-                    // Only display a user's zone if it differs
-                    // from the client's zone.
-                    if (nameAndZone[1] == that.zone)
-                        displayName = nameAndZone[0];
+          // that.canManageGroup(groupName))
+          $user.html('<input class="form-check-input" type="checkbox" value=""> <i class="fa-solid ' +
+                               that.accessIcons[user.access] +
+                               '" aria-hidden="true" title="' +
+                               that.accessNames[user.access] +
+                               '"></i> ' +
+                               Yoda.escapeEntities(displayName))
 
-                    // that.canManageGroup(groupName))
-                    $user.html('<input class="form-check-input" type="checkbox" value=""> <i class="fa-solid '
-                               + that.accessIcons[user.access]
-                               + '" aria-hidden="true" title="'
-                               + that.accessNames[user.access]
-                               + '"></i> '
-                               + Yoda.escapeEntities(displayName));
+          $userList.append($user)
+        })
 
-                    $userList.append($user);
-                });
+        // Move the user creation item to the bottom of the list.
+        const $userList2 = $('#user-list-add-user')
+        $userList2.find('#f-user-create-group').val(groupName)
+        $userList2.attr('hidden', !that.canManageGroup(groupName))
 
-                // Move the user creation item to the bottom of the list.
-                var $userList2 = $('#user-list-add-user');
-                var $userCreateItem = $userList2.find('.item-user-create');
-                $userList2.find('#f-user-create-group').val(groupName);
-                $userList2.attr('hidden', !that.canManageGroup(groupName));
+        // Show or hide user actions depending on group permissions.
+        const $userActions = $('#user-actions')
+        $userActions.attr('hidden', !that.canManageGroup(groupName))
 
-                var $userPanel = $('.card.users');
-                $userPanel.find('#user-list').removeClass('hidden');
-                $userPanel.find('.card-body:has(.placeholder-text)').addClass('hidden');
+        const $userPanel = $('.card.users')
+        $userPanel.find('#user-list').removeClass('hidden')
+        $userPanel.find('.card-body:has(.placeholder-text)').addClass('hidden')
 
-                // Fix bad bootstrap borders caused by hidden elements.
-                $userPanel.find('.card-header').css({ borderBottom: 'none' });
-                $userPanel.find('.card-footer').css( { borderTop:    ''     });
+        // Fix bad bootstrap borders caused by hidden elements.
+        $userPanel.find('.card-header').css({ borderBottom: 'none' })
+        $userPanel.find('.card-footer').css({ borderTop: '' })
 
-                $userPanel.find('.create-button').removeClass('disabled');
-                $userPanel.find('.update-button, .delete-button').addClass('disabled');
-            })();
+        $userPanel.find('.create-button').removeClass('disabled')
+        $userPanel.find('.update-button, .delete-button').addClass('disabled')
+      })()
 
-            // }}}
-        },
+      // }}}
+    },
 
-        /**
+    /**
          * \brief Deselects the selected group, if any.
          */
-        deselectGroup: function() {
-            this.deselectUser();
+    deselectGroup: function () {
+      this.deselectUser()
 
-            var $groupPanel = $('.card.groups');
-            $groupPanel.find('.delete-button').addClass('disabled');
+      const $groupPanel = $('.card.groups')
+      $groupPanel.find('.delete-button').addClass('disabled')
 
-            var $groupList = $('#group-list');
-            $groupList.find('.active').removeClass('active');
+      const $groupList = $('#group-list')
+      $groupList.find('.active').removeClass('active')
 
-            var $groupProperties = $('#group-properties');
-            $groupProperties.find('.placeholder-text').removeClass('hidden');
-            $groupProperties.find('form').addClass('hidden');
+      const $groupProperties = $('#group-properties')
+      $groupProperties.find('.placeholder-text').removeClass('hidden')
+      $groupProperties.find('form').addClass('hidden')
 
-            var $userPanel = $('.card.users');
+      const $userPanel = $('.card.users')
 
-            var $panelTitle = $userPanel.find('.card-title');
-            $panelTitle.text($panelTitle.text().replace(/\s*\(\d+\)$/, ''));
+      const $panelTitle = $userPanel.find('.card-title')
+      $panelTitle.text($panelTitle.text().replace(/\s*\(\d+\)$/, ''))
 
-            $userPanel.find('#user-list-search').val('');
-            $userPanel.find('.card-body:has(.placeholder-text)').removeClass('hidden');
-            $userPanel.find('#user-list').addClass('hidden');
+      $userPanel.find('#user-list-search').val('')
+      $userPanel.find('.card-body:has(.placeholder-text)').removeClass('hidden')
+      $userPanel.find('#user-list').addClass('hidden')
 
-            // Fix bad bootstrap borders caused by hidden elements.
-            $userPanel.find('.card-header').css({ borderBottom: ''               });
+      // Fix bad bootstrap borders caused by hidden elements.
+      $userPanel.find('.card-header').css({ borderBottom: '' })
 
-            $userPanel.find('.card-footer').css({ borderTop:    '1px solid #ddd' });
+      $userPanel.find('.card-footer').css({ borderTop: '1px solid #ddd' })
 
-            $('#group-properties-group-name').html('');
+      $('#group-properties-group-name').html('')
 
-            Yoda.storage.session.remove('selected-group');
-        },
+      Yoda.storage.session.remove('selected-group')
+    },
 
-        /**
+    /**
          * \brief Select the given user in the user list.
          *
          * \param item: the row that was clicked in the userlist
          */
-        selectUser: function(item) {
-            if (item.hasClass('active')) {
-                item.removeClass('active');
-                item.find('.form-check-input').prop('checked', false);
-            } else {
-                item.addClass('active');
-                item.find('.form-check-input').prop('checked', true);
-            }
+    selectUser: function (item) {
+      if (item.hasClass('active')) {
+        item.removeClass('active')
+        item.find('.form-check-input').prop('checked', false)
+      } else {
+        item.addClass('active')
+        item.find('.form-check-input').prop('checked', true)
+      }
 
-            // inform users of member count and selection count
-            this.updateGroupMemberCount($('#group-list .active.group').attr('data-name'));
+      // inform users of member count and selection count
+      this.updateGroupMemberCount($('#group-list .active.group').attr('data-name'))
 
-            var count_selected = $('#user-list .active').length
-            if (this.canManageGroup($('#group-list .active.group').attr('data-name'))) {
-                var $userPanel = $('.card.users');
-                if (count_selected>0) {
-                    $userPanel.find('.delete-button').removeClass('disabled');
-                    $userPanel.find('.update-button').removeClass('disabled');
-                    return;
-                }
-            }
-            // Disable user management buttons
-            $userPanel.find('.delete-button').addClass('disabled');
-            $userPanel.find('.update-button').addClass('disabled');
-        },
+      const countSelected = $('#user-list .active').length
+      const $userPanel = $('.card.users')
+      if (this.canManageGroup($('#group-list .active.group').attr('data-name'))) {
+        if (countSelected > 0) {
+          $userPanel.find('.delete-button').removeClass('disabled')
+          $userPanel.find('.update-button').removeClass('disabled')
+          return
+        }
+      }
+      // Disable user management buttons
+      $userPanel.find('.delete-button').addClass('disabled')
+      $userPanel.find('.update-button').addClass('disabled')
+    },
 
-        /**
+    /**
          * \brief Deselects the selected user, if any.
          */
-        deselectUser: function() {
-            var $userPanel = $('.card.users');
-            var $userList  = $('#user-list');
-            $userList.find('.active').removeClass('active');
-            $userPanel.find('.update-button, .delete-button').addClass('disabled');
-        },
+    deselectUser: function () {
+      const $userPanel = $('.card.users')
+      const $userList = $('#user-list')
+      $userList.find('.active').removeClass('active')
+      $userPanel.find('.update-button, .delete-button').addClass('disabled')
+    },
 
-        /**
+    /**
          * \brief Turn certain inputs into select2 inputs with autocompletion.
          */
-        selectifyInputs: function(sel) {
-            var that = this;
+    selectifyInputs: function (sel) {
+      const that = this
 
-            // Category fields {{{
+      // Category fields {{{
 
-            $(sel).filter('.selectify-category').each(function() {
-                var $el = $(this);
+      $(sel).filter('.selectify-category').each(function () {
+        const $el = $(this)
 
-                $el.attr(
-                    'placeholder',
-                    (that.isMemberOfGroup('priv-category-add') || that.isRodsAdmin)
-                        ? 'Select one or enter a new name'
-                        : 'Select a category'
-                );
+        $el.attr(
+          'placeholder',
+          (that.isMemberOfGroup('priv-category-add') || that.isRodsAdmin)
+            ? 'Select one or enter a new name'
+            : 'Select a category'
+        )
 
-                $el.select2({
-                    ajax: {
-                        quietMillis: 200,
-                        url:      '/group_manager/get_categories',
-                        type:     'post',
-                        dataType: 'json',
-                        data: function (term, page) {
-                            return { query: term };
-                        },
-                        results: function (data) {
-                            var categories = data.categories
-                            var results = [];
-                            var query   = $el.data('select2').search.val();
-                            var inputMatches = false;
+        $el.select2({
+          ajax: {
+            quietMillis: 200,
+            url: '/group_manager/get_categories',
+            type: 'post',
+            dataType: 'json',
+            data: function (term, page) {
+              return { query: term }
+            },
+            results: function (data) {
+              const categories = data.categories
+              const results = []
+              const query = $el.data('select2').search.val()
+              let inputMatches = false
 
-                            // For legacy reasons we allow selecting existing categories with illegal names.
-                            // New categories (where we show '(create)' in the dropdown) must adhere to the new rules:
-                            // They must be valid as part of a group name -> only lowercase letters, numbers and hyphens.
-                            //
-                            // When we drop support for the old category name style this code can be updated to
-                            // automatically lowercase user input (see the username input code for an example).
+              // For legacy reasons we allow selecting existing categories with illegal names.
+              // New categories (where we show '(create)' in the dropdown) must adhere to the new rules:
+              // They must be valid as part of a group name -> only lowercase letters, numbers and hyphens.
+              //
+              // When we drop support for the old category name style this code can be updated to
+              // automatically lowercase user input (see the username input code for an example).
 
-                            categories.forEach(function(category) {
-                                if (query === category)
-                                    inputMatches = true;
+              categories.forEach(function (category) {
+                if (query === category) { inputMatches = true }
 
-                                if (that.isManagerInCategory(category))
-                                    results.push({
-                                        id:   category,
-                                        text: category,
-                                    });
-                                else if (inputMatches)
-                                    // Only show a (disabled) category the user doesn't have access to
-                                    // if they type its exact name.
-                                    results.push({
-                                        id:       category,
-                                        text:     category,
-                                        disabled: true,
-                                    });
-                            });
-
-                            results.sort(function(a, b) {
-                                return (a.id === b.id  ?  0 :
-                                        a.id === query ? -1 :
-                                        b.id === query ?  1 :
-                                        a.id >=  b.id  ?  1 : -1);
-                            });
-
-                            if (
-                                  !inputMatches
-                                && query.length
-                                && (that.isMemberOfGroup('priv-category-add') || that.isRodsAdmin)
-                            ) {
-                                results.push({
-                                    id:     query,
-                                    text:   query,
-                                    exists: false
-                                });
-                            }
-
-                            return { results: results };
-                        },
-                    },
-                    formatResult: function(result, $container, query, escaper) {
-                        return escaper(result.text)
-                            + (
-                                'exists' in result && !result.exists
-                                ? ' <span class="grey">(create)</span>'
-                                : ''
-                            );
-                    },
-                    initSelection: function($el, callback) {
-                        callback({ id: $el.val(), text: $el.val() });
-                    },
-                }).on('open', function() {
-                    $(this).select2('val', '');
-                }).on('change', function() {
-                    $($(this).attr('data-subcategory')).select2('val', '');
-
-                    // bring over the category value to the schema-id if exists.
-                    if (that.schemaIDs.includes($(this).select2('val'))) {
-                        $('#f-group-create-schema-id').select2('val', $(this).select2('val'));
-                    }
-
-                    if (this.id === 'f-group-create-category') {
-                        if (that.canCreateDatamanagerGroup(this.value))
-                            $('#f-group-create-prefix-datamanager').removeClass('hidden');
-                        else
-                            $('#f-group-create-prefix-datamanager').addClass('hidden');
-
-                        if ($('#f-group-create-name').attr('data-prefix') === 'datamanager-') {
-                            // Reset the group name + prefix by pretending that
-                            // the user clicked on the default prefix.
-                            $('#f-group-create-prefix-div a[data-value="' + that.GROUP_DEFAULT_PREFIX + '"]').click();
-                            $('#f-group-create-name').val('');
-                        }
-                    }
-                });
-            });
-
-            // }}}
-            // Subcategory fields {{{
-
-            $(sel).filter('.selectify-subcategory').each(function() {
-                var $el = $(this);
-
-                $el.select2({
-                    ajax: {
-                        quietMillis: 200,
-                        url:      '/group_manager/get_subcategories',
-                        type:     'post',
-                        dataType: 'json',
-                        data: function (term, page) {
-                            return {
-                                category: $($el.attr('data-category')).val(),
-                                query: term
-                            };
-                        },
-                        results: function (data) {
-                            var subcategories = data.subcategories
-                            var results = [];
-                            var query   = $el.data('select2').search.val();
-                            var inputMatches = false;
-
-                            subcategories.forEach(function(subcategory) {
-                                results.push({
-                                    id:   subcategory,
-                                    text: subcategory
-                                });
-                                if (query === subcategory)
-                                    inputMatches = true;
-                            });
-
-                            results.sort(function(a, b) {
-                                return (a.id === b.id  ?  0 :
-                                        a.id === query ? -1 :
-                                        b.id === query ?  1 :
-                                        a.id >=  b.id  ?  1 : -1);
-                            });
-
-                            if (!inputMatches && query.length)
-                                results.push({
-                                    id:   query,
-                                    text: query,
-                                    exists: false
-                                });
-
-                            return { results: results };
-                        },
-                    },
-                    formatResult: function(result, $container, query, escaper) {
-                        return escaper(result.text)
-                            + (
-                                'exists' in result && !result.exists
-                                ? ' <span class="grey">(create)</span>'
-                                : ''
-                            );
-                    },
-                    initSelection: function($el, callback) {
-                        callback({ id: $el.val(), text: $el.val() });
-                    },
-                }).on('open', function() {
-                    $(this).select2('val', '');
-                });
-            });
-
-
-            // }}}
-
-            // Schema-id {{{
-            $(sel).filter('.selectify-schema-id').each(function() {
-                var $el = $(this);
-
-                $el.select2({
-                    ajax: {
-                        quietMillis: 200,
-                        url:      '/group_manager/get_schemas',
-                        type:     'post',
-                        dataType: 'json',
-                        data: function (term, page) {
-                            return { query: term };
-                        },
-
-                        results: function (data) {
-                            var schemas = data.schemas
-                            var results = [];
-                            var query   = $el.data('select2').search.val();
-                            var inputMatches = false;
-
-                            schemas.forEach(function(schema) {
-                                if (schema.startsWith(query)) {
-                                    results.push({
-                                        id:   schema,
-                                        text: schema,
-                                    });
-                                 }
-                            });
-
-                            results.sort(function(a, b) {
-                                return (a.id === b.id  ?  0 :
-                                        a.id === query ? -1 :
-                                        b.id === query ?  1 :
-                                        a.id >=  b.id  ?  1 : -1);
-                            });
-
-                            return { results: results };
-                        },
-                    },
-                    formatResult: function(result, $container, query, escaper) {
-                        return escaper(result.text)
-                            + (
-                                'exists' in result && !result.exists
-                                ? ' <span class="grey">(create)</span>'
-                                : ''
-                            );
-                    },
-                    initSelection: function($el, callback) {
-                        callback({ id: $el.val(), text: $el.val() });
-                    },
-                }).on('open', function() {
-                    $(this).select2('val', '');
-                }).on('change', function() {
-                });
-            });
-
-
-            // }}}
-
-            // Username fields {{{
-            $(sel).filter('.selectify-user-name').each(function() {
-                var $el = $(this);
-
-                $el.select2({
-                    allowClear:  true,
-                    openOnEnter: false,
-                    minimumInputLength: 3,
-                    ajax: {
-                        quietMillis: 400,
-                        url:      '/group_manager/get_users',
-                        type:     'post',
-                        dataType: 'json',
-                        data: function (term, page) {
-                            return {
-                                query: term.toLowerCase()
-                            };
-                        },
-                        results: function (data) {
-                            var users = data.users
-                            var query   = $el.data('select2').search.val().toLowerCase();
-                            var results = [];
-                            var inputMatches = false;
-
-                            users.forEach(function(userName) {
-                                // Exclude users already in the group.
-                                if (!(userName in that.groups[$($el.attr('data-group')).val()].members)) {
-                                    var nameAndZone = userName.split('#');
-                                    results.push({
-                                        id:   userName,
-                                        text: nameAndZone[1] === that.zone ? nameAndZone[0] : userName
-                                    });
-                                }
-                                if (query === userName || query + '#' + that.zone === userName)
-                                    inputMatches = true;
-                            });
-
-                            if (!inputMatches && query.length)
-                                results.push({
-                                    id:   query,
-                                    text: query,
-                                    exists: false
-                                });
-
-                            return { results: results };
-                        },
-                    },
-                    formatResult: function(result, $container, query, escaper) {
-                        return escaper(result.text)
-                            + (
-                                'exists' in result && !result.exists
-                                ? ' <span class="grey">(create)</span>'
-                                : ''
-                            );
-                    },
-                    initSelection: function($el, callback) {
-                        callback({ id: $el.val(), text: $el.val() });
-                    },
-                }).on('open', function() {
-                    $(this).select2('val', '');
-                });
-            });
-
-            // }}}
-
-            // Search username field {{{
-            $(sel).filter('.selectify-search').each(function() {
-
-                // Build array with co-members to be used by select2.
-                var hier = Yoda.groupManager.groupHierarchy;
-
-                var usernames = [];
-                var groupnames = [];
-                for (var categoryName in hier) {
-                    for (var subcategoryName in hier[categoryName]) {
-                        for (var groupName in hier[categoryName][subcategoryName]) {
-                            groupnames.push(groupName);
-                            // find the user within the group array
-                            for (var mem in hier[categoryName][subcategoryName][groupName].members) {
-                                usernames.push(mem);
-                            }
-                        }
-                    }
+                if (that.isManagerInCategory(category)) {
+                  results.push({
+                    id: category,
+                    text: category
+                  })
+                } else if (inputMatches) {
+                  // Only show a (disabled) category the user doesn't have access to
+                  // if they type its exact name.
+                  results.push({
+                    id: category,
+                    text: category,
+                    disabled: true
+                  })
                 }
+              })
 
-                // only unique usernames
-                var unique_users = [...new Set(usernames)];
-                unique_users.sort();
-                var user_list = []
-                for (var val in unique_users) {
-                    user_list.push({id: "user:" + unique_users[val],text: unique_users[val].split('#')[0]});
+              results.sort(function (a, b) {
+                return (a.id === b.id
+                  ? 0
+                  : a.id === query
+                    ? -1
+                    : b.id === query
+                      ? 1
+                      : a.id >= b.id ? 1 : -1)
+              })
+
+              if (
+                !inputMatches &&
+                                query.length &&
+                                (that.isMemberOfGroup('priv-category-add') || that.isRodsAdmin)
+              ) {
+                results.push({
+                  id: query,
+                  text: query,
+                  exists: false
+                })
+              }
+
+              return { results }
+            }
+          },
+          formatResult: function (result, $container, query, escaper) {
+            return escaper(result.text) +
+                            (
+                              'exists' in result && !result.exists
+                                ? ' <span class="grey">(create)</span>'
+                                : ''
+                            )
+          },
+          initSelection: function ($el, callback) {
+            callback({ id: $el.val(), text: $el.val() })
+          }
+        }).on('open', function () {
+          $(this).select2('val', '')
+        }).on('change', function () {
+          $($(this).attr('data-subcategory')).select2('val', '')
+
+          // bring over the category value to the schema-id if exists.
+          if (that.schemaIDs.includes($(this).select2('val'))) {
+            $('#f-group-create-schema-id').select2('val', $(this).select2('val'))
+          }
+
+          if (this.id === 'f-group-create-category') {
+            if (that.canCreateDatamanagerGroup(this.value)) { $('#f-group-create-prefix-datamanager').removeClass('hidden') } else { $('#f-group-create-prefix-datamanager').addClass('hidden') }
+
+            if ($('#f-group-create-name').attr('data-prefix') === 'datamanager-') {
+              // Reset the group name + prefix by pretending that
+              // the user clicked on the default prefix.
+              $('#f-group-create-prefix-div a[data-value="' + that.GROUP_DEFAULT_PREFIX + '"]').click()
+              $('#f-group-create-name').val('')
+            }
+          }
+        })
+      })
+
+      // }}}
+      // Subcategory fields {{{
+
+      $(sel).filter('.selectify-subcategory').each(function () {
+        const $el = $(this)
+
+        $el.select2({
+          ajax: {
+            quietMillis: 200,
+            url: '/group_manager/get_subcategories',
+            type: 'post',
+            dataType: 'json',
+            data: function (term, page) {
+              return {
+                category: $($el.attr('data-category')).val(),
+                query: term
+              }
+            },
+            results: function (data) {
+              const subcategories = data.subcategories
+              const results = []
+              const query = $el.data('select2').search.val()
+              let inputMatches = false
+
+              subcategories.forEach(function (subcategory) {
+                results.push({
+                  id: subcategory,
+                  text: subcategory
+                })
+                if (query === subcategory) { inputMatches = true }
+              })
+
+              results.sort(function (a, b) {
+                return (a.id === b.id
+                  ? 0
+                  : a.id === query
+                    ? -1
+                    : b.id === query
+                      ? 1
+                      : a.id >= b.id ? 1 : -1)
+              })
+
+              if (!inputMatches && query.length) {
+                results.push({
+                  id: query,
+                  text: query,
+                  exists: false
+                })
+              }
+
+              return { results }
+            }
+          },
+          formatResult: function (result, $container, query, escaper) {
+            return escaper(result.text) +
+                            (
+                              'exists' in result && !result.exists
+                                ? ' <span class="grey">(create)</span>'
+                                : ''
+                            )
+          },
+          initSelection: function ($el, callback) {
+            callback({ id: $el.val(), text: $el.val() })
+          }
+        }).on('open', function () {
+          $(this).select2('val', '')
+        })
+      })
+
+      // }}}
+
+      // Schema-id {{{
+      $(sel).filter('.selectify-schema-id').each(function () {
+        const $el = $(this)
+
+        $el.select2({
+          ajax: {
+            quietMillis: 200,
+            url: '/group_manager/get_schemas',
+            type: 'post',
+            dataType: 'json',
+            data: function (term, page) {
+              return { query: term }
+            },
+
+            results: function (data) {
+              const schemas = data.schemas
+              const results = []
+              const query = $el.data('select2').search.val()
+
+              schemas.forEach(function (schema) {
+                if (schema.startsWith(query)) {
+                  results.push({
+                    id: schema,
+                    text: schema
+                  })
                 }
+              })
 
-                // only unique usernames
-                var unique_groups = [...new Set(groupnames)];
-                unique_groups.sort();
-                var group_list = []
-                for (var val in unique_groups) {
-                    group_list.push({id: "group:" + unique_groups[val], text: unique_groups[val]});
+              results.sort(function (a, b) {
+                return (a.id === b.id
+                  ? 0
+                  : a.id === query
+                    ? -1
+                    : b.id === query
+                      ? 1
+                      : a.id >= b.id ? 1 : -1)
+              })
+
+              return { results }
+            }
+          },
+          formatResult: function (result, $container, query, escaper) {
+            return escaper(result.text) +
+                            (
+                              'exists' in result && !result.exists
+                                ? ' <span class="grey">(create)</span>'
+                                : ''
+                            )
+          },
+          initSelection: function ($el, callback) {
+            callback({ id: $el.val(), text: $el.val() })
+          }
+        }).on('open', function () {
+          $(this).select2('val', '')
+        }).on('change', function () {
+        })
+      })
+
+      // }}}
+
+      // Username fields {{{
+      $(sel).filter('.selectify-user-name').each(function () {
+        const $el = $(this)
+
+        $el.select2({
+          allowClear: true,
+          openOnEnter: false,
+          minimumInputLength: 3,
+          ajax: {
+            quietMillis: 400,
+            url: '/group_manager/get_users',
+            type: 'post',
+            dataType: 'json',
+            data: function (term, page) {
+              return {
+                query: term.toLowerCase()
+              }
+            },
+            results: function (data) {
+              const users = data.users
+              const query = $el.data('select2').search.val().toLowerCase()
+              const results = []
+              let inputMatches = false
+
+              users.forEach(function (userName) {
+                // Exclude users already in the group.
+                if (!(userName in that.groups[$($el.attr('data-group')).val()].members)) {
+                  const nameAndZone = userName.split('#')
+                  results.push({
+                    id: userName,
+                    text: nameAndZone[1] === that.zone ? nameAndZone[0] : userName
+                  })
                 }
+                if (query === userName || query + '#' + that.zone === userName) { inputMatches = true }
+              })
 
-                var data = [{"text": "Groups", "children": group_list}, {"text": "Users", "children": user_list}]
+              if (!inputMatches && query.length) {
+                results.push({
+                  id: query,
+                  text: query,
+                  exists: false
+                })
+              }
 
-                // Initialize Select2.
-                var $el = $(this);
-                $el.select2({
-                    data: data,
-                    allowClear:  true,
-                    openOnEnter: false,
-                    minimumInputLength: 3
-                }).on('open', function() {
-                    $(this).select2('val', '');
-                }).on('change', function() {
-                    treeListGroups();
-                    flatListGroups();
-                });
-            });
+              return { results }
+            }
+          },
+          formatResult: function (result, $container, query, escaper) {
+            return escaper(result.text) +
+                            (
+                              'exists' in result && !result.exists
+                                ? ' <span class="grey">(create)</span>'
+                                : ''
+                            )
+          },
+          initSelection: function ($el, callback) {
+            callback({ id: $el.val(), text: $el.val() })
+          }
+        }).on('open', function () {
+          $(this).select2('val', '')
+        })
+      })
 
-            // }}}
-        },
+      // }}}
 
-        /**
+      // Search username field {{{
+      $(sel).filter('.selectify-search').each(function () {
+        // Build array with co-members to be used by select2.
+        const hier = Yoda.groupManager.groupHierarchy
+
+        const usernames = []
+        const groupnames = []
+        for (const categoryName in hier) {
+          for (const subcategoryName in hier[categoryName]) {
+            for (const groupName in hier[categoryName][subcategoryName]) {
+              groupnames.push(groupName)
+              // find the user within the group array
+              for (const mem in hier[categoryName][subcategoryName][groupName].members) {
+                usernames.push(mem)
+              }
+            }
+          }
+        }
+
+        // only unique usernames
+        const uniqueUsers = [...new Set(usernames)]
+        uniqueUsers.sort()
+        const userList = []
+        for (const val in uniqueUsers) {
+          userList.push({ id: 'user:' + uniqueUsers[val], text: uniqueUsers[val].split('#')[0] })
+        }
+
+        // only unique usernames
+        const uniqueGroups = [...new Set(groupnames)]
+        uniqueGroups.sort()
+        const groupList = []
+        for (const val in uniqueGroups) {
+          groupList.push({ id: 'group:' + uniqueGroups[val], text: uniqueGroups[val] })
+        }
+
+        const data = [{ text: 'Groups', children: groupList }, { text: 'Users', children: userList }]
+
+        // Initialize Select2.
+        const $el = $(this)
+        $el.select2({
+          data,
+          allowClear: true,
+          openOnEnter: false,
+          minimumInputLength: 3
+        }).on('open', function () {
+          $(this).select2('val', '')
+        }).on('change', function () {
+          treeListGroups()
+          flatListGroups()
+        })
+      })
+
+      // }}}
+    },
+
+    /**
          * \brief Group create / update form submission handler.
          *
          * `this` is assumed to be the groupManager object, not the form element
@@ -1503,228 +1494,222 @@ $(function() {
          *
          * \param button the button that determines updating or creation of group data
          */
-        onSubmitGroupCreateOrUpdate: function(button) {
-
-            var action =
+    onSubmitGroupCreateOrUpdate: function (button) {
+      const action =
                 $(button).attr('id') === 'f-group-create-submit'
-                ? 'create' : 'update';
+                  ? 'create'
+                  : 'update'
 
-            $(button).addClass('disabled').val(
-                    action === 'create'
-                    ? 'Adding group...'
-                    : 'Updating...'
-                );
+      $(button).addClass('disabled').val(
+        action === 'create'
+          ? 'Adding group...'
+          : 'Updating...'
+      )
 
-            function resetSubmitButton() {
-                $(button).removeClass('disabled')
-                    .val(
-                        action === 'create'
-                        ? 'Add group'
-                        : 'Update'
-                    );
-            }
+      function resetSubmitButton () {
+        $(button).removeClass('disabled')
+          .val(
+            action === 'create'
+              ? 'Add group'
+              : 'Update'
+          )
+      }
 
-            // all now bases upon update-fields. Create dialog is discarded
-            var newProperties = {
-                name:                $('#f-group-' + action + '-name'     ).attr('data-prefix')
-                                   + $('#f-group-' + action + '-name'     ).val(),
-                description:         $('#f-group-' + action + '-description').val(),
-                schema_id:           $('#f-group-' + action + '-schema-id').val(),
-                data_classification: $('#f-group-' + action + '-data-classification').val(),
-                category:            $('#f-group-' + action + '-category'   ).val(),
-                subcategory:         $('#f-group-' + action + '-subcategory').val(),
-                expiration_date:    $('#f-group-' + action + '-expiration-date').val()
-            };
+      // all now bases upon update-fields. Create dialog is discarded
+      const newProperties = {
+        name: $('#f-group-' + action + '-name').attr('data-prefix') +
+                                   $('#f-group-' + action + '-name').val(),
+        description: $('#f-group-' + action + '-description').val(),
+        schema_id: $('#f-group-' + action + '-schema-id').val(),
+        data_classification: $('#f-group-' + action + '-data-classification').val(),
+        category: $('#f-group-' + action + '-category').val(),
+        subcategory: $('#f-group-' + action + '-subcategory').val(),
+        expiration_date: $('#f-group-' + action + '-expiration-date').val()
+      }
 
-            // specific datamanager-group testing dependent on mode
-            if (newProperties.name.startsWith("datamanager-")) {
-                if (action == 'create') {
-                    if (!this.canCreateDatamanagerGroup(newProperties.category)) {
-                        alert("Datamanager group names may only contain lowercase letters (a-z) and hyphens (-).");
-                        resetSubmitButton();
-                        return;
-                    }
-                } else if (action == 'update') {
-                    if (!this.canUpdateDatamanagerGroup(newProperties.category)) {
-                        alert("Insufficient permissions to update this datamanager group.");
-                        resetSubmitButton();
-                        return;
-                    }
-                }
-            }
+      // specific datamanager-group testing dependent on mode
+      if (newProperties.name.startsWith('datamanager-')) {
+        if (action === 'create') {
+          if (!this.canCreateDatamanagerGroup(newProperties.category)) {
+            window.alert('Datamanager group names may only contain lowercase letters (a-z) and hyphens (-).')
+            resetSubmitButton()
+            return
+          }
+        } else if (action === 'update') {
+          if (!this.canUpdateDatamanagerGroup(newProperties.category)) {
+            window.alert('Insufficient permissions to update this datamanager group.')
+            resetSubmitButton()
+            return
+          }
+        }
+      }
 
-            if (!newProperties.name.startsWith("datamanager-") && !newProperties.name.match(/^(intake|research|deposit)-([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
-                alert("Group names must start with one of 'intake-' or 'research-' or 'deposit-' and may only contain lowercase letters (a-z) and hyphens (-).");
-                resetSubmitButton();
-                return;
-            }
+      if (!newProperties.name.startsWith('datamanager-') && !newProperties.name.match(/^(intake|research|deposit)-([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
+        window.alert("Group names must start with one of 'intake-' or 'research-' or 'deposit-' and may only contain lowercase letters (a-z) and hyphens (-).")
+        resetSubmitButton()
+        return
+      }
 
-            if (newProperties.category === '' || newProperties.subcategory === '') {
-                alert('Please select a category and subcategory.');
-                resetSubmitButton();
-                return;
-            } else if (
-                // Validate input, in case HTML5 validation did not work.
-                // Also needed for the select2 inputs.
-                [newProperties.category, newProperties.subcategory, newProperties.description]
-                    .some(function(item) {
-                        return !item.match(/^[a-zA-Z0-9,.()_ -]*$/);
-                    })
-            ) {
-                alert('The (sub)category name and group description fields may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).');
-                resetSubmitButton();
-                return;
-            }
+      if (newProperties.category === '' || newProperties.subcategory === '') {
+        window.alert('Please select a category and subcategory.')
+        resetSubmitButton()
+        return
+      } else if (
+      // Validate input, in case HTML5 validation did not work.
+      // Also needed for the select2 inputs.
+        [newProperties.category, newProperties.subcategory, newProperties.description]
+          .some(function (item) {
+            return !item.match(/^[a-zA-Z0-9,.()_ -]*$/)
+          })
+      ) {
+        window.alert('The (sub)category name and group description fields may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')
+        resetSubmitButton()
+        return
+      }
 
-            // Check if schema id is valid.
-            if (this.prefixHasSchemaId(this.getPrefix(newProperties.name)) && !this.schemaIDs.includes(newProperties.schema_id)) {
-                alert('Please select a valid metadata schema as it is a required field');
-                resetSubmitButton();
-                return;
-            }
+      // Check if schema id is valid.
+      if (this.prefixHasSchemaId(this.getPrefix(newProperties.name)) && !this.schemaIDs.includes(newProperties.schema_id)) {
+        window.alert('Please select a valid metadata schema as it is a required field')
+        resetSubmitButton()
+        return
+      }
 
-            var postData = {
-                group_name:                newProperties.name,
-                group_description:         newProperties.description,
-                group_schema_id:           newProperties.schema_id,
-                group_expiration_date:    newProperties.expiration_date,
-                group_data_classification: newProperties.data_classification,
-                group_category:            newProperties.category,
-                group_subcategory:         newProperties.subcategory,
-            };
+      const postData = {
+        group_name: newProperties.name,
+        group_description: newProperties.description,
+        group_schema_id: newProperties.schema_id,
+        group_expiration_date: newProperties.expiration_date,
+        group_data_classification: newProperties.data_classification,
+        group_category: newProperties.category,
+        group_subcategory: newProperties.subcategory
+      }
 
-            // Avoid trying to set a schema id for groups that
-            // can't have one.
-            if (!this.prefixHasSchemaId(this.getPrefix(newProperties.name)))
-                delete postData.group_schema_id;
+      // Avoid trying to set a schema id for groups that
+      // can't have one.
+      if (!this.prefixHasSchemaId(this.getPrefix(newProperties.name))) { delete postData.group_schema_id }
 
-            if (action === 'update') {
-                var selectedGroup = this.groups[$($('#group-list .group.active')[0]).attr('data-name')];
-                ['description',
-                 'data_classification',
-                 'expiration_date',
-                 'category',
-                 'subcategory'].forEach(function(item) {
-                    // Filter out fields that have not changed.
-                    if (selectedGroup[item] === newProperties[item])
-                        delete postData['group_' + item];
-                });
-            }
+      if (action === 'update') {
+        const selectedGroup = this.groups[$($('#group-list .group.active')[0]).attr('data-name')];
+        ['description',
+          'data_classification',
+          'expiration_date',
+          'category',
+          'subcategory'].forEach(function (item) {
+          // Filter out fields that have not changed.
+          if (selectedGroup[item] === newProperties[item]) { delete postData['group_' + item] }
+        })
+      }
 
-            var that = this;
+      const that = this
 
-            // Avoid trying to set/update a data classification for groups that
-            // can't have one.
-            if (!this.prefixHasDataClassification(this.getPrefix(newProperties.name)))
-                delete postData.group_data_classification;
+      // Avoid trying to set/update a data classification for groups that
+      // can't have one.
+      if (!this.prefixHasDataClassification(this.getPrefix(newProperties.name))) { delete postData.group_data_classification }
 
-            // Avoid trying to set/update a expiration date for groups that
-            // can't have one.
-            if (!this.prefixHasExpirationDate(this.getPrefix(newProperties.name)))
-                delete postData.group_expiration_date;
+      // Avoid trying to set/update a expiration date for groups that
+      // can't have one.
+      if (!this.prefixHasExpirationDate(this.getPrefix(newProperties.name))) { delete postData.group_expiration_date }
 
-            $.ajax({
-                url:      $(button).attr('action'),
-                type:     'post',
-                dataType: 'json',
-                data:     postData
-            }).done(function(result) {
-                if ('status' in result && result.status === 0) {
-                    // OK! Make sure the newly added group is selected after reloading the page.
-                    Yoda.storage.session.set('selected-group', postData.group_name);
+      $.ajax({
+        url: $(button).attr('action'),
+        type: 'post',
+        dataType: 'json',
+        data: postData
+      }).done(function (result) {
+        if ('status' in result && result.status === 0) {
+          // OK! Make sure the newly added group is selected after reloading the page.
+          Yoda.storage.session.set('selected-group', postData.group_name)
 
-                    // And give the user some feedback.
-                    Yoda.storage.session.set('messages',
-                        Yoda.storage.session.get('messages', []).concat({
-                            type:    'success',
-                            message: action === 'create'
-                                     ? 'Created group ' + postData.group_name + '.'
-                                     : 'Updated '       + postData.group_name + ' group properties.'
-                        })
-                    );
+          // And give the user some feedback.
+          Yoda.storage.session.set('messages',
+            Yoda.storage.session.get('messages', []).concat({
+              type: 'success',
+              message: action === 'create'
+                ? 'Created group ' + postData.group_name + '.'
+                : 'Updated ' + postData.group_name + ' group properties.'
+            })
+          )
 
-                    $(window).on('beforeunload', function() {
-                        $(window).scrollTop(0);
-                    });
-                    window.location.reload(true);
-                } else {
-                    // Something went wrong.
-                    resetSubmitButton();
+          $(window).on('beforeunload', function () {
+            $(window).scrollTop(0)
+          })
+          window.location.reload(true)
+        } else {
+          // Something went wrong.
+          resetSubmitButton()
 
-                    if ('message' in result) {
-                        alert(result.message);
-                    } else {
-                        alert(
-                              "Error: Could not "+action+" group due to an internal error.\n"
-                            + "Please contact a Yoda administrator"
-                        );
-                    }
-                    return;
-                }
-            }).fail(function(result) {
-                that.ifRequestNotAborted(result, function() {
-                    alert("Error: Could not "+action+" group due to an internal error.\nPlease contact a Yoda administrator");
-                    resetSubmitButton();
-                });
-            });
-        },
+          if ('message' in result) {
+            window.alert(result.message)
+          } else {
+            window.alert(
+              'Error: Could not ' + action + ' group due to an internal error.\n' +
+                            'Please contact a Yoda administrator'
+            )
+          }
+        }
+      }).fail(function (result) {
+        that.ifRequestNotAborted(result, function () {
+          window.alert('Error: Could not ' + action + ' group due to an internal error.\nPlease contact a Yoda administrator')
+          resetSubmitButton()
+        })
+      })
+    },
 
-        /**
+    /**
          * \brief Handle a group delete button click event.
          */
-        onClickGroupDelete: function(el) {
-            var groupName = $('#group-list .group.active').attr('data-name');
+    onClickGroupDelete: function (el) {
+      const groupName = $('#group-list .group.active').attr('data-name')
 
-            $('#group-list .group.active')
-                .addClass('delete-pending disabled')
-                .attr('title', 'Removal pending');
-            this.deselectGroup();
+      $('#group-list .group.active')
+        .addClass('delete-pending disabled')
+        .attr('title', 'Removal pending')
+      this.deselectGroup()
 
-            var that = this;
+      const that = this
 
-            $.ajax({
-                url:      $(el).attr('data-action'),
-                type:     'post',
-                dataType: 'json',
-                data: {
-                    group_name: groupName,
-                },
-            }).done(function(result) {
-                if ('status' in result && result.status === 0) {
-                    // Give the user some feedback.
-                    Yoda.storage.session.set('messages',
-                        Yoda.storage.session.get('messages', []).concat({
-                            type:    'success',
-                            message: 'Removed group ' + groupName + '.'
-                        })
-                    );
+      $.ajax({
+        url: $(el).attr('data-action'),
+        type: 'post',
+        dataType: 'json',
+        data: {
+          group_name: groupName
+        }
+      }).done(function (result) {
+        if ('status' in result && result.status === 0) {
+          // Give the user some feedback.
+          Yoda.storage.session.set('messages',
+            Yoda.storage.session.get('messages', []).concat({
+              type: 'success',
+              message: 'Removed group ' + groupName + '.'
+            })
+          )
 
-                    $(window).on('beforeunload', function() {
-                        $(window).scrollTop(0);
-                    });
-                    window.location.reload(true);
-                } else {
-                    // Something went wrong.
+          $(window).on('beforeunload', function () {
+            $(window).scrollTop(0)
+          })
+          window.location.reload(true)
+        } else {
+          // Something went wrong.
 
-                    // Re-enable group list entry.
-                    $('#group-list .group.delete-pending[data-name="' + Yoda.escapeQuotes(groupName) + '"]').removeClass('delete-pending disabled').attr('title', '');
+          // Re-enable group list entry.
+          $('#group-list .group.delete-pending[data-name="' + Yoda.escapeQuotes(groupName) + '"]').removeClass('delete-pending disabled').attr('title', '')
 
-                    if ('message' in result)
-                        alert(result.message);
-                    else
-                        alert(
-                              "Error: Could not remove the selected group due to an internal error.\n"
-                            + "Please contact a Yoda administrator"
-                        );
-                }
-            }).fail(function(result) {
-                that.ifRequestNotAborted(result, function() {
-                    alert("Error: Could not remove the selected group due to an internal error.\nPlease contact a Yoda administrator");
-                });
-            });
-        },
+          if ('message' in result) { window.alert(result.message) } else {
+            window.alert(
+              'Error: Could not remove the selected group due to an internal error.\n' +
+                            'Please contact a Yoda administrator'
+            )
+          }
+        }
+      }).fail(function (result) {
+        that.ifRequestNotAborted(result, function () {
+          window.alert('Error: Could not remove the selected group due to an internal error.\nPlease contact a Yoda administrator')
+        })
+      })
+    },
 
-        /**
+    /**
          * \brief User add form submission handler.
          *
          * Adds a user to the selected group.
@@ -1735,82 +1720,78 @@ $(function() {
          * \param el the form element
          * \param e  a submit event
          */
-        onSubmitUserCreate: function(el, e) {
-            e.preventDefault();
+    onSubmitUserCreate: function (el, e) {
+      e.preventDefault()
 
-            if ($(el).find('input[type="submit"]').hasClass('disabled'))
-                return;
+      if ($(el).find('input[type="submit"]').hasClass('disabled')) { return }
 
-            var groupName = $(el).find('#f-user-create-group').val();
-            var  userName = $(el).find('#f-user-create-name' ).val().trim();
+      const groupName = $(el).find('#f-user-create-group').val()
+      const userName = $(el).find('#f-user-create-name').val().trim()
 
-            if (!userName.match(/^([a-z.]+|[a-z0-9_.-]+@[a-z0-9_.-]+)(#[a-zA-Z0-9_-]+)?$/)) {
-                alert('Please enter either an e-mail address or a name consisting only of lowercase chars and dots.');
-                return;
-            }
+      if (!userName.match(/^([a-z.]+|[a-z0-9_.-]+@[a-z0-9_.-]+)(#[a-zA-Z0-9_-]+)?$/)) {
+        window.alert('Please enter either an e-mail address or a name consisting only of lowercase chars and dots.')
+        return
+      }
 
-            $(el).find('input[type="submit"]').addClass('disabled').val('Adding...');
+      $(el).find('input[type="submit"]').addClass('disabled').val('Adding...')
 
-            var that = this;
+      const that = this
 
-            $.ajax({
-                url:      $(el).attr('action'),
-                type:     'post',
-                dataType: 'json',
-                data: {
-                    group_name: groupName,
-                    user_name: userName,
-                },
-            }).done(function(result) {
-                if ('status' in result)
-                    console.log('User add completed with status ' + result.status);
-                if ('status' in result && result.status === 0) {
-                    that.groups[groupName].members[userName] = {
-                        // XXX
-                        access: 'normal'
-                    };
+      $.ajax({
+        url: $(el).attr('action'),
+        type: 'post',
+        dataType: 'json',
+        data: {
+          group_name: groupName,
+          user_name: userName
+        }
+      }).done(function (result) {
+        if ('status' in result) { console.log('User add completed with status ' + result.status) }
+        if ('status' in result && result.status === 0) {
+          that.groups[groupName].members[userName] = {
+            // XXX
+            access: 'normal'
+          }
 
-                    $(el).find('#f-user-create-name').select2('val', '');
+          $(el).find('#f-user-create-name').select2('val', '')
 
-                    that.deselectGroup();
-                    that.selectGroup(groupName);
+          that.deselectGroup()
+          that.selectGroup(groupName)
 
-                    var $userList = $('#user-list');
-                    var $user = $userList.find('.user[data-name="' + Yoda.escapeQuotes(userName) + '"]');
+          const $userList = $('#user-list')
+          const $user = $userList.find('.user[data-name="' + Yoda.escapeQuotes(userName) + '"]')
 
-                    // that.selectUser(userName);
-                    that.selectUser($user);
+          // that.selectUser(userName);
+          that.selectUser($user)
 
-                    // Give a visual hint that the user was added.
-                    $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]')[0].scrollIntoView({
-                        block: "center",
-                        behavior: "smooth"
-                    });
-                    $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once');
+          // Give a visual hint that the user was added.
+          $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]')[0].scrollIntoView({
+            block: 'center',
+            behavior: 'smooth'
+          })
+          $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once')
 
-                    // open the select-user select2 for ease of use
-                    $('.selectify-user-name').select2('open');
-                } else {
-                    // Something went wrong. :(
-                    if ('message' in result)
-                        alert(result.message);
-                    else
-                        alert(
-                              "Error: Could not add a member due to an internal error.\n"
-                            + "Please contact a Yoda administrator"
-                        );
-                }
-                $(el).find('input[type="submit"]').removeClass('disabled').val('Add');
+          // open the select-user select2 for ease of use
+          $('.selectify-user-name').select2('open')
+        } else {
+          // Something went wrong. :(
+          if ('message' in result) { window.alert(result.message) } else {
+            window.alert(
+              'Error: Could not add a member due to an internal error.\n' +
+                            'Please contact a Yoda administrator'
+            )
+          }
+        }
+        $(el).find('input[type="submit"]').removeClass('disabled').val('Add')
+      }).fail(function (result) {
+        that.ifRequestNotAborted(result, function () {
+          window.alert('Error: Could not add a member due to an internal error.\nPlease contact a Yoda administrator')
+          $(el).find('input[type="submit"]').removeClass('disabled').val('Add')
+        })
+      })
+    },
 
-            }).fail(function(result) {
-                that.ifRequestNotAborted(result, function() {
-                    alert("Error: Could not add a member due to an internal error.\nPlease contact a Yoda administrator");
-                    $(el).find('input[type="submit"]').removeClass('disabled').val('Add');
-                });
-            });
-        },
-
-        /**
+    /**
          * \brief Handle a change role button click event.
          *
          * `this` is assumed to be the groupManager object, not the form element
@@ -1819,66 +1800,64 @@ $(function() {
          * \param el
          * \param e
          */
-        onClickUserUpdate: function(el, e) {
-            var that = this;
+    onClickUserUpdate: function (el, e) {
+      const that = this
 
-            var groupName = $('#group-list .group.active').attr('data-name');
-            var  userName = $('#user-list   .user.active').attr('data-name');
+      const groupName = $('#group-list .group.active').attr('data-name')
+      const userName = $('#user-list   .user.active').attr('data-name')
 
-            $('#user-list .user.active')
-                .addClass('update-pending disabled')
-                .attr('title', 'Update pending');
+      $('#user-list .user.active')
+        .addClass('update-pending disabled')
+        .attr('title', 'Update pending')
 
-            // Get the new role name from the button element before we deselect the user.
-            var newRole = $(el).attr('data-target-role');
+      // Get the new role name from the button element before we deselect the user.
+      const newRole = $(el).attr('data-target-role')
 
-            this.deselectUser();
+      this.deselectUser()
 
-            $.ajax({
-                url:      $(el).attr('data-action'),
-                type:     'post',
-                dataType: 'json',
-                data: {
-                    group_name: groupName,
-                     user_name: userName,
-                    new_role:   newRole
-                },
-            }).done(function(result) {
-                if ('status' in result)
-                    console.log('User update completed with status ' + result.status);
-                if ('status' in result && result.status === 0) {
-                    // Update user role.
-                    that.groups[groupName].members[userName].access = newRole
+      $.ajax({
+        url: $(el).attr('data-action'),
+        type: 'post',
+        dataType: 'json',
+        data: {
+          group_name: groupName,
+          user_name: userName,
+          new_role: newRole
+        }
+      }).done(function (result) {
+        if ('status' in result) { console.log('User update completed with status ' + result.status) }
+        if ('status' in result && result.status === 0) {
+          // Update user role.
+          that.groups[groupName].members[userName].access = newRole
 
-                    // Force-regenerate the user list.
-                    that.deselectGroup();
-                    that.selectGroup(groupName);
+          // Force-regenerate the user list.
+          that.deselectGroup()
+          that.selectGroup(groupName)
 
-                    // Give a visual hint that the user was updated.
-                    $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once');
-                } else {
-                    // Something went wrong. :(
+          // Give a visual hint that the user was updated.
+          $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once')
+        } else {
+          // Something went wrong. :(
 
-                    $('#user-list .user.update-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]')
-                        .removeClass('update-pending disabled')
-                        .attr('title', '');
+          $('#user-list .user.update-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]')
+            .removeClass('update-pending disabled')
+            .attr('title', '')
 
-                    if ('message' in result)
-                        alert(result.message);
-                    else
-                        alert(
-                              "Error: Could not change the role for the selected member due to an internal error.\n"
-                            + "Please contact a Yoda administrator"
-                        );
-                }
-            }).fail(function(result) {
-                that.ifRequestNotAborted(result, function() {
-                    alert("Error: Could not change the role for the selected member due to an internal error.\nPlease contact a Yoda administrator");
-                });
-            });
-        },
+          if ('message' in result) { window.alert(result.message) } else {
+            window.alert(
+              'Error: Could not change the role for the selected member due to an internal error.\n' +
+                            'Please contact a Yoda administrator'
+            )
+          }
+        }
+      }).fail(function (result) {
+        that.ifRequestNotAborted(result, function () {
+          window.alert('Error: Could not change the role for the selected member due to an internal error.\nPlease contact a Yoda administrator')
+        })
+      })
+    },
 
-        /**
+    /**
          * \brief Initialize the group manager module.
          *
          * The structure of the groupHierarchy parameter is as follows:
@@ -1903,271 +1882,263 @@ $(function() {
          *
          * \todo Generate the group list in JS just like the user list.
          */
-        load: function(groupHierarchy, schemaIDs, userType, userZone) {
-            this.groupHierarchy = groupHierarchy;
-            this.schemaIDs      = schemaIDs
-            this.isRodsAdmin    = userType == 'rodsadmin';
-            this.zone           = userZone;
-            this.userNameFull   = Yoda.user.username + '#' + userZone;
-            this.groups         = (function(hier) {
-                // Create a flat group map based on the hierarchy object.
-                var groups = { };
-                for (var categoryName in hier) {
-                    for (var subcategoryName in hier[categoryName]) {
-                        for (var groupName in hier[categoryName][subcategoryName]) {
-                            groups[groupName] = {
-                                category:    categoryName,
-                                subcategory: subcategoryName,
-                                name:        groupName,
-                                description: hier[categoryName][subcategoryName][groupName].description,
-                                schema_id:   hier[categoryName][subcategoryName][groupName].schema_id,
-                                expiration_date:    hier[categoryName][subcategoryName][groupName].expiration_date,
-                                data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
-                                members:     hier[categoryName][subcategoryName][groupName].members
-                            };
-
-                        }
-                    }
-                }
-                return groups;
-            })(this.groupHierarchy);
-
-            // Unfiltered flattened group list
-            flatListGroups();
-
-            var that = this;
-            var $groupList = $('#group-list');
-
-            // Attach event handlers {{{
-            // Generic {{{
-
-            $(document).ajaxSend(function(e, request, settings) {
-                // Append a CSRF token to all AJAX POST requests.
-                if (settings.type === 'POST' && settings.data.length)
-                    settings.data
-                        += '&' + encodeURIComponent(Yoda.csrf.tokenName)
-                         + '=' + encodeURIComponent(Yoda.csrf.tokenValue);
-            });
-            // }}}
-
-            // Set inial state of group create button {{{
-            if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
-                $('.create-button-new').removeClass('hidden');
+    load: function (groupHierarchy, schemaIDs, userType, userZone) {
+      this.groupHierarchy = groupHierarchy
+      this.schemaIDs = schemaIDs
+      this.isRodsAdmin = userType === 'rodsadmin'
+      this.zone = userZone
+      this.userNameFull = Yoda.user.username + '#' + userZone
+      this.groups = (function (hier) {
+        // Create a flat group map based on the hierarchy object.
+        const groups = { }
+        for (const categoryName in hier) {
+          for (const subcategoryName in hier[categoryName]) {
+            for (const groupName in hier[categoryName][subcategoryName]) {
+              groups[groupName] = {
+                category: categoryName,
+                subcategory: subcategoryName,
+                name: groupName,
+                description: hier[categoryName][subcategoryName][groupName].description,
+                schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
+                expiration_date: hier[categoryName][subcategoryName][groupName].expiration_date,
+                data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
+                members: hier[categoryName][subcategoryName][groupName].members
+              }
             }
-            else {
-                $('.create-button-new').addClass('hidden');
-            }
-            // }}}
+          }
+        }
+        return groups
+      })(this.groupHierarchy)
 
-            // Group list {{{
+      // Unfiltered flattened group list
+      flatListGroups()
 
-            $groupList.on('show.bs.collapse', function(e) {
-                $(e.target).parent('.list-group-item').find('.triangle').first()
-                    .removeClass('fa-caret-right')
-                       .addClass('fa-caret-down');
-            });
+      const that = this
+      const $groupList = $('#group-list')
 
-            $groupList.on('shown.bs.collapse', function(e) {
-                // Once a category is fully opened, open its subcategory (if there is only one).
-                var subs = $(e.target).children(".subcategory");
-                subs.children('.subcategory-ul').collapse('hide');
-                if (subs.length == 1) {
-                    // Only one subcategory, expand it automatically.
-                    subs.first().children('a.name').removeClass('collapsed');
-                    subs.first().children('.subcategory-ul').removeClass('hidden');
-                    subs.first().children('.subcategory-ul').collapse('show');
-                }
-            });
+      // Attach event handlers {{{
+      // Generic {{{
 
-            $groupList.on('hide.bs.collapse', function(e) {
-                $(e.target).parent('.list-group-item').find('.triangle').first()
-                    .removeClass('fa-caret-down')
-                       .addClass('fa-caret-right');
-            });
+      $(document).ajaxSend(function (e, request, settings) {
+        // Append a CSRF token to all AJAX POST requests.
+        if (settings.type === 'POST' && settings.data.length) {
+          settings.data +=
+                        '&' + encodeURIComponent(Yoda.csrf.tokenName) +
+                         '=' + encodeURIComponent(Yoda.csrf.tokenValue)
+        }
+      })
+      // }}}
 
-            $groupList.on('click', 'a.group', function() {
-                if ($(this).is($groupList.find('.active')))
-                    that.deselectGroup();
-                else
-                    that.selectGroup($(this).attr('data-name'));
-            });
+      // Set inial state of group create button {{{
+      if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
+        $('.create-button-new').removeClass('hidden')
+      } else {
+        $('.create-button-new').addClass('hidden')
+      }
+      // }}}
 
-            // Search for groups.
-            $('#search-group').on('keyup', function() {
-                treeListGroups();
-                flatListGroups();
-            });
+      // Group list {{{
 
-            // Group creation {{{
+      $groupList.on('show.bs.collapse', function (e) {
+        $(e.target).parent('.list-group-item').find('.triangle').first()
+          .removeClass('fa-caret-right')
+          .addClass('fa-caret-down')
+      })
 
-            $('#f-group-create-prefix-div a').on('click', function(e) {
-                // Select new group prefix.
-                var newPrefix = $(this).attr('data-value');
-                var oldPrefix = $('#f-group-create-name').attr('data-prefix');
+      $groupList.on('shown.bs.collapse', function (e) {
+        // Once a category is fully opened, open its subcategory (if there is only one).
+        const subs = $(e.target).children('.subcategory')
+        subs.children('.subcategory-ul').collapse('hide')
+        if (subs.length === 1) {
+          // Only one subcategory, expand it automatically.
+          subs.first().children('a.name').removeClass('collapsed')
+          subs.first().children('.subcategory-ul').removeClass('hidden')
+          subs.first().children('.subcategory-ul').collapse('show')
+        }
+      })
 
-                $('#f-group-create-prefix-div button .text').html(newPrefix + '&nbsp;');
-                $('#f-group-create-name').attr('data-prefix', newPrefix);
+      $groupList.on('hide.bs.collapse', function (e) {
+        $(e.target).parent('.list-group-item').find('.triangle').first()
+          .removeClass('fa-caret-down')
+          .addClass('fa-caret-right')
+      })
 
-                if (newPrefix === 'datamanager-') {
-                    // Autofill the group name - the user cannot customize the
-                    // name of a datamanager group.
-                    $('#f-group-create-name').val($('#f-group-create-category').val());
-                    $('#f-group-create-name').prop('readonly', true);
-                } else {
-                    $('#f-group-create-name').prop('readonly', false);
-                }
+      $groupList.on('click', 'a.group', function () {
+        if ($(this).is($groupList.find('.active'))) { that.deselectGroup() } else { that.selectGroup($(this).attr('data-name')) }
+      })
 
-                var hadDataClass = that.prefixHasDataClassification(oldPrefix);
-                var haveDataClass = that.prefixHasDataClassification(newPrefix);
+      // Search for groups.
+      $('#search-group').on('keyup', function () {
+        treeListGroups()
+        flatListGroups()
+      })
 
-                if (hadDataClass != haveDataClass) {
-                    if (haveDataClass) {
-                        $('.data-classification').show();
-                        $('#f-group-create-data-classification').val('unspecified').trigger('change');
+      // Group creation {{{
 
-                    } else {
-                        $('.data-classification').hide();
-                    }
-                }
+      $('#f-group-create-prefix-div a').on('click', function (e) {
+        // Select new group prefix.
+        const newPrefix = $(this).attr('data-value')
+        const oldPrefix = $('#f-group-create-name').attr('data-prefix')
 
-                var hadSchemaId = that.prefixHasSchemaId(oldPrefix);
-                var haveSchemaId = that.prefixHasSchemaId(newPrefix);
+        $('#f-group-create-prefix-div button .text').html(newPrefix + '&nbsp;')
+        $('#f-group-create-name').attr('data-prefix', newPrefix)
 
-                if (hadSchemaId != haveSchemaId) {
-                    if (haveSchemaId) {
-                        $('.schema-id').show();
-                    } else {
-                        $('.schema-id').hide();
-                    }
-                }
+        if (newPrefix === 'datamanager-') {
+          // Autofill the group name - the user cannot customize the
+          // name of a datamanager group.
+          $('#f-group-create-name').val($('#f-group-create-category').val())
+          $('#f-group-create-name').prop('readonly', true)
+        } else {
+          $('#f-group-create-name').prop('readonly', false)
+        }
 
-                var hadRetentionPeriod = that.prefixHasExpirationDate(oldPrefix);
-                var haveRetentionPeriod = that.prefixHasExpirationDate(newPrefix);
+        const hadDataClass = that.prefixHasDataClassification(oldPrefix)
+        const haveDataClass = that.prefixHasDataClassification(newPrefix)
 
-                if (hadRetentionPeriod != haveRetentionPeriod) {
-                    if (haveRetentionPeriod) {
-                        $('.expiration-date').show();
-                    } else {
-                        $('.expiration-date').hide();
-                    }
-                }
+        if (hadDataClass !== haveDataClass) {
+          if (haveDataClass) {
+            $('.data-classification').show()
+            $('#f-group-create-data-classification').val('unspecified').trigger('change')
+          } else {
+            $('.data-classification').hide()
+          }
+        }
 
-                e.preventDefault();
-            });
+        const hadSchemaId = that.prefixHasSchemaId(oldPrefix)
+        const haveSchemaId = that.prefixHasSchemaId(newPrefix)
 
+        if (hadSchemaId !== haveSchemaId) {
+          if (haveSchemaId) {
+            $('.schema-id').show()
+          } else {
+            $('.schema-id').hide()
+          }
+        }
 
-            // Only rodsadmin can select the 'grp-' prefix.
-            if (!this.isRodsAdmin)
-                $('#f-group-create-prefix-grp').addClass('hidden');
+        const hadRetentionPeriod = that.prefixHasExpirationDate(oldPrefix)
+        const haveRetentionPeriod = that.prefixHasExpirationDate(newPrefix)
 
-            // Group removal.
-            $('#modal-group-delete .confirm').on('click', function(e) {
-                that.onClickGroupDelete($('.card.properties-update .delete-button')[0]);
-                $('#modal-group-delete').modal('hide');
-            });
+        if (hadRetentionPeriod !== haveRetentionPeriod) {
+          if (haveRetentionPeriod) {
+            $('.expiration-date').show()
+          } else {
+            $('.expiration-date').hide()
+          }
+        }
 
-            $('#modal-group-delete').on('show.bs.modal', function() {
-                var groupName = $('#group-list .group.active').attr('data-name');
-                $(this).find('.group').text(groupName);
-            });
+        e.preventDefault()
+      })
 
-            // }}}
-            // }}}
-            // User list {{{
-            var $userList = $('#user-list');
-            $userList.on('click', 'a.user:not(.disabled)', function() {
-                that.selectUser($(this));
-            });
+      // Only rodsadmin can select the 'grp-' prefix.
+      if (!this.isRodsAdmin) { $('#f-group-create-prefix-grp').addClass('hidden') }
 
-            $userList.on('click', '.list-group-item:has(.user-create-text:not(.hidden))', function() {
-                // Show the user add form.
-                that.deselectUser();
-                $(this).find('.user-create-text').attr('hidden', '');
-                $(this).find('form').removeClass('hidden');
-                $(this).find('form').find('#f-user-create-name').select2('open');
-            });
+      // Group removal.
+      $('#modal-group-delete .confirm').on('click', function (e) {
+        that.onClickGroupDelete($('.card.properties-update .delete-button')[0])
+        $('#modal-group-delete').modal('hide')
+      })
 
-            $('#f-user-create-name').on('select2-close', function() {
-                // Remove the new user name input on unfocus if nothing was entered.
-                if ($(this).val().length === 0) {
-                    $(this).parents('.list-group-item').find('.user-create-text').removeAttr('hidden');
-                }
-            });
+      $('#modal-group-delete').on('show.bs.modal', function () {
+        const groupName = $('#group-list .group.active').attr('data-name')
+        $(this).find('.group').text(groupName)
+      })
 
-            // Adding users to groups.
-            $('#f-user-create').on('submit', function(e) {
-                that.onSubmitUserCreate(this, e);
-            });
+      // }}}
+      // }}}
+      // User list {{{
+      const $userList = $('#user-list')
+      $userList.on('click', 'a.user:not(.disabled)', function () {
+        that.selectUser($(this))
+      })
 
-            // User list search.
-            $('#user-list-search').on('keyup', function() {
-                var $users  = $('.card.users .user');
+      $userList.on('click', '.list-group-item:has(.user-create-text:not(.hidden))', function () {
+        // Show the user add form.
+        that.deselectUser()
+        $(this).find('.user-create-text').attr('hidden', '')
+        $(this).find('form').removeClass('hidden')
+        $(this).find('form').find('#f-user-create-name').select2('open')
+      })
 
-                if ($(this).val().length) {
-                    var quotedVal = Yoda.escapeQuotes($(this).val().toLowerCase());
-                    $users.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered');
-                    $users.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered');
-                } else {
-                    $users.removeClass('filtered');
-                }
-            });
+      $('#f-user-create-name').on('select2-close', function () {
+        // Remove the new user name input on unfocus if nothing was entered.
+        if ($(this).val().length === 0) {
+          $(this).parents('.list-group-item').find('.user-create-text').removeAttr('hidden')
+        }
+      })
 
-            // }}}
-            // }}}
+      // Adding users to groups.
+      $('#f-user-create').on('submit', function (e) {
+        that.onSubmitUserCreate(this, e)
+      })
 
-            this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-schema-id, .selectify-user-name, .selectify-search');
-            $('.selectify-data-classification').select2();
+      // User list search.
+      $('#user-list-search').on('keyup', function () {
+        const $users = $('.card.users .user')
 
-            if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
-                var $groupPanel = $('.card.groups');
-                $groupPanel.find('.create-button').removeClass('disabled');
-            }
+        if ($(this).val().length) {
+          const quotedVal = Yoda.escapeQuotes($(this).val().toLowerCase())
+          $users.filter('.filtered[data-name*="' + quotedVal + '"]').removeClass('filtered')
+          $users.filter(':not(.filtered):not([data-name*="' + quotedVal + '"])').addClass('filtered')
+        } else {
+          $users.removeClass('filtered')
+        }
+      })
 
-            if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
-                // show import button only for rodsadmin and members of priv-group-add
-                $('.import-groups-csv').removeClass('hidden');
-            }
+      // }}}
+      // }}}
 
-            // Indicate which groups are managed by this user.
-            for (var groupName in this.groups) {
-                if (this.isManagerOfGroup(groupName)) {
-                    $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                        '<i class="float-end fa fa-crown mt-1" title="You manage this group"></i>'
-                    );
-                } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
-                    $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                        '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>'
-                    );
-                } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access == 'reader') {
-                    $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-                        '<i class="float-end fa-solid fa-eye mt-1" title="You have read access to this group"></i>'
-                    );
-                }
-            }
+      this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-schema-id, .selectify-user-name, .selectify-search')
+      $('.selectify-data-classification').select2()
 
-            var selectedGroup = Yoda.storage.session.get('selected-group');
-            if (selectedGroup !== null && selectedGroup in this.groups) {
-                // Automatically select the last selected group within this session (bound to this tab).
-                this.selectGroup(selectedGroup);
-            }
+      if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
+        const $groupPanel = $('.card.groups')
+        $groupPanel.find('.create-button').removeClass('disabled')
+      }
 
-            if (Object.keys(this.groups).length < this.CATEGORY_FOLD_THRESHOLD) {
-                // Unfold all categories containing non-priv groups if the user has access to less than
-                // CATEGORY_FOLD_THRESHOLD groups.
-                for (groupName in this.groups)
-                    if (!groupName.match(/^priv-/))
-                        this.unfoldToGroup(groupName);
-            } else {
-                // When the user can only access a single category, unfold it automatically.
-                var $categoryEls = $('#group-list .category');
-                if ($categoryEls.length === 1)
-                    this.unfoldToGroup($categoryEls.find('.group').attr('data-name'));
-            }
+      if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
+        // show import button only for rodsadmin and members of priv-group-add
+        $('.import-groups-csv').removeClass('hidden')
+      }
 
-            $(window).on('beforeunload', function() {
-                that.unloading = true;
-            });
-        },
+      // Indicate which groups are managed by this user.
+      for (const groupName in this.groups) {
+        if (this.isManagerOfGroup(groupName)) {
+          $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
+            '<i class="float-end fa fa-crown mt-1" title="You manage this group"></i>'
+          )
+        } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
+          $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
+            '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>'
+          )
+        } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access === 'reader') {
+          $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
+            '<i class="float-end fa-solid fa-eye mt-1" title="You have read access to this group"></i>'
+          )
+        }
+      }
 
-    };
-});
+      const selectedGroup = Yoda.storage.session.get('selected-group')
+      if (selectedGroup !== null && selectedGroup in this.groups) {
+        // Automatically select the last selected group within this session (bound to this tab).
+        this.selectGroup(selectedGroup)
+      }
+
+      if (Object.keys(this.groups).length < this.CATEGORY_FOLD_THRESHOLD) {
+        // Unfold all categories containing non-priv groups if the user has access to less than
+        // CATEGORY_FOLD_THRESHOLD groups.
+        for (const groupName in this.groups) {
+          if (!groupName.match(/^priv-/)) { this.unfoldToGroup(groupName) }
+        }
+      } else {
+        // When the user can only access a single category, unfold it automatically.
+        const $categoryEls = $('#group-list .category')
+        if ($categoryEls.length === 1) { this.unfoldToGroup($categoryEls.find('.group').attr('data-name')) }
+      }
+
+      $(window).on('beforeunload', function () {
+        that.unloading = true
+      })
+    }
+
+  }
+})

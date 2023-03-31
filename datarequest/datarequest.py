@@ -77,7 +77,6 @@ def index_dacrequests() -> Response:
 @datarequest_bp.route('/')
 def index(archived: Optional[bool] = False, dacrequests: Optional[bool] = False) -> Response:
     # Todo: read browser-items-per-page from config
-    items = 10
 
     roles              = api.call('datarequest_roles_get')['data']
     submission_allowed = 'PM' not in roles and 'DM' not in roles
@@ -85,7 +84,6 @@ def index(archived: Optional[bool] = False, dacrequests: Optional[bool] = False)
 
     return render_template('datarequest/index.html',
                            activeModule='datarequest',
-                           items=items,
                            archived=archived,
                            dacrequests=dacrequests,
                            submission_allowed=submission_allowed,
@@ -220,7 +218,7 @@ def download_attachment(request_id: str) -> Response:
     with session.data_objects.open(file_path, 'r') as obj_desc:
         file = obj_desc.read()
         obj_desc.close()
-        return send_file(io.BytesIO(file), as_attachment=True, attachment_filename=file_name)
+        return send_file(io.BytesIO(file), as_attachment=True, download_name=file_name)
 
 
 @datarequest_bp.route('submit_attachments/<request_id>')
@@ -393,7 +391,7 @@ def download_dta(request_id: str) -> Response:
     with session.data_objects.open(file_path, 'r') as obj_desc:
         file = obj_desc.read()
         obj_desc.close()
-        return send_file(io.BytesIO(file), as_attachment=True, attachment_filename=file_path.split('/')[-1])
+        return send_file(io.BytesIO(file), as_attachment=True, download_name=file_path.split('/')[-1])
 
 
 @datarequest_bp.route('upload_signed_dta/<request_id>', methods=['POST'])

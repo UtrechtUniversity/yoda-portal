@@ -15,6 +15,10 @@
     padding: 15px 30px;
 }
 
+.header-logo-text-content img {
+    height: 96px;
+}
+
 .header-logo-text-content, .header-logo-text-content a {
     color: #fff;
     overflow: hidden;
