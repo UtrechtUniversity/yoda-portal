@@ -1,3 +1,4 @@
+/* global Option */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
@@ -58,12 +59,12 @@ $(function () {
   // Show checksum report
   $('body').on('click', 'a.action-show-checksum-report', function () {
     const folder = $(this).attr('data-folder')
-    const download_url = 'browse/download_checksum_report?path=' + encodeURIComponent(folder)
+    const downloadUrl = 'browse/download_checksum_report?path=' + encodeURIComponent(folder)
 
     $('#showChecksumReport .collection').text(folder)
     $('#showChecksumReport .modal-body #checksumReport').html('')
-    $('#showChecksumReport .modal-footer .download-report-text').attr('href', download_url + '&format=text')
-    $('#showChecksumReport .modal-footer .download-report-csv').attr('href', download_url + '&format=csv')
+    $('#showChecksumReport .modal-footer .download-report-text').attr('href', downloadUrl + '&format=text')
+    $('#showChecksumReport .modal-footer .download-report-csv').attr('href', downloadUrl + '&format=csv')
 
     Yoda.call('research_manifest',
       { coll: Yoda.basePath + folder }).then((data) => {
@@ -86,7 +87,6 @@ $(function () {
   $('body').on('click', 'a.action-check-for-unpreservable-files', function () {
     // Check for unpreservable file formats.
     // If present, show extensions to user.
-    const folder = $(this).attr('data-folder')
     $('#file-formats-list').val('')
 
     $('#showUnpreservableFiles .help').hide()
@@ -102,7 +102,7 @@ $(function () {
 
         $('#file-formats-list').html("<option value='' disabled selected>Select a file format list</option>")
         for (const list in data) {
-          if (data.hasOwnProperty(list)) {
+          if (Object.prototype.hasOwnProperty.call(data, list)) {
             $('#file-formats-list').append(new Option(data[list].name, list))
           }
         }
@@ -156,12 +156,12 @@ $(function () {
         let i = 0
         $.each(data, function (doi, publication) {
           i++
-          const vault_path = publication.path.replace(Yoda.basePath, '')
+          const vaultPath = publication.path.replace(Yoda.basePath, '')
           $('.previousPublications').append(`
 <div class="form-check">
   <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${htmlEncode(publication.path)}">
   <label class="form-check-label" for="dataPackage${i}">
-    ${htmlEncode(doi)} (<a target="_blank" href="?dir=${encodeURIComponent(vault_path)}">${htmlEncode(publication.title)}</a>)
+    ${htmlEncode(doi)} (<a target="_blank" href="?dir=${encodeURIComponent(vaultPath)}">${htmlEncode(publication.title)}</a>)
   </label>
 </div>
 `)
@@ -295,7 +295,7 @@ function changeBrowserUrl (path) {
     url += '?dir=' + encodeURIComponent(path)
   }
 
-  history.pushState({}, {}, url)
+  window.history.pushState({}, {}, url)
 }
 
 function browse (dir = '', changeHistory = false) {
@@ -414,15 +414,16 @@ const getFolderContents = (() => {
     const data = await get(args)
     if (data === null) { return }
 
-    cb({
+    const callback = {
       data,
       recordsTotal: total,
       recordsFiltered: total
-    })
+    }
+    cb(callback)
   })()
 
   // Allow manually clearing results (needed during soft-reload after uploading a file).
-  fn.dropCache = () => cache = []
+  fn.dropCache = () => { cache = [] }
   return fn
 })()
 
@@ -599,7 +600,7 @@ window.addEventListener('popstate', function (e) {
   const query = window.location.search.substr(1).split('&').reduce(
     function (acc, kv) {
       const xy = kv.split('=', 2)
-      acc[xy[0]] = xy.length == 1 || decodeURIComponent(xy[1])
+      acc[xy[0]] = xy.length === 1 || decodeURIComponent(xy[1])
       return acc
     }, {})
 
@@ -611,8 +612,6 @@ function topInformation (dir, showAlert) {
     Yoda.call('vault_collection_details',
       { path: Yoda.basePath + dir }).then((data) => {
       let statusText = ''
-      const basename = data.basename
-      const metadata = data.metadata
       const vaultStatus = data.status
       const vaultActionPending = data.vault_action_pending
       const hasWriteRights = 'yes'
@@ -636,17 +635,17 @@ function topInformation (dir, showAlert) {
           $('.btn-group button.folder-status').attr('data-datamanager', isDatamanager)
 
           // Set status badge.
-          if (vaultStatus == 'SUBMITTED_FOR_PUBLICATION') {
+          if (vaultStatus === 'SUBMITTED_FOR_PUBLICATION') {
             statusText = 'Submitted for publication'
-          } else if (vaultStatus == 'APPROVED_FOR_PUBLICATION') {
+          } else if (vaultStatus === 'APPROVED_FOR_PUBLICATION') {
             statusText = 'Approved for publication'
-          } else if (vaultStatus == 'PUBLISHED') {
+          } else if (vaultStatus === 'PUBLISHED') {
             statusText = 'Published'
-          } else if (vaultStatus == 'DEPUBLISHED') {
+          } else if (vaultStatus === 'DEPUBLISHED') {
             statusText = 'Depublished'
-          } else if (vaultStatus == 'PENDING_DEPUBLICATION') {
+          } else if (vaultStatus === 'PENDING_DEPUBLICATION') {
             statusText = 'Depublication pending'
-          } else if (vaultStatus == 'PENDING_REPUBLICATION') {
+          } else if (vaultStatus === 'PENDING_REPUBLICATION') {
             statusText = 'Republication pending'
           } else {
             statusText = 'Unpublished'
@@ -655,20 +654,20 @@ function topInformation (dir, showAlert) {
           // Set actions for datamanager and researcher.
           if (!vaultActionPending) {
             if (isDatamanager) {
-              if (vaultStatus == 'SUBMITTED_FOR_PUBLICATION') {
+              if (vaultStatus === 'SUBMITTED_FOR_PUBLICATION') {
                 actions['cancel-publication'] = 'Cancel publication'
                 actions['approve-for-publication'] = 'Approve for publication'
-              } else if (vaultStatus == 'UNPUBLISHED') {
+              } else if (vaultStatus === 'UNPUBLISHED') {
                 actions['submit-for-publication'] = 'Submit for publication'
-              } else if (vaultStatus == 'PUBLISHED') {
+              } else if (vaultStatus === 'PUBLISHED') {
                 actions['depublish-publication'] = 'Depublish publication'
-              } else if (vaultStatus == 'DEPUBLISHED') {
+              } else if (vaultStatus === 'DEPUBLISHED') {
                 actions['republish-publication'] = 'Republish publication'
               }
             } else if (hasDatamanager) {
-              if (vaultStatus == 'UNPUBLISHED') {
+              if (vaultStatus === 'UNPUBLISHED') {
                 actions['submit-for-publication'] = 'Submit for publication'
-              } else if (vaultStatus == 'SUBMITTED_FOR_PUBLICATION') {
+              } else if (vaultStatus === 'SUBMITTED_FOR_PUBLICATION') {
                 actions['cancel-publication'] = 'Cancel publication'
               }
             }
@@ -747,7 +746,6 @@ function topInformation (dir, showAlert) {
         $('a.action-go-to-research').attr('research-path', researchPath)
       }
 
-      const folderName = htmlEncode(basename).replace(/ /g, '&nbsp;')
       const statusBadge = '<span id="statusBadge" class="ml-2 badge rounded-pill bg-primary">' + statusText + '</span>'
 
       // Reset action dropdown.
@@ -782,20 +780,20 @@ function handleActionsList (actions, folder) {
     'go-to-research']
 
   $.each(possibleActions, function (index, value) {
-    if (actions.hasOwnProperty(value)) {
+    if (Object.prototype.hasOwnProperty.call(actions, value)) {
       html += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>'
     }
   })
 
   $.each(possibleVaultActions, function (index, value) {
-    if (actions.hasOwnProperty(value)) {
+    if (Object.prototype.hasOwnProperty.call(actions, value)) {
       vaultHtml += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>'
     }
   })
 
-  if (html != '' && vaultHtml != '') {
+  if (html !== '' && vaultHtml !== '') {
     html += '<div class="dropdown-divider"></div>' + vaultHtml
-  } else if (vaultHtml != '') {
+  } else if (vaultHtml !== '') {
     html += vaultHtml
   }
 
@@ -813,9 +811,9 @@ async function vaultSubmitForPublication (folder) {
 
   try {
     if (dataPackage) {
-      const status = await Yoda.call('vault_submit', { coll: Yoda.basePath + folder, previous_version: dataPackage })
+      await Yoda.call('vault_submit', { coll: Yoda.basePath + folder, previous_version: dataPackage })
     } else {
-      const status = await Yoda.call('vault_submit', { coll: Yoda.basePath + folder })
+      await Yoda.call('vault_submit', { coll: Yoda.basePath + folder })
     }
     $('#statusBadge').html('')
   } catch (e) {
@@ -830,8 +828,7 @@ async function vaultApproveForPublication (folder) {
   $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
 
   try {
-    const status = await Yoda.call('vault_approve',
-      { coll: Yoda.basePath + folder })
+    await Yoda.call('vault_approve', { coll: Yoda.basePath + folder })
     $('#statusBadge').html('')
   } catch (e) {
     $('#statusBadge').html(btnText)
@@ -845,8 +842,7 @@ async function vaultCancelPublication (folder) {
   $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
 
   try {
-    const status = await Yoda.call('vault_cancel',
-      { coll: Yoda.basePath + folder })
+    await Yoda.call('vault_cancel', { coll: Yoda.basePath + folder })
     $('#statusBadge').html('')
   } catch (e) {
     $('#statusBadge').html(btnText)
@@ -860,8 +856,7 @@ async function vaultDepublishPublication (folder) {
   $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
 
   try {
-    const status = await Yoda.call('vault_depublish',
-      { coll: Yoda.basePath + folder })
+    await Yoda.call('vault_depublish', { coll: Yoda.basePath + folder })
     $('#statusBadge').html('')
   } catch (e) {
     $('#statusBadge').html(btnText)
@@ -875,8 +870,7 @@ async function vaultRepublishPublication (folder) {
   $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
 
   try {
-    const status = await Yoda.call('vault_republish',
-      { coll: Yoda.basePath + folder })
+    await Yoda.call('vault_republish', { coll: Yoda.basePath + folder })
     $('#statusBadge').html('')
   } catch (e) {
     $('#statusBadge').html(btnText)
@@ -923,7 +917,7 @@ function vaultAccess (action, folder) {
   $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
 
   $.post('access', { path: decodeURIComponent(folder), action }, function (data) {
-    if (data.data.status != 'Success') {
+    if (data.data.status !== 'Success') {
       Yoda.set_message('error', data.statusInfo)
     }
 
@@ -931,16 +925,16 @@ function vaultAccess (action, folder) {
   }, 'json')
 }
 
-async function handleFileStage (collection, file_name) {
+async function handleFileStage (collection, fileName) {
   const result = await Yoda.call('tape_archive_stage',
-    { path: Yoda.basePath + collection + '/' + file_name },
+    { path: Yoda.basePath + collection + '/' + fileName },
     { quiet: true, rawResult: true }
   )
 
-  if (result.status == 'ok') {
-    Yoda.set_message('success', 'Successfully requested to bring file <' + file_name + '> online')
+  if (result.status === 'ok') {
+    Yoda.set_message('success', 'Successfully requested to bring file <' + fileName + '> online')
   } else {
-    Yoda.set_message('error', 'Failed to request to bring file <' + file_name + '> online')
+    Yoda.set_message('error', 'Failed to request to bring file <' + fileName + '> online')
   }
 }
 
@@ -963,7 +957,7 @@ function metadataInfo (dir) {
       { coll: Yoda.basePath + dir },
       { rawResult: true })
       .then((result) => {
-        if (!result || jQuery.isEmptyObject(result.data)) { return console.info('No result data from meta_form_load') }
+        if (!result || Object.keys(result.data).length === 0) { return console.info('No result data from meta_form_load') }
 
         const metadata = result.data.metadata
         $('.metadata-info').show()
@@ -1006,7 +1000,7 @@ function metadataInfo (dir) {
   }
 }
 
-function truncate (str, nr_words) {
+function truncate (str, numberOfWords) {
   // Truncate string on n number of words
-  return str.split(' ').splice(0, nr_words).join(' ')
+  return str.split(' ').splice(0, numberOfWords).join(' ')
 }
