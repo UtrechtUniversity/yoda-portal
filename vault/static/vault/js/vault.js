@@ -102,7 +102,7 @@ $(function () {
 
         $('#file-formats-list').html("<option value='' disabled selected>Select a file format list</option>")
         for (const list in data) {
-          if (data.hasOwnProperty(list)) {
+          if (Object.prototype.hasOwnProperty.call(data, list)) {
             $('#file-formats-list').append(new Option(data[list].name, list))
           }
         }
@@ -394,15 +394,16 @@ const getFolderContents = (() => {
     const data = await get(args)
     if (data === null) { return }
 
-    cb({
+    const callback = {
       data,
       recordsTotal: total,
       recordsFiltered: total
-    })
+    }
+    cb(callback)
   })()
 
   // Allow manually clearing results (needed during soft-reload after uploading a file).
-  fn.dropCache = () => cache = []
+  fn.dropCache = () => { cache = [] }
   return fn
 })()
 
@@ -729,13 +730,13 @@ function handleActionsList (actions, folder) {
     'go-to-research']
 
   $.each(possibleActions, function (index, value) {
-    if (actions.hasOwnProperty(value)) {
+    if (Object.prototype.hasOwnProperty.call(actions, value)) {
       html += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>'
     }
   })
 
   $.each(possibleVaultActions, function (index, value) {
-    if (actions.hasOwnProperty(value)) {
+    if (Object.prototype.hasOwnProperty.call(actions, value)) {
       vaultHtml += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>'
     }
   })

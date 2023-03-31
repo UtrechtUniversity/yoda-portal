@@ -7,7 +7,7 @@ $(document).ready(function () {
       (data) => {
         $(this).parent().remove()
       },
-      (error) => {
+      () => {
         Yoda.set_message(
           'error',
           'An error occurred while deleting the data access password. If the issue persists, contact your administrator.')

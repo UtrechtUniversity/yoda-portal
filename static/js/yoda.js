@@ -6,8 +6,8 @@
  */
 'use strict'
 
-/// Namespace for JS functions shared across Yoda modules.
-let Yoda = {}
+// Namespace for JS functions shared across Yoda modules.
+const Yoda = {}
 
 Yoda.store_message = function (type, msg) {
   type = (type === 'error') ? 'danger' : type
@@ -16,7 +16,7 @@ Yoda.store_message = function (type, msg) {
   Yoda.storage.session.set('messages',
     Yoda.storage.session.get('messages', [])
       .concat({
-        type: type,
+        type,
         message: msg
       })
   )
@@ -39,7 +39,7 @@ Yoda.load = function () {
   // Insert sessionStorage messages if a #messages container is present.
   const $messages = document.querySelector('#messages')
   if ($messages) {
-    let messages = Yoda.storage.session.get('messages', [])
+    const messages = Yoda.storage.session.get('messages', [])
     Yoda.storage.session.remove('messages')
     messages.forEach(item =>
       $messages.insertAdjacentHTML('beforeend', `<div class="alert alert-${item.type} alert-dismissible fade show" role="alert">` +
@@ -52,7 +52,7 @@ Yoda.load = function () {
 // Yoda.api = {
 Yoda.call = async function (path, data = {}, options = {}) {
   // Bare API call.
-  let call_ = async (path, data = {}, options = {}) => {
+  const call_ = async (path, data = {}, options = {}) => {
     // POST an API request, return results as a Promise.
     //
     // The result of the promise, whether resolved or rejected, is
@@ -64,20 +64,21 @@ Yoda.call = async function (path, data = {}, options = {}) {
     // a rejected Promise, while an 'ok' API status results in a
     // resolved Promise.
 
-    let formData = new FormData()
+    const formData = new FormData()
     // Note: csrf is set in general/templates/general/base.html.
     formData.append(Yoda.csrf.tokenName, Yoda.csrf.tokenValue)
     formData.append('data', JSON.stringify(data))
 
-    let errorResult = (msg = 'Your request could not be completed due to an internal error') =>
-      Promise.reject({
+    const errorResult = (msg = 'Your request could not be completed due to an internal error') =>
+      Promise.reject({ // eslint-disable-line prefer-promise-reject-errors
         data: null,
         status: 'error_internal',
         status_info: msg
       })
 
+    let r
     try {
-      var r = await fetch('/api/' + path, {
+      r = await fetch('/api/' + path, {
         method: 'POST',
         body: formData,
         credentials: 'same-origin',
@@ -89,30 +90,37 @@ Yoda.call = async function (path, data = {}, options = {}) {
       return errorResult('Your request could not be completed due to a network connection issue.' +
         ' Please try again in a few minutes.')
     }
+
     if (r.status === 401 || r.type === 'opaqueredirect') {
       // API Unauthorized.
       console.error('API Unauthorized: HTTP status 401')
       window.location.reload()
       return errorResult('Unauthorized. Please login.')
     }
+
     if (!((r.status >= 200 && r.status < 300) || r.status === 400 || r.status === 500)) {
       // API responses should either produce 200, 400 or 500.
       // Any other status code indicates an internal error without (human-readable) information.
       console.error(`API Error: HTTP status ${r.status}`)
       return errorResult()
     }
+
+    let j
     try {
-      var j = await r.json()
+      j = await r.json()
     } catch (error) {
       console.error(`API Error: Bad response JSON: ${error}`)
       return errorResult()
     }
+
     if (!('status' in j && 'status_info' in j && 'data' in j)) {
       console.error('API Error: missing status/status_info/data in response JSON', j)
       return errorResult()
     }
-    if (j.status === 'ok')
+
+    if (j.status === 'ok') {
       return Promise.resolve(j)
+    }
     return Promise.reject(j)
   }
 
@@ -138,7 +146,7 @@ Yoda.call = async function (path, data = {}, options = {}) {
   }
 
   try {
-    let x = await call_(path, data)
+    const x = await call_(path, data)
     if (Yoda.version === 'development') {
       console.log(`API: ${path} result: `, x)
     }
@@ -163,12 +171,14 @@ Yoda.call = async function (path, data = {}, options = {}) {
 Yoda.storage = {
   _get: function (storage, key, defaultValue = null) {
     const item = storage.getItem('yoda.' + key)
+
+    let json
     try {
-      var json = item === null
+      json = item === null
         ? undefined
         : JSON.parse(item)
     } catch (ex) {
-      var json = undefined
+      json = undefined
     }
     return typeof (json) === 'undefined' ? defaultValue : json
   },
@@ -202,10 +212,10 @@ Yoda.storage = {
   }
 }
 
-/// Escapes quotes in attribute selectors.
+// Escapes quotes in attribute selectors.
 Yoda.escapeQuotes = str => str.replace(/\\/g, '\\\\').replace(/("|')/g, '\\$1')
 
-/// Escape characters that may have a special meaning in HTML by converting them to HTML entities.
+// Escape characters that may have a special meaning in HTML by converting them to HTML entities.
 Yoda.escapeEntities = str => str.replace(/[\u00A0-\u9999<>&]/g, i => '&#' + i.charCodeAt(0) + ';')
 
 // DOM ready.
