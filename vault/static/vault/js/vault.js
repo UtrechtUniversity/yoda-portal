@@ -174,6 +174,11 @@ $(function () {
     })
   })
 
+  $("body").on("click", "a.action-vault-download", function() {
+    $('.action-confirm-vault-download').attr( 'data-folder', $(this).attr('data-folder') );
+    $('#vaultDownload').modal('show');
+  });
+
   $('body').on('click', 'a.action-vault-archival', function () {
     $('.action-confirm-vault-archival').attr('data-folder', $(this).attr('data-folder'))
     $('#vaultArchival').modal('show')
@@ -268,6 +273,11 @@ $(function () {
     $('#confirmRepublish').modal('hide')
     vaultRepublishPublication($(this).attr('data-folder'))
   })
+
+  $("#vaultDownload").on("click", ".action-confirm-vault-download", function() {
+    $('#vaultDownload').modal('hide');
+    vaultDownload($(this).attr('data-folder'));
+  });
 
   $('#vaultArchival').on('click', '.action-confirm-vault-archival', function () {
     $('#vaultArchival').modal('hide')
@@ -697,11 +707,14 @@ function topInformation (dir, showAlert) {
                 $('.alert.is-archived').show()
               } else if (archive.status == 'extract') {
                 archiveText = 'Scheduled for unarchive'
+              } else if (archive['status'] == 'bagit' || archive['status'] == 'baggingit') {
+                archiveText = 'Scheduled for download';
               }
 
               var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white">' + archiveText + '</span>'
             } else {
               var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white hide"></span>'
+              actions['vault-download'] = 'Download as bagit';
             }
           }
         }
@@ -770,7 +783,7 @@ function handleActionsList (actions, folder) {
   let vaultHtml = ''
   const possibleActions = ['submit-for-publication', 'cancel-publication',
     'approve-for-publication', 'depublish-publication',
-    'republish-publication', 'vault-archival',
+    'republish-publication', 'vault-download', 'vault-archival',
     'vault-unarchive']
 
   const possibleVaultActions = ['grant-vault-access', 'revoke-vault-access',
@@ -876,6 +889,26 @@ async function vaultRepublishPublication (folder) {
     $('#statusBadge').html(btnText)
   }
   topInformation(folder, false)
+}
+
+async function vaultDownload(folder)
+{
+  $('#archiveBadge').html('Schedule for download <i class="fa-solid fa-spinner fa-spin fa-fw"></i>');
+  $('#archiveBadge').removeClass('hide');
+
+  let result = await Yoda.call('vault_download',
+    {'coll': Yoda.basePath + folder},
+    {'quiet': true, 'rawResult': true}
+  );
+
+  if (result.status == 'ok') {
+    topInformation(folder, false);
+  }
+  else {
+    Yoda.set_message('error', 'Failed to bagit data package');
+    $('#archiveBadge').hide();
+    topInformation(folder, true);
+  }
 }
 
 async function vaultArchival (folder) {
