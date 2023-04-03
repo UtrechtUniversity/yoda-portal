@@ -4,6 +4,7 @@ import Form from "@rjsf/bootstrap-4";
 import Select from 'react-select';
 import Geolocation from "./Geolocation";
 import Vocabulary from "./Vocabulary";
+import ROR from  "./ROR";
 
 const path = $('#form').attr('data-path');
 
@@ -111,7 +112,8 @@ const widgets = {
 
 const fields = {
     geo: Geolocation,
-    vocabulary: Vocabulary
+    vocabulary: Vocabulary,
+    ror: ROR
 };
 
 const onSubmit = ({formData}) => submitData(formData);
