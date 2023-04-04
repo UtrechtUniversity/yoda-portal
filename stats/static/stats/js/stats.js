@@ -113,6 +113,27 @@ function chartShow (group) {
       chartData = {
         labels: chartDateLabels,
         datasets: [{
+          label: chartDatasetLabels[0],
+          data: chartDatapoints[0],
+          borderWidth: 1,
+          backgroundColor: 'rgba(255, 26, 104, 0.2)',
+          borderColor: 'rgba(255, 26, 104, 1)'
+        },
+        {
+          label: chartDatasetLabels[1],
+          data: chartDatapoints[1],
+          borderWidth: 1,
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)'
+        },
+        {
+          label: chartDatasetLabels[2],
+          data: chartDatapoints[2],
+          borderWidth: 1,
+          backgroundColor: 'rgba(255, 159, 64, 0.2)',
+          borderColor: 'rgba(255, 159, 64, 1)'
+        },
+        {
           label: chartDatasetLabels[3],
           data: chartDatapoints[3],
           borderWidth: 1,
@@ -194,16 +215,16 @@ function chartShow (group) {
     )
   }
 
+  // Have the buttons have the same color as the corresponding dataset bars.
+  document.getElementById('legend-research').style.backgroundColor = chart.data.datasets[0].backgroundColor
+  document.getElementById('legend-vault').style.backgroundColor = chart.data.datasets[1].backgroundColor
+  document.getElementById('legend-revisions').style.backgroundColor = chart.data.datasets[2].backgroundColor
+
   if (group.startsWith('grp') || group.startsWith('intake')) {
     document.getElementById('legend-research').style.visibility = 'hidden'
     document.getElementById('legend-vault').style.visibility = 'hidden'
     document.getElementById('legend-revisions').style.visibility = 'hidden'
   } else {
-    // Have the buttons have the same color as the corresponding dataset bars.
-    document.getElementById('legend-research').style.backgroundColor = chart.data.datasets[0].backgroundColor
-    document.getElementById('legend-vault').style.backgroundColor = chart.data.datasets[1].backgroundColor
-    document.getElementById('legend-revisions').style.backgroundColor = chart.data.datasets[2].backgroundColor
-
     document.getElementById('legend-research').style.visibility = 'visible'
     document.getElementById('legend-vault').style.visibility = 'visible'
     document.getElementById('legend-revisions').style.visibility = 'visible'
