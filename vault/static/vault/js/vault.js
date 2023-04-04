@@ -630,6 +630,7 @@ function topInformation (dir, showAlert) {
       const researchGroupAccess = data.research_group_access
       const researchPath = data.research_path
       const actions = []
+      const downloadable = data.downloadable
       const archive = data.archive
 
       $('.btn-group button.metadata-form').hide()
@@ -714,7 +715,9 @@ function topInformation (dir, showAlert) {
               var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white">' + archiveText + '</span>'
             } else {
               var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white hide"></span>'
-              actions['vault-download'] = 'Download as bagit';
+              if (downloadable) {
+                actions['vault-download'] = 'Download as bagit';
+              }
             }
           }
         }
