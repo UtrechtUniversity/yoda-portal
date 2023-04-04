@@ -24,7 +24,7 @@ $(document).ready(function () {
 // Dataset labels - this order is essential
 const chartDatasetLabels = ['Research', 'Vault', 'Revisions', 'Total']
 // Labels on the x-axis -> dates
-const chartDateLabels = []
+let chartDateLabels = []
 
 // 4 dimensional array holding all data for research, vault, revisions and total
 let chartDatapoints = [[], [], [], []]
@@ -40,7 +40,7 @@ function getGroupDetails (group) {
   Yoda.call('resource_full_year_differentiated_group_storage',
     { group_name: group }).then((data) => {
     // Labels on the x-axis -> dates
-    const chartDateLabels = data.labels
+    chartDateLabels = data.labels
 
     // 4 dimensional array holding all data for research, vault, revisions and total
     let nrOfPoints = 0
@@ -85,6 +85,7 @@ function getGroupDetails (group) {
 
 function chartShow (group) {
   let chartData = {}
+
   if (chart) {
     chart.config.data.labels = chartDateLabels
     chart.config.data.datasets[0].data = chartDatapoints[0]
@@ -112,27 +113,6 @@ function chartShow (group) {
       chartData = {
         labels: chartDateLabels,
         datasets: [{
-          label: chartDatasetLabels[0],
-          data: chartDatapoints[0],
-          borderWidth: 1,
-          backgroundColor: 'rgba(255, 26, 104, 0.2)',
-          borderColor: 'rgba(255, 26, 104, 1)'
-        },
-        {
-          label: chartDatasetLabels[1],
-          data: chartDatapoints[1],
-          borderWidth: 1,
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)'
-        },
-        {
-          label: chartDatasetLabels[2],
-          data: chartDatapoints[2],
-          borderWidth: 1,
-          backgroundColor: 'rgba(255, 159, 64, 0.2)',
-          borderColor: 'rgba(255, 159, 64, 1)'
-        },
-        {
           label: chartDatasetLabels[3],
           data: chartDatapoints[3],
           borderWidth: 1,
@@ -174,12 +154,10 @@ function chartShow (group) {
       }
     }
 
-    const data = chartData
-
     // config
     const config = {
       type: 'bar',
-      data,
+      data: chartData,
       options: {
         scales: {
           x: {
@@ -216,16 +194,16 @@ function chartShow (group) {
     )
   }
 
-  // Have the buttons have the same color as the corresponding dataset bars.
-  document.getElementById('legend-research').style.backgroundColor = chart.data.datasets[0].backgroundColor
-  document.getElementById('legend-vault').style.backgroundColor = chart.data.datasets[1].backgroundColor
-  document.getElementById('legend-revisions').style.backgroundColor = chart.data.datasets[2].backgroundColor
-
   if (group.startsWith('grp') || group.startsWith('intake')) {
     document.getElementById('legend-research').style.visibility = 'hidden'
     document.getElementById('legend-vault').style.visibility = 'hidden'
     document.getElementById('legend-revisions').style.visibility = 'hidden'
   } else {
+    // Have the buttons have the same color as the corresponding dataset bars.
+    document.getElementById('legend-research').style.backgroundColor = chart.data.datasets[0].backgroundColor
+    document.getElementById('legend-vault').style.backgroundColor = chart.data.datasets[1].backgroundColor
+    document.getElementById('legend-revisions').style.backgroundColor = chart.data.datasets[2].backgroundColor
+
     document.getElementById('legend-research').style.visibility = 'visible'
     document.getElementById('legend-vault').style.visibility = 'visible'
     document.getElementById('legend-revisions').style.visibility = 'visible'
@@ -319,7 +297,6 @@ function chartFilterDate () {
   // Pass all datasets to chart
   i = 0
   while (i < 4) {
-    // filterDatapoints[i] = arAllDatapoints[i].slice(indexstartdate, indexenddate + 1);
     chart.config.data.datasets[i].data = filterDatapoints[i]
     i++
   }
