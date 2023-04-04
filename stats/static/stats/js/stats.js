@@ -53,7 +53,6 @@ function getGroupDetails (group) {
     }
     if (group.startsWith('grp') || group.startsWith('intake')) {
       chartDatapoints = [data.research, data.vault, data.revision, data.total]
-      console.log(chartDatapoints)
     } else {
       chartDatapoints = [data.research, data.vault, data.revision, chartTotals]
     }
