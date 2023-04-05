@@ -451,12 +451,25 @@ const tableRenderer = {
     return `<div class="list-group-item group" data-name="${name}" >${htmlEncode(name)}</div>`
   },
   size: (size, _, row) => {
-    return '<span aria-hidden="true" title="' +
-            `Research: ${humanReadableSize(size[0])} (${size[0]}), ` +
-            `Vault: ${humanReadableSize(size[1])} (${size[1]}), ` +
-            `Revision: ${humanReadableSize(size[2])} (${size[2]}), ` +
-            `Total: ${humanReadableSize(size[3])} (${size[3]})` +
+    const group = row.name
+    if (group.startsWith('grp') || group.startsWith('intake')) {
+      return '<span aria-hidden="true" title="' +
+        `Total: ${humanReadableSize(size[3])}` +
+        `"'>${humanReadableSize(size[3])} </span>`
+    } else if (group.startsWith('deposit')) {
+      return '<span aria-hidden="true" title="' +
+            `Deposit: ${humanReadableSize(size[0])}, ` +
+            `Vault: ${humanReadableSize(size[1])}, ` +
+            `Total: ${humanReadableSize(size[3])}` +
             `"'>${humanReadableSize(size[3])} </span>`
+    } else {
+      return '<span aria-hidden="true" title="' +
+            `Research: ${humanReadableSize(size[0])}, ` +
+            `Vault: ${humanReadableSize(size[1])}, ` +
+            `Revision: ${humanReadableSize(size[2])}, ` +
+            `Total: ${humanReadableSize(size[3])}` +
+            `"'>${humanReadableSize(size[3])} </span>`
+    }
   }
 }
 
