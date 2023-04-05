@@ -4,7 +4,6 @@
 
 {% block style %}
     <link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('stats_bp.static', filename='lib/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('stats_bp.static', filename='css/stats.css') }}">
 {% endblock style %}
 
@@ -12,7 +11,6 @@
     <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-4.2.0/chart.min.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='js/stats.js') }}"></script>
-    <script src="{{ url_for('stats_bp.static', filename='lib/select2/js/select2.full.min.js') }}"></script>
 {% endblock scripts %}
 
 {% block content %}
