@@ -23,6 +23,7 @@ $(document).ready(function () {
 // CHART DATA VARIABLES
 // Dataset labels - this order is essential
 const chartDatasetLabels = ['Research', 'Vault', 'Revisions', 'Total']
+
 // Labels on the x-axis -> dates
 let chartDateLabels = []
 
@@ -97,7 +98,12 @@ function chartShow (group) {
       chart.config.data.datasets[3].type = 'bar'
       chart.config.data.datasets[3].backgroundColor = 'rgba(62, 103, 20, 0.2)'
       chart.config.data.datasets[3].borderColor = 'rgba(62, 103, 20, 1)'
+    } else if (group.startsWith('deposit')) {
+      chart.config.data.datasets[0].label = 'Deposit'
+      chart.config.data.datasets[3].type = 'line'
+      chart.config.data.datasets[3].borderColor = '#ff0000'
     } else {
+      chart.config.data.datasets[0].label = 'Research'
       chart.config.data.datasets[3].type = 'line'
       chart.config.data.datasets[3].borderColor = '#ff0000'
     }
@@ -216,18 +222,26 @@ function chartShow (group) {
   }
 
   // Have the buttons have the same color as the corresponding dataset bars.
+  document.getElementById('legend-deposit').style.backgroundColor = chart.data.datasets[0].backgroundColor
   document.getElementById('legend-research').style.backgroundColor = chart.data.datasets[0].backgroundColor
   document.getElementById('legend-vault').style.backgroundColor = chart.data.datasets[1].backgroundColor
   document.getElementById('legend-revisions').style.backgroundColor = chart.data.datasets[2].backgroundColor
 
   if (group.startsWith('grp') || group.startsWith('intake')) {
-    document.getElementById('legend-research').style.visibility = 'hidden'
-    document.getElementById('legend-vault').style.visibility = 'hidden'
-    document.getElementById('legend-revisions').style.visibility = 'hidden'
-  } else {
-    document.getElementById('legend-research').style.visibility = 'visible'
-    document.getElementById('legend-vault').style.visibility = 'visible'
-    document.getElementById('legend-revisions').style.visibility = 'visible'
+    document.getElementById('legend-deposit').style.display = 'none'
+    document.getElementById('legend-research').style.display = 'none'
+    document.getElementById('legend-vault').style.display = 'none'
+    document.getElementById('legend-revisions').style.display = 'none'
+  } else if (group.startsWith('deposit')) {
+    document.getElementById('legend-research').style.display = 'none'
+    document.getElementById('legend-deposit').style.display = 'block'
+    document.getElementById('legend-revisions').style.display = 'block'
+    document.getElementById('legend-vault').style.display = 'block'
+  } else if (group.startsWith('research')) {
+    document.getElementById('legend-deposit').style.display = 'none'
+    document.getElementById('legend-research').style.display = 'block'
+    document.getElementById('legend-revisions').style.display = 'block'
+    document.getElementById('legend-vault').style.display = 'block'
   }
 }
 
