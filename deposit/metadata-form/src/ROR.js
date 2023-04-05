@@ -56,7 +56,10 @@ class ROR extends React.Component {
     const title_aff_identifier = this.props.schema.properties.Affiliation_Identifier.title
 
     let label = <label className='form-label'>{title_aff_name}</label>
-    const help = this.props.uiSchema['ui:help']
+
+    const help_aff_name = this.props.uiSchema['Affiliation_Name']['ui:help'];
+    const help_aff_identifier = this.props.uiSchema['Affiliation_Identifier']['ui:help'];
+
     let customStyles = {
       control: styles => ({
         ...styles,
@@ -101,9 +104,9 @@ class ROR extends React.Component {
             onChange={this.handleChange}
             styles={customStyles}
           />
-          {help && (
+          {help_aff_name && (
             <small className='text-muted form-text'>
-              <p className='help-block'>{help}</p>
+              <p className='help-block'>{help_aff_name}</p>
             </small>
           )}
         </div>
@@ -112,8 +115,12 @@ class ROR extends React.Component {
           <div className='mb-0 form-group'>
             <label className='form-label'>{title_aff_identifier}</label>
             <input type='text' className='form-control' readOnly={this.props.readonly} onChange={this.handleChangeIdentifier} value={Affiliation_Identifier} />
+            {help_aff_identifier && (
+              <small className='text-muted form-text'>
+                <p className='help-block'>{help_aff_identifier}</p>
+              </small>
+            )}
           </div>
-
         </div>
       </div>
     )
