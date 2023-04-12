@@ -1,4 +1,6 @@
 /* global browse */
+'use strict'
+
 let folderSelectBrowser = null
 let dlgCurrentFolder = ''
 let currentBrowseFolder = ''
@@ -478,15 +480,16 @@ const getFolderContents2 = (() => {
     const data = await get(args)
     if (data === null) { return }
 
-    cb({
+    const callback = {
       data,
       recordsTotal: total,
       recordsFiltered: total
-    })
+    }
+    cb(callback)
   })()
 
   // Allow manually clearing results (needed during soft-reload after uploading a file).
-  fn.dropCache = () => cache = []
+  fn.dropCache = () => { cache = [] }
   return fn
 })()
 
@@ -578,9 +581,9 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
   // Build html
   const totalParts = parts.length
 
-  let html = '<li class="active">Home</li>'
+  let html = '<li class="active">Research</li>'
   if (totalParts > 0 && parts[0] !== 'undefined') {
-    html = '<li class="browse-select breadcrumb-item" data-path="">Home</li>' // HdR added to differentiate from main browser and avoid collisions
+    html = '<li class="browse-select breadcrumb-item" data-path="">Research</li>'
     let path = ''
     $.each(parts, function (k, part) {
       path += '/' + encodeURIComponent(part)
@@ -590,7 +593,7 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
       if (k === (totalParts - 1)) {
         html += '<li class="active breadcrumb-item">' + valueString + '</li>'
       } else {
-        html += '<li class="browse-select breadcrumb-item" data-path="' + path + '">' + valueString + '</li>' // HdR added to differentiate from main browser and avoid collisions
+        html += '<li class="browse-select breadcrumb-item" data-path="' + path + '">' + valueString + '</li>'
       }
     })
   }

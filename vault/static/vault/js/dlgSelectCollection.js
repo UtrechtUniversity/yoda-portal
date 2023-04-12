@@ -1,3 +1,5 @@
+'use strict'
+
 let urlEncodedPath = ''
 let urlEncodedOrigin = ''
 let folderSelectBrowser = null

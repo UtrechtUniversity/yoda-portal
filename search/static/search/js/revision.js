@@ -124,15 +124,16 @@ const getRevisionListContents = (() => {
     const data = await get(args)
     if (data === null) { return }
 
-    cb({
+    const callback = {
       data,
       recordsTotal: total,
       recordsFiltered: total
-    })
+    }
+    cb(callback)
   })()
 
   // Allow manually clearing results (needed during soft-reload after uploading a file).
-  fn.dropCache = () => cache = []
+  fn.dropCache = () => { cache = [] }
   return fn
 })()
 
@@ -338,15 +339,16 @@ const getFolderContents2 = (() => {
     const data = await get(args)
     if (data === null) { return }
 
-    cb({
+    const callback = {
       data,
       recordsTotal: total,
       recordsFiltered: total
-    })
+    }
+    cb(callback)
   })()
 
   // Allow manually clearing results (needed during soft-reload after uploading a file).
-  fn.dropCache = () => cache = []
+  fn.dropCache = () => { cache = [] }
   return fn
 })()
 
