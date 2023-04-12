@@ -1,5 +1,9 @@
 {
   "standard": {
-    "globals": [ "Yoda", "$" ]
+    "globals": [ "Yoda", "$" ],
+    "ignore": [
+      "metadata-form.js",
+      "datarequest/static/**"
+    ]
   }
 }
