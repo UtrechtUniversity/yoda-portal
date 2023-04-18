@@ -1172,7 +1172,7 @@ function topInformation (dir, showAlert) {
       // Lock icon
       $('.lock').hide()
       let lockIcon = ''
-      if (lockCount !== '0' && typeof lockCount !== 'undefined') {
+      if (lockCount !== 0 && typeof lockCount !== 'undefined') {
         lockIcon = `<i class="fa-solid fa-lock lock-icon" data-folder="${htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`
       }
 
