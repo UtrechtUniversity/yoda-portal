@@ -478,6 +478,7 @@ async function submitData(data) {
             {errorPrefix: 'Metadata could not be saved'});
 
         Yoda.set_message('success', `Updated metadata of folder <${path}>`);
+        $('.yodaButtons button').attr('disabled', false);
     } catch (e) {
         // Allow retry.
         $('.yodaButtons button').attr('disabled', false);
