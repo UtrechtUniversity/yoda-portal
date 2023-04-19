@@ -223,7 +223,7 @@ $(function () {
   $('body').on('click', '.browse', function (e) {
     browse($(this).attr('data-path'), true)
     // Dismiss stale messages.
-    $('#messages .close').click()
+    $('#messages .close').trigger('click')
     e.preventDefault()
   })
 
