@@ -26,7 +26,7 @@ $(function () {
     fileMgmtDialogAlert('deposit-delete', '')
 
     // set initial values for further processing and user experience
-    $('#deposit-delete-name').html($(this).attr('data-name'))
+    $('#deposit-delete-name').text($(this).attr('data-name'))
     $('.btn-confirm-deposit-delete').attr('data-collection', $(this).attr('data-collection'))
     $('.btn-confirm-deposit-delete').attr('data-name', $(this).attr('data-name'))
 
