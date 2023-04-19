@@ -38,7 +38,7 @@ $(function() {
         }
     });
 
-    $('#btn-start-scan').click(function(){
+    $('#btn-start-scan').on('click', function (){
         var study_id = $('#studyID').val();
         var study_folder = $("#studyFolder").val();
         var collection_to_scan = Yoda.basePath + '/' + study_id;
@@ -60,7 +60,7 @@ $(function() {
     });
 
     // datamanager only
-    $('#btn-lock').click(function(){
+    $('#btn-lock').on('click', function (){
         var datasets = [],
             intake_path = Yoda.basePath + '/' + $('#studyID').val();
         inProgressStart('Locking in progress...');
@@ -74,7 +74,7 @@ $(function() {
     });
 
     // datamanager only
-    $('#btn-unlock').click(function(){
+    $('#btn-unlock').on('click', function (){
         var datasets = [],
             intake_path = Yoda.basePath + '/' + $('#studyID').val();
         inProgressStart('Locking in progress...');
@@ -136,7 +136,7 @@ $(function() {
                                + '</td><td>' + $('<div>').text(data.comment).html()
                                + '</td></tr>'
                 );
-                $('input[name="comments"]', table).val('');           
+                $('input[name="comments"]', table).val('');
             })
 
             return;
@@ -200,10 +200,10 @@ $(function() {
         }
     });
 
-    $('#select-study tr').click(function(){
+    $('#select-study tr').on('click', function (){
         document.location = $(this).data('study-url');
     });
-    $('#select-study-folder tr').click(function(){
+    $('#select-study-folder tr').on('click', function (){
         document.location = $(this).data('study-folder-url');
     });
 
@@ -242,7 +242,7 @@ $(function() {
     console.log($("#studyFolder").val());
     console.log(window.location.origin);
     console.log(window.location.pathname);
-    
+
 });
 
 function reload_page_with_alert(alertNr) {
@@ -280,7 +280,7 @@ function datasetRowClickForDetails(obj, mainTable)
         //return;
         //
         // "csrf_token": Yoda.csrf.tokenValue
-        url = 'getDatasetDetailView' 
+        url = 'getDatasetDetailView'
         $.post(
             url,
             {   tbl_id: tbl_id,

@@ -74,7 +74,7 @@ $(document).ready(function() {
              });
 
             // Required as every time page changes, this effect was lost.
-             $('.cbDataSet').click(function(event){
+             $('.cbDataSet').on('click', function (event){
                  event.stopPropagation();
                  handleVaultButtonStatus();
              });
@@ -104,19 +104,19 @@ $(document).ready(function() {
 
     // 1) prevent opening of dataset details when clicking on row.
     // 2) enable lock/unlock buttons as to make the relation between the checkboxes and buttons more evident
-    $('.cbDataSet').click(function(event){
+    $('.cbDataSet').on('click', function (event){
         event.stopPropagation();
         handleVaultButtonStatus();
     });
 
     // 1) check all checkboxes belonging to the group
     // 2) lock/unlock buttons as to make the relation between the checkboxes and buttons more evident
-    $('#datatable tbody tr .group').click(function(){
+    $('#datatable tbody tr .group').on('click', function (){
         $('#datatable tbody tr[data-target="'+$(this).data('target')+'"] .cbDataSet').prop('checked',$(this).prop('checked'));
         handleVaultButtonStatus();
     });
 
-    $('.control-all-cbDataSets').click(function(){
+    $('.control-all-cbDataSets').on('click', function (){
         $('.cbDataSet').prop('checked',$(this).prop('checked'));
         handleVaultButtonStatus();
     });
