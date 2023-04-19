@@ -40,7 +40,7 @@ $(document).ready(function () {
     })
   })
 
-  $('.btn-copy-to-clipboard').click(function (event) {
+  $('.btn-copy-to-clipboard').on('click', function (event) {
     $('#f-token').select()
     document.execCommand('copy')
     event.preventDefault()

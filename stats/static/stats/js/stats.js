@@ -360,7 +360,7 @@ function startBrowsing () {
     pageLength: parseInt(Yoda.settings.number_of_items),
     // "searching": true,
     fnDrawCallback: function () {
-      $('#group-browser td').click(function () {
+      $('#group-browser td').on('click', function () {
         const groupName = $(this).parent().find('.list-group-item').attr('data-name')
         getGroupDetails(groupName)
         $('#selected-group').html('Group [' + groupName + ']')

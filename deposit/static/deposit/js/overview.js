@@ -33,7 +33,7 @@ $(function () {
     $('#deposit-delete').modal('show')
   })
 
-  $('.btn-confirm-deposit-delete').click(function () {
+  $('.btn-confirm-deposit-delete').on('click', function () {
     handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'))
   })
 })

@@ -25,14 +25,14 @@ $(function () {
     startBrowsing()
   }
 
-  $('.btn-group button.metadata-form').click(function () {
+  $('.btn-group button.metadata-form').on('click', function () {
     showMetadataForm($(this).attr('data-path'))
   })
 
   /// /////////////////////////////////////////////
   // File and folder management from context menu
   /// /////////////////////////////////////////////
-  $('.btn-group button.folder-create').click(function () {
+  $('.btn-group button.folder-create').on('click', function () {
     // Destroy earlier alerts
     fileMgmtDialogAlert('folder-create', '')
 
@@ -45,7 +45,7 @@ $(function () {
   })
 
   // handle addition of new folder to
-  $('.btn-confirm-folder-create').click(function () {
+  $('.btn-confirm-folder-create').on('click', function () {
     // er kan een dubbele naam zijn? error handling afwikkelen!
     handleFolderAdd($('#path-folder-create').val(), $(this).attr('data-path'))
   })
@@ -62,7 +62,7 @@ $(function () {
 
     $('#folder-rename').modal('show')
   })
-  $('.btn-confirm-folder-rename').click(function () {
+  $('.btn-confirm-folder-rename').on('click', function () {
     handleFolderRename($('#folder-rename-name').val(), $(this).attr('data-collection'), $('#org-folder-rename-name').val())
   })
 
@@ -79,7 +79,7 @@ $(function () {
     $('#folder-delete').modal('show')
   })
 
-  $('.btn-confirm-folder-delete').click(function () {
+  $('.btn-confirm-folder-delete').on('click', function () {
     handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'))
   })
 
@@ -108,11 +108,11 @@ $(function () {
         const fileRelative = file.substring(length)
         addCleanupFile(fileData, fileRelative, index)
       })
-      $('.cleanup-check-all').click(function () {
+      $('.cleanup-check-all').on('click', function () {
         // "cleanup-select-file"
         $('.cleanup-select-file').prop('checked', $(this).is(':checked'))
       })
-      $('.cleanup-single-file').click(function () {
+      $('.cleanup-single-file').on('click', function () {
         const collName = $(this).attr('coll-name')
         const dataName = $(this).attr('data-name')
         const rowId = $(this).attr('row-id')
@@ -160,7 +160,7 @@ $(function () {
     })
   })
 
-  $('.btn-confirm-cleanup-collection').click(function () {
+  $('.btn-confirm-cleanup-collection').on('click', function () {
     $('.cleanup-select-file').each(function (index, item) {
       if ($(item).is(':checked')) {
         const collName = $(this).attr('coll-name')
@@ -199,7 +199,7 @@ $(function () {
     document.getElementById('file-rename-name').setSelectionRange(0, endSelection)
   })
 
-  $('.btn-confirm-file-rename').click(function () {
+  $('.btn-confirm-file-rename').on('click', function () {
     handleFileRename($('#file-rename-name').val(), $(this).attr('data-collection'), $('#org-file-rename-name').val())
   })
 
@@ -217,7 +217,7 @@ $(function () {
     $('#file-delete').modal('show')
   })
 
-  $('.btn-confirm-file-delete').click(function () {
+  $('.btn-confirm-file-delete').on('click', function () {
     handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'))
   })
 
@@ -245,7 +245,7 @@ $(function () {
   r.assignBrowse($('.upload-folder')[0], true)
 
   // When chosing to close overview of upload overview then all incomplete file uploads will be canceled.
-  $('.btn-close-uploads-overview').click(function () {
+  $('.btn-close-uploads-overview').on('click', function () {
     r.cancel()
     $('#files').html('')
     $('#uploads').addClass('hidden')

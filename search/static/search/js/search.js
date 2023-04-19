@@ -12,7 +12,7 @@ $(document).ready(function () {
     search()
   }
 
-  $('#search-panel a').click(function () {
+  $('#search-panel a').on('click', function () {
     $('#search_concept').html($(this).text())
     $('#search_concept').attr('data-type', $(this).attr('data-type'))
 
@@ -30,7 +30,7 @@ $(document).ready(function () {
     search()
   })
 
-  $('.search-btn').click(function () {
+  $('.search-btn').on('click', function () {
     currentSearchString = $('#search-filter').val()
     currentSearchType = $('#search_concept').attr('data-type')
     search()
