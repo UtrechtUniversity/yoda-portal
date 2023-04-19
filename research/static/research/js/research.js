@@ -422,7 +422,7 @@ $(function () {
     }
   })
 
-  $('#file-formats-list').change(function () {
+  $('#file-formats-list').on('change', function () {
     const folder = $('a.action-check-for-unpreservable-files').attr('data-folder')
     const list = $('#file-formats-list option:selected').val()
     if (!(list in preservableFormatsLists)) { return }
