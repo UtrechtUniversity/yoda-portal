@@ -108,13 +108,13 @@ let getFolderContents = (() => {
 // Functions for rendering table cells, per column.
 const tableRenderer = {
     name: (name, _, row) => {
-        return `${htmlEncode(name)}`;
+        return `${Yoda.htmlEncode(name)}`;
     },
     id: (id, _, row) => {
-        return `<a class="coll browse" href="view/${encodeURIComponent(id)}" data-path="${htmlEncode(id)}">${htmlEncode(id)}</a>`;
+        return `<a class="coll browse" href="view/${encodeURIComponent(id)}" data-path="${Yoda.htmlEncode(id)}">${Yoda.htmlEncode(id)}</a>`;
     },
     title: (title, _, row) => {
-        return `${htmlEncode(title)}`;
+        return `${Yoda.htmlEncode(title)}`;
     },
     date: ts => {
          let date = new Date(ts*1000);
@@ -126,7 +126,7 @@ const tableRenderer = {
          return elem[0].outerHTML;
      },
      status: (status, _, row) => {
-         return `${htmlEncode(convertToHumanReadableStatus(status))}`;
+         return `${Yoda.htmlEncode(convertToHumanReadableStatus(status))}`;
      },
 };
 
@@ -215,12 +215,5 @@ function convertToHumanReadableStatus(status) {
             return "Data ready";
         default:
             return "Unknown status";
-    } 
-}
-
-
-function htmlEncode(value){
-    //create a in-memory div, set it's inner text(which jQuery automatically encodes)
-    //then grab the encoded contents back out.  The div never exists on the page.
-    return $('<div/>').text(value).html().replaceAll('"', '&quot;');
+    }
 }

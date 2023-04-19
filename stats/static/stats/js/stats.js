@@ -462,7 +462,7 @@ const getFolderContents = (() => {
 // Functions for rendering table cells, per column.
 const tableRenderer = {
   name: (name, _, row) => {
-    return `<div class="list-group-item group" data-name="${name}" >${htmlEncode(name)}</div>`
+    return `<div class="list-group-item group" data-name="${name}" >${Yoda.htmlEncode(name)}</div>`
   },
   size: (size, _, row) => {
     const group = row.name
@@ -495,12 +495,6 @@ function humanReadableSize (size) {
     szi++
   }
   return (Math.floor(size * 10) / 10 + '') + '&nbsp;' + szs[szi]
-}
-
-function htmlEncode (value) {
-  // create a in-memory div, set it's inner text(which jQuery automatically encodes)
-  // then grab the encoded contents back out.  The div never exists on the page.
-  return $('<div/>').text(value).html().replace('"', '&quot;')
 }
 
 function getNearestDate (findDate) {
