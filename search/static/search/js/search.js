@@ -44,7 +44,7 @@ $(document).ready(function () {
     }
   })
 
-  $('.search-status').change(function () {
+  $('.search-status').on('change', function () {
     currentSearchString = $(this).val()
     currentSearchType = 'status'
     search()
