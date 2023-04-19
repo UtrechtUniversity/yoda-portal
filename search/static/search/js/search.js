@@ -110,9 +110,9 @@ const resultsRenderer = {
     }
 
     if (row.type === 'coll') {
-      return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`
+      return `<a class="browse-search" href="${Yoda.htmlEncode(href)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>`
     } else {
-      return `<a class="browse-search" href="${htmlEncode(href)}"><i class="fa-regular fa-file"></i> ${htmlEncode(name)}</a>`
+      return `<a class="browse-search" href="${Yoda.htmlEncode(href)}"><i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}</a>`
     }
   },
   size: (size, _, row) => {
@@ -225,7 +225,7 @@ function search () {
       const searchStatus = $('.search-status option:selected').text()
       $('.search-string').text(searchStatus)
     } else {
-      $('.search-string').html(htmlEncode(currentSearchString).replace(/ /g, '&nbsp;'))
+      $('.search-string').html(Yoda.htmlEncode(currentSearchString).replace(/ /g, '&nbsp;'))
     }
   }
 
@@ -240,10 +240,4 @@ function search () {
   }
 
   return true
-}
-
-function htmlEncode (value) {
-  // create a in-memory div, set it's inner text(which jQuery automatically encodes)
-  // then grab the encoded contents back out.  The div never exists on the page.
-  return $('<div/>').text(value).html()
 }

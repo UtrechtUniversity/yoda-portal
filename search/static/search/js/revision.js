@@ -141,10 +141,10 @@ const tableRenderer = {
   name: (name, _, row) => {
     // let tgt = `${dlgCurrentFolder}/${name}`;
     // return row.revision_count;
-    return `<a data-path="${encodeURIComponent(row.original_coll_name)}" data-collection-exists="${row.collection_exists}" >/${htmlEncode(row.original_coll_name)}</a>`
+    return `<a data-path="${encodeURIComponent(row.original_coll_name)}" data-collection-exists="${row.collection_exists}" >/${Yoda.htmlEncode(row.original_coll_name)}</a>`
   },
   count: (count, _, row) => {
-    return htmlEncode(count)
+    return Yoda.htmlEncode(count)
   }
 }
 
@@ -355,7 +355,7 @@ const getFolderContents2 = (() => {
 const tableRenderer2 = {
   name: (name, _, row) => {
     const tgt = `${dlgCurrentFolder}/${name}`
-    if (row.type === 'coll') { return `<a class="coll dlg-browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>` } else { return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}` }
+    if (row.type === 'coll') { return `<a class="coll dlg-browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>` } else { return `<i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}` }
   },
   size: (size, _, row) => {
     if (row.type === 'coll') {
@@ -490,7 +490,7 @@ function makeBreadcrumb (urlEncodedDir) {
       path += '/' + encodeURIComponent(part)
 
       // Active item
-      const valueString = htmlEncode(part).replace(/ /g, '&nbsp;')
+      const valueString = Yoda.htmlEncode(part).replace(/ /g, '&nbsp;')
       if (k === (totalParts - 1)) {
         html += '<li class="breadcrumb-item active">' + valueString + '</li>'
       } else {
@@ -579,12 +579,6 @@ function dlgAlreadyExistsAlert (message) {
 
 /// ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // util functions
-
-function htmlEncode (value) {
-  // create a in-memory div, set it's inner text(which jQuery automatically encodes)
-  // then grab the encoded contents back out.  The div never exists on the page.
-  return $('<div/>').text(value).html()
-}
 
 function rawurlencode (str) {
   //       discuss at: https://locutus.io/php/rawurlencode/

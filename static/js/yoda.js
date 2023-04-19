@@ -29,7 +29,7 @@ Yoda.set_message = function (type, msg) {
   const $messages = document.querySelector('#messages')
   if ($messages) {
     $messages.insertAdjacentHTML('beforeend', `<div class="alert alert-${type} alert-dismissible fade show" role="alert">` +
-      `${Yoda.escapeEntities(msg)}` +
+      `${Yoda.htmlEncode(msg)}` +
       '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
       '</div>')
   }
@@ -43,7 +43,7 @@ Yoda.load = function () {
     Yoda.storage.session.remove('messages')
     messages.forEach(item =>
       $messages.insertAdjacentHTML('beforeend', `<div class="alert alert-${item.type} alert-dismissible fade show" role="alert">` +
-        `${Yoda.escapeEntities(item.message)}` +
+        `${Yoda.htmlEncode(item.message)}` +
         '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
         '</div>'))
   }
@@ -215,8 +215,13 @@ Yoda.storage = {
 // Escapes quotes in attribute selectors.
 Yoda.escapeQuotes = str => str.replace(/\\/g, '\\\\').replace(/("|')/g, '\\$1')
 
-// Escape characters that may have a special meaning in HTML by converting them to HTML entities.
-Yoda.escapeEntities = str => str.replace(/[\u00A0-\u9999<>&]/g, i => '&#' + i.charCodeAt(0) + ';')
+// Encode HTML entities in string.
+Yoda.htmlEncode = function (value) {
+  const textarea = document.createElement('textarea')
+  const text = document.createTextNode(value)
+  textarea.appendChild(text)
+  return textarea.innerHTML
+}
 
 // DOM ready.
 const onReady = (callback) => {

@@ -284,21 +284,21 @@ $(function () {
 
   $('body').on('click', 'a.view-video', function () {
     const path = $(this).attr('data-path')
-    const viewerHtml = `<video width="640" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></video>`
+    const viewerHtml = `<video width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></video>`
     $('#viewer').html(viewerHtml)
     $('#viewMedia').modal('show')
   })
 
   $('body').on('click', 'a.view-audio', function () {
     const path = $(this).attr('data-path')
-    const viewerHtml = `<audio width="640" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></audio>`
+    const viewerHtml = `<audio width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></audio>`
     $('#viewer').html(viewerHtml)
     $('#viewMedia').modal('show')
   })
 
   $('body').on('click', 'a.view-image', function () {
     const path = $(this).attr('data-path')
-    const viewerHtml = `<img width="640" src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}" />`
+    const viewerHtml = `<img width="640" src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}" />`
     $('#viewer').html(viewerHtml)
     $('#viewMedia').modal('show')
   })
@@ -535,14 +535,14 @@ function makeBreadcrumb (dir) {
     // Skip deposit group level.
     if (i !== 1) {
       const el = $('<li class="breadcrumb-item">')
-      text = htmlEncode(text).replace(/ /g, '&nbsp;')
+      text = Yoda.htmlEncode(text).replace(/ /g, '&nbsp;')
       if (i === crumbs.length - 1) {
         el.addClass('active').html(text)
       } else {
         if (i === 0) {
-          el.html(`<a data-path="${htmlEncode(path)}" href="/deposit/browse">${text}</a>`)
+          el.html(`<a data-path="${Yoda.htmlEncode(path)}" href="/deposit/browse">${text}</a>`)
         } else {
-          el.html(`<a data-path="${htmlEncode(path)}" href="/deposit/data?dir=${encodeURIComponent(path)}">${text}</a>`)
+          el.html(`<a data-path="${Yoda.htmlEncode(path)}" href="/deposit/data?dir=${encodeURIComponent(path)}">${text}</a>`)
         }
       }
       html += el[0].outerHTML
@@ -550,12 +550,6 @@ function makeBreadcrumb (dir) {
   }
 
   $('nav ol.breadcrumb').html(html)
-}
-
-function htmlEncode (value) {
-  // create a in-memory div, set it's inner text(which jQuery automatically encodes)
-  // then grab the encoded contents back out.  The div never exists on the page.
-  return $('<div/>').text(value).html().replace('"', '&quot;')
 }
 
 function buildFileBrowser (dir) {
@@ -655,13 +649,13 @@ const tableRenderer = {
     const tgt = `${currentFolder}/${name}`
     let checkbox = ''
     if (currentFolder) {
-      checkbox = `<input class="form-check-input ms-1" type="checkbox" name="multiSelect[]" value="${htmlEncode(tgt)}" data-name="${htmlEncode(name)}" data-type="${row.type}">`
+      checkbox = `<input class="form-check-input ms-1" type="checkbox" name="multiSelect[]" value="${Yoda.htmlEncode(tgt)}" data-name="${Yoda.htmlEncode(name)}" data-type="${row.type}">`
     }
     return checkbox
   },
   name: (name, _, row) => {
     const tgt = `${currentFolder}/${name}`
-    if (row.type === 'coll') { return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>` } else return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}`
+    if (row.type === 'coll') { return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>` } else return `<i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}`
   },
   size: (size, _, row) => {
     if (row.type === 'coll') {
@@ -695,10 +689,10 @@ const tableRenderer = {
       }
 
       // Context menu folder
-      actions.append(`<a href="#" class="dropdown-item folder-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this folder" >Rename</a>`)
-      actions.append(`<a href="#" class="dropdown-item folder-copy" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Copy this folder">Copy</a>`)
-      actions.append(`<a href="#" class="dropdown-item folder-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this folder">Move</a>`)
-      actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
+      actions.append(`<a href="#" class="dropdown-item folder-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this folder" >Rename</a>`)
+      actions.append(`<a href="#" class="dropdown-item folder-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this folder">Copy</a>`)
+      actions.append(`<a href="#" class="dropdown-item folder-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this folder">Move</a>`)
+      actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
     } else {
       // Context menu for files
       const viewExts = {
@@ -708,20 +702,20 @@ const tableRenderer = {
       }
       const ext = row.name.replace(/.*\./, '').toLowerCase()
 
-      actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Download this file">Download</a>`)
+      actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
 
       // Generate dropdown "view" actions for different media types.
       for (const type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-        actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`)
+        actions.append(`<a class="dropdown-item view-${type}" data-path="${Yoda.htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`)
       }
 
-      actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this file">Rename</a>`)
-      actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Copy this file">Copy</a>`)
-      actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this file">Move</a>`)
-      actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this file">Rename</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this file">Copy</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this file">Move</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
     }
     const dropdown = $(`<div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${Yoda.htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               <i class="fa-solid fa-ellipsis-h" aria-hidden="true"></i>
                             </button>`)
     dropdown.append(actions)
@@ -774,7 +768,7 @@ window.addEventListener('popstate', function (e) {
 function logUpload (id, file) {
   const log = `<div class="row upload-row mb-1" id="${id}">
                   <div class="col-md-6">
-                    <div class="upload-filename text-break">${htmlEncode(file.relativePath)}</div>
+                    <div class="upload-filename text-break">${Yoda.htmlEncode(file.relativePath)}</div>
                     <div class="upload-btns btn-group btn-group-sm ms-3" role="group" aria-label="Basic example">
                       <button type="button" class="btn btn-secondary upload-pause me-1">Pause</button>
                       <button type="button" class="btn btn-secondary upload-resume me-1 hide">Resume</button>
@@ -794,7 +788,7 @@ function handleActionsList (actions, folder) {
 
   $.each(possibleActions, function (index, value) {
     if (Object.prototype.hasOwnProperty.call(actions, value)) {
-      html += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>'
+      html += '<a class="dropdown-item action-' + value + '" data-folder="' + Yoda.htmlEncode(folder) + '">' + actions[value] + '</a>'
     }
   })
 

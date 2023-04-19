@@ -83,12 +83,6 @@ function browse (dir = '', changeHistory = false) {
   buildFileBrowser(dir)
 }
 
-function htmlEncode (value) {
-  // create a in-memory div, set it's inner text(which jQuery automatically encodes)
-  // then grab the encoded contents back out.  The div never exists on the page.
-  return $('<div/>').text(value).html().replace('"', '&quot;')
-}
-
 function buildFileBrowser (dir) {
   const fileBrowser = $('#file-browser').DataTable()
   getFolderContents.dropCache()
@@ -186,14 +180,14 @@ const getFolderContents = (() => {
 const tableRenderer = {
   name: (name, _, row) => {
     const tgt = `${currentFolder}/${name}`
-    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`
+    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>`
   },
   title: (name, _, row) => {
     const tgt = `${currentFolder}/${name}`
-    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}">${htmlEncode(row.deposit_title)}</a>`
+    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}">${Yoda.htmlEncode(row.deposit_title)}</a>`
   },
   access: (name, _, row) => {
-    return `${htmlEncode(row.deposit_access)}`
+    return `${Yoda.htmlEncode(row.deposit_access)}`
   },
   size: (depositSize, _, row) => {
     const szs = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB']
@@ -221,7 +215,7 @@ const tableRenderer = {
       return ''
     }
 
-    actions.append(`<a href="#" class="deposit-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this deposit"><i class="fa-solid fa-trash"></a>`)
+    actions.append(`<a href="#" class="deposit-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this deposit"><i class="fa-solid fa-trash"></a>`)
 
     return actions[0].innerHTML
   }
