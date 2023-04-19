@@ -31,7 +31,7 @@ $(function () {
 
     // Set initial values
     $('#path-folder-create').val('')
-    $('#folder-create #collection').html($(this).attr('data-path')) // for user
+    $('#folder-create #collection').text($(this).attr('data-path')) // for user
     $('.btn-confirm-folder-create').attr('data-path', $(this).attr('data-path'))
 
     $('#folder-create').modal('show')
@@ -50,7 +50,7 @@ $(function () {
     // set initial values for further processing and user experience
     $('#folder-rename-name').val($(this).attr('data-name'))
     $('#org-folder-rename-name').val($(this).attr('data-name'))
-    $('#folder-rename #collection').html($(this).attr('data-collection'))
+    $('#folder-rename #collection').text($(this).attr('data-collection'))
     $('.btn-confirm-folder-rename').attr('data-collection', $(this).attr('data-collection'))
 
     $('#folder-rename').modal('show')
@@ -64,8 +64,8 @@ $(function () {
     fileMgmtDialogAlert('folder-delete', '')
 
     // set initial values for further processing and user experience
-    $('#folder-delete #collection').html($(this).attr('data-collection'))
-    $('#folder-delete-name').html($(this).attr('data-name'))
+    $('#folder-delete #collection').text($(this).attr('data-collection'))
+    $('#folder-delete-name').text($(this).attr('data-name'))
     $('.btn-confirm-folder-delete').attr('data-collection', $(this).attr('data-collection'))
     $('.btn-confirm-folder-delete').attr('data-name', $(this).attr('data-name'))
 
@@ -84,7 +84,7 @@ $(function () {
     // set initial values for further processing and user experience
     $('#file-rename-name').val($(this).attr('data-name'))
     $('#org-file-rename-name').val($(this).attr('data-name'))
-    $('#file-rename #collection').html($(this).attr('data-collection'))
+    $('#file-rename #collection').text($(this).attr('data-collection'))
     $('.btn-confirm-file-rename').attr('data-collection', $(this).attr('data-collection'))
 
     $('#file-rename').modal('show')
@@ -107,8 +107,8 @@ $(function () {
     fileMgmtDialogAlert('file-delete', '')
 
     // set initial values for further processing and user experience
-    $('#file-delete #collection').html($(this).attr('data-collection'))
-    $('#file-delete-name').html($(this).attr('data-name'))
+    $('#file-delete #collection').text($(this).attr('data-collection'))
+    $('#file-delete-name').text($(this).attr('data-name'))
     $('.btn-confirm-file-delete').attr('data-collection', $(this).attr('data-collection'))
     $('.btn-confirm-file-delete').attr('data-name', $(this).attr('data-name'))
 
