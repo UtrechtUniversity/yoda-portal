@@ -1012,7 +1012,7 @@ $(function () {
                                '" aria-hidden="true" title="' +
                                that.accessNames[user.access] +
                                '"></i> ' +
-                               Yoda.escapeEntities(displayName))
+                               Yoda.htmlEncode(displayName))
 
           $userList.append($user)
         })
