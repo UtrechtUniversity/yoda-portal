@@ -27,7 +27,7 @@ $(function () {
     startBrowsing()
   }
 
-  $('.btn-group button.metadata-form').click(function () {
+  $('.btn-group button.metadata-form').on('click', function () {
     showMetadataForm($(this).attr('data-path'))
   })
 

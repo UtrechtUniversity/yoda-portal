@@ -8,7 +8,7 @@ import DataSelection, { DataSelectionCart } from "./DataSelection.js";
 document.addEventListener("DOMContentLoaded", async () => {
 
     // Enable "Confirm registration" button after OSF preregistration has been visited
-    $("#visitPreregistration").click(function () { 
+    $("#visitPreregistration").on('click', function () { 
         $("#confirmPreregistration").removeClass("disabled");
     });
 
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     var preregistrationUiSchema = {};
     var preregistrationFormData = {};
 
-    // Get preregistration form 
+    // Get preregistration form
     Yoda.call('datarequest_preregistration_get',
         {request_id: config.request_id},
         {errorPrefix: "Could not get preregistration"})
