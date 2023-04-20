@@ -1,4 +1,4 @@
-/* global browse */
+/* global browse, path */
 'use strict'
 
 let folderSelectBrowser = null
@@ -6,7 +6,7 @@ let dlgCurrentFolder = ''
 let currentBrowseFolder = ''
 
 $(document).ready(function () {
-  dlgCurrentFolder = currentBrowseFolder = browseStartDir
+  dlgCurrentFolder = currentBrowseFolder = path
 
   // single file/folder moves
   $('body').on('click', 'a.file-copy, a.file-move, a.folder-copy, a.folder-move', function () {
@@ -541,14 +541,7 @@ function dlgBrowse (dir) {
 
   dlgMakeBreadcrumb(dir)
 
-  dlgChangeBrowserUrl(dir)
-
   dlgBuildFileBrowser(dir)
-}
-
-function dlgChangeBrowserUrl (path) {
-  // currentFolder =   path;
-  urlEncodedPath = path
 }
 
 function dlgBuildFileBrowser (dir) {

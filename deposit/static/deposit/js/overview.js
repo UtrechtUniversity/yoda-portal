@@ -1,3 +1,4 @@
+/* global path */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
@@ -12,10 +13,8 @@ $(document).ajaxSend(function (e, request, settings) {
 let currentFolder
 
 $(function () {
-  currentFolder = dir
-
   // Canonicalize path somewhat, for convenience.
-  currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '')
+  currentFolder = path.replace(/\/+/g, '/').replace(/\/$/, '')
 
   if ($('#file-browser').length) {
     startBrowsing()
@@ -73,7 +72,7 @@ function changeBrowserUrl (path) {
     url += '?dir=' + encodeURIComponent(path)
   }
 
-  history.pushState({}, {}, url)
+  window.history.pushState({}, {}, url)
 }
 
 function browse (dir = '', changeHistory = false) {

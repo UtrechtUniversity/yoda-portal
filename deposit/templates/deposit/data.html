@@ -10,7 +10,7 @@
 
 {% block scripts %}
 <script>
-    var browseStartDir = dir = path = {{ path|tojson|safe }};
+    var path = {{ path|tojson|safe }};
     var view = 'browse';
 </script>
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
