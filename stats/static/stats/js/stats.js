@@ -363,7 +363,7 @@ function startBrowsing () {
       $('#group-browser td').on('click', function () {
         const groupName = $(this).parent().find('.list-group-item').attr('data-name')
         getGroupDetails(groupName)
-        $('#selected-group').html('Group [' + groupName + ']')
+        $('#selected-group').text('Group ' + groupName)
       })
     }
   })
