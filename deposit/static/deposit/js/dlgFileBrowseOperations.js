@@ -38,7 +38,7 @@ $(document).ready(function () {
     dlgCurrentFolder = $(this).attr('data-collection')
     console.info('File/folder move to collection: ' + dlgCurrentFolder)
     dlgSelectAlertHide()
-    startBrowsing()
+    startBrowsingColl()
 
     $('#dlg-file-browse-operations').modal('show')
   })
@@ -65,7 +65,7 @@ $(document).ready(function () {
     currentBrowseFolder = $('.folder-create').attr('data-path')
     dlgCurrentFolder = currentBrowseFolder
     dlgSelectAlertHide()
-    startBrowsing()
+    startBrowsingColl()
 
     $('#dlg-file-browse-operations').modal('show')
   })
@@ -386,7 +386,7 @@ async function deleteFile (collection, fileName, multipleIndex = null) {
   }
 }
 
-function startBrowsing () {
+function startBrowsingColl () {
   if (!folderSelectBrowser) {
     folderSelectBrowser = $('#folder-select-browser').DataTable({
       bFilter: false,
@@ -398,11 +398,11 @@ function startBrowsing () {
       },
       dom: '<"top">frt<"bottom"lp><"clear">',
       columns: [
-        { render: tableRenderer.name, data: 'name' },
+        { render: tableRendererColl.name, data: 'name' },
         // Size and date best not be orderable, may result in duplicated results for data objects.
-        // {render: tableRenderer.size, orderable: false, data: 'size'},
-        { render: tableRenderer.date, orderable: false, data: 'modify_time' }
-        // {render: tableRenderer.context, orderable: false },
+        // {render: tableRendererColl.size, orderable: false, data: 'size'},
+        { render: tableRendererColl.date, orderable: false, data: 'modify_time' }
+        // {render: tableRendererColl.context, orderable: false },
       ],
       ajax: getFolderContents2,
       processing: true,
@@ -501,7 +501,7 @@ const getFolderContents2 = (() => {
   return fn
 })()
 
-const tableRenderer = {
+const tableRendererColl = {
   name: (name, _, row) => {
     const tgt = `${dlgCurrentFolder}/${name}`
     if (row.type === 'coll') { return `<a class="coll dlg-browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>` } else { return `<i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}` }
