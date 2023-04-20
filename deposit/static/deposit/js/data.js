@@ -165,7 +165,7 @@ $(function () {
 
   // Assign upload places for dropping/selecting files
   r.assignDrop($('.upload-drop')[0])
-  r.assignBrowse($('.upload-file')[0])
+  r.assignBrowse($('.upload')[0])
   r.assignBrowse($('.upload-folder')[0], true)
 
   // When chosing to close overview of upload overview then all incomplete file uploads will be canceled.
