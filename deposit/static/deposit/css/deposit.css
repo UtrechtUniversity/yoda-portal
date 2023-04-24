@@ -78,3 +78,7 @@ a.dropdown-item:hover, a.dropdown-item:focus
     border-style: dashed;
     border-width: 5px;
 }
+
+.modal.show {
+    pointer-events: none;
+}
