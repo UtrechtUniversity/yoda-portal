@@ -155,3 +155,7 @@ table.dataTable > tbody > tr > td {
     border-style: dashed;
     border-width: 5px;
 }
+
+.modal.show {
+    pointer-events: none;
+}
