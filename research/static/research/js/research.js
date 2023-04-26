@@ -551,9 +551,7 @@ async function handleFolderAdd (newFolder, collection) {
     fileMgmtDialogAlert('folder-create', 'Please add a folder name')
     return
   }
-
   $('#folder-create .btn-confirm-folder-create').html('Creating <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-
   const result = await Yoda.call('research_folder_add',
     {
       coll: Yoda.basePath + collection,
@@ -577,9 +575,7 @@ async function handleFolderRename (newFolderName, collection, orgFolderName) {
     fileMgmtDialogAlert('folder-rename', 'Please add a new folder name')
     return
   }
-
   $('#folder-rename .btn-confirm-folder-rename').html('Renaming <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-
   const result = await Yoda.call('research_folder_rename',
     {
       new_folder_name: newFolderName,
@@ -596,13 +592,11 @@ async function handleFolderRename (newFolderName, collection, orgFolderName) {
   } else {
     fileMgmtDialogAlert('folder-rename', result.status_info)
   }
-
   $('#folder-rename .btn-confirm-folder-rename').html('Rename Folder')
 }
 
 async function handleFolderDelete (collection, folderName) {
   $('#folder-delete .btn-confirm-folder-delete').html('Deleting <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-
   const result = await Yoda.call('research_folder_delete',
     {
       coll: Yoda.basePath + collection,
@@ -618,7 +612,6 @@ async function handleFolderDelete (collection, folderName) {
   } else {
     fileMgmtDialogAlert('folder-delete', result.status_info)
   }
-
   $('#folder-delete .btn-confirm-folder-delete').html('Delete Folder')
 }
 
@@ -651,9 +644,7 @@ async function handleFileRename (newFileName, collection, origFileName) {
     fileMgmtDialogAlert('file-rename', 'Please add a new file name')
     return
   }
-
   $('#file-rename .btn-confirm-file-rename').html('Renaming <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-
   const result = await Yoda.call('research_file_rename',
     {
       new_file_name: newFileName,
