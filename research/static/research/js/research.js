@@ -552,6 +552,8 @@ async function handleFolderAdd (newFolder, collection) {
     return
   }
 
+  $('#folder-create .btn-confirm-folder-create').html('Creating <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
+
   const result = await Yoda.call('research_folder_add',
     {
       coll: Yoda.basePath + collection,
@@ -567,6 +569,7 @@ async function handleFolderAdd (newFolder, collection) {
   } else {
     fileMgmtDialogAlert('folder-create', result.status_info)
   }
+  $('#folder-create .btn-confirm-folder-create').html('Create new folder')
 }
 
 async function handleFolderRename (newFolderName, collection, orgFolderName) {
@@ -574,6 +577,8 @@ async function handleFolderRename (newFolderName, collection, orgFolderName) {
     fileMgmtDialogAlert('folder-rename', 'Please add a new folder name')
     return
   }
+
+  $('#folder-rename .btn-confirm-folder-rename').html('Renaming <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
 
   const result = await Yoda.call('research_folder_rename',
     {
@@ -591,9 +596,13 @@ async function handleFolderRename (newFolderName, collection, orgFolderName) {
   } else {
     fileMgmtDialogAlert('folder-rename', result.status_info)
   }
+
+  $('#folder-rename .btn-confirm-folder-rename').html('Rename Folder')
 }
 
 async function handleFolderDelete (collection, folderName) {
+  $('#folder-delete .btn-confirm-folder-delete').html('Deleting <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
+
   const result = await Yoda.call('research_folder_delete',
     {
       coll: Yoda.basePath + collection,
@@ -609,6 +618,8 @@ async function handleFolderDelete (collection, folderName) {
   } else {
     fileMgmtDialogAlert('folder-delete', result.status_info)
   }
+
+  $('#folder-delete .btn-confirm-folder-delete').html('Delete Folder')
 }
 
 function addCleanupFile (file, fileRelative, index) {
@@ -641,6 +652,8 @@ async function handleFileRename (newFileName, collection, origFileName) {
     return
   }
 
+  $('#file-rename .btn-confirm-file-rename').html('Renaming <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
+
   const result = await Yoda.call('research_file_rename',
     {
       new_file_name: newFileName,
@@ -657,9 +670,11 @@ async function handleFileRename (newFileName, collection, origFileName) {
   } else {
     fileMgmtDialogAlert('file-rename', result.status_info)
   }
+  $('#file-rename .btn-confirm-file-rename').html('Rename file')
 }
 
 async function handleFileDelete (collection, fileName) {
+  $('#file-delete .btn-confirm-file-delete').html('Deleting <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   const result = await Yoda.call('research_file_delete',
     {
       coll: Yoda.basePath + collection,
@@ -675,6 +690,7 @@ async function handleFileDelete (collection, fileName) {
   } else {
     fileMgmtDialogAlert('file-delete', result.status_info)
   }
+  $('#file-delete .btn-confirm-file-delete').html('Delete file')
 }
 
 async function handleFileStage (collection, fileName) {

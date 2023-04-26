@@ -175,6 +175,7 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null) 
     $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   } else {
     dlgSelectAlertHide()
+    $('#dlg-file-browse-operations .dlg-action-button').html('Copying <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
 
   try {
@@ -208,6 +209,7 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null) 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
 }
 
 async function moveFile (filepath, newFilepath, multiple, multipleIndex = null) {
@@ -215,6 +217,7 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null) 
     $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   } else {
     dlgSelectAlertHide()
+    $('#dlg-file-browse-operations .dlg-action-button').html('Moving <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
 
   try {
@@ -250,6 +253,7 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null) 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
 }
 
 async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = null) {
@@ -257,6 +261,7 @@ async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = 
     $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   } else {
     dlgSelectAlertHide()
+    $('#dlg-file-browse-operations .dlg-action-button').html('Copying <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
 
   try {
@@ -290,6 +295,7 @@ async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
 }
 
 async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = null) {
@@ -297,6 +303,7 @@ async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = 
     $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   } else {
     dlgSelectAlertHide()
+    $('#dlg-file-browse-operations .dlg-action-button').html('Moving <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
 
   try {
@@ -332,6 +339,7 @@ async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
 }
 async function deleteFolder (collection, folderName, multipleIndex = null) {
   $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
