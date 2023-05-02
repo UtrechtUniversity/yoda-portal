@@ -42,7 +42,7 @@ function flatListGroups () {
   }
 
   // Build result table.
-  let table = '<table id="tbl-list-groups" class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th><td></th></tr></thead><tbody>'
+  let table = '<table id="tbl-list-groups" class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th><th></th></tr></thead><tbody>'
   $.each(data, function (index, usergroup) {
     if (usergroup[0].includes(groupname)) {
       table += `<tr style="cursor: pointer" class="user-search-result-group" user-search-result-group="${usergroup[0]}">
@@ -50,7 +50,7 @@ function flatListGroups () {
                      <td>${usergroup[2]}</td>
                      <td>${usergroup[3]}</td>`
 
-      table += '<td><a href="/research/?dir=' + encodeURIComponent('/' + usergroup[0]) + '" title="Go to group ' + usergroup[0] + ' in research area"><i class="fa-regular fa-folder"></i></a><td>';
+      table += '<td><a href="/research/?dir=' + encodeURIComponent('/' + usergroup[0]) + '" title="Go to group ' + usergroup[0] + ' in research area"><i class="fa-regular fa-folder"></i></a></td>';
 
       if (usergroup[1] === 'manager') {
         table += '<td><i class="fa-solid fa-crown" title="You manage this group"></i></td>'
@@ -2107,25 +2107,25 @@ $(function () {
       for (const groupName in this.groups) {
 
         a = '<table class="float-end"><tr><td>';
-        a += '<a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research area"><i class="float-end fa-regular fa-folder"></i></a>';
-        a += '</td><td>';
+        a += '<a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research area"><i class="fa-regular fa-folder"></i></a>';
+        a += '</td>';
 
         if (this.isManagerOfGroup(groupName)) {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            a + '&nbsp;<i class="float-end fa fa-crown mt-1" title="You manage this group"></i>' + '</td></tr></table>'
+            a + '<td>&nbsp;<i class="fa fa-crown mt-1" title="You manage this group"></i>' + '</td></tr></table>'
           )
         } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            a + '&nbsp;<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>' + '</td></tr></table>'
+            a + '<td>&nbsp;<i class="fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>' + '</td></tr></table>'
           )
         } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access === 'reader') {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            a + '&nbsp;<i class="float-end fa-solid fa-eye mt-1" title="You have read access to this group"></i>' + '</td></tr></table>'
+            a + '<td>&nbsp;<i class="fa-solid fa-eye mt-1" title="You have read access to this group"></i>' + '</td></tr></table>'
           )
         }
         else {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            a  + '</td></tr></table>'
+            a  + '<td style="width: 26px;"></td></tr></table>'
           )
         }
       }
