@@ -317,6 +317,7 @@ async function processImportedRow (row) {
                 category: categoryName,
                 subcategory: subcategoryName,
                 name: groupName,
+                creation_date: hier[categoryName][subcategoryName][groupName].creation_date,
                 description: hier[categoryName][subcategoryName][groupName].description,
                 schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
                 expiration_date: hier[categoryName][subcategoryName][groupName].expiration_date,
@@ -936,6 +937,11 @@ $(function () {
         $groupProperties.find('#f-group-update-description')
           .val(group.description)
           .prop('readonly', !userCanManage)
+
+        // Creation date of this group
+        $groupProperties.find('#f-group-update-creation-date')
+          .val(group.creation_date)
+          .prop('readonly', true)
 
         if (that.prefixHasDataClassification(prefix)) {
           $groupProperties.find('.data-classification').show()
@@ -1898,6 +1904,7 @@ $(function () {
                 category: categoryName,
                 subcategory: subcategoryName,
                 name: groupName,
+                creation_date: hier[categoryName][subcategoryName][groupName].creation_date,
                 description: hier[categoryName][subcategoryName][groupName].description,
                 schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
                 expiration_date: hier[categoryName][subcategoryName][groupName].expiration_date,
