@@ -20,8 +20,8 @@
                     Sort order
                 </a>
                 <div class="dropdown-menu" aria-labelledby="sortMenu">
-                    <a class="dropdown-item" href="{{ url_for('user_bp.notifications', sort_order='desc') }}">Newest first</a>
-                    <a class="dropdown-item" href="{{ url_for('user_bp.notifications', sort_order='asc') }}">Oldest first</a>
+                    <a class="dropdown-item" href="{{ url_for('user_bp.notifications', sort_order="desc") }}">Newest first</a>
+                    <a class="dropdown-item" href="{{ url_for('user_bp.notifications', sort_order="asc") }}">Oldest first</a>
                 </div>
             </div>
             {% endif %}
