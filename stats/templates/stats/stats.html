@@ -23,7 +23,7 @@
                     Groups
 
                     <div class="input-group-sm has-feedback float-end">
-                        <input class="form-control form-control-sm" id="search-group-table" type="text" maxlength="63" placeholder="Search groups" />
+                        <input class="form-control form-control-sm" id="search-group-table" type="text" maxlength="63" placeholder="Search groups">
                     </div>
                 </div>
                 <div>
@@ -56,18 +56,18 @@
                             <canvas id="chart"></canvas>
                             <div class="row">
                                 <div class="btn-group" role="group"">
-                                    <button class="form-control item btn btn-sm" id="legend-deposit" onClick="chartToggleData(0)">Deposit</button>
-                                    <button class="form-control item btn btn-sm" id="legend-research" onClick="chartToggleData(0)">Research</button>
-                                    <button class="form-control item btn btn-sm" id="legend-vault" onClick="chartToggleData(1)">Vault</button>
-                                    <button class="form-control item btn btn-sm" id="legend-revisions" onClick="chartToggleData(2)">Revisions</button>
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-deposit" onClick="chartToggleData(0)">Deposit</button>
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-research" onClick="chartToggleData(0)">Research</button>
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-vault" onClick="chartToggleData(1)">Vault</button>
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-revisions" onClick="chartToggleData(2)">Revisions</button>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="btn-group" role="group"">
-                                    <button class="form-control btn btn-sm btn-secondary" id="startdate_min"><i class="fa-solid fa-angles-left"></i> Earliest</button>
+                                    <button type="button" class="form-control btn btn-sm btn-secondary" id="startdate_min"><i class="fa-solid fa-angles-left"></i> Earliest</button>
                                     <input class="form-control" onchange="chartFilterDate()" type="date" id="startdate" value="2023-01-25">
                                     <input class="form-control" onchange="chartFilterDate()" type="date" id="enddate" value="2023-01-31">
-                                    <button class="form-control btn btn-sm btn-secondary" id="enddate_max">Latest <i class="fa-solid fa-angles-right"></i></button>
+                                    <button type="button" class="form-control btn btn-sm btn-secondary" id="enddate_max">Latest <i class="fa-solid fa-angles-right"></i></button>
                                </div>
                             </div>
                         </div>

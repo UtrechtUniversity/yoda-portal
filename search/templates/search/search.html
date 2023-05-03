@@ -18,7 +18,7 @@
     <div class="col-md-12">
 
         <div class="input-group mb-3">
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 <span id="search_concept" data-type="filename">Search by filename</span>
             </button>
             <ul id="search-panel" class="dropdown-menu">
@@ -29,7 +29,7 @@
                 <li><a class="dropdown-item" data-type="revision">Search revision by name</a></li>
             </ul>
             <input type="text" class="form-control search-term" id="search-filter" placeholder="Search term..." value="{{ searchTerm|safe }}" maxlength="255">
-            <button class="btn btn-outline-secondary search-term" type="button" data-items-per-page="25"><i class="fa-solid fa-search" aria-hidden="true"></i></button>
+            <button type="button" class="btn btn-outline-secondary search-term" data-items-per-page="25"><i class="fa-solid fa-search" aria-hidden="true"></i></button>
 
             <select name="status" class="form-control search-status hide">
                 <option disabled selected value>Select status...</option>
@@ -114,8 +114,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-primary" id="btn-restore"><i class="fa-solid fa-magic" aria-hidden="true"></i> Restore</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btn-restore"><i class="fa-solid fa-magic" aria-hidden="true"></i> Restore</button>
             </div>
 
             <!--- CoverALL Second dialog for handling of duplicate situations -->
@@ -127,7 +127,7 @@
                     <div class="card-body">
                         <p class="alert-dlg-already-exists"></p>
                         <h6 class="card-title">Please choose to overwrite or rename current file:</h6>
-                        </br>
+                        <br>
                         <div class="row">
                             <div class="col-md-6">
                                 <form id="form-restore-overwrite">
@@ -136,7 +136,7 @@
                                     </div>
                                     <div class="row d-block">
                                         <p>
-                                            <button class="btn btn-danger" id="btn-restore-overwrite">Overwrite</button>
+                                            <button type="button" class="btn btn-danger" id="btn-restore-overwrite">Overwrite</button>
                                         </p>
                                     </div>
                                 </form>
@@ -149,7 +149,7 @@
                                     <div class="row d-block">
                                         <p>
                                             <input type="text"  class="form-control" placeholder="Enter new filename" id="newFileName">
-                                            <button  class="btn btn-primary" id="btn-restore-next-to">Restore with a new filename</button>
+                                            <button type="button" class="btn btn-primary" id="btn-restore-next-to">Restore with a new filename</button>
                                         </p>
                                     </div>
                                 </form>

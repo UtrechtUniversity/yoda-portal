@@ -25,8 +25,8 @@
                 <h5>Upload a DTA (to be signed by the researcher).</h5>
                 <div class="form-group">
                     <form id="dta" enctype="multipart/form-data">
-                        <label for="file">Select a document to upload (must be a PDF file):</label><br />
-                        <input type="file" accept=".pdf,application/pdf" name="file" id="file" />
+                        <label for="file">Select a document to upload (must be a PDF file):</label><br>
+                        <input type="file" accept=".pdf,application/pdf" name="file" id="file">
                     </form>
                 </div>
                 <div id="dta-non-pdf-warning" class="hidden">
@@ -35,8 +35,8 @@
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary grey cancel" data-bs-dismiss="modal">Close</button>
-                <button class="btn btn-secondary grey submit_dta">Upload</button>
+                <button type="button" class="btn btn-secondary grey cancel" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary grey submit_dta">Upload</button>
             </div>
         </div>
     </div>
@@ -49,8 +49,8 @@
                 <h5>Upload the signed DTA.</h5>
                 <div class="form-group">
                     <form id="signed_dta" enctype="multipart/form-data">
-                        <label for="file">Select a document to upload (must be a PDF file):</label><br />
-                        <input type="file" accept=".pdf,application/pdf" name="file" id="file" />
+                        <label for="file">Select a document to upload (must be a PDF file):</label><br>
+                        <input type="file" accept=".pdf,application/pdf" name="file" id="file">
                     </form>
                 </div>
                 <div id="signed-dta-non-pdf-warning" class="hidden">
@@ -59,8 +59,8 @@
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary grey cancel" data-bs-dismiss="modal">Close</button>
-                <button class="btn btn-secondary grey submit_signed_dta">Upload</button>
+                <button type="button" class="btn btn-secondary grey cancel" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary grey submit_signed_dta">Upload</button>
             </div>
         </div>
     </div>
@@ -277,7 +277,7 @@
                 <?php endif ?>
                 {% endif %}
 
-                <hr />
+                <hr>
 
                 <p><b>Title: </b>{{ request['datarequest']['study_information']['title'] }}</p>
                 <p><b>Status: </b>{{ human_request_status }}</p>
@@ -294,7 +294,7 @@
 <div class="row">
     <div class="col-md-12">
         {% include 'datarequest/partials/datarequest.html' %}
-        {% if attachments|length > 0 %} 
+        {% if attachments|length > 0 %}
         {% include 'datarequest/partials/attachments.html' %}
         {% endif %}
 

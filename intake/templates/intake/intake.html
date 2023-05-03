@@ -39,7 +39,7 @@
         <div class="col-sm-12">
             <p>You have no access to the selected study. Please select another. </p>
             <div class="btn-group">
-                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
                     <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
@@ -115,7 +115,7 @@
     <div class="row" id="toprow">
         <div class="col-sm-12">
             <div class="btn-group">
-                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" id="dropdown-select-study">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" id="dropdown-select-study">
                     <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
@@ -144,7 +144,7 @@
             </div>
             {% if selectableScanFolders %}
                 <div class="btn-group">
-                    <button class="btn  btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    <button type="button" class="btn  btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
                         <i class="fa-solid fa-folder-open" aria-hidden="true"></i> Change folder <span class="caret"></span>
                     </button>
                     <div class="dropdown-menu" style="width:300px; padding:5px; max-height:500px; overflow-y: auto;">
@@ -192,15 +192,15 @@
             {% endif %}
 
             <div class="btn-group">
-                <button class="btn btn-outline-secondary" id="btn-start-scan"><i class="fa-solid fa-search-plus" aria-hidden="true"></i> Scan all files</button>
+                <button type="button" class="btn btn-outline-secondary" id="btn-start-scan"><i class="fa-solid fa-search-plus" aria-hidden="true"></i> Scan all files</button>
             </div>
 
             {% if permissions.manager %}
                 <div class="btn-group">
-                    <button class="btn btn-outline-secondary" id="btn-lock"><span class="fa-solid fa-check"></span> Lock datasets</button>
+                    <button type="button" class="btn btn-outline-secondary" id="btn-lock"><span class="fa-solid fa-check"></span> Lock datasets</button>
                 </div>
                 <div class="btn-group">
-                        <button class="btn btn-outline-secondary" id="btn-unlock"><span class="fa-solid fa-check"></span> Unlock datasets</button>
+                        <button type="button" class="btn btn-outline-secondary" id="btn-unlock"><span class="fa-solid fa-check"></span> Unlock datasets</button>
                 </div>
                 <div class="btn-group">
                     <a href="{{ url_for('intake_bp.reports') }}" class="btn btn-info btn-goto-reports"><span class="fa-solid fa-signal"></span> Reports</a>
