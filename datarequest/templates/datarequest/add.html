@@ -3,7 +3,7 @@
 {% block title %}{{ super() }} &dash; Datarequest {{ request_id }} &dash; Add request{% endblock title %}
 
 {% block scripts %}
-<script type="text/javascript"> window.config = {
+<script> window.config = {
   draft_request_id: '{{ draft_request_id }}',
   previous_request_id: '{{ previous_request_id }}'
 }
