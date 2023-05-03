@@ -30,9 +30,9 @@
                     <table id="group-browser" class="table yoda-table table-striped">
                         <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Size</th>
-                            <th>Members</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Size</th>
+                            <th scope="col">Members</th>
                         </tr>
                         </thead>
                     </table>
@@ -55,7 +55,7 @@
                         <div id="storage-chart" class="hidden">
                             <canvas id="chart"></canvas>
                             <div class="row">
-                                <div class="btn-group" role="group"">
+                                <div class="btn-group" role="group">
                                     <button type="button" class="form-control item btn btn-sm" id="legend-deposit" onClick="chartToggleData(0)">Deposit</button>
                                     <button type="button" class="form-control item btn btn-sm" id="legend-research" onClick="chartToggleData(0)">Research</button>
                                     <button type="button" class="form-control item btn btn-sm" id="legend-vault" onClick="chartToggleData(1)">Vault</button>
@@ -63,7 +63,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="btn-group" role="group"">
+                                <div class="btn-group" role="group">
                                     <button type="button" class="form-control btn btn-sm btn-secondary" id="startdate_min"><i class="fa-solid fa-angles-left"></i> Earliest</button>
                                     <input class="form-control" onchange="chartFilterDate()" type="date" id="startdate" value="2023-01-25">
                                     <input class="form-control" onchange="chartFilterDate()" type="date" id="enddate" value="2023-01-31">
@@ -87,11 +87,11 @@
                 <div class="card-body">
                     <table class="table table-striped storage-table">
                         <tr>
-                            <th>Category</th>
-                            <th>Total</th>
-                            <th>Research</th>
-                            <th>Vault</th>
-                            <th>Revisions</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Research</th>
+                            <th scope="col">Vault</th>
+                            <th scope="col">Revisions</th>
                         </tr>
                         {% for category in categories %}
                             <tr>
