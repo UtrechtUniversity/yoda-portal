@@ -44,7 +44,7 @@
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
                     Please select a study:
-                    <br/>
+                    <br>
                     <table class="table table-striped hover" id="select-study">
                         {% for study in studies %}
                             <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}">
@@ -120,7 +120,7 @@
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
                     Please select a study:
-                    <br/>
+                    <br>
                     <table class="table table-striped hover" id="select-study">
                         {% for study in studies %}
                             <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}" class="ta-{{ study }}">
@@ -149,7 +149,7 @@
                     </button>
                     <div class="dropdown-menu" style="width:300px; padding:5px; max-height:500px; overflow-y: auto;">
                         Please select a folder:
-                        <br/>
+                        <br>
                         <table class="table table-striped hover" id="select-study-folder">
                             <tr data-study-folder-url="{{ url_for('intake_bp.index', studyID=study) }}">
                                 <td style="width:10px;">
@@ -234,8 +234,8 @@
                         <th>Wave</th>
                         <th>Version</th>
                         <th style="text-align: right;">Nr. of files</th>
-                        <th style="text-align: right;">Nr. of errors/<br/>warnings</th>
-                        <th style="text-align: right;">Nr. of <br/>comments</th>
+                        <th style="text-align: right;">Nr. of errors/<br>warnings</th>
+                        <th style="text-align: right;">Nr. of <br>comments</th>
                         <th>Created by</th>
                     </tr>
                 </thead>
