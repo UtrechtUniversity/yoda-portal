@@ -1,7 +1,7 @@
 <h2 id="scan_result_text">
     Unrecognised {% if totalErrorCount %}({{ totalErrorCount }}) {% endif %}
-    and unscanned 
-        {% if (totalFileCount - totalDatasetFiles - totalErrorCount) > 0 %} 
+    and unscanned
+        {% if (totalFileCount - totalDatasetFiles - totalErrorCount) > 0 %}
            ({{ totalFileCount - totalDatasetFiles - totalErrorCount }})
         {% else %}
             (-)
@@ -12,14 +12,14 @@
 <table id="datatable_unrecognised" class="row-border hover table table-striped w-100">
     <thead>
     <tr>
-        <th>Name</th>
-        <th>Date</th>
-        <th>Pseudocode</th>
-        <th>Experiment type</th>
-        <th>Wave</th>
-        <th>Version</th>
-        <th>Status</th>
-        <th>Created by</th>
+        <th scope="col">Name</th>
+        <th scope="col">Date</th>
+        <th scope="col">Pseudocode</th>
+        <th scope="col">Experiment type</th>
+        <th scope="col">Wave</th>
+        <th scope="col">Version</th>
+        <th scope="col">Status</th>
+        <th scope="col">Created by</th>
     </tr>
     </thead>
     <tbody>
@@ -39,4 +39,3 @@
         {% endfor %}
     </tbody>
 </table>
-
