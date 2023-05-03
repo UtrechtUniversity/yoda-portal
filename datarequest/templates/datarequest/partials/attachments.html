@@ -11,7 +11,7 @@
     <div id="attachmentsDiv" class="card-body collapse">
         <ul>
             {% for attachment in attachments %}
-            <li><a href='/datarequest/download_attachment/{{ request_id }}?file={{ loop.index0 }}'>{{ attachment }}</a></li>
+            <li><a href="/datarequest/download_attachment/{{ request_id }}?file={{ loop.index0 }}">{{ attachment }}</a></li>
             {% endfor %}
         </ul>
     </div>
