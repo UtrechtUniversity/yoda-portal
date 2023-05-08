@@ -17,7 +17,6 @@
 {% endblock scripts %}
 
 {% block content %}
-
 <div class="modal" id="uploadDTA">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -73,87 +72,59 @@
         {% endif %}
 
         {% if request_status == 'PENDING_ATTACHMENTS' and is_request_owner %}
-        <?php if ($requestStatus == "PENDING_ATTACHMENTS" && $isRequestOwner): ?>
         <a href="/datarequest/add_attachments/{{ request_id }}" class="btn btn-primary mb-3 float-end" role="button">Add attachments</a>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status == 'SUBMITTED' and is_project_manager %}
-        <?php if($requestStatus == "SUBMITTED" && $isProjectManager): ?>
         <a href="/datarequest/preliminary_review/{{ request_id }}" class="btn btn-primary mb-3 float-end" role="button">Preliminary review</a>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status == 'PRELIMINARY_ACCEPT' and is_datamanager %}
-        <?php if($requestStatus == "PRELIMINARY_ACCEPT" && $isDatamanager): ?>
         <a href="/datarequest/datamanager_review/{{ request_id }}" class="btn btn-primary mb-3 float-end" role="button">Data manager review</a>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status in ['DATAMANAGER_ACCEPT', 'DATAMANAGER_REJECT', 'DATAMANAGER_RESUBMIT'] and is_project_manager %}
-        <?php if(in_array($requestStatus, ["DATAMANAGER_ACCEPT", "DATAMANAGER_REJECT", "DATAMANAGER_RESUBMIT"]) && $isProjectManager): ?>
         <a href="/datarequest/assign/{{ request_id }}" class="btn btn-primary mb-3 float-end" role="button">Review / assign</a>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status == 'UNDER_REVIEW' and is_pending_reviewer %}
-        <?php if($requestStatus == "UNDER_REVIEW" && $isPendingReviewer): ?>
         <a href="/datarequest/review/{{ request_id }}" class="btn btn-primary mb-3 float-end" role="button">Review data request</a>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status in ['DAO_SUBMITTED', 'REVIEWED'] and is_project_manager %}
-        <?php if(in_array($requestStatus, ["DAO_SUBMITTED", "REVIEWED"]) && $isProjectManager): ?>
         <a href="/datarequest/evaluate/{{ request_id }}" class="btn btn-primary mb-3 float-end" role="button">Evaluate data request</a>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status == 'APPROVED' and is_request_owner %}
-        <?php if (in_array($requestStatus, ["APPROVED"]) && $isRequestOwner): ?>
         <a href="/datarequest/preregister/{{ request_id }}" class="btn btn-primary mb-3 float-end" role="button">Preregister study</a>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status == 'PREREGISTRATION_SUBMITTED' and is_project_manager %}
-        <?php if (in_array($requestStatus, ["PREREGISTRATION_SUBMITTED"]) && $isProjectManager): ?>
         <a href="/datarequest/preregistration_confirm/{{ request_id }}" class="btn btn-primary mb-3 float-end" role="button">Go to preregistration confirmation page</a>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status in ['PREREGISTRATION_CONFIRMED', 'DAO_APPROVED'] and is_datamanager %}
-        <?php if (in_array($requestStatus, ["PREREGISTRATION_CONFIRMED", "DAO_APPROVED"]) && $isDatamanager): ?>
         <button type="button" class="btn btn-primary mb-3 float-end upload_dta" data-path="">Upload DTA</button>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status == 'DTA_READY' and is_request_owner %}
-        <?php if ($requestStatus == "DTA_READY" && $isRequestOwner): ?>
         <button type="button" class="btn btn-primary mb-3 ms-1 float-end upload_signed_dta" data-path="">Upload signed DTA</button>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status == 'DTA_SIGNED' and is_datamanager %}
-        <?php if ($requestStatus == "DTA_SIGNED" && $isDatamanager): ?>
         <a href="/datarequest/data_ready/{{ request_id }}" class="btn btn-primary mb-3 ms-1 float-end" role="button">Data ready</a>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status in ['PRELIMINARY_RESUBMIT', 'RESUBMIT_AFTER_DATAMANAGER_REVIEW', 'RESUBMIT'] and is_request_owner %}
-        <?php if (in_array($requestStatus, array("PRELIMINARY_RESUBMIT", "RESUBMIT_AFTER_DATAMANAGER_REVIEW", "RESUBMIT")) && $isRequestOwner): ?>
         <a href="/datarequest/add/{{ request_id }}" class="btn btn-primary mb-3 float-end" role="button">Resubmit</a>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status in ['DTA_SIGNED', 'DATA_READY'] and (is_request_owner or is_project_manager or is_datamanager) %}
-        <?php if (in_array($requestStatus, array("DTA_SIGNED", "DATA_READY")) && ($isRequestOwner || $isProjectManager || $isDatamanager)): ?>
         <a href="/datarequest/download_signed_dta/{{ request_id }}" class="btn btn-primary mb-3 ms-1 float-end">Download signed DTA</a>
-        <?php endif ?>
         {% endif %}
 
         {% if request_status in ['DTA_READY', 'DTA_SIGNED', 'DATA_READY'] and (is_request_owner or is_project_manager or is_datamanager) %}
-        <?php if (in_array($requestStatus, array("DTA_READY", "DTA_SIGNED", "DATA_READY")) && ($isRequestOwner || $isProjectManager || $isDatamanager)): ?>
         <a href="/datarequest/download_dta/{{ request_id }}" class="btn btn-primary mb-3 ms-1 float-end">Download DTA</a>
-        <?php endif ?>
         {% endif %}
     </div>
 </div>
@@ -246,35 +217,27 @@
                 {% endif %}
 
                 {% if request_status in ['PRELIMINARY_REJECT', 'REJECTED_AFTER_DATAMANAGER_REVIEW', 'REJECTED'] %}
-                <?php if (in_array($requestStatus, array("PRELIMINARY_REJECT", "REJECTED_AFTER_DATAMANAGER_REVIEW", "REJECTED"))): ?>
                 <div class="rejected"><h5>Proposal rejected</h5></div>
                     {% if is_request_owner %}
-                    <?php if ($isRequestOwner): ?>
                     <h5>Feedback for researcher</h5>
                     <hr class="border-0 bg-secondary" style="height: 1px;">
-                    <p><?php echo nl2br(html_escape($feedback)) ?></p>
-                    <?php endif ?>
+                    <p>{{ request['feedback'] }}</p>
                     {% endif %}
                 {% elif request_status in ['PRELIMINARY_RESUBMIT', 'RESUBMIT_AFTER_DATAMANAGER_REVIEW', 'RESUBMIT'] %}
-                <?php elseif (in_array($requestStatus, array("PRELIMINARY_RESUBMIT", "RESUBMIT_AFTER_DATAMANAGER_REVIEW", "RESUBMIT"))): ?>
                 <div class="resubmit"><h5>Resubmission requested</h5></div>
                     {% if is_request_owner %}
-                    <?php if ($isRequestOwner): ?>
                     <div class="resubmit">
-                        <p>(click <a href=/datarequest/add/<?php echo html_escape($requestId) ?>>here</a> to open the resubmission form)</p>
+                        <p>(click <a href="/datarequest/add/{{ request_id }}">here</a> to open the resubmission form)</p>
                     </div>
                     <h5>Feedback for researcher</h5>
                     <hr class="border-0 bg-secondary" style="height: 1px;">
-                    <p><?php echo nl2br(html_escape($feedback)) ?></p>
-                    <?php endif ?>
+                    <p>{{ request['feedback'] }}</p>
                     {% endif %}
                 {% elif request_status == 'RESUBMITTED' %}
-                <?php elseif ($requestStatus == "RESUBMITTED"): ?>
                 <div class="resubmitted"><h5>Resubmitted</h5></div>
                 <div class="resubmitted">
-                    <p>(click <a href=/datarequest/view/<?php echo html_escape($resubmissionId) ?>>here</a> to go to the resubmision)</p>
+                    <p>(click <a href="/datarequest/view/{{ request_id }}">here</a> to go to the resubmision)</p>
                 </div>
-                <?php endif ?>
                 {% endif %}
 
                 <hr />
@@ -303,30 +266,24 @@
         {% endif %}
 
         {% if request_type == 'REGULAR' and request_status in ['DATAMANAGER_ACCEPT', 'DATAMANAGER_REJECT', 'DATAMANAGER_RESUBMIT', 'UNDER_REVIEW', 'REJECTED_AFTER_DATAMANAGER_REVIEW', 'RESUBMIT_AFTER_DATAMANAGER_REVIEW', 'REVIEWED', 'APPROVED', 'REJECTED', 'RESUBMIT', 'RESUBMITTED', 'DAO_APPROVED', 'PREREGISTRATION_SUBMITTED', 'PREREGISTRATION_CONFIRMED', 'DTA_READY', 'DTA_SIGNED', 'DATA_READY'] and (is_project_manager or is_datamanager or is_reviewer) %}
-        <!-- <?php if ($requestType == "REGULAR" and in_array($requestStatus, ["DATAMANAGER_ACCEPT", "DATAMANAGER_REJECT", "DATAMANAGER_RESUBMIT", "UNDER_REVIEW", "REJECTED_AFTER_DATAMANAGER_REVIEW", "RESUBMIT_AFTER_DATAMANAGER_REVIEW", "REVIEWED", "APPROVED", "REJECTED", "RESUBMIT", "RESUBMITTED", "DAO_APPROVED", "PREREGISTRATION_SUBMITTED", "PREREGISTRATION_CONFIRMED", "DTA_READY", "DTA_SIGNED", "DATA_READY"]) && ($isProjectManager || $isDatamanager || $isReviewer)): ?> -->
         {% include 'datarequest/partials/datamanager_review.html' %}
         {% endif %}
 
         {% if request_type == 'REGULAR' and request_status in ['UNDER_REVIEW', 'REJECTED_AFTER_DATAMANAGER_REVIEW', 'RESUBMIT_AFTER_DATAMANAGER_REVIEW', 'REVIEWED', 'APPROVED', 'REJECTED', 'RESUBMIT', 'RESUBMITTED', 'DAO_APPROVED', 'PREREGISTRATION_SUBMITTED', 'PREREGISTRATION_CONFIRMED', 'DTA_READY', 'DTA_SIGNED', 'DATA_READY'] and (is_project_manager or is_reviewer) %}
-        <!-- <?php if ($requestType == "REGULAR" and in_array($requestStatus, ["UNDER_REVIEW", "REJECTED_AFTER_DATAMANAGER_REVIEW", "RESUBMIT_AFTER_DATAMANAGER_REVIEW", "REVIEWED", "APPROVED", "REJECTED", "RESUBMIT", "RESUBMITTED", "DAO_APPROVED", "PREREGISTRATION_SUBMITTED", "PREREGISTRATION_CONFIRMED", "DTA_READY", "DTA_SIGNED", "DATA_READY"]) && ($isProjectManager || $isReviewer)): ?> -->
         {% include 'datarequest/partials/assign.html' %}
         {% endif %}
     </div>
 
-        {% if request_type == 'REGULAR' and request_status in ['UNDER_REVIEW', 'REVIEWED', 'APPROVED', 'REJECTED', 'RESUBMIT', 'RESUBMITTED', 'DAO_APPROVED', 'PREREGISTRATION_SUBMITTED', 'PREREGISTRATION_CONFIRMED', 'DTA_READY', 'DTA_SIGNED', 'DATA_READY'] and (is_project_manager or is_reviewer) %}
-    <!-- <?php if ($requestType == "REGULAR" and in_array($requestStatus, ["UNDER_REVIEW", "REVIEWED", "APPROVED", "REJECTED", "RESUBMIT", "RESUBMITTED", "DAO_APPROVED", "PREREGISTRATION_SUBMITTED", "PREREGISTRATION_CONFIRMED", "DTA_READY", "DTA_SIGNED", "DATA_READY"]) && ($isProjectManager || $isReviewer)): ?> -->
+    {% if request_type == 'REGULAR' and request_status in ['UNDER_REVIEW', 'REVIEWED', 'APPROVED', 'REJECTED', 'RESUBMIT', 'RESUBMITTED', 'DAO_APPROVED', 'PREREGISTRATION_SUBMITTED', 'PREREGISTRATION_CONFIRMED', 'DTA_READY', 'DTA_SIGNED', 'DATA_READY'] and (is_project_manager or is_reviewer) %}
     <div class="col-md-12" id="reviews"></div>
-    <?php endif ?>
     {% endif %}
 
     <div class="col-md-12">
         {% if request_status in ['APPROVED', 'REJECTED', 'RESUBMIT', 'RESUBMITTED', 'DAO_APPROVED', 'PREREGISTRATION_SUBMITTED', 'PREREGISTRATION_CONFIRMED', 'DTA_READY', 'DTA_SIGNED', 'DATA_READY'] and (is_project_manager or is_reviewer) %}
-        <!-- <?php if (in_array($requestStatus, ["APPROVED", "REJECTED", "RESUBMIT", "RESUBMITTED", "DAO_APPROVED", "PREREGISTRATION_SUBMITTED", "PREREGISTRATION_CONFIRMED", "DTA_READY", "DTA_SIGNED", "DATA_READY"]) && ($isProjectManager || $isReviewer)): ?> -->
         {% include 'datarequest/partials/evaluation.html' %}
         {% endif %}
 
         {% if request_type == 'REGULAR' and request_status in ['PREREGISTRATION_SUBMITTED', 'PREREGISTRATION_CONFIRMED', 'DTA_READY', 'DTA_SIGNED', 'DATA_READY'] and (is_request_owner or is_project_manager) %}
-        <!-- <?php if ($requestType == "REGULAR" and in_array($requestStatus, ["PREREGISTRATION_SUBMITTED", "PREREGISTRATION_CONFIRMED", "DTA_READY", "DTA_SIGNED", "DATA_READY"]) && ($isRequestOwner || $isProjectManager)): ?> -->
         {% include 'datarequest/partials/preregistration.html' %}
         {% endif %}
     </div>

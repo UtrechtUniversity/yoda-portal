@@ -9,9 +9,7 @@
         <h5 class="float-start">Datamanager review</h5>
     </div>
     <div id="datamanagerReviewDiv" class="card-body {% if not expanded %}collapse{% endif %}{% if expanded %}show{% endif %}">
-        <div id="datamanagerReview" class="metadata-form"
-             data-csrf_token_name="<?php echo rawurlencode($tokenName); ?>"
-             data-csrf_token_hash="<?php echo rawurlencode($tokenHash); ?>">
+        <div id="datamanagerReview" class="metadata-form">
             <p>Loading metadata <i class="fa fa-spinner fa-spin fa-fw"></i></p>
         </div>
     </div>
