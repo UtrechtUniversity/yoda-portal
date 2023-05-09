@@ -92,16 +92,40 @@
                             <th>Research</th>
                             <th>Vault</th>
                             <th>Revisions</th>
+                            <th>Int-users</th>
+                            <th>Ext-users</th>
+                            <th>Total users</th>
                         </tr>
                         {% for category in categories %}
-                            <tr>
+                          {% if not category.category == "YODA_INSTANCE_TOTAL" %}
+                            <tr name="1">
                                 <td>{{ category.category }}</td>
                                 <td>{{ category.storage.total }}</td>
                                 <td>{{ category.storage.research }}</td>
                                 <td>{{ category.storage.vault }}</td>
                                 <td>{{ category.storage.revision }}</td>
+                                <td>{{ category.users.internals }}</td>
+                                <td>{{ category.users.externals }}</td>
+                                <td>{{ category.users.externals + category.users.internals }}</td>
                             </tr>
+                           {% endif %}
                         {% endfor %}
+
+                        {% for category in categories %}
+                          {% if category.category == "YODA_INSTANCE_TOTAL" %}
+                            <tr name="2">
+                                <td><b>TOTALS</b></td>
+                                <td>{{ category.storage.total }}</td>
+                                <td>{{ category.storage.research }}</td>
+                                <td>{{ category.storage.vault }}</td>
+                                <td>{{ category.storage.revision }}</td>
+                                <td>{{ category.users.internals }}</td>
+                                <td>{{ category.users.externals }}</td>
+                                <td>{{ category.users.externals + category.users.internals }}</td>
+                            </tr>
+                           {% endif %}
+                        {% endfor %}
+
                     </table>
 
                     <a href="{{ url_for('stats_bp.export') }}" class="btn btn-primary btn-sm">
