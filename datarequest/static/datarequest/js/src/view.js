@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     var datarequestSchema = {};
     var datarequestUiSchema = {};
     var datarequestFormData = {};
+    var datarequestSchemaVersion = {};
     var datarequestStatus = {};
     var datarequestStatusInt = null;
     var datarequestType = "";
@@ -28,9 +29,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         {request_id: config.request_id},
         {errorPrefix: "Could not get datarequest"})
     .then(datarequest => {
-        datarequestFormData = JSON.parse(datarequest.requestJSON);
-        datarequestStatus   = datarequest.requestStatus;
-        datarequestType     = datarequest.requestType;
+        datarequestFormData      = JSON.parse(datarequest.requestJSON);
+        datarequestSchemaVersion = datarequest.requestSchemaVersion;
+        datarequestStatus        = datarequest.requestStatus;
+        datarequestType          = datarequest.requestType;
     })
     // Set progress bar according to status of data request
     .then(() => {
@@ -119,7 +121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     })
     // Get data request schema and uischema
     .then(async () => {
-        await Yoda.call("datarequest_schema_get", {schema_name: "datarequest"})
+        await Yoda.call("datarequest_schema_get", {schema_name: "datarequest", version: datarequestSchemaVersion})
         .then(response => {
             datarequestSchema   = response.schema;
             datarequestUiSchema = response.uischema;
