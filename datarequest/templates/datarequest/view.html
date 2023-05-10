@@ -246,9 +246,6 @@
                 <p><b>Status: </b>{{ human_request_status }}</p>
                 <p><b>Requestee: </b>{{ request['owner'] }}</p>
                 <p><b>Purpose: </b>{{ request['datarequest']['purpose'] }}
-                {% if request_type == 'REGULAR' %}
-                <p><b>Publication type: </b>{{ publication_type }}</p>
-                {% endif %}
             </div>
         </div>
     </div>
