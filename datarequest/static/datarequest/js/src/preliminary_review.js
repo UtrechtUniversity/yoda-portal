@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     var datarequestSchema = {};
     var datarequestUiSchema = {};
     var datarequestFormData = {};
+    var datarequestSchemaVersion = {};
 
     // Get data request
     Yoda.call('datarequest_get',
@@ -29,10 +30,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         {errorPrefix: "Could not get datarequest"})
     .then(datarequest => {
         datarequestFormData = JSON.parse(datarequest.requestJSON);
+        datarequestSchemaVersion = datarequest.requestSchemaVersion;
     })
     // Get data request schema and uischema
     .then(async () => {
-        await Yoda.call("datarequest_schema_get", {schema_name: "datarequest"})
+        await Yoda.call("datarequest_schema_get", {schema_name: "datarequest", version: datarequestSchemaVersion})
         .then(response => {
             datarequestSchema   = response.schema;
             datarequestUiSchema = response.uischema;
