@@ -1,4 +1,4 @@
-/* global browse */
+/* global browse, path */
 'use strict'
 
 let folderSelectBrowser = null
@@ -6,7 +6,7 @@ let dlgCurrentFolder = ''
 let currentBrowseFolder = ''
 
 $(document).ready(function () {
-  dlgCurrentFolder = currentBrowseFolder = browseStartDir
+  dlgCurrentFolder = currentBrowseFolder = path
 
   // single file/folder moves
   $('body').on('click', 'a.file-copy, a.file-move, a.folder-copy, a.folder-move', function () {
@@ -38,7 +38,7 @@ $(document).ready(function () {
     dlgCurrentFolder = $(this).attr('data-collection')
     console.info('File/folder move to collection: ' + dlgCurrentFolder)
     dlgSelectAlertHide()
-    startBrowsing()
+    startBrowsingColl()
 
     $('#dlg-file-browse-operations').modal('show')
   })
@@ -65,7 +65,7 @@ $(document).ready(function () {
     currentBrowseFolder = $('.folder-create').attr('data-path')
     dlgCurrentFolder = currentBrowseFolder
     dlgSelectAlertHide()
-    startBrowsing()
+    startBrowsingColl()
 
     $('#dlg-file-browse-operations').modal('show')
   })
@@ -182,6 +182,7 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null) 
     $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   } else {
     dlgSelectAlertHide()
+    $('#dlg-file-browse-operations .dlg-action-button').html('Copying <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
 
   try {
@@ -215,6 +216,7 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null) 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
 }
 
 async function moveFile (filepath, newFilepath, multiple, multipleIndex = null) {
@@ -222,6 +224,7 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null) 
     $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   } else {
     dlgSelectAlertHide()
+    $('#dlg-file-browse-operations .dlg-action-button').html('Moving <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
 
   try {
@@ -257,6 +260,7 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null) 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
 }
 
 async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = null) {
@@ -264,6 +268,7 @@ async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = 
     $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   } else {
     dlgSelectAlertHide()
+    $('#dlg-file-browse-operations .dlg-action-button').html('Copying <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
 
   try {
@@ -297,6 +302,7 @@ async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
 }
 
 async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = null) {
@@ -304,6 +310,7 @@ async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = 
     $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   } else {
     dlgSelectAlertHide()
+    $('#dlg-file-browse-operations .dlg-action-button').html('Moving <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
 
   try {
@@ -339,6 +346,7 @@ async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
 }
 async function deleteFolder (collection, folderName, multipleIndex = null) {
   $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
@@ -386,7 +394,7 @@ async function deleteFile (collection, fileName, multipleIndex = null) {
   }
 }
 
-function startBrowsing () {
+function startBrowsingColl () {
   if (!folderSelectBrowser) {
     folderSelectBrowser = $('#folder-select-browser').DataTable({
       bFilter: false,
@@ -398,11 +406,11 @@ function startBrowsing () {
       },
       dom: '<"top">frt<"bottom"lp><"clear">',
       columns: [
-        { render: tableRenderer.name, data: 'name' },
+        { render: tableRendererColl.name, data: 'name' },
         // Size and date best not be orderable, may result in duplicated results for data objects.
-        // {render: tableRenderer.size, orderable: false, data: 'size'},
-        { render: tableRenderer.date, orderable: false, data: 'modify_time' }
-        // {render: tableRenderer.context, orderable: false },
+        // {render: tableRendererColl.size, orderable: false, data: 'size'},
+        { render: tableRendererColl.date, orderable: false, data: 'modify_time' }
+        // {render: tableRendererColl.context, orderable: false },
       ],
       ajax: getFolderContents2,
       processing: true,
@@ -501,10 +509,10 @@ const getFolderContents2 = (() => {
   return fn
 })()
 
-const tableRenderer = {
+const tableRendererColl = {
   name: (name, _, row) => {
     const tgt = `${dlgCurrentFolder}/${name}`
-    if (row.type === 'coll') { return `<a class="coll dlg-browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>` } else { return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}` }
+    if (row.type === 'coll') { return `<a class="coll dlg-browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>` } else { return `<i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}` }
   },
   //    size: (size, _, row) => {
   //        if (row.type === 'coll') {
@@ -541,14 +549,7 @@ function dlgBrowse (dir) {
 
   dlgMakeBreadcrumb(dir)
 
-  dlgChangeBrowserUrl(dir)
-
   dlgBuildFileBrowser(dir)
-}
-
-function dlgChangeBrowserUrl (path) {
-  // currentFolder =   path;
-  urlEncodedPath = path
 }
 
 function dlgBuildFileBrowser (dir) {
@@ -583,7 +584,7 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
       path += '/' + encodeURIComponent(part)
 
       // Active item
-      const valueString = htmlEncode(part).replace(/ /g, '&nbsp;')
+      const valueString = Yoda.htmlEncode(part).replace(/ /g, '&nbsp;')
       if (k === (totalParts - 1)) {
         html += '<li class="active breadcrumb-item">' + valueString + '</li>'
       } else {
@@ -593,12 +594,6 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
   }
 
   $('ol.dlg-breadcrumb').html(html)
-}
-
-function htmlEncode (value) {
-  // create a in-memory div, set it's inner text(which jQuery automatically encodes)
-  // then grab the encoded contents back out.  The div never exists on the page.
-  return $('<div/>').text(value).html()
 }
 
 /// alert handling

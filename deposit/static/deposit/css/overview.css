@@ -36,3 +36,7 @@
 #file-browser tr.odd {
     background-color: transparent !important;
 }
+
+.modal.show {
+    pointer-events:none;
+}

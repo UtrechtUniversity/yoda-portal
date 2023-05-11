@@ -9,6 +9,7 @@
 {% endblock style %}
 
 {% block scripts %}
+    <script src="{{ url_for('static', filename='lib/jquery-3.6.4/jquery-migrate-3.4.1.min.js') }}"></script>
     <script src="{{ url_for('group_manager_bp.static', filename='js/group_manager.js') }}"></script>
     <script src="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.min.js') }}"></script>
     <script>
@@ -267,6 +268,16 @@
                                 <input name="group_description" id="f-group-update-description" class="form-control" type="text" placeholder="Enter a short description" pattern="^[a-zA-Z0-9,.()_ -]*$" oninvalid="setCustomValidity('Please enter only letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')" onchange="setCustomValidity('')" />
                             </div>
                         </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-4 form-label" for="f-group-update-creation-date">Creation date
+                                <i class="fa-solid fa-question-circle" aria-hidden="true" title="Creation date for this group"></i>
+                            </label>
+                            <div class="col-sm-8">
+                                <input name="group_creation_date" id="f-group-update-creation-date" class="form-control" type="text" disabled />
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="offset-sm-4 col-sm-8">
                                 <input action="{{ url_for('group_manager_bp.group_update') }}" id="f-group-update-submit" class="btn btn-primary" type="button" value="Save changes" />
@@ -330,7 +341,7 @@
                   <h6>Step 1. Upload the csv file</h6>
                   <p class="placeholder-text">Select a CSV file containing group definions (format described below).</p>
                 </div>
-                <div class='col-sm-6 div-process-results-import hidden'>
+                <div class="col-sm-6 div-process-results-import hidden">
                   <div class="div-process-results-import">
                     <h6>Step 2. Process the uploaded csv file</h6>
                     <p class="placeholder-text">Check the options you prefer and click the process button.</p>
@@ -346,13 +357,13 @@
                   <input type="file" id="file-input" name="file-input" class="csv-import-file" accept=".csv" title="Upload CSV with group definition" />
                   <label for="file-input" class="btn btn-primary file-input-click"><i class="fa-solid fa-upload" aria-hidden="true"></i> Upload CSV with group definitions</label>
                 </div>
-                <div class='col-sm-6 div-process-results-import hidden'>
+                <div class="col-sm-6 div-process-results-import hidden">
                   <button type="button" class="btn btn-primary process-csv" title="Process CSV with group definition(s)"><i class="fa-solid fa-user-group" aria-hidden="true"></i> Process CSV</button>
                 </div>
               </div>
               <div class="row">
                 <div id="result-import-groups-csv">
-                  <br />
+                  <br>
                   <h5>Group definition CSV format</h5>
 
                   <p>The CSV file is expected to include the following labels in its header (the first row):</p>

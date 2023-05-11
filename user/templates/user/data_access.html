@@ -12,8 +12,8 @@
     In order to upload, download or view the content of files via iCommands or network disk (webDAV), you need a one-time data access password.
     This is a personal data access password that must not be shared with other people.
     If you wish to give other people access to your data, please add them to the group in the group manager module.
-    <br />
-    <br />
+    <br>
+    <br>
     Below you can generate a data access password.
 {% if token_lifetime >= 48 and token_lifetime % 24 == 0 -%}
     The password is valid for {{ (token_lifetime / 24) | int }} days.
@@ -39,7 +39,7 @@
             <div class="list-group-item d-inline-flex">
                 <label class="col-sm-7">{{ t.label }}</label>
                 <span class="col-sm-3">{{ t.exp_time }}</span>
-                <input class="btn btn-danger col-sm-2 delete-token" type="button" value="Delete"/>
+                <button type="button" class="btn btn-danger col-sm-2 delete-token">Delete</button>
             </div>
             {% endfor %}
         </div>
@@ -66,7 +66,7 @@
                           type="text"
                           placeholder="Enter a label to identify the new password by"
                           autofocus
-                          required />
+                          required>
                   </div>
               </div>
               <div class="form-group row">
@@ -76,10 +76,10 @@
                           id="f-token"
                           class="form-control"
                           type="text"
-                          readonly/>
+                          readonly>
                   </div>
                   <div class="col-sm-2">
-                      <button class="btn btn-secondary btn-copy-to-clipboard">
+                      <button type="button" class="btn btn-secondary btn-copy-to-clipboard">
                           <i class="fa fa-copy"></i> Copy
                       </button>
                   </div>

@@ -11,7 +11,7 @@
 <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
-<script type="text/javascript">
+<script>
         var browseStartDir = {{ dir | tojson }};
         var view = 'browse';
 </script>
@@ -45,8 +45,8 @@
                             <table id="folder-select-browser" class="table yoda-table table-bordered">
                                 <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Modified date</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Modified date</th>
                                 </tr>
                                 </thead>
                             </table>
@@ -56,8 +56,8 @@
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button class="btn btn-primary" id="btn-copy-package"><i class="fa-solid fa-copy" aria-hidden="true"></i> Copy package to research area</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btn-copy-package"><i class="fa-solid fa-copy" aria-hidden="true"></i> Copy package to research area</button>
             </div>
         </div>
     </div>
@@ -73,12 +73,12 @@
       <div class="modal-body">
         <p>Submit this data package as a new publication or submit it as a new version of an existing publication from this vault.</p>
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage" value="" checked="checked">
+          <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage" value="" checked>
           <label class="form-check-label" for="dataPackage">
             New publication
           </label>
         </div>
-        <hr />
+        <hr>
         <p>Existing publications:</p>
         <div class="previousPublications"></div>
       </div>
@@ -106,8 +106,8 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button class='btn btn-primary ms-2 action-confirm-submit-for-publication'>Confirm agreement</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary ms-2 action-confirm-submit-for-publication">Confirm agreement</button>
                     </div>
                 </div>
             </div>
@@ -135,7 +135,7 @@
             <div class="modal-footer">
                 <a href="#" class="btn btn-outline-secondary download-report-text">Download as text</a>
                 <a href="#" class="btn btn-outline-secondary download-report-csv">Download as CSV</a>
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -152,7 +152,7 @@
                         <option value="" disabled selected>Select a file format list</option>
                     </select>
                 </div>
-                <p class="help"></p><br/>
+                <p class="help"></p><br>
                 <p class="advice"></p>
                 <p class="checking">Checking files <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
                 <p class="preservable">
@@ -165,7 +165,7 @@
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -178,8 +178,8 @@
                 <p>Please confirm that you agree to depublish this datapackage.</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-primary action-confirm-depublish-publication'>Confirm depublish</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary action-confirm-depublish-publication">Confirm depublish</button>
             </div>
         </div>
     </div>
@@ -192,8 +192,8 @@
                 <p>Please confirm that you agree to republish this datapackage.</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-primary action-confirm-republish-publication'>Confirm republish</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary action-confirm-republish-publication">Confirm republish</button>
             </div>
         </div>
     </div>
@@ -206,7 +206,7 @@
                 <div id="viewer"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -227,8 +227,8 @@
         </div>
         <div class="col-lg-10">
             <div class="metadata-description"></div>
-            <button class="btn read-more-button hide" role="button">Read full description...</button>
-            <button class="btn read-less-button hide" role="button">Collapse description...</button>
+            <button type="button" class="btn read-more-button hide">Read full description...</button>
+            <button type="button" class="btn read-less-button hide">Collapse description...</button>
         </div>
     </div>
     <div class="row">
@@ -266,7 +266,7 @@
             </div>
             <div class="btn-group">
                 <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="actionMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button>
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" id="actionMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button>
                     <div class="dropdown-menu action-list" role="menu"></div>
                 </div>
             </div>
@@ -287,11 +287,11 @@
 <table id="file-browser" class="table yoda-table table-striped">
     <thead>
     <tr>
-        <th>Name</th>
-        <th>Size</th>
-        <th>Modified date</th>
-        <th></th>
-        <th></th>
+        <th scope="col">Name</th>
+        <th scope="col">Size</th>
+        <th scope="col">Modified date</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
     </tr>
     </thead>
 </table>

@@ -145,7 +145,7 @@ $(function () {
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '')
   }
 
-  $('.btn-copy-to-clipboard').click(function () {
+  $('.btn-copy-to-clipboard').on('click', function () {
     textToClipboard($('.metadata-identifier').text())
     Yoda.set_message('success', 'DAG permalink identifier has been copied to the clipboard')
   })
@@ -316,7 +316,7 @@ function metadataShow () {
     }
   })
 
-  $('.show-map').click(function () {
+  $('.show-map').on('click', function () {
     const lon0 = parseFloat($(this).data('lon0'))
     const lat0 = parseFloat($(this).data('lat0'))
     const lon1 = parseFloat($(this).data('lon1'))
@@ -338,11 +338,11 @@ function metadataShow () {
     $('#viewMap').modal('show')
   })
 
-  $('.btn-copy-as-new-deposit').click(function () {
+  $('.btn-copy-as-new-deposit').on('click', function () {
     $('#confirmCopyAsNewDeposit').modal('show')
   })
 
-  $('.action-confirm-copy-as-new-deposit').click(function () {
+  $('.action-confirm-copy-as-new-deposit').on('click', function () {
     Yoda.call('deposit_copy_data_package',
       { reference: $(this).attr('data-yoda-reference') },
       { rawResult: true })

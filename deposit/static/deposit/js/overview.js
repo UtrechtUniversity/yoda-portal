@@ -1,3 +1,4 @@
+/* global path */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
@@ -12,10 +13,8 @@ $(document).ajaxSend(function (e, request, settings) {
 let currentFolder
 
 $(function () {
-  currentFolder = dir
-
   // Canonicalize path somewhat, for convenience.
-  currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '')
+  currentFolder = path.replace(/\/+/g, '/').replace(/\/$/, '')
 
   if ($('#file-browser').length) {
     startBrowsing()
@@ -26,14 +25,14 @@ $(function () {
     fileMgmtDialogAlert('deposit-delete', '')
 
     // set initial values for further processing and user experience
-    $('#deposit-delete-name').html($(this).attr('data-name'))
+    $('#deposit-delete-name').text($(this).attr('data-name'))
     $('.btn-confirm-deposit-delete').attr('data-collection', $(this).attr('data-collection'))
     $('.btn-confirm-deposit-delete').attr('data-name', $(this).attr('data-name'))
 
     $('#deposit-delete').modal('show')
   })
 
-  $('.btn-confirm-deposit-delete').click(function () {
+  $('.btn-confirm-deposit-delete').on('click', function () {
     handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'))
   })
 })
@@ -73,7 +72,7 @@ function changeBrowserUrl (path) {
     url += '?dir=' + encodeURIComponent(path)
   }
 
-  history.pushState({}, {}, url)
+  window.history.pushState({}, {}, url)
 }
 
 function browse (dir = '', changeHistory = false) {
@@ -81,12 +80,6 @@ function browse (dir = '', changeHistory = false) {
   if (changeHistory) { changeBrowserUrl(dir) }
 
   buildFileBrowser(dir)
-}
-
-function htmlEncode (value) {
-  // create a in-memory div, set it's inner text(which jQuery automatically encodes)
-  // then grab the encoded contents back out.  The div never exists on the page.
-  return $('<div/>').text(value).html().replace('"', '&quot;')
 }
 
 function buildFileBrowser (dir) {
@@ -186,14 +179,14 @@ const getFolderContents = (() => {
 const tableRenderer = {
   name: (name, _, row) => {
     const tgt = `${currentFolder}/${name}`
-    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>`
+    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>`
   },
   title: (name, _, row) => {
     const tgt = `${currentFolder}/${name}`
-    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}">${htmlEncode(row.deposit_title)}</a>`
+    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}">${Yoda.htmlEncode(row.deposit_title)}</a>`
   },
   access: (name, _, row) => {
-    return `${htmlEncode(row.deposit_access)}`
+    return `${Yoda.htmlEncode(row.deposit_access)}`
   },
   size: (depositSize, _, row) => {
     const szs = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB']
@@ -221,7 +214,7 @@ const tableRenderer = {
       return ''
     }
 
-    actions.append(`<a href="#" class="deposit-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this deposit"><i class="fa-solid fa-trash"></a>`)
+    actions.append(`<a href="#" class="deposit-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this deposit"><i class="fa-solid fa-trash"></a>`)
 
     return actions[0].innerHTML
   }

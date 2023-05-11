@@ -67,7 +67,7 @@ function flatListGroups () {
   $('#result-user-search-groups').html(table)
 
   // Clicking a row must highlite rows in in both tree/flat list and present details in the corresponding panel
-  $('.user-search-result-group').click(function () {
+  $('.user-search-result-group').on('click', function () {
     // $('#user-search-groups').modal('hide');
     const groupName = $(this).attr('user-search-result-group')
     Yoda.groupManager.unfoldToGroup(groupName)
@@ -273,7 +273,7 @@ async function processImportedRow (row) {
       // Solely added for test automation - splinter.
       // This was the only way to be able to perform an automated click work on a row.
       // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
-      $('#processed-indicator-' + groupname).click(function () {
+      $('#processed-indicator-' + groupname).on('click', function () {
         const groupName = 'research-' + groupname
         $('#dlg-import-groups-csv').modal('hide')
         Yoda.groupManager.unfoldToGroup(groupName)
@@ -296,7 +296,7 @@ async function processImportedRow (row) {
   // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
   if ($('.import-groupname').length === $('.import-groupname-done').length) {
     // only enable new groups that have been successfully added
-    $('.import-csv-group-ok').click(function () {
+    $('.import-csv-group-ok').on('click', function () {
       const groupName = 'research-' + $(this).attr('groupname')
       $('#dlg-import-groups-csv').modal('hide')
       Yoda.groupManager.unfoldToGroup(groupName)
@@ -317,6 +317,7 @@ async function processImportedRow (row) {
                 category: categoryName,
                 subcategory: subcategoryName,
                 name: groupName,
+                creation_date: hier[categoryName][subcategoryName][groupName].creation_date,
                 description: hier[categoryName][subcategoryName][groupName].description,
                 schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
                 expiration_date: hier[categoryName][subcategoryName][groupName].expiration_date,
@@ -514,15 +515,15 @@ $(function () {
   // CSV import handling {{{
   document.getElementById('file-input').addEventListener('change', readCsvFile, false)
 
-  $('.file-input-click').click(function () {
+  $('.file-input-click').on('click', function () {
     $('#file-input').val(null)
   })
 
-  $('.import-groups-csv').click(function () {
+  $('.import-groups-csv').on('click', function () {
     $('#dlg-import-groups-csv').modal('show')
   })
 
-  $('.process-csv').click(function () {
+  $('.process-csv').on('click', function () {
     // First disable the button
     $(this).prop('disabled', true)
 
@@ -534,7 +535,7 @@ $(function () {
   // }}}
 
   // When allowed to add groups the fields have to be initialized
-  $('.create-button-new').click(function () {
+  $('.create-button-new').on('click', function () {
     $('.properties-update').addClass('hidden')
     $('.users').addClass('hidden')
     $('.properties-create').removeClass('hidden')
@@ -559,12 +560,12 @@ $(function () {
   })
 
   // Intercept group creation submission of form
-  $('#f-group-create-submit').click(function () {
+  $('#f-group-create-submit').on('click', function () {
     Yoda.groupManager.onSubmitGroupCreateOrUpdate(this)
   })
 
   // Intercept group update submission of form
-  $('#f-group-update-submit').click(function () {
+  $('#f-group-update-submit').on('click', function () {
     Yoda.groupManager.onSubmitGroupCreateOrUpdate(this)
   })
 
@@ -937,6 +938,11 @@ $(function () {
           .val(group.description)
           .prop('readonly', !userCanManage)
 
+        // Creation date of this group
+        $groupProperties.find('#f-group-update-creation-date')
+          .val(group.creation_date)
+          .prop('readonly', true)
+
         if (that.prefixHasDataClassification(prefix)) {
           $groupProperties.find('.data-classification').show()
           $('#f-group-update-data-classification')
@@ -1012,7 +1018,7 @@ $(function () {
                                '" aria-hidden="true" title="' +
                                that.accessNames[user.access] +
                                '"></i> ' +
-                               Yoda.escapeEntities(displayName))
+                               Yoda.htmlEncode(displayName))
 
           $userList.append($user)
         })
@@ -1898,6 +1904,7 @@ $(function () {
                 category: categoryName,
                 subcategory: subcategoryName,
                 name: groupName,
+                creation_date: hier[categoryName][subcategoryName][groupName].creation_date,
                 description: hier[categoryName][subcategoryName][groupName].description,
                 schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
                 expiration_date: hier[categoryName][subcategoryName][groupName].expiration_date,

@@ -60,6 +60,14 @@
                     <p>Loading metadata <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
                 </div>
             </div>
+            <div class="card-footer">
+                <h5 class="card-title float-start">
+                    Metadata form - {{ path | trim | safe }}
+                </h5>
+                <div class="input-group-sm has-feedback float-end close-button">
+                    <a class="btn btn-light btn-sm" href="/vault/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

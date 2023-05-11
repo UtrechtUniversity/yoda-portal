@@ -32,10 +32,10 @@
             </div>
 
             <div class="modal-body text-center">
-                <div class='map' id='map1'></div>
+                <div class="map" id="map1"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -50,16 +50,16 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-sm-12">
-                        <span class='dlg-deposit-copy-text'>Are you sure you want to copy this data package as a new deposit?</span>
+                        <span class="dlg-deposit-copy-text">Are you sure you want to copy this data package as a new deposit?</span>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <div class="row">
                     <div class="col-sm-12">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <span class='dlg-deposit-copy-result'>
-                            <button class='btn btn-primary ms-2 action-confirm-copy-as-new-deposit' data-yoda-reference='{{ reference }}'>Copy</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <span class="dlg-deposit-copy-result">
+                            <button type="button" class="btn btn-primary ms-2 action-confirm-copy-as-new-deposit" data-yoda-reference="{{ reference }}">Copy</button>
                         </span>
                     </div>
                 </div>
@@ -78,7 +78,7 @@
             <a class="btn btn-light float-end" href="https://dag.sites.uu.nl/search/datapackage-request-access/" target="_blank" title="How to request for access for this restricted datapackage"><i class="fa fa-info-circle"></i> Request access</a>
             {% else %}
             <a class="btn btn-light float-end" href="https://dag.sites.uu.nl/find-and-retrieve-data/" target="_blank" title="Guidance"><i class="fa fa-info-circle"></i> Guidance</a>
-            <button class="btn btn-secondary float-end btn-copy-as-new-deposit me-2"><i class="fa fa-copy"></i> Copy as a new deposit</button>
+            <button type="button" class="btn btn-secondary float-end btn-copy-as-new-deposit me-2"><i class="fa fa-copy"></i> Copy as a new deposit</button>
             {% endif %}
         </div>
     </div>
@@ -105,8 +105,8 @@
     <div class="row mt-2">
         <div class="col">
             <div class="metadata-description"></div>
-            <button class="btn read-more-button p-0 hide" role="button">Read full description...</button>
-            <button class="btn read-less-button p-0 hide" role="button">Collapse description...</button>
+            <button type="button" class="btn read-more-button p-0 hide">Read full description...</button>
+            <button type="button" class="btn read-less-button p-0 hide">Collapse description...</button>
         </div>
     </div>
 
@@ -116,7 +116,7 @@
         </div>
         <div class="col">
             <span class="metadata-identifier">{{ url_for('vault_bp.metadata', _external=True, reference=reference) }}</span>
-            <button class="btn btn-secondary btn-sm float-end btn-copy-to-clipboard"><i class="fa fa-copy"></i> Copy to clipboard</button>
+            <button type="button" class="btn btn-secondary btn-sm float-end btn-copy-to-clipboard"><i class="fa fa-copy"></i> Copy to clipboard</button>
         </div>
     </div>
 
@@ -220,14 +220,14 @@
     </div>
 </section>
 
-<div class='breadcrumbs-browser hide'>
+<div class="breadcrumbs-browser hide">
     <table id="file-browser" class="table yoda-table table-striped">
         <thead>
         <tr>
-            <th>Name</th>
-            <th>Size</th>
-            <th>Modified date</th>
-            <th></th>
+            <th scope="col">Name</th>
+            <th scope="col">Size</th>
+            <th scope="col">Modified date</th>
+            <th scope="col"></th>
         </tr>
         </thead>
     </table>

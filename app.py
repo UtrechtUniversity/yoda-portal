@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 from os import path
@@ -26,6 +26,7 @@ from vault.vault import vault_bp
 
 
 app = Flask(__name__, static_folder='assets')
+app.json.sort_keys = False
 
 # Load configurations
 with app.app_context():

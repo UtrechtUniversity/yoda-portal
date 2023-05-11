@@ -7,7 +7,7 @@
 {% endblock style %}
 
 {% block scripts %}
-<script type="text/javascript"> window.config = {
+<script> window.config = {
   request_id: '{{ request_id }}',
   username: '{{ username }}'
 }
@@ -27,11 +27,11 @@
         {% set expanded = true %}
         {% include 'datarequest/partials/datarequest.html' %}
         {% endwith %}
-        {% if attachments|length > 0 %} 
+        {% if attachments|length > 0 %}
         {% include 'datarequest/partials/attachments.html' %}
         {% endif %}
     </div>
-    <div class=col-md-6>
+    <div class="col-md-6">
         <div class="card">
             <div class="card-header clearfix">
                 <h5 class="card-header float-left">
@@ -39,9 +39,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <div id="form" class="metadata-form"
-                     data-csrf_token_name="<?php echo rawurlencode($tokenName); ?>"
-                     data-csrf_token_hash="<?php echo rawurlencode($tokenHash); ?>">
+                <div id="form" class="metadata-form">
                     <p>Loading metadata <i class="fa fa-spinner fa-spin fa-fw"></i></p>
                 </div>
             </div>
