@@ -113,7 +113,8 @@
                             </tr>
                            {% endif %}
                         {% endfor %}
-
+                        </tbody>
+                        <tfoot>
                         {% for category in categories %}
                           {% if category.category == "YODA_INSTANCE_TOTAL" %}
                             <tr>
@@ -128,7 +129,7 @@
                             </tr>
                            {% endif %}
                         {% endfor %}
-                        </tbody>
+                        </tfoot>
                     </table>
 
                     <a href="{{ url_for('stats_bp.export') }}" class="btn btn-primary btn-sm">
