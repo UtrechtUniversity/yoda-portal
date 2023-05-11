@@ -56,10 +56,10 @@
                             <canvas id="chart"></canvas>
                             <div class="row">
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="form-control item btn btn-sm" id="legend-deposit" onClick="chartToggleData(0)">Deposit</button>
-                                    <button type="button" class="form-control item btn btn-sm" id="legend-research" onClick="chartToggleData(0)">Research</button>
-                                    <button type="button" class="form-control item btn btn-sm" id="legend-vault" onClick="chartToggleData(1)">Vault</button>
-                                    <button type="button" class="form-control item btn btn-sm" id="legend-revisions" onClick="chartToggleData(2)">Revisions</button>
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-deposit" onclick="chartToggleData(0)">Deposit</button>
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-research" onclick="chartToggleData(0)">Research</button>
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-vault" onclick="chartToggleData(1)">Vault</button>
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-revisions" onclick="chartToggleData(2)">Revisions</button>
                                 </div>
                             </div>
                             <div class="row">
@@ -79,33 +79,61 @@
 
     {% if categories %}
     <div class="row mt-4">
-        <div class="col-md-7">
+        <div class="col-md-10">
             <div class="card">
                 <div class="card-header">
-                    Category storage
+                    Category statistics
                 </div>
                 <div class="card-body">
                     <table class="table table-striped storage-table">
-                        <tr>
-                            <th scope="col">Category</th>
-                            <th scope="col">Total</th>
-                            <th scope="col">Research</th>
-                            <th scope="col">Vault</th>
-                            <th scope="col">Revisions</th>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th scope="col">Category</th>
+                                <th scope="col">Research</th>
+                                <th scope="col">Vault</th>
+                                <th scope="col">Revisions</th>
+                                <th scope="col">Total storage</th>
+                                <th scope="col">Internal users</th>
+                                <th scope="col">External users</th>
+                                <th scope="col">Total users</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                         {% for category in categories %}
+                          {% if not category.category == "YODA_INSTANCE_TOTAL" %}
                             <tr>
                                 <td>{{ category.category }}</td>
-                                <td>{{ category.storage.total }}</td>
                                 <td>{{ category.storage.research }}</td>
                                 <td>{{ category.storage.vault }}</td>
                                 <td>{{ category.storage.revision }}</td>
+                                <td>{{ category.storage.total }}</td>
+                                <td>{{ category.users.internals }}</td>
+                                <td>{{ category.users.externals }}</td>
+                                <td>{{ category.users.externals + category.users.internals }}</td>
                             </tr>
+                           {% endif %}
                         {% endfor %}
+                        </tbody>
+                        <tfoot>
+                        {% for category in categories %}
+                          {% if category.category == "YODA_INSTANCE_TOTAL" %}
+                            <tr>
+                                <th scope="row">Totals</th>
+                                <td>{{ category.storage.research }}</td>
+                                <td>{{ category.storage.vault }}</td>
+                                <td>{{ category.storage.revision }}</td>
+                                <td>{{ category.storage.total }}</td>
+                                <td>{{ category.users.internals }}</td>
+                                <td>{{ category.users.externals }}</td>
+                                <td>{{ category.users.externals + category.users.internals }}</td>
+                            </tr>
+                           {% endif %}
+                        {% endfor %}
+                        </tfoot>
                     </table>
 
                     <a href="{{ url_for('stats_bp.export') }}" class="btn btn-primary btn-sm">
-                        Export all details
+                        Export monthly storage details
                     </a>
                 </div>
             </div>
