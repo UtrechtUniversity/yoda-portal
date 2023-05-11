@@ -23,16 +23,16 @@
                     Groups
 
                     <div class="input-group-sm has-feedback float-end">
-                        <input class="form-control form-control-sm" id="search-group-table" type="text" maxlength="63" placeholder="Search groups" />
+                        <input class="form-control form-control-sm" id="search-group-table" type="text" maxlength="63" placeholder="Search groups">
                     </div>
                 </div>
                 <div>
                     <table id="group-browser" class="table yoda-table table-striped">
                         <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Size</th>
-                            <th>Members</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Size</th>
+                            <th scope="col">Members</th>
                         </tr>
                         </thead>
                     </table>
@@ -55,19 +55,19 @@
                         <div id="storage-chart" class="hidden">
                             <canvas id="chart"></canvas>
                             <div class="row">
-                                <div class="btn-group" role="group"">
-                                    <button class="form-control item btn btn-sm" id="legend-deposit" onClick="chartToggleData(0)">Deposit</button>
-                                    <button class="form-control item btn btn-sm" id="legend-research" onClick="chartToggleData(0)">Research</button>
-                                    <button class="form-control item btn btn-sm" id="legend-vault" onClick="chartToggleData(1)">Vault</button>
-                                    <button class="form-control item btn btn-sm" id="legend-revisions" onClick="chartToggleData(2)">Revisions</button>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-deposit" onclick="chartToggleData(0)">Deposit</button>
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-research" onclick="chartToggleData(0)">Research</button>
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-vault" onclick="chartToggleData(1)">Vault</button>
+                                    <button type="button" class="form-control item btn btn-sm" id="legend-revisions" onclick="chartToggleData(2)">Revisions</button>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="btn-group" role="group"">
-                                    <button class="form-control btn btn-sm btn-secondary" id="startdate_min"><i class="fa-solid fa-angles-left"></i> Earliest</button>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="form-control btn btn-sm btn-secondary" id="startdate_min"><i class="fa-solid fa-angles-left"></i> Earliest</button>
                                     <input class="form-control" onchange="chartFilterDate()" type="date" id="startdate" value="2023-01-25">
                                     <input class="form-control" onchange="chartFilterDate()" type="date" id="enddate" value="2023-01-31">
-                                    <button class="form-control btn btn-sm btn-secondary" id="enddate_max">Latest <i class="fa-solid fa-angles-right"></i></button>
+                                    <button type="button" class="form-control btn btn-sm btn-secondary" id="enddate_max">Latest <i class="fa-solid fa-angles-right"></i></button>
                                </div>
                             </div>
                         </div>
@@ -79,31 +79,34 @@
 
     {% if categories %}
     <div class="row mt-4">
-        <div class="col-md-7">
+        <div class="col-md-10">
             <div class="card">
                 <div class="card-header">
-                    Category storage
+                    Category statistics
                 </div>
                 <div class="card-body">
                     <table class="table table-striped storage-table">
-                        <tr>
-                            <th>Category</th>
-                            <th>Total</th>
-                            <th>Research</th>
-                            <th>Vault</th>
-                            <th>Revisions</th>
-                            <th>Int-users</th>
-                            <th>Ext-users</th>
-                            <th>Total users</th>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th scope="col">Category</th>
+                                <th scope="col">Research</th>
+                                <th scope="col">Vault</th>
+                                <th scope="col">Revisions</th>
+                                <th scope="col">Total storage</th>
+                                <th scope="col">Internal users</th>
+                                <th scope="col">Externalusers</th>
+                                <th scope="col">Total users</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                         {% for category in categories %}
                           {% if not category.category == "YODA_INSTANCE_TOTAL" %}
-                            <tr name="1">
+                            <tr>
                                 <td>{{ category.category }}</td>
-                                <td>{{ category.storage.total }}</td>
                                 <td>{{ category.storage.research }}</td>
                                 <td>{{ category.storage.vault }}</td>
                                 <td>{{ category.storage.revision }}</td>
+                                <td>{{ category.storage.total }}</td>
                                 <td>{{ category.users.internals }}</td>
                                 <td>{{ category.users.externals }}</td>
                                 <td>{{ category.users.externals + category.users.internals }}</td>
@@ -113,19 +116,19 @@
 
                         {% for category in categories %}
                           {% if category.category == "YODA_INSTANCE_TOTAL" %}
-                            <tr name="2">
-                                <td><b>TOTALS</b></td>
-                                <td>{{ category.storage.total }}</td>
+                            <tr>
+                                <th scope="row">Totals</th>
                                 <td>{{ category.storage.research }}</td>
                                 <td>{{ category.storage.vault }}</td>
                                 <td>{{ category.storage.revision }}</td>
+                                <td>{{ category.storage.total }}</td>
                                 <td>{{ category.users.internals }}</td>
                                 <td>{{ category.users.externals }}</td>
                                 <td>{{ category.users.externals + category.users.internals }}</td>
                             </tr>
                            {% endif %}
                         {% endfor %}
-
+                        </tbody>
                     </table>
 
                     <a href="{{ url_for('stats_bp.export') }}" class="btn btn-primary btn-sm">
