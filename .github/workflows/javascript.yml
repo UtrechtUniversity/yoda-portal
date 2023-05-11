@@ -1,0 +1,21 @@
+name: "Javascript lint"
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 17
+
+      - name: Install standard
+        run: |
+          npm install standard --location=global
+
+      - name: Lint with standard
+        run: |
+          standard **/static/**/js/**.js || true

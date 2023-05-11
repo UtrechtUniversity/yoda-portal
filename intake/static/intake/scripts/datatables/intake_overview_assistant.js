@@ -78,7 +78,7 @@ $(document).ready(function() {
         datasetRowClickForDetails($(this), mainTable);
     });
     // prevent opening of dataset details when clicking on row.
-    $('.cbDataSet').click(function(event){
+    $('.cbDataSet').on('click', function (event){
         event.stopPropagation();
     });
 } );

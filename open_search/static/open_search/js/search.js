@@ -32,12 +32,12 @@ $(function () {
     }
   })
 
-  $('.search-btn').click(function () {
+  $('.search-btn').on('click', function () {
     const filter = $('#search-filter').val()
     search(filter, 1, itemsPerPage, sort, sortOrder, facets, filters, ranges)
   })
 
-  $('.search-pagination .next, .search-pagination .previous').click(function () {
+  $('.search-pagination .next, .search-pagination .previous').on('click', function () {
     const page = $(this).attr('data-page')
     search(currentSearchString, page, itemsPerPage, sort, sortOrder, facets, filters, ranges)
   })

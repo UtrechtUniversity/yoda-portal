@@ -3,7 +3,7 @@ $(function() {
         expandable: true
     });
 
-    $('#btn-meta-data').click(function(){
+    $('#btn-meta-data').on('click', function (){
         var path = $('#helper').text();
         getMetaDataOnPath( path );
     });

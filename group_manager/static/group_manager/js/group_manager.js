@@ -42,13 +42,15 @@ function flatListGroups () {
   }
 
   // Build result table.
-  let table = '<table id="tbl-list-groups" class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th></tr></thead><tbody>'
+  let table = '<table id="tbl-list-groups" class="table table-striped"><thead><tr><th>Group</th><th>Category</th><th>Subcategory</th><th></th><th></th></tr></thead><tbody>'
   $.each(data, function (index, usergroup) {
     if (usergroup[0].includes(groupname)) {
       table += `<tr style="cursor: pointer" class="user-search-result-group" user-search-result-group="${usergroup[0]}">
                      <td>${usergroup[0]}</td>
                      <td>${usergroup[2]}</td>
                      <td>${usergroup[3]}</td>`
+
+      table += '<td><a href="/research/?dir=' + encodeURIComponent('/' + usergroup[0]) + '" title="Go to group ' + usergroup[0] + ' in research space"><i class="fa-regular fa-folder"></i></a></td>';
 
       if (usergroup[1] === 'manager') {
         table += '<td><i class="fa-solid fa-crown" title="You manage this group"></i></td>'
@@ -67,7 +69,7 @@ function flatListGroups () {
   $('#result-user-search-groups').html(table)
 
   // Clicking a row must highlite rows in in both tree/flat list and present details in the corresponding panel
-  $('.user-search-result-group').click(function () {
+  $('.user-search-result-group').on('click', function () {
     // $('#user-search-groups').modal('hide');
     const groupName = $(this).attr('user-search-result-group')
     Yoda.groupManager.unfoldToGroup(groupName)
@@ -273,7 +275,7 @@ async function processImportedRow (row) {
       // Solely added for test automation - splinter.
       // This was the only way to be able to perform an automated click work on a row.
       // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
-      $('#processed-indicator-' + groupname).click(function () {
+      $('#processed-indicator-' + groupname).on('click', function () {
         const groupName = 'research-' + groupname
         $('#dlg-import-groups-csv').modal('hide')
         Yoda.groupManager.unfoldToGroup(groupName)
@@ -296,7 +298,7 @@ async function processImportedRow (row) {
   // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
   if ($('.import-groupname').length === $('.import-groupname-done').length) {
     // only enable new groups that have been successfully added
-    $('.import-csv-group-ok').click(function () {
+    $('.import-csv-group-ok').on('click', function () {
       const groupName = 'research-' + $(this).attr('groupname')
       $('#dlg-import-groups-csv').modal('hide')
       Yoda.groupManager.unfoldToGroup(groupName)
@@ -317,6 +319,7 @@ async function processImportedRow (row) {
                 category: categoryName,
                 subcategory: subcategoryName,
                 name: groupName,
+                creation_date: hier[categoryName][subcategoryName][groupName].creation_date,
                 description: hier[categoryName][subcategoryName][groupName].description,
                 schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
                 expiration_date: hier[categoryName][subcategoryName][groupName].expiration_date,
@@ -514,15 +517,15 @@ $(function () {
   // CSV import handling {{{
   document.getElementById('file-input').addEventListener('change', readCsvFile, false)
 
-  $('.file-input-click').click(function () {
+  $('.file-input-click').on('click', function () {
     $('#file-input').val(null)
   })
 
-  $('.import-groups-csv').click(function () {
+  $('.import-groups-csv').on('click', function () {
     $('#dlg-import-groups-csv').modal('show')
   })
 
-  $('.process-csv').click(function () {
+  $('.process-csv').on('click', function () {
     // First disable the button
     $(this).prop('disabled', true)
 
@@ -534,7 +537,7 @@ $(function () {
   // }}}
 
   // When allowed to add groups the fields have to be initialized
-  $('.create-button-new').click(function () {
+  $('.create-button-new').on('click', function () {
     $('.properties-update').addClass('hidden')
     $('.users').addClass('hidden')
     $('.properties-create').removeClass('hidden')
@@ -559,12 +562,12 @@ $(function () {
   })
 
   // Intercept group creation submission of form
-  $('#f-group-create-submit').click(function () {
+  $('#f-group-create-submit').on('click', function () {
     Yoda.groupManager.onSubmitGroupCreateOrUpdate(this)
   })
 
   // Intercept group update submission of form
-  $('#f-group-update-submit').click(function () {
+  $('#f-group-update-submit').on('click', function () {
     Yoda.groupManager.onSubmitGroupCreateOrUpdate(this)
   })
 
@@ -937,6 +940,11 @@ $(function () {
           .val(group.description)
           .prop('readonly', !userCanManage)
 
+        // Creation date of this group
+        $groupProperties.find('#f-group-update-creation-date')
+          .val(group.creation_date)
+          .prop('readonly', true)
+
         if (that.prefixHasDataClassification(prefix)) {
           $groupProperties.find('.data-classification').show()
           $('#f-group-update-data-classification')
@@ -1012,7 +1020,7 @@ $(function () {
                                '" aria-hidden="true" title="' +
                                that.accessNames[user.access] +
                                '"></i> ' +
-                               Yoda.escapeEntities(displayName))
+                               Yoda.htmlEncode(displayName))
 
           $userList.append($user)
         })
@@ -1898,6 +1906,7 @@ $(function () {
                 category: categoryName,
                 subcategory: subcategoryName,
                 name: groupName,
+                creation_date: hier[categoryName][subcategoryName][groupName].creation_date,
                 description: hier[categoryName][subcategoryName][groupName].description,
                 schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
                 expiration_date: hier[categoryName][subcategoryName][groupName].expiration_date,
@@ -2100,19 +2109,30 @@ $(function () {
         $('.import-groups-csv').removeClass('hidden')
       }
 
+      var a = '';
       // Indicate which groups are managed by this user.
       for (const groupName in this.groups) {
+
+        a = '<table class="float-end"><tr><td>';
+        a += '<a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research space"><i class="fa-regular fa-folder"></i></a>';
+        a += '</td>';
+
         if (this.isManagerOfGroup(groupName)) {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            '<i class="float-end fa fa-crown mt-1" title="You manage this group"></i>'
+            a + '<td>&nbsp;<i class="fa fa-crown mt-1" title="You manage this group"></i>' + '</td></tr></table>'
           )
         } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            '<i class="float-end fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>'
+            a + '<td>&nbsp;<i class="fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>' + '</td></tr></table>'
           )
         } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access === 'reader') {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            '<i class="float-end fa-solid fa-eye mt-1" title="You have read access to this group"></i>'
+            a + '<td>&nbsp;<i class="fa-solid fa-eye mt-1" title="You have read access to this group"></i>' + '</td></tr></table>'
+          )
+        }
+        else {
+          $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
+            a  + '<td style="width: 26px;"></td></tr></table>'
           )
         }
       }

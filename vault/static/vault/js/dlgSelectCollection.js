@@ -1,3 +1,5 @@
+'use strict'
+
 let urlEncodedPath = ''
 let urlEncodedOrigin = ''
 let folderSelectBrowser = null
@@ -223,7 +225,7 @@ const getFolderContents2 = (() => {
 const tableRenderer2 = {
   name: (name, _, row) => {
     const tgt = `${dlgCurrentFolder}/${name}`
-    if (row.type === 'coll') { return `<a class="coll dlg-browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>` } else { return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}` }
+    if (row.type === 'coll') { return `<a class="coll dlg-browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>` } else { return `<i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}` }
   },
   size: (size, _, row) => {
     if (row.type === 'coll') {
@@ -262,7 +264,7 @@ const tableRenderer2 = {
     actions.append(`<li><a href="browse/download?filepath=${encodeURIComponent(dlgCurrentFolder + '/' + row.name)}">Download</a>`)
 
     // Generate dropdown "view" actions for different media types.
-    for (const type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) { actions.append(`<li><a class="view-${type}" data-path="${htmlEncode(dlgCurrentFolder + '/' + row.name)}">View</a>`) }
+    for (const type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) { actions.append(`<li><a class="view-${type}" data-path="${Yoda.htmlEncode(dlgCurrentFolder + '/' + row.name)}">View</a>`) }
 
     const dropdown = $(`<div class="dropdown">
                                 <span class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -321,7 +323,7 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
       path += '/' + encodeURIComponent(part)
 
       // Active item
-      const valueString = htmlEncode(part).replace(/ /g, '&nbsp;')
+      const valueString = Yoda.htmlEncode(part).replace(/ /g, '&nbsp;')
       if (k === (totalParts - 1)) {
         html += '<li class="active">' + valueString + '</li>'
       } else {
@@ -331,10 +333,4 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
   }
 
   $('ol.dlg-breadcrumb').html(html)
-}
-
-function htmlEncode (value) {
-  // create a in-memory div, set it's inner text(which jQuery automatically encodes)
-  // then grab the encoded contents back out.  The div never exists on the page.
-  return $('<div/>').text(value).html()
 }

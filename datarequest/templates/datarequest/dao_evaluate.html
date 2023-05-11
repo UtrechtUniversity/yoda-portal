@@ -7,7 +7,7 @@
 {% endblock style %}
 
 {% block scripts %}
-<script type="text/javascript"> window.config = {
+<script> window.config = {
   request_id: '{{ request_id }}',
 }
 </script>
@@ -27,7 +27,7 @@
 <div class="row">
     <div class="col-md-12">
         {% include 'datarequest/partials/datarequest.html' %}
-        {% if attachments|length > 0 %} 
+        {% if attachments|length > 0 %}
         {% include 'datarequest/partials/attachments.html' %}
         {% endif %}
     </div>

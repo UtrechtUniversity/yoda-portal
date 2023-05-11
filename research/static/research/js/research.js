@@ -25,27 +25,27 @@ $(function () {
     startBrowsing()
   }
 
-  $('.btn-group button.metadata-form').click(function () {
+  $('.btn-group button.metadata-form').on('click', function () {
     showMetadataForm($(this).attr('data-path'))
   })
 
   /// /////////////////////////////////////////////
   // File and folder management from context menu
   /// /////////////////////////////////////////////
-  $('.btn-group button.folder-create').click(function () {
+  $('.btn-group button.folder-create').on('click', function () {
     // Destroy earlier alerts
     fileMgmtDialogAlert('folder-create', '')
 
     // Set initial values
     $('#path-folder-create').val('')
-    $('#folder-create #collection').html($(this).attr('data-path')) // for user
+    $('#folder-create #collection').text($(this).attr('data-path')) // for user
     $('.btn-confirm-folder-create').attr('data-path', $(this).attr('data-path'))
 
     $('#folder-create').modal('show')
   })
 
   // handle addition of new folder to
-  $('.btn-confirm-folder-create').click(function () {
+  $('.btn-confirm-folder-create').on('click', function () {
     // er kan een dubbele naam zijn? error handling afwikkelen!
     handleFolderAdd($('#path-folder-create').val(), $(this).attr('data-path'))
   })
@@ -57,12 +57,12 @@ $(function () {
     // set initial values for further processing and user experience
     $('#folder-rename-name').val($(this).attr('data-name'))
     $('#org-folder-rename-name').val($(this).attr('data-name'))
-    $('#folder-rename #collection').html($(this).attr('data-collection'))
+    $('#folder-rename #collection').text($(this).attr('data-collection'))
     $('.btn-confirm-folder-rename').attr('data-collection', $(this).attr('data-collection'))
 
     $('#folder-rename').modal('show')
   })
-  $('.btn-confirm-folder-rename').click(function () {
+  $('.btn-confirm-folder-rename').on('click', function () {
     handleFolderRename($('#folder-rename-name').val(), $(this).attr('data-collection'), $('#org-folder-rename-name').val())
   })
 
@@ -71,15 +71,15 @@ $(function () {
     fileMgmtDialogAlert('folder-delete', '')
 
     // set initial values for further processing and user experience
-    $('#folder-delete #collection').html($(this).attr('data-collection'))
-    $('#folder-delete-name').html($(this).attr('data-name'))
+    $('#folder-delete #collection').text($(this).attr('data-collection'))
+    $('#folder-delete-name').text($(this).attr('data-name'))
     $('.btn-confirm-folder-delete').attr('data-collection', $(this).attr('data-collection'))
     $('.btn-confirm-folder-delete').attr('data-name', $(this).attr('data-name'))
 
     $('#folder-delete').modal('show')
   })
 
-  $('.btn-confirm-folder-delete').click(function () {
+  $('.btn-confirm-folder-delete').on('click', function () {
     handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'))
   })
 
@@ -88,7 +88,7 @@ $(function () {
     fileMgmtDialogAlert('cleanup-collection', '')
 
     const folder = $(this).attr('data-folder')
-    $('#cleanup-collection #collection').html($(this).attr('data-folder'))
+    $('#cleanup-collection #collection').text($(this).attr('data-folder'))
     $('.btn-confirm-cleanup-collection').attr('data-collection', $(this).attr('data-folder'))
 
     $('#cleanup-files').html('')
@@ -108,11 +108,11 @@ $(function () {
         const fileRelative = file.substring(length)
         addCleanupFile(fileData, fileRelative, index)
       })
-      $('.cleanup-check-all').click(function () {
+      $('.cleanup-check-all').on('click', function () {
         // "cleanup-select-file"
         $('.cleanup-select-file').prop('checked', $(this).is(':checked'))
       })
-      $('.cleanup-single-file').click(function () {
+      $('.cleanup-single-file').on('click', function () {
         const collName = $(this).attr('coll-name')
         const dataName = $(this).attr('data-name')
         const rowId = $(this).attr('row-id')
@@ -160,7 +160,7 @@ $(function () {
     })
   })
 
-  $('.btn-confirm-cleanup-collection').click(function () {
+  $('.btn-confirm-cleanup-collection').on('click', function () {
     $('.cleanup-select-file').each(function (index, item) {
       if ($(item).is(':checked')) {
         const collName = $(this).attr('coll-name')
@@ -186,7 +186,7 @@ $(function () {
     // set initial values for further processing and user experience
     $('#file-rename-name').val($(this).attr('data-name'))
     $('#org-file-rename-name').val($(this).attr('data-name'))
-    $('#file-rename #collection').html($(this).attr('data-collection'))
+    $('#file-rename #collection').text($(this).attr('data-collection'))
     $('.btn-confirm-file-rename').attr('data-collection', $(this).attr('data-collection'))
 
     $('#file-rename').modal('show')
@@ -199,7 +199,7 @@ $(function () {
     document.getElementById('file-rename-name').setSelectionRange(0, endSelection)
   })
 
-  $('.btn-confirm-file-rename').click(function () {
+  $('.btn-confirm-file-rename').on('click', function () {
     handleFileRename($('#file-rename-name').val(), $(this).attr('data-collection'), $('#org-file-rename-name').val())
   })
 
@@ -209,15 +209,15 @@ $(function () {
     fileMgmtDialogAlert('file-delete', '')
 
     // set initial values for further processing and user experience
-    $('#file-delete #collection').html($(this).attr('data-collection'))
-    $('#file-delete-name').html($(this).attr('data-name'))
+    $('#file-delete #collection').text($(this).attr('data-collection'))
+    $('#file-delete-name').text($(this).attr('data-name'))
     $('.btn-confirm-file-delete').attr('data-collection', $(this).attr('data-collection'))
     $('.btn-confirm-file-delete').attr('data-name', $(this).attr('data-name'))
 
     $('#file-delete').modal('show')
   })
 
-  $('.btn-confirm-file-delete').click(function () {
+  $('.btn-confirm-file-delete').on('click', function () {
     handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'))
   })
 
@@ -245,7 +245,7 @@ $(function () {
   r.assignBrowse($('.upload-folder')[0], true)
 
   // When chosing to close overview of upload overview then all incomplete file uploads will be canceled.
-  $('.btn-close-uploads-overview').click(function () {
+  $('.btn-close-uploads-overview').on('click', function () {
     r.cancel()
     $('#files').html('')
     $('#uploads').addClass('hidden')
@@ -358,21 +358,21 @@ $(function () {
 
   $('body').on('click', 'a.view-video', function () {
     const path = $(this).attr('data-path')
-    const viewerHtml = `<video width="640" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></video>`
+    const viewerHtml = `<video width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></video>`
     $('#viewer').html(viewerHtml)
     $('#viewMedia').modal('show')
   })
 
   $('body').on('click', 'a.view-audio', function () {
     const path = $(this).attr('data-path')
-    const viewerHtml = `<audio width="640" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></audio>`
+    const viewerHtml = `<audio width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></audio>`
     $('#viewer').html(viewerHtml)
     $('#viewMedia').modal('show')
   })
 
   $('body').on('click', 'a.view-image', function () {
     const path = $(this).attr('data-path')
-    const viewerHtml = `<img width="640" src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}" />`
+    const viewerHtml = `<img width="640" src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}" />`
     $('#viewer').html(viewerHtml)
     $('#viewMedia').modal('show')
   })
@@ -422,7 +422,7 @@ $(function () {
     }
   })
 
-  $('#file-formats-list').change(function () {
+  $('#file-formats-list').on('change', function () {
     const folder = $('a.action-check-for-unpreservable-files').attr('data-folder')
     const list = $('#file-formats-list option:selected').val()
     if (!(list in preservableFormatsLists)) { return }
@@ -443,7 +443,7 @@ $(function () {
       $('#showUnpreservableFiles .help').show()
       if (data.length > 0) {
         $('#showUnpreservableFiles .list-unpreservable-formats').html('')
-        for (const ext of data) { $('#showUnpreservableFiles .list-unpreservable-formats').append(`<li>${htmlEncode(ext)}</li>`) }
+        for (const ext of data) { $('#showUnpreservableFiles .list-unpreservable-formats').append(`<li>${Yoda.htmlEncode(ext)}</li>`) }
         $('#showUnpreservableFiles .advice').show()
         $('#showUnpreservableFiles .unpreservable').show()
       } else {
@@ -480,7 +480,7 @@ $(function () {
   $('body').on('click', '.browse', function (e) {
     browse($(this).attr('data-path'), true)
     // Dismiss stale messages.
-    $('#messages .close').click()
+    $('#messages .close').trigger('click')
     e.preventDefault()
   })
 
@@ -551,7 +551,7 @@ async function handleFolderAdd (newFolder, collection) {
     fileMgmtDialogAlert('folder-create', 'Please add a folder name')
     return
   }
-
+  $('#folder-create .btn-confirm-folder-create').html('Creating <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   const result = await Yoda.call('research_folder_add',
     {
       coll: Yoda.basePath + collection,
@@ -567,6 +567,7 @@ async function handleFolderAdd (newFolder, collection) {
   } else {
     fileMgmtDialogAlert('folder-create', result.status_info)
   }
+  $('#folder-create .btn-confirm-folder-create').html('Create new folder')
 }
 
 async function handleFolderRename (newFolderName, collection, orgFolderName) {
@@ -574,7 +575,7 @@ async function handleFolderRename (newFolderName, collection, orgFolderName) {
     fileMgmtDialogAlert('folder-rename', 'Please add a new folder name')
     return
   }
-
+  $('#folder-rename .btn-confirm-folder-rename').html('Renaming <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   const result = await Yoda.call('research_folder_rename',
     {
       new_folder_name: newFolderName,
@@ -591,9 +592,11 @@ async function handleFolderRename (newFolderName, collection, orgFolderName) {
   } else {
     fileMgmtDialogAlert('folder-rename', result.status_info)
   }
+  $('#folder-rename .btn-confirm-folder-rename').html('Rename Folder')
 }
 
 async function handleFolderDelete (collection, folderName) {
+  $('#folder-delete .btn-confirm-folder-delete').html('Deleting <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   const result = await Yoda.call('research_folder_delete',
     {
       coll: Yoda.basePath + collection,
@@ -609,12 +612,13 @@ async function handleFolderDelete (collection, folderName) {
   } else {
     fileMgmtDialogAlert('folder-delete', result.status_info)
   }
+  $('#folder-delete .btn-confirm-folder-delete').html('Delete Folder')
 }
 
 function addCleanupFile (file, fileRelative, index) {
   const cfile = `<div class="col-md-12" id="${'row-id-' + index}">
                      <input type="checkbox" class="form-check-input ms-1 cleanup-select-file" data-name="${file[1]}" coll-name="${file[0]}" row-id="${index}">
-                     <i class="fa-solid fa-trash-can cleanup-single-file" data-name="${file[1]}" coll-name="${file[0]}" row-id="${index}"></i> ${htmlEncode(fileRelative)}
+                     <i class="fa-solid fa-trash-can cleanup-single-file" data-name="${file[1]}" coll-name="${file[0]}" row-id="${index}"></i> ${Yoda.htmlEncode(fileRelative)}
                  </div>`
   $('#cleanup-files').append(cfile)
 }
@@ -640,7 +644,7 @@ async function handleFileRename (newFileName, collection, origFileName) {
     fileMgmtDialogAlert('file-rename', 'Please add a new file name')
     return
   }
-
+  $('#file-rename .btn-confirm-file-rename').html('Renaming <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   const result = await Yoda.call('research_file_rename',
     {
       new_file_name: newFileName,
@@ -657,9 +661,11 @@ async function handleFileRename (newFileName, collection, origFileName) {
   } else {
     fileMgmtDialogAlert('file-rename', result.status_info)
   }
+  $('#file-rename .btn-confirm-file-rename').html('Rename file')
 }
 
 async function handleFileDelete (collection, fileName) {
+  $('#file-delete .btn-confirm-file-delete').html('Deleting <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   const result = await Yoda.call('research_file_delete',
     {
       coll: Yoda.basePath + collection,
@@ -675,6 +681,7 @@ async function handleFileDelete (collection, fileName) {
   } else {
     fileMgmtDialogAlert('file-delete', result.status_info)
   }
+  $('#file-delete .btn-confirm-file-delete').html('Delete file')
 }
 
 async function handleFileStage (collection, fileName) {
@@ -693,7 +700,7 @@ async function handleFileStage (collection, fileName) {
 // Alerts regarding folder/file management
 function fileMgmtDialogAlert (dlgName, alert) {
   if (alert.length) {
-    $('#alert-panel-' + dlgName + ' span').html(alert)
+    $('#alert-panel-' + dlgName + ' span').text(alert)
     $('#alert-panel-' + dlgName).show()
   } else {
     $('#alert-panel-' + dlgName).hide()
@@ -728,9 +735,9 @@ function makeBreadcrumb (dir) {
   let html = ''
   for (let [i, [text, path]] of crumbs.entries()) {
     const el = $('<li class="breadcrumb-item">')
-    text = htmlEncode(text).replace(/ /g, '&nbsp;')
+    text = Yoda.htmlEncode(text).replace(/ /g, '&nbsp;')
     if (i === crumbs.length - 1) { el.addClass('active').html(text) } else {
-      el.html(`<a class="browse" data-path="${htmlEncode(path)}"
+      el.html(`<a class="browse" data-path="${Yoda.htmlEncode(path)}"
                          href="?dir=${encodeURIComponent(path)}">${text}</a>`)
     }
 
@@ -738,12 +745,6 @@ function makeBreadcrumb (dir) {
   }
 
   $('nav ol.breadcrumb').html(html)
-}
-
-function htmlEncode (value) {
-  // create a in-memory div, set it's inner text(which jQuery automatically encodes)
-  // then grab the encoded contents back out.  The div never exists on the page.
-  return $('<div/>').text(value).html().replace('"', '&quot;')
 }
 
 function buildFileBrowser (dir) {
@@ -843,13 +844,13 @@ const tableRenderer = {
     const tgt = `${currentFolder}/${name}`
     let checkbox = ''
     if (currentFolder) {
-      checkbox = `<input class="form-check-input ms-1" type="checkbox" name="multiSelect[]" value="${htmlEncode(tgt)}" data-name="${htmlEncode(name)}" data-type="${row.type}">`
+      checkbox = `<input class="form-check-input ms-1" type="checkbox" name="multiSelect[]" value="${Yoda.htmlEncode(tgt)}" data-name="${Yoda.htmlEncode(name)}" data-type="${row.type}">`
     }
     return checkbox
   },
   name: (name, _, row) => {
     const tgt = `${currentFolder}/${name}`
-    if (row.type === 'coll') { return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>` } else return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}`
+    if (row.type === 'coll') { return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>` } else return `<i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}`
   },
   size: (size, _, row) => {
     if (row.type === 'coll') {
@@ -892,13 +893,13 @@ const tableRenderer = {
       if (currentFolder.length === 0) {
         return ''
       }
-      actions.append(`<a href="#" class="dropdown-item folder-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this folder" >Rename</a>`)
-      actions.append(`<a href="#" class="dropdown-item folder-copy" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Copy this folder">Copy</a>`)
-      actions.append(`<a href="#" class="dropdown-item folder-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this folder">Move</a>`)
-      actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
+      actions.append(`<a href="#" class="dropdown-item folder-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this folder" >Rename</a>`)
+      actions.append(`<a href="#" class="dropdown-item folder-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this folder">Copy</a>`)
+      actions.append(`<a href="#" class="dropdown-item folder-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this folder">Move</a>`)
+      actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
     } else {
       if (row.state === 'OFL') {
-        actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`)
+        actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`)
       } else if (row.state === 'MIG' || row.state === 'UNM') {
         // no context menu for data objects migrating from or to tape archive
         return ''
@@ -911,22 +912,22 @@ const tableRenderer = {
         }
         const ext = row.name.replace(/.*\./, '').toLowerCase()
 
-        actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Download this file">Download</a>`)
+        actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
 
         // Generate dropdown "view" actions for different media types.
         for (const type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-          actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`)
+          actions.append(`<a class="dropdown-item view-${type}" data-path="${Yoda.htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`)
         }
 
-        actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Rename this file">Rename</a>`)
-        actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Copy this file">Copy</a>`)
-        actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Move this file">Move</a>`)
-        actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
+        actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this file">Rename</a>`)
+        actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this file">Copy</a>`)
+        actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this file">Move</a>`)
+        actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
       }
     }
 
     const dropdown = $(`<div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${Yoda.htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               <i class="fa-solid fa-ellipsis-h" aria-hidden="true"></i>
                             </button>`)
     dropdown.append(actions)
@@ -978,7 +979,7 @@ function toggleLocksList (folder) {
 
       let html = ''
       $.each(data, function (index, value) {
-        html += '<a class="list-group-item list-group-item-action"><span class="browse" data-path="' + htmlEncode(value) + '">' + htmlEncode(value) + '</span></a>'
+        html += '<a class="list-group-item list-group-item-action"><span class="browse" data-path="' + Yoda.htmlEncode(value) + '">' + Yoda.htmlEncode(value) + '</span></a>'
       })
       $('.lock-items').html(html)
       $('.lock').show()
@@ -1003,11 +1004,11 @@ function toggleActionLogList (folder) {
       if (data.length) {
         $.each(data, function (index, value) {
           html += '<a class="list-group-item list-group-item-action">' +
-                         htmlEncode(value[2]) +
+                         Yoda.htmlEncode(value[2]) +
                          ' - <strong>' +
-                         htmlEncode(value[1]) +
+                         Yoda.htmlEncode(value[1]) +
                          '</strong> - ' +
-                         htmlEncode(value[0]) +
+                         Yoda.htmlEncode(value[0]) +
                          '</a>'
         })
       } else {
@@ -1036,9 +1037,9 @@ function toggleSystemMetadata (folder) {
       if (data) {
         $.each(data, function (index, value) {
           html += '<a class="list-group-item list-group-item-action"><strong>' +
-                        htmlEncode(index) +
+                        Yoda.htmlEncode(index) +
                         '</strong>: ' +
-                        htmlEncode(value) +
+                        Yoda.htmlEncode(value) +
                         '</a>'
         })
       } else {
@@ -1172,17 +1173,17 @@ function topInformation (dir, showAlert) {
       // Lock icon
       $('.lock').hide()
       let lockIcon = ''
-      if (lockCount !== '0' && typeof lockCount !== 'undefined') {
-        lockIcon = `<i class="fa-solid fa-lock lock-icon" data-folder="${htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`
+      if (lockCount !== 0 && typeof lockCount !== 'undefined') {
+        lockIcon = `<i class="fa-solid fa-lock lock-icon" data-folder="${Yoda.htmlEncode(dir)}" data-locks="${lockCount}" title="${lockCount} lock(s) found" aria-hidden="true"></i>`
       }
 
       // Provenance action log
       $('.actionlog').hide()
-      const actionLogIcon = ` <i class="fa-solid fa-book actionlog-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`
+      const actionLogIcon = ` <i class="fa-solid fa-book actionlog-icon" data-folder="${Yoda.htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`
 
       // System metadata.
       $('.system-metadata').hide()
-      const systemMetadataIcon = ` <i class="fa-solid fa-info-circle system-metadata-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`
+      const systemMetadataIcon = ` <i class="fa-solid fa-info-circle system-metadata-icon" data-folder="${Yoda.htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`
 
       $('.btn-group button.folder-status').attr('data-write', hasWriteRights)
 
@@ -1205,7 +1206,7 @@ function topInformation (dir, showAlert) {
         $('a.action-go-to-vault').attr('vault-path', vaultPath)
       }
 
-      const folderName = htmlEncode(basename).replace(/ /g, '&nbsp;')
+      const folderName = Yoda.htmlEncode(basename).replace(/ /g, '&nbsp;')
       const statusBadge = '<span id="statusBadge" class="ms-2 badge rounded-pill bg-primary">' + statusText + '</span>'
 
       // Reset action dropdown.
@@ -1244,13 +1245,13 @@ function handleActionsList (actions, folder) {
 
   $.each(possibleActions, function (index, value) {
     if (Object.prototype.hasOwnProperty.call(actions, value)) {
-      html += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>'
+      html += '<a class="dropdown-item action-' + value + '" data-folder="' + Yoda.htmlEncode(folder) + '">' + actions[value] + '</a>'
     }
   })
 
   $.each(possibleVaultActions, function (index, value) {
     if (Object.prototype.hasOwnProperty.call(actions, value)) {
-      vaultHtml += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>'
+      vaultHtml += '<a class="dropdown-item action-' + value + '" data-folder="' + Yoda.htmlEncode(folder) + '">' + actions[value] + '</a>'
     }
   })
 
@@ -1368,7 +1369,7 @@ async function rejectFolder (folder) {
 function logUpload (id, file) {
   const log = `<div class="row upload-row" id="${id}">
                   <div class="col-md-6">
-                    <div class="upload-filename">${htmlEncode(file.relativePath)}</div>
+                    <div class="upload-filename">${Yoda.htmlEncode(file.relativePath)}</div>
                     <div class="upload-btns btn-group btn-group-sm" role="group" aria-label="Basic example">
                       <button type="button" class="btn btn-secondary upload-cancel me-1">
                         Cancel

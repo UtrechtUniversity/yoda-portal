@@ -3,7 +3,7 @@
 {% block title %}{{ super() }} &dash; Datarequest {{ request_id }} &dash; Add attachments{% endblock title %}
 
 {% block scripts %}
-<script type="text/javascript"> window.config = {
+<script> window.config = {
   request_id: '{{ request_id }}'
 }
 </script>
@@ -23,12 +23,12 @@
                 <hr class="border-0 bg-secondary" style="height: 1px;">
                 <div class="form-group">
                     <form id="attachment" enctype="multipart/form-data">
-                        <label for="file">Select a file to upload:</label><br />
-                        <input type="file" name="file" id="file" />
+                        <label for="file">Select a file to upload:</label><br>
+                        <input type="file" name="file" id="file">
                     </form>
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-primary upload_attachment">Upload</button>
+                    <button type="button" class="btn btn-primary upload_attachment">Upload</button>
                 </div>
                 <hr class="border-0 bg-secondary" style="height: 1px;">
                 <div class="form-group">

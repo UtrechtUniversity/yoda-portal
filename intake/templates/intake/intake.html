@@ -11,6 +11,7 @@
 {% endblock style %}
 
 {% block scripts %}
+    <script src="{{ url_for('static', filename='lib/jquery-3.6.4/jquery-migrate-3.4.1.min.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/jquery.dataTables.min.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/dataTables.bootstrap.js') }}"></script>
     <script src="{{ url_for('intake_bp.static', filename='scripts/dataTables.bootstrapPagination-3.js') }}"></script>
@@ -20,7 +21,7 @@
         <script src="{{ url_for('intake_bp.static', filename='scripts/datatables/intake_overview_assistant.js') }}"></script>
     {% endif %}
 
-    <script type="text/javascript">
+    <script>
         var view = 'intake';
         var alertNr = '{{ alertNr }}';
         var alertMsg = '{{ alertMesg }}';
@@ -38,12 +39,12 @@
         <div class="col-sm-12">
             <p>You have no access to the selected study. Please select another. </p>
             <div class="btn-group">
-                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
                     <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
                     Please select a study:
-                    <br/>
+                    <br>
                     <table class="table table-striped hover" id="select-study">
                         {% for study in studies %}
                             <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}">
@@ -106,7 +107,7 @@
                 <h1 class="float-end">
                     Scanning process in progress...
                 </h1>
-                <img class="h1 float-end" src="{{ url_for('intake_bp.static', filename='images/ajax-loader.gif') }}" style="height:30px;">
+                <img class="h1 float-end" src="{{ url_for('intake_bp.static', filename='images/ajax-loader.gif') }}" style="height:30px;" alt="Scanning process in progress...">
             </div>
         </div>
     </div>
@@ -114,12 +115,12 @@
     <div class="row" id="toprow">
         <div class="col-sm-12">
             <div class="btn-group">
-                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" id="dropdown-select-study">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" id="dropdown-select-study">
                     <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
                     Please select a study:
-                    <br/>
+                    <br>
                     <table class="table table-striped hover" id="select-study">
                         {% for study in studies %}
                             <tr data-study-url="{{ url_for('intake_bp.index', studyID=study) }}" class="ta-{{ study }}">
@@ -143,12 +144,12 @@
             </div>
             {% if selectableScanFolders %}
                 <div class="btn-group">
-                    <button class="btn  btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    <button type="button" class="btn  btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
                         <i class="fa-solid fa-folder-open" aria-hidden="true"></i> Change folder <span class="caret"></span>
                     </button>
                     <div class="dropdown-menu" style="width:300px; padding:5px; max-height:500px; overflow-y: auto;">
                         Please select a folder:
-                        <br/>
+                        <br>
                         <table class="table table-striped hover" id="select-study-folder">
                             <tr data-study-folder-url="{{ url_for('intake_bp.index', studyID=study) }}">
                                 <td style="width:10px;">
@@ -191,15 +192,15 @@
             {% endif %}
 
             <div class="btn-group">
-                <button class="btn btn-outline-secondary" id="btn-start-scan"><i class="fa-solid fa-search-plus" aria-hidden="true"></i> Scan all files</button>
+                <button type="button" class="btn btn-outline-secondary" id="btn-start-scan"><i class="fa-solid fa-search-plus" aria-hidden="true"></i> Scan all files</button>
             </div>
 
             {% if permissions.manager %}
                 <div class="btn-group">
-                    <button class="btn btn-outline-secondary" id="btn-lock"><span class="fa-solid fa-check"></span> Lock datasets</button>
+                    <button type="button" class="btn btn-outline-secondary" id="btn-lock"><span class="fa-solid fa-check"></span> Lock datasets</button>
                 </div>
                 <div class="btn-group">
-                        <button class="btn btn-outline-secondary" id="btn-unlock"><span class="fa-solid fa-check"></span> Unlock datasets</button>
+                        <button type="button" class="btn btn-outline-secondary" id="btn-unlock"><span class="fa-solid fa-check"></span> Unlock datasets</button>
                 </div>
                 <div class="btn-group">
                     <a href="{{ url_for('intake_bp.reports') }}" class="btn btn-info btn-goto-reports"><span class="fa-solid fa-signal"></span> Reports</a>
@@ -224,18 +225,18 @@
                         {% if permissions.manager %}
                             <th class="th-invisible-order"></th>
                         {% endif %}
-                        <th align="center"><input type="checkbox" class="control-all-cbDataSets"></th>
-                        <th></th>
-                        <th>Status</th>
-                        <th style="width:80px;">Date</th>
-                        <th>Pseudocode</th>
-                        <th>Experiment type</th>
-                        <th>Wave</th>
-                        <th>Version</th>
-                        <th style="text-align: right;">Nr. of files</th>
-                        <th style="text-align: right;">Nr. of errors/<br/>warnings</th>
-                        <th style="text-align: right;">Nr. of <br/>comments</th>
-                        <th>Created by</th>
+                        <th scope="col" align="center"><input type="checkbox" class="control-all-cbDataSets"></th>
+                        <th scope="col"></th>
+                        <th scope="col">Status</th>
+                        <th scope="col" style="width:80px;">Date</th>
+                        <th scope="col">Pseudocode</th>
+                        <th scope="col">Experiment type</th>
+                        <th scope="col">Wave</th>
+                        <th scope="col">Version</th>
+                        <th scope="col" style="text-align: right;">Nr. of files</th>
+                        <th scope="col" style="text-align: right;">Nr. of errors/<br>warnings</th>
+                        <th scope="col" style="text-align: right;">Nr. of <br>comments</th>
+                        <th scope="col">Created by</th>
                     </tr>
                 </thead>
                 <tbody>

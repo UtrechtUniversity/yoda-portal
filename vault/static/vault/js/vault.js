@@ -27,27 +27,27 @@ $(function () {
     startBrowsing()
   }
 
-  $('.btn-group button.metadata-form').click(function () {
+  $('.btn-group button.metadata-form').on('click', function () {
     showMetadataForm($(this).attr('data-path'))
   })
 
   $('body').on('click', 'a.view-video', function () {
     const path = $(this).attr('data-path')
-    const viewerHtml = `<video width="640" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></video>`
+    const viewerHtml = `<video width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></video>`
     $('#viewer').html(viewerHtml)
     $('#viewMedia').modal('show')
   })
 
   $('body').on('click', 'a.view-audio', function () {
     const path = $(this).attr('data-path')
-    const viewerHtml = `<audio width="640" controls autoplay><source src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}"></audio>`
+    const viewerHtml = `<audio width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></audio>`
     $('#viewer').html(viewerHtml)
     $('#viewMedia').modal('show')
   })
 
   $('body').on('click', 'a.view-image', function () {
     const path = $(this).attr('data-path')
-    const viewerHtml = `<img width="640" src="browse/download?filepath=${htmlEncode(encodeURIComponent(path))}" />`
+    const viewerHtml = `<img width="640" src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}" />`
     $('#viewer').html(viewerHtml)
     $('#viewMedia').modal('show')
   })
@@ -113,7 +113,7 @@ $(function () {
     }
   })
 
-  $('#file-formats-list').change(function () {
+  $('#file-formats-list').on('change', function () {
     const folder = $('a.action-check-for-unpreservable-files').attr('data-folder')
     const list = $('#file-formats-list option:selected').val()
     if (!(list in preservableFormatsLists)) { return }
@@ -134,7 +134,7 @@ $(function () {
       $('#showUnpreservableFiles .help').show()
       if (data.length > 0) {
         $('#showUnpreservableFiles .list-unpreservable-formats').html('')
-        for (const ext of data) { $('#showUnpreservableFiles .list-unpreservable-formats').append(`<li>${htmlEncode(ext)}</li>`) }
+        for (const ext of data) { $('#showUnpreservableFiles .list-unpreservable-formats').append(`<li>${Yoda.htmlEncode(ext)}</li>`) }
         $('#showUnpreservableFiles .advice').show()
         $('#showUnpreservableFiles .unpreservable').show()
       } else {
@@ -159,9 +159,9 @@ $(function () {
           const vaultPath = publication.path.replace(Yoda.basePath, '')
           $('.previousPublications').append(`
 <div class="form-check">
-  <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${htmlEncode(publication.path)}">
+  <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${Yoda.htmlEncode(publication.path)}">
   <label class="form-check-label" for="dataPackage${i}">
-    ${htmlEncode(doi)} (<a target="_blank" href="?dir=${encodeURIComponent(vaultPath)}">${htmlEncode(publication.title)}</a>)
+    ${Yoda.htmlEncode(doi)} (<a target="_blank" href="?dir=${encodeURIComponent(vaultPath)}">${Yoda.htmlEncode(publication.title)}</a>)
   </label>
 </div>
 `)
@@ -238,7 +238,7 @@ $(function () {
   $('body').on('click', '.browse', function (e) {
     browse($(this).attr('data-path'), true)
     // Dismiss stale messages.
-    $('#messages .close').click()
+    $('#messages .close').trigger('click')
     e.preventDefault()
   })
 
@@ -328,9 +328,9 @@ function makeBreadcrumb (dir) {
   let html = ''
   for (let [i, [text, path]] of crumbs.entries()) {
     const el = $('<li class="breadcrumb-item">')
-    text = htmlEncode(text).replace(/ /g, '&nbsp;')
+    text = Yoda.htmlEncode(text).replace(/ /g, '&nbsp;')
     if (i === crumbs.length - 1) { el.addClass('active').html(text) } else {
-      el.html(`<a class="browse" data-path="${htmlEncode(path)}"
+      el.html(`<a class="browse" data-path="${Yoda.htmlEncode(path)}"
                          href="?dir=${encodeURIComponent(path)}">${text}</a>`)
     }
 
@@ -338,12 +338,6 @@ function makeBreadcrumb (dir) {
   }
 
   $('ol.breadcrumb').html(html)
-}
-
-function htmlEncode (value) {
-  // create a in-memory div, set it's inner text(which jQuery automatically encodes)
-  // then grab the encoded contents back out.  The div never exists on the page.
-  return $('<div/>').text(value).html().replace('"', '&quot;')
 }
 
 function buildFileBrowser (dir) {
@@ -441,7 +435,7 @@ const getFolderContents = (() => {
 const tableRenderer = {
   name: (name, _, row) => {
     const tgt = `${currentFolder}/${name}`
-    if (row.type === 'coll') { return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${htmlEncode(name)}</a>` } else return `<i class="fa-regular fa-file"></i> ${htmlEncode(name)}`
+    if (row.type === 'coll') { return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>` } else return `<i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}`
   },
   size: (size, _, row) => {
     if (row.type === 'coll') {
@@ -482,7 +476,7 @@ const tableRenderer = {
     if (row.type === 'coll') { return '' }
 
     if (row.state === 'OFL') {
-      actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`)
     } else if (row.state === 'MIG' || row.state === 'UNM') {
       // no context menu for data objects migrating from or to tape archive
       return ''
@@ -495,16 +489,16 @@ const tableRenderer = {
       }
       const ext = row.name.replace(/.*\./, '').toLowerCase()
 
-      actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${htmlEncode(currentFolder)}" data-name="${htmlEncode(row.name)}" title="Download this file">Download</a>`)
+      actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
 
       // Generate dropdown "view" actions for different media types.
       for (const type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-        actions.append(`<a class="dropdown-item view-${type}" data-path="${htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`)
+        actions.append(`<a class="dropdown-item view-${type}" data-path="${Yoda.htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`)
       }
     }
 
     const dropdown = $(`<div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${Yoda.htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               <i class="fa-solid fa-ellipsis-h" aria-hidden="true"></i>
                             </button>`)
     dropdown.append(actions)
@@ -558,11 +552,11 @@ function toggleActionLogList (folder) {
       if (data.length) {
         $.each(data, function (index, value) {
           html += '<a class="list-group-item list-group-item-action">' +
-                         htmlEncode(value[2]) +
+                         Yoda.htmlEncode(value[2]) +
                          ' - <strong>' +
-                         htmlEncode(value[1]) +
+                         Yoda.htmlEncode(value[1]) +
                          '</strong> - ' +
-                         htmlEncode(value[0]) +
+                         Yoda.htmlEncode(value[0]) +
                          '</a>'
         })
       } else {
@@ -591,7 +585,7 @@ function toggleSystemMetadata (folder) {
       if (data) {
         $.each(data, function (index, value) {
           html += '<span class="list-group-item list-group-item-action"><strong>' +
-                        htmlEncode(index) +
+                        Yoda.htmlEncode(index) +
                         '</strong>: ' +
                         value +
                         '</span>'
@@ -735,11 +729,11 @@ function topInformation (dir, showAlert) {
 
       // Provenance action log
       $('.actionlog').hide()
-      const actionLogIcon = ` <i class="fa-solid fa-book actionlog-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`
+      const actionLogIcon = ` <i class="fa-solid fa-book actionlog-icon" data-folder="${Yoda.htmlEncode(dir)}" aria-hidden="true" title="Show provenance information"></i>`
 
       // System metadata.
       $('.system-metadata').hide()
-      const systemMetadataIcon = ` <i class="fa-solid fa-info-circle system-metadata-icon" data-folder="${htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`
+      const systemMetadataIcon = ` <i class="fa-solid fa-info-circle system-metadata-icon" data-folder="${Yoda.htmlEncode(dir)}" aria-hidden="true" title="Show system metadata"></i>`
 
       $('.btn-group button.folder-status').attr('data-write', hasWriteRights)
 
@@ -797,13 +791,13 @@ function handleActionsList (actions, folder) {
 
   $.each(possibleActions, function (index, value) {
     if (Object.prototype.hasOwnProperty.call(actions, value)) {
-      html += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>'
+      html += '<a class="dropdown-item action-' + value + '" data-folder="' + Yoda.htmlEncode(folder) + '">' + actions[value] + '</a>'
     }
   })
 
   $.each(possibleVaultActions, function (index, value) {
     if (Object.prototype.hasOwnProperty.call(actions, value)) {
-      vaultHtml += '<a class="dropdown-item action-' + value + '" data-folder="' + htmlEncode(folder) + '">' + actions[value] + '</a>'
+      vaultHtml += '<a class="dropdown-item action-' + value + '" data-folder="' + Yoda.htmlEncode(folder) + '">' + actions[value] + '</a>'
     }
   })
 
