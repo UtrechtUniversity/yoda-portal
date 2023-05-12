@@ -12,7 +12,7 @@ $(function () {
     })
   })
 
-  $('body').on('click', 'a#notifications_dismiss_all', function (e) {
+  $('body').on('click', 'button#notifications_dismiss_all', function (e) {
     e.preventDefault()
     Yoda.call('notifications_dismiss_all',
       {}).then((data) => {
