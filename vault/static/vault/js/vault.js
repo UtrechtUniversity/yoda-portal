@@ -683,8 +683,8 @@ function topInformation (dir, showAlert) {
           $('.btn-group button.metadata-form').show()
 
           // Archival vault
+          var archiveBadge = ''
           if (typeof archive !== 'undefined') {
-            var archiveBadge = ''
             if ((isDatamanager && archive.archivable) && archive.status == false) {
               actions['vault-archival'] = 'Archive on tape'
             }
@@ -700,7 +700,7 @@ function topInformation (dir, showAlert) {
                   actions['vault-unarchive'] = 'Unarchive from tape'
                 }
                 $('.alert.is-archived').show()
-              } else if (archive.status == 'extract') {
+              } else if (archive.status == 'extract' || archive.status == 'extracting') {
                 archiveText = 'Scheduled for unarchive'
               } else if (archive['status'] == 'bagit' || archive['status'] == 'baggingit') {
                 archiveText = 'Scheduled for download';
