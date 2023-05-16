@@ -52,6 +52,9 @@ function flatListGroups () {
 
       if(usergroup[0].match(/^(research)-/)) {
         table += '<td><a href="/research/?dir=' + encodeURIComponent('/' + usergroup[0]) + '" title="Go to group ' + usergroup[0] + ' in research space"><i class="fa-regular fa-folder"></i></a></td>';
+      } else {
+        table += '<td></td>';
+
       }
 
       if (usergroup[1] === 'manager') {
