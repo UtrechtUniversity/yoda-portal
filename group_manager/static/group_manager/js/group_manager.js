@@ -50,7 +50,9 @@ function flatListGroups () {
                      <td>${usergroup[2]}</td>
                      <td>${usergroup[3]}</td>`
 
-      table += '<td><a href="/research/?dir=' + encodeURIComponent('/' + usergroup[0]) + '" title="Go to group ' + usergroup[0] + ' in research space"><i class="fa-regular fa-folder"></i></a></td>';
+      if(usergroup[0].match(/^(research)-/)) {
+        table += '<td><a href="/research/?dir=' + encodeURIComponent('/' + usergroup[0]) + '" title="Go to group ' + usergroup[0] + ' in research space"><i class="fa-regular fa-folder"></i></a></td>';
+      }
 
       if (usergroup[1] === 'manager') {
         table += '<td><i class="fa-solid fa-crown" title="You manage this group"></i></td>'
@@ -2113,9 +2115,11 @@ $(function () {
       // Indicate which groups are managed by this user.
       for (const groupName in this.groups) {
 
-        a = '<table class="float-end"><tr><td>';
-        a += '<a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research space"><i class="fa-regular fa-folder"></i></a>';
-        a += '</td>';
+        a = '<table class="float-end"><tr>';
+
+        if(groupName.match(/^(research)-/)) {
+          a += '<td><a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research space"><i class="fa-regular fa-folder"></i></a></td>';
+        }
 
         if (this.isManagerOfGroup(groupName)) {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
