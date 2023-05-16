@@ -4,9 +4,9 @@ import CreatableSelect from 'react-select/creatable';
 import axios from 'axios';
 import { FieldProps } from "@rjsf/utils";
 
-class ROR extends React.Component<FieldProps> {
-    constructor(props: FieldProps) {
-        super(props)
+class ROR extends React.Component {
+    constructor(props) {
+        super(props);
         this.state = {
             ...props.formData
         }

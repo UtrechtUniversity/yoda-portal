@@ -1,29 +1,17 @@
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 import { render } from "react-dom";
 import Form from '@rjsf/bootstrap-4';
-import Select from 'react-select';
-import {
-    RJSFSchema,
-    UiSchema,
-    ErrorListProps,
-    ArrayFieldTemplateProps,
-    ObjectFieldTemplateProps,
-    FieldTemplateProps,
-    WidgetProps,
-    RegistryWidgetsType,
-    RegistryFieldsType
-} from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
+import { getTemplate } from '@rjsf/utils';
+import Select from 'react-select';
 import Geolocation from "./Geolocation";
 import Vocabulary from "./Vocabulary";
 import ROR from  "./ROR";
 
-const [schema, setSchema] = useState<RJSFSchema>(schema);
-const [uiSchema, setUiSchema] = useState<UiSchema>(uiSchema);
-
-
 const path = $('#form').attr('data-path');
 
+let schema       = {};
+let uiSchema     = {};
 let yodaFormData = {};
 
 let formProperties;
@@ -32,10 +20,8 @@ let saving = false;
 
 let form = document.getElementById('form');
 
-const onSubmit = ({formData}) => submitData(formData);
 
-// TODO: refactor widgets to subdirectory
-const enumWidget = function (props: WidgetProps) {
+const enumWidget = (props) => {
     let enumArray = props['schema']['enum'];
     let enumNames = props['schema']['enumNames'];
 
@@ -110,7 +96,7 @@ const enumWidget = function (props: WidgetProps) {
 
     return (
         <div>
-            {label}
+
             <Select className={'select-box'}
                     placeholder={placeholder}
                     required={required}
@@ -121,52 +107,19 @@ const enumWidget = function (props: WidgetProps) {
         </div>
     );
 };
-const widgets: RegistryWidgetsType = {
+
+const widgets = {
     SelectWidget: enumWidget
 };
 
-
-const fields: RegistryFieldsType = {
+const fields = {
     geo: Geolocation,
     vocabulary: Vocabulary,
     ror: ROR
 };
 
-
-// TODO: refactor templates to subdirectory
-const CustomErrorListTemplate = (props: ErrorListProps) => {
-    let {errors, formContext} = props;
-    errors = errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies');
-
-    if (errors.length === 0) {
-        return(<div></div>);
-    } else {
-        // Show error list only on save.
-        if (formContext.saving) {
-            return (
-                <div className="mb-4 card border-danger">
-                    <div className="alert-danger card-header">Validation warnings</div>
-                    <div className="p-0 card-body">
-                        <div className="list-group">
-                            {errors.map((error, i) => {
-                                return (
-                                    <div key={i} className="border-0 list-group-item">
-                                        <span>{error.stack}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            );
-        } else {
-            return(<div></div>);
-        }
-    }
-}
-
-const CustomArrayFieldTemplate = (props: ArrayFieldTemplateProps) => {
-    const { DescriptionField, readonly, disabled } = props;
+const CustomArrayFieldTemplate = (props) => {
+    const { readonly, disabled } = props;
 
     if (disabled) {
         let output = props.items.map((element, i) => {
@@ -253,11 +206,70 @@ const CustomArrayFieldTemplate = (props: ArrayFieldTemplateProps) => {
             </fieldset>
         );
     }
-}
+};
 
-const CustomObjectFieldTemplate = (props: ObjectFieldTemplateProps) => {
-    const { TitleField, DescriptionField } = props;
+const CustomFieldTemplate = (props) => {
+    const {id, classNames, style, label, help, hidden, required, description, errors,
+        rawErrors, children, displayLabel, formContext, readonly} = props;
 
+    let labelClass = '';
+    if (Array.isArray(rawErrors)) {
+        labelClass = 'text-danger';
+    }
+
+
+    if (hidden || !displayLabel) {
+        return children;
+    }
+
+    // Only show error messages after submit.
+    if (formContext.saving) {
+        return (
+            <div className={classNames + ' row'}>
+                <div className={'col-12 field-wrapper'}>
+                    <div className={'form-group mb-0'}>
+                        <div className={'mb-0 form-group'}>
+                            <label htmlFor={id} className={labelClass}>
+                                {label}
+                                {required ? '*' : null}
+                            </label>
+                            {children}
+                            {help && (
+                                <small className="text-muted form-text">{help}</small>
+                            )}
+                            {description}
+                        </div>
+                    </div>
+                    {errors}
+                </div>
+            </div>
+        );
+    } else {
+        return (
+            <div className={classNames+ ' row'}>
+                <div className={'col-12 field-wrapper'}>
+                    <div className={'form-group mb-0'}>
+                        <div className={'mb-0 form-group'}>
+                            <label htmlFor={id} className={labelClass}>
+                                {label}
+                                {required ? '*' : null}
+                            </label>
+                            {children}
+                            {help && (
+                                <small className="text-muted form-text">{help}</small>
+                            )}
+                            {description}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+};
+
+const CustomObjectFieldTemplate = (props) => {
+    const { registry, uiOptions } = props;
+    const TitleField = getTemplate("TitleFieldTemplate", registry, uiOptions);
     let structureClass;
     let structure;
     if ('yoda:structure' in props.schema) {
@@ -290,14 +302,6 @@ const CustomObjectFieldTemplate = (props: ObjectFieldTemplateProps) => {
 
     return (
         <fieldset className="mb-3">
-            {(props.uiSchema["ui:title"] || props.title) && (
-                <TitleField
-                    id={`${props.idSchema.$id}__title`}
-                    title={props.title || props.uiSchema["ui:title"]}
-                    required={props.required}
-                    formContext={props.formContext}
-                />
-            )}
             {(props.uiSchema["ui:description"] || props.schema.description) && (
                 <small className="col-xs-12 text-muted form-text">
                     {props.uiSchema["ui:description"] || props.schema.description}
@@ -312,59 +316,47 @@ const CustomObjectFieldTemplate = (props: ObjectFieldTemplateProps) => {
             </div>
         </fieldset>
     );
-}
+};
 
-const CustomFieldTemplate = (props: FieldTemplateProps) => {
-    const {id, classNames, label, help, hidden, required, description, errors,
-        rawErrors, children, displayLabel, formContext, readonly} = props;
+const CustomErrorListTemplate = (props) => {
+    let {errors, formContext} = props;
+    errors = errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies');
 
-    if (hidden || !displayLabel) {
-        return children;
-    }
-
-    // Only show error messages after submit.
-    if (formContext.saving) {
-        return (
-            <div className={classNames + ' row'}>
-                <div className={'col-12 field-wrapper'}>
-                    <div className={'form-group mb-0'}>
-                        <div className={'mb-0 form-group'}>
-                            {children}
-                            {help && (
-                                <small className="text-muted form-text">{help}</small>
-                            )}
-                            {description}
-                        </div>
-                    </div>
-                    {errors}
-                </div>
-            </div>
-        );
+    if (errors.length === 0) {
+        return(<div></div>);
     } else {
-        return (
-            <div className={classNames+ ' row'}>
-                <div className={'col-12 field-wrapper'}>
-                    <div className={'form-group mb-0'}>
-                        <div className={'mb-0 form-group'}>
-                            {children}
-                            {help && (
-                                <small className="text-muted form-text">{help}</small>
-                            )}
-                            {description}
+        // Show error list only on save.
+        if (formContext.saving) {
+            return (
+                <div className="mb-4 card border-danger">
+                    <div className="alert-danger card-header">Validation warnings</div>
+                    <div className="p-0 card-body">
+                        <div className="list-group">
+                            {errors.map((error, i) => {
+                                return (
+                                    <div key={i} className="border-0 list-group-item">
+                                        <span>{error.stack}</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
-            </div>
-        );
+            );
+        } else {
+            return(<div></div>);
+        }
     }
-}
+};
 
-const templates: Partial<TemplatesType> = {
+const templates = {
     ArrayFieldTemplate: CustomArrayFieldTemplate,
-    FieldTemplate: CustomFieldTemplate,
     ObjectFieldTemplate: CustomObjectFieldTemplate,
     ErrorListTemplate: CustomErrorListTemplate,
+    FieldTemplate: CustomFieldTemplate
 };
+
+const onSubmit = ({formData}) => submitData(formData);
 
 class YodaForm extends React.Component {
     constructor(props) {
@@ -413,20 +405,19 @@ class YodaForm extends React.Component {
                   idPrefix={"yoda"}
                   uiSchema={uiSchema}
                   fields={fields}
-                  widgets={widgets}
                   formData={this.state.formData}
                   formContext={this.state.formContext}
                   liveValidate={true}
                   noValidate={false}
                   noHtml5Validate={true}
                   showErrorList={"top"}
+                  widgets={widgets}
                   templates={templates}
                   onSubmit={onSubmit}
-                  widgets={widgets}
                   onChange={this.onChange.bind(this)}
                   onError={this.onError.bind(this)}
-                  validator={validator}
-                  transformErrors={this.transformErrors}>
+                  transformErrors={this.transformErrors}
+                  validator={validator}>
                 <button ref={(btn) => {this.submitButton=btn;}} className="hidden" />
             </Form>
         );
@@ -531,6 +522,36 @@ class Container extends React.Component {
     }
 };
 
+/**
+ * Returns to the browse view for the current collection.
+ */
+function browse() {
+    window.location.href = '/research/browse?dir=' + encodeURIComponent(path);
+}
+
+function deleteMetadata() {
+    swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this action.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete all metadata!",
+            closeOnConfirm: false,
+            animation: false
+        },
+        async isConfirm => {
+            if (isConfirm) {
+                await Yoda.call('meta_remove',
+                    {coll: Yoda.basePath+path},
+                    {errorPrefix: 'Metadata could not be deleted'});
+
+                Yoda.store_message('success', `Deleted metadata of folder <${path}>`);
+                browse();
+            }
+        });
+}
+
 function loadForm() {
     // Inhibit "loading" text.
     formLoaded = true;
@@ -544,8 +565,8 @@ function loadForm() {
             if (formProperties.data !== null) {
                 // These ary only present when there is a form to show (i.e. no
                 // validation errors, and no transformation needed).
-                setSchema(formProperties.data.schema);
-                setUiSchema(formProperties.data.uischema);
+                schema       = formProperties.data.schema;
+                uiSchema     = formProperties.data.uischema;
                 yodaFormData = formProperties.data.metadata === null ? undefined : formProperties.data.metadata;
             }
 
@@ -663,19 +684,12 @@ async function submitData(data) {
             {coll: Yoda.basePath+path, metadata: data},
             {errorPrefix: 'Metadata could not be saved'});
 
-        Yoda.store_message('success', `Updated metadata of folder <${path}>`);
-        browse();
+        Yoda.set_message('success', `Updated metadata of folder <${path}>`);
+        $('.yodaButtons button').attr('disabled', false);
     } catch (e) {
         // Allow retry.
         $('.yodaButtons button').attr('disabled', false);
     }
-}
-
-/**
- * Returns to the browse view for the current collection.
- */
-function browse() {
-    window.location.href = '/research/browse?dir=' + encodeURIComponent(path);
 }
 
 function updateCompleteness()

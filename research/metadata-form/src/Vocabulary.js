@@ -4,8 +4,8 @@ import { render } from "react-dom";
 import Select from 'react-select';
 import axios from "axios";
 
-class Vocabulary extends React.Component<FieldProps> {
-    constructor(props: FieldProps) {
+class Vocabulary extends React.Component {
+    constructor(props) {
         super(props);
         this.state = {
             ...props.formData,

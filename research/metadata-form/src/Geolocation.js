@@ -22,8 +22,8 @@ const customModalStyles = {
     }
 };
 
-class Geolocation extends React.Component<FieldProps> {
-    constructor(props: FieldProps) {
+class Geolocation extends React.Component {
+    constructor(props) {
         super(props);
         this.state = {
             //showModal: false,

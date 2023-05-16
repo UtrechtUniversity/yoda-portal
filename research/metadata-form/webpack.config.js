@@ -15,21 +15,11 @@ var config = {
             {
                 test: /\.js?/,
                 include : APP_DIR,
-                exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        "presets": [
-                            ['@babel/preset-typescript', { allowNamespaces: true }],
-                            "@babel/preset-env",
-                            "@babel/preset-react"
-                        ],
-                        "plugins": [
-                            "@babel/plugin-syntax-dynamic-import",
-                            "@babel/plugin-proposal-object-rest-spread",
-                            "@babel/plugin-proposal-class-properties",
-                            "@babel/plugin-transform-typescript"
-                        ]
+                        presets: ['@babel/react'],
+                        plugins: ['@babel/plugin-proposal-object-rest-spread']
                     }
                 }
             }
