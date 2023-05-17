@@ -185,6 +185,60 @@
     </div>
 </div>
 
+<div class="modal" tabindex="-1" role="dialog" id="vaultDownload">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Download datapackage</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>The data package will be archived in a bagit, which may be downloaded.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class='btn btn-primary action-confirm-vault-download'>Confirm download</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="vaultArchival">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Archive datapackage to tape</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>The data is not directly accessible after archiving. Please confirm that you agree to archive the datapackage to tape.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class='btn btn-primary action-confirm-vault-archival'>Confirm archive</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="vaultUnarchive">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Unarchive datapackage from tape</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>The data is not directly accessible after unarchiving. Please confirm that you agree to unarchive the datapackage from tape.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class='btn btn-primary action-confirm-vault-unarchive'>Confirm unarchive</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal" tabindex="-1" role="dialog" id="confirmRepublish">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -217,6 +271,10 @@
         <li class="breadcrumb-item">Vault</li>
     </ol>
 </nav>
+
+<div class="alert is-archived alert-info hide">
+    This data package is archived on tape. Unarchive this data package to access the contents of this data package.
+</div>
 
 <section class="metadata-info container hide">
     <h3 class="metadata-title"></h3>
