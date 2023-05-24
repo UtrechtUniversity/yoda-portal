@@ -700,6 +700,9 @@ function topInformation (dir, showAlert) {
                   actions['vault-unarchive'] = 'Unarchive from tape'
                 }
                 $('.alert.is-archived').show()
+              } else if (archive.status == 'update' || archive.status == 'updating') {
+                archiveText = 'Updating archive'
+                $('.alert.is-archived').show()         
               } else if (archive.status == 'extract' || archive.status == 'extracting') {
                 archiveText = 'Scheduled for unarchive'
               } else if (archive['status'] == 'bagit' || archive['status'] == 'baggingit') {
