@@ -336,6 +336,7 @@ def callback() -> Response:
                 'administrator',
                 'danger'
             )
+            log_error(f"OIDC error occurred for {str(email)}", True)
 
         # Redirect to gate when exception has occured.
         if exception_occurred:
