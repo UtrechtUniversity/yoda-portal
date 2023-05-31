@@ -1144,7 +1144,7 @@ $(function () {
         $el.attr(
           'placeholder',
           (that.isMemberOfGroup('priv-category-add') || that.isRodsAdmin)
-            ? 'Select one or enter a new name'
+            ? 'Select a category or enter a new name'
             : 'Select a category'
         )
 
