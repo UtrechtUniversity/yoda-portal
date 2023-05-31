@@ -1558,7 +1558,7 @@ $(function () {
       }
 
       if (!newProperties.name.startsWith('datamanager-') && !newProperties.name.match(/^(intake|research|deposit)-([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
-        window.alert("Group names must start with one of 'intake-' or 'research-' or 'deposit-' and may only contain lowercase letters (a-z) and hyphens (-).")
+        window.alert("Group names may only contain lowercase letters (a-z) and hyphens (-).")
         resetSubmitButton()
         return
       }
@@ -1570,19 +1570,42 @@ $(function () {
       } else if (
       // Validate input, in case HTML5 validation did not work.
       // Also needed for the select2 inputs.
-        [newProperties.category, newProperties.subcategory, newProperties.description]
+        [newProperties.category]
+          .some(function (item) {
+            return !item.match(/^[a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9]*$/)
+          })
+      ) {
+        window.alert('The category name may only contain lowercase letters (a-z) and hyphens (-).')
+        resetSubmitButton()
+        return
+      } else if (
+      // Validate input, in case HTML5 validation did not work.
+      // Also needed for the select2 inputs.
+        [newProperties.subcategory]
           .some(function (item) {
             return !item.match(/^[a-zA-Z0-9,.()_ -]*$/)
           })
       ) {
-        window.alert('The (sub)category name and group description fields may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')
+        window.alert('The subcategory name may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')
         resetSubmitButton()
         return
       }
 
       // Check if schema id is valid.
       if (this.prefixHasSchemaId(this.getPrefix(newProperties.name)) && !this.schemaIDs.includes(newProperties.schema_id)) {
-        window.alert('Please select a valid metadata schema as it is a required field')
+        window.alert('Please select a valid metadata schema as it is a required field.')
+        resetSubmitButton()
+        return
+      }
+
+      if (
+      // Validate input, in case HTML5 validation did not work.
+        [newProperties.description]
+          .some(function (item) {
+            return !item.match(/^[a-zA-Z0-9,.()_ -]*$/)
+          })
+      ) {
+        window.alert('The group description may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')
         resetSubmitButton()
         return
       }
