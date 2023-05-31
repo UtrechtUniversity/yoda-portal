@@ -1563,29 +1563,23 @@ $(function () {
         return
       }
 
-      if (newProperties.category === '' || newProperties.subcategory === '') {
-        window.alert('Please select a category and subcategory.')
+      // Check if category is valid.
+      if (newProperties.category === '') {
+        window.alert('Please select a category.')
         resetSubmitButton()
         return
-      } else if (
-      // Validate input, in case HTML5 validation did not work.
-      // Also needed for the select2 inputs.
-        [newProperties.category]
-          .some(function (item) {
-            return !item.match(/^[a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9]*$/)
-          })
-      ) {
+      } else if (!newProperties.category.match(/^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
         window.alert('The category name may only contain lowercase letters (a-z) and hyphens (-).')
         resetSubmitButton()
         return
-      } else if (
-      // Validate input, in case HTML5 validation did not work.
-      // Also needed for the select2 inputs.
-        [newProperties.subcategory]
-          .some(function (item) {
-            return !item.match(/^[a-zA-Z0-9,.()_ -]*$/)
-          })
-      ) {
+      }
+
+      // Check if subcategory is valid.
+      if (newProperties.subcategory === '') {
+        window.alert('Please select a subcategory.')
+        resetSubmitButton()
+        return
+      } else if (!newProperties.subcategory.match(/^[a-zA-Z0-9,.()_ -]*$/)) {
         window.alert('The subcategory name may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')
         resetSubmitButton()
         return
@@ -1598,13 +1592,8 @@ $(function () {
         return
       }
 
-      if (
-      // Validate input, in case HTML5 validation did not work.
-        [newProperties.description]
-          .some(function (item) {
-            return !item.match(/^[a-zA-Z0-9,.()_ -]*$/)
-          })
-      ) {
+      // Check if group decription is valid.
+      if (!newProperties.description.match(/^[a-zA-Z0-9,.()_ -]*$/)) {
         window.alert('The group description may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')
         resetSubmitButton()
         return
