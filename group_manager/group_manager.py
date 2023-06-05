@@ -99,14 +99,16 @@ def group_create() -> Response:
     schema_id = request.form['group_schema_id'] if 'group_schema_id' in request.form else ''
     data_classification = request.form['group_data_classification'] if 'group_data_classification' in request.form else ''
     expiration_date = request.form['group_expiration_date'] if 'group_expiration_date' in request.form else ''
-
+    enable_sram = request.form['group_enable_sram'] if 'group_enable_sram' in request.form else ''
+    
     response = api.call('group_create', data={'group_name': request.form['group_name'],
                                               'category': request.form['group_category'],
                                               'subcategory': request.form['group_subcategory'],
                                               'schema_id': schema_id,
                                               'expiration_date': expiration_date,
                                               'description': request.form['group_description'],
-                                              'data_classification': data_classification})
+                                              'data_classification': data_classification,
+                                              'enable_sram': enable_sram})
 
     output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
     output.headers["Content-type"] = "application/json"

@@ -176,6 +176,17 @@
                                 </div>
                             </div>
 
+                            <div class="mb-3 row enable-sram">
+                                <label class="col-sm-4 form-label" for="f-group-create-enable-sram">Enable SRAM
+                                    <i class="fa-solid fa-question-circle" aria-hidden="true" title="Enable SRAM to create SRAM CO Identifier for the group."></i>
+                                </label>
+                                <div class="col-sm-8">
+                                    <div class="form-check">
+                                        <input name="group_enable_sram" id="f-group-create-enable-sram" type="checkbox" class="form-check-input"/>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row">
                                 <div class="offset-sm-4 col-sm-8">
                                     <input action="{{ url_for('group_manager_bp.group_create') }}" id="f-group-create-submit" class="btn btn-primary" type="button" value="Add group">
