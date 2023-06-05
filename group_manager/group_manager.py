@@ -100,7 +100,7 @@ def group_create() -> Response:
     data_classification = request.form['group_data_classification'] if 'group_data_classification' in request.form else ''
     expiration_date = request.form['group_expiration_date'] if 'group_expiration_date' in request.form else ''
     enable_sram = request.form['group_enable_sram'] if 'group_enable_sram' in request.form else ''
-    
+
     response = api.call('group_create', data={'group_name': request.form['group_name'],
                                               'category': request.form['group_category'],
                                               'subcategory': request.form['group_subcategory'],
