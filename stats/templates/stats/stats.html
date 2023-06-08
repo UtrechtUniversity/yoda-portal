@@ -89,13 +89,27 @@
                         <thead>
                             <tr>
                                 <th scope="col">Category</th>
-                                <th scope="col">Research</th>
-                                <th scope="col">Vault</th>
-                                <th scope="col">Revisions</th>
-                                <th scope="col">Total storage</th>
-                                <th scope="col">Internal users</th>
-                                <th scope="col">External users</th>
-                                <th scope="col">Total users</th>
+                                <th scope="col">Research
+<i class="fa-solid fa-question-circle" aria-hidden="true" title="Used storage in the research space for given category"></i>
+                                </th>
+                                <th scope="col">Vault
+<i class="fa-solid fa-question-circle" aria-hidden="true" title="Used storage in the vault for given category"></i>
+                                </th>
+                                <th scope="col">Revisions
+<i class="fa-solid fa-question-circle" aria-hidden="true" title="Used storage as revisions for given category"></i>
+                                </th>
+                                <th scope="col">Total storage
+                                  <i class="fa-solid fa-question-circle" aria-hidden="true" title="Sum of research, vault and revision storage"></i>
+                                </th>
+                                <th scope="col">Internal users
+                                  <i class="fa-solid fa-question-circle" aria-hidden="true" title="Internal users use email accounts from domains '{{ external_filter }}'"></i>
+                                </th>
+                                <th scope="col">External users
+                                  <i class="fa-solid fa-question-circle" aria-hidden="true" title="External users use email accounts NOT from domains '{{ external_filter }}'"></i>
+                                </th>
+                                <th scope="col">Total users
+                                  <i class="fa-solid fa-question-circle" aria-hidden="true" title="Sum of internal and external users"></i>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>

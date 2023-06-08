@@ -19,7 +19,8 @@ def index() -> Response:
     category_response = api.call('resource_category_stats', data={})
 
     return render_template('stats/stats.html',
-                           categories=category_response['data'])
+                           categories=category_response['data']['categories'],
+                           external_filter=category_response['data']['external_filter'])
 
 
 @stats_bp.route('/export')
