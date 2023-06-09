@@ -702,19 +702,19 @@ function topInformation (dir, showAlert) {
                 $('.alert.is-archived').show()
               } else if (archive.status == 'update' || archive.status == 'updating') {
                 archiveText = 'Updating archive'
-                $('.alert.is-archived').show()         
+                $('.alert.is-archived').show()
               } else if (archive.status == 'extract' || archive.status == 'extracting') {
                 archiveText = 'Scheduled for unarchive'
               } else if (archive['status'] == 'bagit' || archive['status'] == 'baggingit') {
                 archiveText = 'Scheduled for download';
               }
-
               var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white">' + archiveText + '</span>'
-            } else {
-              var archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white hide"></span>'
-              if (downloadable) {
-                actions['vault-download'] = 'Download as bagit';
-              }
+            } else if (downloadable) {
+              actions['vault-download'] = 'Download as bagit';
+            }
+          } else {
+            if (downloadable) {
+              actions['vault-download'] = 'Download as bagit';
             }
           }
         }
