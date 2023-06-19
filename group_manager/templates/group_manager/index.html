@@ -176,6 +176,7 @@
                                 </div>
                             </div>
 
+                            {% if config.get('SRAM_ENABLED') %}
                             <div class="mb-3 row enable-sram">
                                 <label class="col-sm-4 form-label" for="f-group-create-enable-sram">Enable SRAM
                                     <i class="fa-solid fa-question-circle" aria-hidden="true" title="Enable SRAM to create SRAM CO Identifier for the group."></i>
@@ -186,6 +187,7 @@
                                     </div>
                                 </div>
                             </div>
+                            {% endif %}
 
                             <div class="row">
                                 <div class="offset-sm-4 col-sm-8">
