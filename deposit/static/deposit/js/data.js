@@ -32,9 +32,9 @@ $(function () {
     $('#folder-create #collection').text($(this).attr('data-path')) // for user
     $('.btn-confirm-folder-create').attr('data-path', $(this).attr('data-path'))
 
-    $('#folder-create').modal('show');
+    $('#folder-create').modal('show')
     // focus to be set after modal show
-    $('#path-folder-create').focus();
+    $('#path-folder-create').focus()
   })
 
   // FOLDER create
@@ -44,9 +44,9 @@ $(function () {
   })
 
   // Catch pressing the enter key and save the new folder
-  $('#path-folder-create').on('keyup', function(e) {
+  $('#path-folder-create').on('keyup', function (e) {
     if (e.key === 'Enter' || e.keyCode === 13) {
-       handleFolderAdd($(this).val(), $('.btn-confirm-folder-create').attr('data-path'))
+      handleFolderAdd($(this).val(), $('.btn-confirm-folder-create').attr('data-path'))
     }
   })
 
@@ -60,9 +60,9 @@ $(function () {
     $('#folder-rename #collection').text($(this).attr('data-collection'))
     $('.btn-confirm-folder-rename').attr('data-collection', $(this).attr('data-collection'))
 
-    $('#folder-rename').modal('show');
-    document.getElementById('folder-rename-name').focus();
-    document.getElementById('folder-rename-name').setSelectionRange(0, -1);
+    $('#folder-rename').modal('show')
+    document.getElementById('folder-rename-name').focus()
+    document.getElementById('folder-rename-name').setSelectionRange(0, -1)
   })
 
   $('.btn-confirm-folder-rename').on('click', function () {
@@ -70,9 +70,9 @@ $(function () {
   })
 
   // Catch pressing the enter key and rename the folder
-  $('#folder-rename-name').on('keyup', function(e) {
+  $('#folder-rename-name').on('keyup', function (e) {
     if (e.key === 'Enter' || e.keyCode === 13) {
-       handleFolderRename($(this).val(), $('.btn-confirm-folder-rename').attr('data-collection'), $('#org-folder-rename-name').val())
+      handleFolderRename($(this).val(), $('.btn-confirm-folder-rename').attr('data-collection'), $('#org-folder-rename-name').val())
     }
   })
 

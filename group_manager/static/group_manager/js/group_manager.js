@@ -50,11 +50,10 @@ function flatListGroups () {
                      <td>${usergroup[2]}</td>
                      <td>${usergroup[3]}</td>`
 
-      if(usergroup[0].match(/^(research)-/)) {
-        table += '<td><a href="/research/?dir=' + encodeURIComponent('/' + usergroup[0]) + '" title="Go to group ' + usergroup[0] + ' in research space"><i class="fa-regular fa-folder"></i></a></td>';
+      if (usergroup[0].match(/^(research)-/)) {
+        table += '<td><a href="/research/?dir=' + encodeURIComponent('/' + usergroup[0]) + '" title="Go to group ' + usergroup[0] + ' in research space"><i class="fa-regular fa-folder"></i></a></td>'
       } else {
-        table += '<td></td>';
-
+        table += '<td></td>'
       }
 
       if (usergroup[1] === 'manager') {
@@ -1561,7 +1560,7 @@ $(function () {
       }
 
       if (!newProperties.name.startsWith('datamanager-') && !newProperties.name.match(/^(intake|research|deposit)-([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
-        window.alert("Group names may only contain lowercase letters (a-z) and hyphens (-).")
+        window.alert('Group names may only contain lowercase letters (a-z) and hyphens (-).')
         resetSubmitButton()
         return
       }
@@ -2130,14 +2129,13 @@ $(function () {
         $('.import-groups-csv').removeClass('hidden')
       }
 
-      var a = '';
+      let a = ''
       // Indicate which groups are managed by this user.
       for (const groupName in this.groups) {
+        a = '<table class="float-end"><tr>'
 
-        a = '<table class="float-end"><tr>';
-
-        if(groupName.match(/^(research)-/)) {
-          a += '<td><a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research space"><i class="fa-regular fa-folder"></i></a></td>';
+        if (groupName.match(/^(research)-/)) {
+          a += '<td><a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research space"><i class="fa-regular fa-folder"></i></a></td>'
         }
 
         if (this.isManagerOfGroup(groupName)) {
@@ -2152,10 +2150,9 @@ $(function () {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
             a + '<td>&nbsp;<i class="fa-solid fa-eye mt-1" title="You have read access to this group"></i>' + '</td></tr></table>'
           )
-        }
-        else {
+        } else {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            a  + '<td style="width: 26px;"></td></tr></table>'
+            a + '<td style="width: 26px;"></td></tr></table>'
           )
         }
       }
