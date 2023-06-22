@@ -541,36 +541,8 @@ $(function () {
   })
   // }}}
 
-  // When allowed to add groups the fields have to be initialized
-  $('.create-button-new').on('click', function () {
-    $('.properties-update').addClass('hidden')
-    $('.users').addClass('hidden')
-    $('.properties-create').removeClass('hidden')
-
-    const that = Yoda.groupManager
-
-    const $prefixDiv = $('#f-group-create-prefix-div')
-    $prefixDiv.find('button .text').html(that.GROUP_DEFAULT_PREFIX + '&nbsp;')
-
-    $('#f-group-create-data-classification').val('unspecified').trigger('change')
-
-    $('#f-group-create-prefix-div a[data-value="' + that.GROUP_DEFAULT_PREFIX + '"]').click()
-
-    $('#f-group-create-name').val('')
-    $('#f-group-create-description').val('')
-
-    $('#f-group-create-prefix-datamanager').addClass('hidden')
-
-    $('#f-group-create-schema-id').select2('val', '');
-    $('#f-group-create-expiration-date').val('');
-
-    $('#f-group-create-category').select2('val', '')
-    $('#f-group-create-subcategory').select2('val', '')
-    $('#f-group-create-name').focus()
-  })
-
   // When allowed to add groups the fields have to be initialized. Copy the values of category and subcategory
-  $('.create-button-new-subcat').on('click', function () {
+  $('.create-button-new').on('click', function () {
     $('.properties-update').addClass('hidden')
     $('.users').addClass('hidden')
     $('.properties-create').removeClass('hidden')
@@ -1997,10 +1969,8 @@ $(function () {
       // Set inial state of group create button {{{
       if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
         $('.create-button-new').removeClass('hidden')
-        $('.create-button-new-subcat').removeClass('hidden')
       } else {
         $('.create-button-new').addClass('hidden')
-        $('.create-button-new-subcat').addClass('hidden')
       }
       // }}}
 
