@@ -21,7 +21,7 @@ def index() -> Response:
     user_type = response['data']['user_type']
     user_zone = response['data']['user_zone']
 
-    response = api.call('schema_get_schemas_and_default', data={})
+    response = api.call('schema_get_schemas', data={})
     schema_ids = response['data']['schemas']
     schema_id_default = response['data']['schema_default']
 
@@ -79,7 +79,7 @@ def get_schemas() -> Response:
     response = api.call('schema_get_schemas', data={})
 
     schemas = []
-    for schema in response['data']:
+    for schema in response['data']['schemas']:
         schemas.append(schema)
 
     output = make_response({'schemas': schemas})
