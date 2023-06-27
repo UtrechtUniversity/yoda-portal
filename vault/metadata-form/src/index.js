@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
 import Form from "@rjsf/bootstrap-4";
+import validator from '@rjsf/validator-ajv8';
+import { getTemplate } from '@rjsf/utils';
 import Select from 'react-select';
 import Geolocation from "./Geolocation";
 import Vocabulary from "./Vocabulary";
@@ -94,7 +96,6 @@ const enumWidget = (props) => {
 
     return (
         <div>
-            {label}
             <Select className={'select-box'}
                     placeholder={placeholder}
                     required={required}
@@ -114,6 +115,244 @@ const fields = {
     geo: Geolocation,
     vocabulary: Vocabulary,
     ror: ROR
+};
+
+const CustomArrayFieldTemplate = (props) => {
+    const { readonly, disabled } = props;
+
+    if (disabled) {
+        let output = props.items.map((element, i) => {
+            // Disabled view
+            if (disabled) {
+                return element.children;
+            }
+        });
+        return (<div className="hide">{output}</div>);
+    } else {
+        let buttonClass = "col-sm-2 offset-sm-10 array-item-add text-right";
+        if (props.uiSchema["ui:description"] || props.schema.description) {
+            buttonClass = "col-sm-2 array-item-add text-right";
+        }
+
+        return (
+            <fieldset className="yoda-array-field border rounded mb-4">
+                {(props.title) && (
+                    <legend>{props.title}</legend>
+                )}
+
+                <div className="d-flex">
+                    {(props.uiSchema["ui:description"] || props.schema.description) && (
+                        <small className="col-sm-10 text-muted form-text mb-2">
+                            {props.uiSchema["ui:description"] || props.schema.description}
+                        </small>
+                    )}
+
+                    {(!readonly && props.canAdd) && (
+                        <p className={buttonClass}>
+                            <button className="btn btn-outline-secondary btn-sm" onClick={props.onAddClick} type="button">
+                                <i className="fa-solid fa-plus" aria-hidden="true"></i>
+                            </button>
+                        </p>
+                    )}
+                </div>
+
+                {props.items &&
+                props.items.map(el => (
+                    <div key={el.key} className="d-flex">
+                        <div className="col-lg-10 col-10">
+                            {el.children}
+                        </div>
+                        {!readonly && (
+                            <div className="py-4 col-lg-2 col-2 mt-2">
+                                <div className="d-flex flex-row">
+                                    {el.hasMoveUp && (
+                                        <div className="m-0 p-0">
+                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
+                                                    onClick={el.onReorderClick(
+                                                        el.index,
+                                                        el.index - 1
+                                                    )}>
+                                                <i className="fa-solid fa-arrow-up" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {el.hasMoveDown && (
+                                        <div className="m-0 p-0">
+                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
+                                                    onClick={el.onReorderClick(
+                                                        el.index,
+                                                        el.index + 1
+                                                    )}>
+                                                <i className="fa-solid fa-arrow-down" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {el.hasRemove && (
+                                        <div className="m-0 p-0">
+                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
+                                                    onClick={el.onDropIndexClick(el.index)}>
+                                                <i className="fa-solid fa-trash" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </fieldset>
+        );
+    }
+};
+
+const CustomFieldTemplate = (props) => {
+    const {id, classNames, style, label, help, hidden, required, description, errors,
+        rawErrors, children, displayLabel, formContext, readonly} = props;
+
+    let labelClass = '';
+    if (Array.isArray(rawErrors)) {
+        labelClass = 'text-danger';
+    }
+
+
+    if (hidden || !displayLabel) {
+        return children;
+    }
+
+    // Only show error messages after submit.
+    if (formContext.saving) {
+        return (
+            <div className={classNames + ' row'}>
+                <div className={'col-12 field-wrapper'}>
+                    <div className={'form-group mb-0'}>
+                        <div className={'mb-0 form-group'}>
+                            <label htmlFor={id} className={labelClass}>
+                                {label}
+                                {required ? '*' : null}
+                            </label>
+                            {children}
+                            {help && (
+                                <small className="text-muted form-text">{help}</small>
+                            )}
+                            {description}
+                        </div>
+                    </div>
+                    {errors}
+                </div>
+            </div>
+        );
+    } else {
+        return (
+            <div className={classNames+ ' row'}>
+                <div className={'col-12 field-wrapper'}>
+                    <div className={'form-group mb-0'}>
+                        <div className={'mb-0 form-group'}>
+                            <label htmlFor={id} className={labelClass}>
+                                {label}
+                                {required ? '*' : null}
+                            </label>
+                            {children}
+                            {help && (
+                                <small className="text-muted form-text">{help}</small>
+                            )}
+                            {description}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+};
+
+const CustomObjectFieldTemplate = (props) => {
+    const { registry, uiOptions } = props;
+    const TitleField = getTemplate("TitleFieldTemplate", registry, uiOptions);
+    let structureClass;
+    let structure;
+    if ('yoda:structure' in props.schema) {
+        structureClass = `yoda-structure ${props.schema['yoda:structure']}`;
+        structure = props.schema['yoda:structure'];
+    }
+
+    if (structure === 'compound') {
+        let output = props.properties.map((prop, i) => {
+            return (
+                <div key={i} className="col compound-field">
+                    {prop.content}
+                </div>
+            );
+        });
+
+        if(props.title) {
+            return (
+                <fieldset className="yoda-array-field border rounded mb-4">
+                    <legend>{props.title}</legend>
+                    <div className="d-flex">{output} </div>
+                </fieldset>
+            );
+        } else {
+            return (
+                <div className="d-flex">{output}</div>
+            );
+        }
+    }
+
+    return (
+        <fieldset className="mb-3">
+            {(props.uiSchema["ui:description"] || props.schema.description) && (
+                <small className="col-xs-12 text-muted form-text">
+                    {props.uiSchema["ui:description"] || props.schema.description}
+                </small>
+            )}
+            <div className="container-fluid p-0">
+                {props.properties.map(prop => (
+                    <div className="col-xs-12" key={prop.content.key}>
+                        {prop.content}
+                    </div>
+                ))}
+            </div>
+        </fieldset>
+    );
+};
+
+const CustomErrorListTemplate = (props) => {
+    let {errors, formContext} = props;
+    errors = errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies');
+
+    if (errors.length === 0) {
+        return(<div></div>);
+    } else {
+        // Show error list only on save.
+        if (formContext.saving) {
+            return (
+                <div className="mb-4 card border-danger">
+                    <div className="alert-danger card-header">Validation warnings</div>
+                    <div className="p-0 card-body">
+                        <div className="list-group">
+                            {errors.map((error, i) => {
+                                return (
+                                    <div key={i} className="border-0 list-group-item">
+                                        <span>{error.stack}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        } else {
+            return(<div></div>);
+        }
+    }
+};
+
+const templates = {
+    ArrayFieldTemplate: CustomArrayFieldTemplate,
+    ObjectFieldTemplate: CustomObjectFieldTemplate,
+    ErrorListTemplate: CustomErrorListTemplate,
+    FieldTemplate: CustomFieldTemplate
 };
 
 const onSubmit = ({formData}) => submitData(formData);
@@ -157,37 +396,6 @@ class YodaForm extends React.Component {
         return errors;
     }
 
-    ErrorListTemplate(props) {
-        let {errors, formContext} = props;
-        errors = errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies');
-
-        if (errors.length === 0) {
-            return(<div></div>);
-        } else {
-            // Show error list only on save.
-            if (formContext.saving) {
-                return (
-                    <div className="mb-4 card border-danger">
-                        <div className="alert-danger card-header">Validation warnings</div>
-                        <div className="p-0 card-body">
-                            <div className="list-group">
-                                {errors.map((error, i) => {
-                                    return (
-                                        <div key={i} className="border-0 list-group-item">
-                                            <span>{error.stack}</span>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </div>
-                );
-            } else {
-                return(<div></div>);
-            }
-        }
-    }
-
     render () {
         return (
             <Form className="metadata-form"
@@ -197,19 +405,17 @@ class YodaForm extends React.Component {
                   fields={fields}
                   formData={this.state.formData}
                   formContext={this.state.formContext}
-                  ArrayFieldTemplate={ArrayFieldTemplate}
-                  ObjectFieldTemplate={ObjectFieldTemplate}
-                  FieldTemplate={CustomFieldTemplate}
                   liveValidate={true}
                   noValidate={false}
                   noHtml5Validate={true}
-                  showErrorList={true}
-                  ErrorList={this.ErrorListTemplate}
-                  onSubmit={onSubmit}
+                  showErrorList={"top"}
                   widgets={widgets}
+                  templates={templates}
+                  onSubmit={onSubmit}
                   onChange={this.onChange.bind(this)}
                   onError={this.onError.bind(this)}
-                  transformErrors={this.transformErrors}>
+                  transformErrors={this.transformErrors}
+                  validator={validator}>
                 <button ref={(btn) => {this.submitButton=btn;}} className="hidden" />
             </Form>
         );
@@ -417,200 +623,6 @@ async function submitData(data) {
     } catch (e) {
         // Allow retry.
         $('.yodaButtons button').attr('disabled', false);
-    }
-}
-
-function CustomFieldTemplate(props) {
-    const {id, classNames, label, help, hidden, required, description, errors,
-        rawErrors, children, displayLabel, formContext, readonly} = props;
-
-    if (hidden || !displayLabel) {
-        return children;
-    }
-
-    // Only show error messages after submit.
-    if (formContext.saving) {
-        return (
-            <div className={classNames + ' row'}>
-                <div className={'col-12 field-wrapper'}>
-                    <div className={'form-group mb-0'}>
-                        <div className={'mb-0 form-group'}>
-                            {children}
-                            {help && (
-                                <small className="text-muted form-text">{help}</small>
-                            )}
-                            {description}
-                        </div>
-                    </div>
-                    {errors}
-                </div>
-            </div>
-        );
-    } else {
-        return (
-            <div className={classNames+ ' row'}>
-                <div className={'col-12 field-wrapper'}>
-                    <div className={'form-group mb-0'}>
-                        <div className={'mb-0 form-group'}>
-                            {children}
-                            {help && (
-                                <small className="text-muted form-text">{help}</small>
-                            )}
-                            {description}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-}
-
-function ObjectFieldTemplate(props) {
-    const { TitleField, DescriptionField } = props;
-
-    let structureClass;
-    let structure;
-    if ('yoda:structure' in props.schema) {
-        structureClass = `yoda-structure ${props.schema['yoda:structure']}`;
-        structure = props.schema['yoda:structure'];
-    }
-
-    if (structure === 'compound') {
-        let output = props.properties.map((prop, i) => {
-            return (
-                <div key={i} className="col compound-field">
-                    {prop.content}
-                </div>
-            );
-        });
-
-        if(props.title) {
-            return (
-                <fieldset className="yoda-array-field border rounded mb-4">
-                    <legend>{props.title}</legend>
-                    <div className="d-flex">{output} </div>
-                </fieldset>
-            );
-        } else {
-            return (
-                <div className="d-flex">{output}</div>
-            );
-        }
-    }
-
-    return (
-        <fieldset className="mb-3">
-            {(props.uiSchema["ui:title"] || props.title) && (
-                <TitleField
-                    id={`${props.idSchema.$id}__title`}
-                    title={props.title || props.uiSchema["ui:title"]}
-                    required={props.required}
-                    formContext={props.formContext}
-                />
-            )}
-            {(props.uiSchema["ui:description"] || props.schema.description) && (
-                <small className="col-xs-12 text-muted form-text">
-                    {props.uiSchema["ui:description"] || props.schema.description}
-                </small>
-            )}
-            <div className="container-fluid p-0">
-                {props.properties.map(prop => (
-                    <div className="col-xs-12" key={prop.content.key}>
-                        {prop.content}
-                    </div>
-                ))}
-            </div>
-        </fieldset>
-    );
-}
-
-function ArrayFieldTemplate(props) {
-    const { DescriptionField, readonly, disabled } = props;
-
-    if (disabled) {
-        let output = props.items.map((element, i) => {
-            // Disabled view
-            if (disabled) {
-                return element.children;
-            }
-        });
-        return (<div className="hide">{output}</div>);
-    } else {
-        let buttonClass = "col-sm-2 offset-sm-10 array-item-add text-right";
-        if (props.uiSchema["ui:description"] || props.schema.description) {
-            buttonClass = "col-sm-2 array-item-add text-right";
-        }
-
-        return (
-            <fieldset className="yoda-array-field border rounded mb-4">
-                {(props.title) && (
-                    <legend>{props.title}</legend>
-                )}
-
-                <div className="d-flex">
-                    {(props.uiSchema["ui:description"] || props.schema.description) && (
-                        <small className="col-sm-10 text-muted form-text mb-2">
-                            {props.uiSchema["ui:description"] || props.schema.description}
-                        </small>
-                    )}
-
-                    {(!readonly && props.canAdd) && (
-                        <p className={buttonClass}>
-                            <button className="btn btn-outline-secondary btn-sm" onClick={props.onAddClick} type="button">
-                                <i className="fa-solid fa-plus" aria-hidden="true"></i>
-                            </button>
-                        </p>
-                    )}
-                </div>
-
-                {props.items &&
-                props.items.map(el => (
-                    <div key={el.key} className="d-flex">
-                        <div className="col-lg-10 col-10">
-                            {el.children}
-                        </div>
-                        {!readonly && (
-                            <div className="py-4 col-lg-2 col-2 mt-2">
-                                <div className="d-flex flex-row">
-                                    {el.hasMoveUp && (
-                                        <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
-                                                    onClick={el.onReorderClick(
-                                                        el.index,
-                                                        el.index - 1
-                                                    )}>
-                                                <i className="fa-solid fa-arrow-up" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {el.hasMoveDown && (
-                                        <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
-                                                    onClick={el.onReorderClick(
-                                                        el.index,
-                                                        el.index + 1
-                                                    )}>
-                                                <i className="fa-solid fa-arrow-down" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {el.hasRemove && (
-                                        <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
-                                                    onClick={el.onDropIndexClick(el.index)}>
-                                                <i className="fa-solid fa-trash" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                ))}
-            </fieldset>
-        );
     }
 }
 
