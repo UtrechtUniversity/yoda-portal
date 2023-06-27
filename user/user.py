@@ -3,6 +3,7 @@
 __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import re
 import json
 from typing import List
 
