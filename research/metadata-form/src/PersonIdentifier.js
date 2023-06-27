@@ -156,15 +156,12 @@ class PersonIdentifier extends React.Component {
 
         // Now find possible href/labels if Name_Identifier_Scheme is present.
         if (!this.props.readonly && (typeof Name_Identifier_Scheme !== "undefined") && Name_Identifier_Scheme.length > 0) {
-            if (Name_Identifier_Scheme == 'ResearcherID (Web of Science)') {
-                search_href = 'https://clarivate.com/products/scientific-and-academic-research/research-discovery-and-workflow-solutions/researcher-profiles/';
-                search_label = 'RESEARCHERID: (Thomson Reuters)'
-            } else if (Name_Identifier_Scheme == 'ORCID') {
-                search_href = 'https://orcid.org/orcid-search/quick-search/?searchQuery';
-                search_label = 'ORCID (publisher neutral)'
+            if (Name_Identifier_Scheme == 'ORCID') {
+                search_href = 'https://orcid.org/orcid-search/search?searchQuery=';
+                search_label = 'ORCID'
             } else if (Name_Identifier_Scheme == 'Author identifier (Scopus)') {
                 search_href = 'https://www.scopus.com/freelookup/form/author.uri?zone=TopNavBar&origin=';
-                search_label = 'SCOPUSID Elsevier'
+                search_label = 'Scopus Author Identifier'
             }
         }
 
