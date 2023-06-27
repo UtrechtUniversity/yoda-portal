@@ -14,7 +14,7 @@
     <script src="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.min.js') }}"></script>
     <script>
     $(function() {
-        Yoda.groupManager.load({{ group_hierarchy | safe }}, {{ schema_ids | safe }}, '{{ user_type }}', '{{ user_zone }}');
+        Yoda.groupManager.load({{ group_hierarchy | safe }}, {{ schema_ids | safe }}, '{{ schema_id_default }}', '{{ user_type }}', '{{ user_zone }}');
     });
     </script>
 {% endblock scripts %}

@@ -570,9 +570,8 @@ $(function () {
 
     $('#f-group-create-prefix-datamanager').addClass('hidden')
 
-    $('#f-group-create-schema-id').select2('val', '');
+    $('#f-group-create-schema-id').select2('val', that.schemaID_default);
     $('#f-group-create-expiration-date').val('');
-
     $('#f-group-create-category').select2('val', category)
     $('#f-group-create-subcategory').select2('val', subcategory)
     $('#f-group-create-name').focus()
@@ -643,6 +642,9 @@ $(function () {
 
     // All possible schema-id's
     schemaIDs: [],
+
+    // Default schema id for this yoda istance coming from the backend
+    schemaID_default: '',
 
     /// Get the name of an access level one lower than the current one for
     /// the given group.
@@ -1921,9 +1923,10 @@ $(function () {
          *
          * \todo Generate the group list in JS just like the user list.
          */
-    load: function (groupHierarchy, schemaIDs, userType, userZone) {
+    load: function (groupHierarchy, schemaIDs, schemaID_default, userType, userZone) {
       this.groupHierarchy = groupHierarchy
       this.schemaIDs = schemaIDs
+      this.schemaID_default = schemaID_default
       this.isRodsAdmin = userType === 'rodsadmin'
       this.zone = userZone
       this.userNameFull = Yoda.user.username + '#' + userZone

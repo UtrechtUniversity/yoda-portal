@@ -22,7 +22,8 @@ def index() -> Response:
     user_zone = response['data']['user_zone']
 
     response = api.call('schema_get_schemas', data={})
-    schema_ids = response['data']
+    schema_ids = response['data']['schemas']
+    schema_id_default = response['data']['schema_default']
 
     # Group list view to be presented initially.
     response = api.call('settings_load', data={})
@@ -34,6 +35,7 @@ def index() -> Response:
                            group_hierarchy=group_hierarchy,
                            show_list=show_list,
                            schema_ids=schema_ids,
+                           schema_id_default=schema_id_default,
                            user_type=user_type,
                            user_zone=user_zone)
 
@@ -77,7 +79,7 @@ def get_schemas() -> Response:
     response = api.call('schema_get_schemas', data={})
 
     schemas = []
-    for schema in response['data']:
+    for schema in response['data']['schemas']:
         schemas.append(schema)
 
     output = make_response({'schemas': schemas})
