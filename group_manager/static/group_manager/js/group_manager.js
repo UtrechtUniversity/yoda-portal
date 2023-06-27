@@ -50,11 +50,10 @@ function flatListGroups () {
                      <td>${usergroup[2]}</td>
                      <td>${usergroup[3]}</td>`
 
-      if(usergroup[0].match(/^(research)-/)) {
-        table += '<td><a href="/research/?dir=' + encodeURIComponent('/' + usergroup[0]) + '" title="Go to group ' + usergroup[0] + ' in research space"><i class="fa-regular fa-folder"></i></a></td>';
+      if (usergroup[0].match(/^(research)-/)) {
+        table += '<td><a href="/research/?dir=' + encodeURIComponent('/' + usergroup[0]) + '" title="Go to group ' + usergroup[0] + ' in research space"><i class="fa-regular fa-folder"></i></a></td>'
       } else {
-        table += '<td></td>';
-
+        table += '<td></td>'
       }
 
       if (usergroup[1] === 'manager') {
@@ -541,13 +540,21 @@ $(function () {
   })
   // }}}
 
-  // When allowed to add groups the fields have to be initialized
+  // When allowed to add groups the fields have to be initialized. Copy the values of category and subcategory
   $('.create-button-new').on('click', function () {
     $('.properties-update').addClass('hidden')
     $('.users').addClass('hidden')
     $('.properties-create').removeClass('hidden')
 
-    const that = Yoda.groupManager
+    const selectedGroup = Yoda.storage.session.get('selected-group');
+    const that = Yoda.groupManager;
+
+    // take over category and subcategory from previously selected group.
+    var category = '', subcategory = '';
+    if (selectedGroup !== null && selectedGroup in Yoda.groupManager.groups) {
+        category = that.groups[selectedGroup].category;
+        subcategory = that.groups[selectedGroup].subcategory;
+    }
 
     const $prefixDiv = $('#f-group-create-prefix-div')
     $prefixDiv.find('button .text').html(that.GROUP_DEFAULT_PREFIX + '&nbsp;')
@@ -559,12 +566,14 @@ $(function () {
     $('#f-group-create-name').val('')
     $('#f-group-create-description').val('')
 
+    $('#f-group-create-sram-group').prop('checked', false)
+
     $('#f-group-create-prefix-datamanager').addClass('hidden')
 
     $('#f-group-create-schema-id').select2('val', that.schemaID_default);
-
-    $('#f-group-create-category').select2('val', '')
-    $('#f-group-create-subcategory').select2('val', '')
+    $('#f-group-create-expiration-date').val('');
+    $('#f-group-create-category').select2('val', category)
+    $('#f-group-create-subcategory').select2('val', subcategory)
     $('#f-group-create-name').focus()
   })
 
@@ -1542,7 +1551,8 @@ $(function () {
         data_classification: $('#f-group-' + action + '-data-classification').val(),
         category: $('#f-group-' + action + '-category').val(),
         subcategory: $('#f-group-' + action + '-subcategory').val(),
-        expiration_date: $('#f-group-' + action + '-expiration-date').val()
+        expiration_date: $('#f-group-' + action + '-expiration-date').val(),
+        sram_group: $('#f-group-create-sram-group').prop('checked')
       }
 
       // specific datamanager-group testing dependent on mode
@@ -1563,7 +1573,7 @@ $(function () {
       }
 
       if (!newProperties.name.startsWith('datamanager-') && !newProperties.name.match(/^(intake|research|deposit)-([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
-        window.alert("Group names may only contain lowercase letters (a-z) and hyphens (-).")
+        window.alert('Group names may only contain lowercase letters (a-z) and hyphens (-).')
         resetSubmitButton()
         return
       }
@@ -1611,7 +1621,8 @@ $(function () {
         group_expiration_date: newProperties.expiration_date,
         group_data_classification: newProperties.data_classification,
         group_category: newProperties.category,
-        group_subcategory: newProperties.subcategory
+        group_subcategory: newProperties.subcategory,
+        group_sram_group: newProperties.sram_group
       }
 
       // Avoid trying to set a schema id for groups that
@@ -2132,14 +2143,13 @@ $(function () {
         $('.import-groups-csv').removeClass('hidden')
       }
 
-      var a = '';
+      let a = ''
       // Indicate which groups are managed by this user.
       for (const groupName in this.groups) {
+        a = '<table class="float-end"><tr>'
 
-        a = '<table class="float-end"><tr>';
-
-        if(groupName.match(/^(research)-/)) {
-          a += '<td><a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research space"><i class="fa-regular fa-folder"></i></a></td>';
+        if (groupName.match(/^(research)-/)) {
+          a += '<td><a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research space"><i class="fa-regular fa-folder"></i></a></td>'
         }
 
         if (this.isManagerOfGroup(groupName)) {
@@ -2154,10 +2164,9 @@ $(function () {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
             a + '<td>&nbsp;<i class="fa-solid fa-eye mt-1" title="You have read access to this group"></i>' + '</td></tr></table>'
           )
-        }
-        else {
+        } else {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            a  + '<td style="width: 26px;"></td></tr></table>'
+            a + '<td style="width: 26px;"></td></tr></table>'
           )
         }
       }

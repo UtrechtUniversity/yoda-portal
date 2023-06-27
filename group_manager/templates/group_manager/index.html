@@ -26,7 +26,7 @@
     </div>
     <div class="col-md-6 div-show-search-groups">
         <button type="button" class="btn btn-primary import-groups-csv float-end me-2 hidden" title="Import groups from CSV"><i class="fa-solid fa-file-csv" aria-hidden="true"></i> Import groups</button>
-        <button type="button" class="btn btn-primary create-button-new float-end me-2 hidden" title="Create a new group"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add group</button>
+        <button type="button" class="btn btn-primary create-button-new float-end me-2 hidden" title="Create new group"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add group </button>
     </div>
 </div>
 
@@ -175,6 +175,19 @@
                                     <input name="group_description" id="f-group-create-description" class="form-control" type="text" placeholder="Enter a short description" pattern="^[a-zA-Z0-9,.()_ -]*$" oninvalid="setCustomValidity('Please enter only letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')" onchange="setCustomValidity('')" />
                                 </div>
                             </div>
+
+                            {% if config.get('SRAM_ENABLED') %}
+                            <div class="mb-3 row enable-sram">
+                                <label class="col-sm-4 form-label" for="f-group-create-sram-group">SRAM group
+                                    <i class="fa-solid fa-question-circle" aria-hidden="true" title="SRAM create, create SRAM CO for this group"></i>
+                                </label>
+                                <div class="col-sm-8">
+                                    <div class="form-check">
+                                        <input name="group_sram_group" id="f-group-create-sram-group" type="checkbox" class="form-check-input"/>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
 
                             <div class="row">
                                 <div class="offset-sm-4 col-sm-8">
