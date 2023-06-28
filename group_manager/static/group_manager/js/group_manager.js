@@ -546,14 +546,14 @@ $(function () {
     $('.users').addClass('hidden')
     $('.properties-create').removeClass('hidden')
 
-    const selectedGroup = Yoda.storage.session.get('selected-group');
-    const that = Yoda.groupManager;
+    const selectedGroup = Yoda.storage.session.get('selected-group')
+    const that = Yoda.groupManager
 
     // take over category and subcategory from previously selected group.
-    var category = '', subcategory = '';
+    let category = ''; let subcategory = ''
     if (selectedGroup !== null && selectedGroup in Yoda.groupManager.groups) {
-        category = that.groups[selectedGroup].category;
-        subcategory = that.groups[selectedGroup].subcategory;
+      category = that.groups[selectedGroup].category
+      subcategory = that.groups[selectedGroup].subcategory
     }
 
     const $prefixDiv = $('#f-group-create-prefix-div')
@@ -570,8 +570,8 @@ $(function () {
 
     $('#f-group-create-prefix-datamanager').addClass('hidden')
 
-    $('#f-group-create-schema-id').select2('val', that.schemaID_default);
-    $('#f-group-create-expiration-date').val('');
+    $('#f-group-create-schema-id').select2('val', that.schemaID_default)
+    $('#f-group-create-expiration-date').val('')
     $('#f-group-create-category').select2('val', category)
     $('#f-group-create-subcategory').select2('val', subcategory)
     $('#f-group-create-name').focus()
