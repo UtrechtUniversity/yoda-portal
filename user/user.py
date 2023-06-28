@@ -350,19 +350,18 @@ def should_redirect_to_oidc(username: str) -> bool:
     """Check if user should be redirected to OIDC based on domain."""
     if '@' in username:
         domains: List[str] = app.config.get('OIDC_DOMAINS', [])
-        # user_domain = username.split('@')[1]
         if app.config.get('OIDC_ENABLED'):
-            # take subdomains into account.
             for domain in domains:
+                # Take subdomains into account..
                 parts = domain.split('.')
                 if parts[0] == '*':
-                    # Wildcard - search including subdomains
+                    # Wildcard - search including subdomains.
                     domain_pattern = "\@([0-9a-z]*\.){0,2}" + parts[-2] + "\." + parts[-1]
                 else:
-                    # No wildcard - search for exact match
+                    # No wildcard - search for exact match.
                     domain_pattern = "@{}$".format(domain)
                 if re.search(domain_pattern, username) is not None:
-                    # If a match occurs between username (which is an email address) then user must be redirected
+                    # If a match occurs between username (which is an email address) then user must be redirected.
                     return True
     return False
 
@@ -450,4 +449,4 @@ def get_login_placeholder() -> str:
     if len(oidc_domains) == 0 or oidc_domains[0] == "":
         return "j.a.smith@uu.nl"
     else:
-        return "j.a.smith@" + oidc_domains[0]
+        return "j.a.smith@" + oidc_domains[0].replace("*.", "")
