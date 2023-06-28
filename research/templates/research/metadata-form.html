@@ -4,12 +4,14 @@
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('research_bp.static', filename='lib/sweetalert/sweetalert.css') }}">
+<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='lib/jstree/style.css') }}">
 <link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/metadata/form.css') }}">
 <link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/metadata/leaflet.css') }}">
 {% endblock style %}
 
 {% block scripts %}
 <script src="{{ url_for('research_bp.static', filename='lib/sweetalert/sweetalert.min.js') }}"></script>
+<script src="{{ url_for('research_bp.static', filename='lib/jstree/jstree.min.js') }}"></script>
 <script>
     var formLoaded = false;
 </script>

@@ -8,6 +8,7 @@ import Geolocation from "./Geolocation";
 import Vocabulary from "./Vocabulary";
 import ROR from  "./ROR";
 import PersonIdentifier from "./PersonIdentifier";
+import KeywordSelector from "./KeywordSelector";
 
 const path = $('#form').attr('data-path');
 
@@ -117,7 +118,8 @@ const fields = {
     geo: Geolocation,
     vocabulary: Vocabulary,
     ror: ROR,
-    person_identifier: PersonIdentifier
+    person_identifier: PersonIdentifier,
+    keyword_selector: KeywordSelector
 };
 
 const CustomArrayFieldTemplate = (props) => {
