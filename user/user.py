@@ -355,7 +355,12 @@ def should_redirect_to_oidc(username: str) -> bool:
             # take subdomains into account.
             for domain in domains:
                 parts = domain.split('.')
-                domain_pattern = "\@[0-9a-z]*\.{}\.{}|@{}.{}$".format(parts[-2], parts[-1], parts[-2], parts[-1])
+                if parts[0] == '*':
+                    # Wildcard - search including subdomains
+                    domain_pattern = "\@([0-9a-z]*\.){0,2}" + parts[-2] + "\." + parts[-1]
+                else:
+                    # No wildcard - search for exact match
+                    domain_pattern = "@{}$".format(domain)
                 if re.search(domain_pattern, username) is not None:
                     # If a match occurs between username (which is an email address) then user must be redirected
                     return True
