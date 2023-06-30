@@ -7,6 +7,8 @@ import Select from 'react-select';
 import Geolocation from "./Geolocation";
 import Vocabulary from "./Vocabulary";
 import ROR from  "./ROR";
+import PersonIdentifier from "./PersonIdentifier";
+
 
 const path = $('#form').attr('data-path');
 
@@ -114,7 +116,8 @@ const widgets = {
 const fields = {
     geo: Geolocation,
     vocabulary: Vocabulary,
-    ror: ROR
+    ror: ROR,
+    person_identifier: PersonIdentifier
 };
 
 const CustomArrayFieldTemplate = (props) => {
