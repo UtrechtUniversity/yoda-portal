@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { FieldProps } from '@rjsf/utils';
 import { render } from "react-dom";
 import Select from 'react-select';
 import axios from "axios";
