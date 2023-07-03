@@ -431,34 +431,26 @@ class YodaButtons extends React.Component {
         super(props);
     }
 
-    renderSaveButton() {
-        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary float-start">Save</button>);
+    renderBackButton() {
+        return (<button onClick={this.props.backButton} type="submit" className="btn btn-secondary float-start btn-step-upload"><i class="fa-solid fa-chevron-left"></i> Upload data</button>);
+    }
+
+    renderSubmitButton() {
+        return (<button onClick={this.props.submitButton} type="submit" className="btn btn-primary float-end btn-step-submit">Submit datapackage <i class="fa-solid fa-chevron-right"></i></button>);
     }
 
     renderDeleteButton() {
-        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn float-end">Delete all metadata </button>);
-    }
-
-    renderCloneButton() {
-        return (<button onClick={this.props.cloneMetadata} type="button" className="btn btn-primary clone-metadata-btn float-end">Clone from parent folder</button>);
-    }
-
-    renderFormCompleteness() {
-        return (<div><span className="text-sm float-start text-muted text-center ms-3 mt-1">Required for the vault:</span><div className="form-completeness progress float-start ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
+        return (<button onClick={deleteMetadata} type="button" className="btn btn-secondary delete-all-metadata-btn ms-3">Delete all metadata </button>);
     }
 
     renderButtons() {
         let buttons = [];
 
         if (formProperties.data.can_edit) {
-            buttons.push(this.renderSaveButton());
-            buttons.push(this.renderFormCompleteness());
-
-            // Delete and clone are mutually exclusive.
+            buttons.push(this.renderBackButton());
+            buttons.push(this.renderSubmitButton());
             if (formProperties.data.metadata !== null)
                 buttons.push(this.renderDeleteButton());
-            else if (formProperties.data.can_clone)
-                buttons.push(this.renderCloneButton());
         }
         return (<div>{buttons}</div>);
     }
@@ -480,56 +472,37 @@ class YodaButtons extends React.Component {
 class Container extends React.Component {
     constructor(props) {
         super(props);
-        this.saveMetadata = this.saveMetadata.bind(this);
+        this.backButton = this.backButton.bind(this);
+        this.submitButton = this.submitButton.bind(this);
     }
 
-    saveMetadata() {
+    backButton() {
+        back = true;
         saving = true;
         this.form.submitButton.click();
     }
 
-    cloneMetadata() {
-        swal({
-                title: "Are you sure?",
-                text: "Entered metadata will be overwritten by cloning.",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#ffcd00",
-                confirmButtonText: "Yes, clone metadata!",
-                closeOnConfirm: false,
-                animation: false
-            },
-            async isConfirm => {
-                if (isConfirm) {
-                    await Yoda.call('meta_clone_file',
-                        {target_coll: Yoda.basePath+path},
-                        {errorPrefix: 'Metadata could not be cloned'});
-                    window.location.reload();
-                }
-            });
+    submitButton() {
+        back = false;
+        saving = true;
+        this.form.submitButton.click();
     }
 
     render() {
         return (
             <div>
-                <YodaButtons saveMetadata={this.saveMetadata}
-                             deleteMetadata={deleteMetadata}
-                             cloneMetadata={this.cloneMetadata} />
+                <YodaButtons backButton={this.backButton}
+                             submitButton={this.submitButton}
+                             deleteMetadata={deleteMetadata}  />
                 <YodaForm ref={(form) => {this.form=form;}}/>
-                <YodaButtons saveMetadata={this.saveMetadata}
-                             deleteMetadata={deleteMetadata}
-                             cloneMetadata={this.cloneMetadata} />
+                <YodaButtons backButton={this.backButton}
+                             submitButton={this.submitButton}
+                             deleteMetadata={deleteMetadata} />
             </div>
         );
     }
 };
 
-/**
- * Returns to the browse view for the current collection.
- */
-function browse() {
-    window.location.href = '/research/browse?dir=' + encodeURIComponent(path);
-}
 
 function deleteMetadata() {
     swal({
@@ -557,6 +530,13 @@ function deleteMetadata() {
 function loadForm() {
     // Inhibit "loading" text.
     formLoaded = true;
+
+    $('.link-step-upload').click(function(){
+        $('.btn-step-upload').click();
+    });
+    $('.link-step-submit').click(function(){
+        $('.btn-step-submit').click();
+    });
 
     Yoda.call('meta_form_load',
         {coll: Yoda.basePath+path},
