@@ -18,6 +18,7 @@ let yodaFormData = {};
 let formProperties;
 
 let saving = false;
+let back   = false;
 
 let form = document.getElementById('form');
 
@@ -374,8 +375,6 @@ class YodaForm extends React.Component {
     }
 
     onChange(form) {
-        updateCompleteness();
-
         // Turn save mode off.
         saving = false;
         const formContext = { saving: false };
@@ -634,8 +633,6 @@ function loadForm() {
                         });
                     }
                 })
-
-                updateCompleteness();
             }
         });
 }
@@ -666,37 +663,13 @@ async function submitData(data) {
             {coll: Yoda.basePath+path, metadata: data},
             {errorPrefix: 'Metadata could not be saved'});
 
-        Yoda.set_message('success', `Updated metadata of folder <${path}>`);
-        $('.yodaButtons button').attr('disabled', false);
+            if (back) {
+                window.location.href = '/deposit/data?dir=' + path;
+            } else {
+                window.location.href = '/deposit/submit?dir=' + path;
+            }
     } catch (e) {
         // Allow retry.
         $('.yodaButtons button').attr('disabled', false);
     }
-}
-
-function updateCompleteness()
-{
-    let mandatoryTotal = 0;
-    let mandatoryFilled = 0;
-    $(".form-control").each(function() {
-        if ($(this)[0].required && !$(this)[0].id.startsWith("yoda_links_")) {
-            mandatoryTotal++;
-            if ($(this)[0].value != "") {
-                mandatoryFilled++;
-            }
-        }
-    });
-
-    $(".select-required").each(function() {
-        mandatoryTotal++;
-    });
-    $(".select-filled").each(function() {
-        mandatoryFilled++;
-    });
-
-    let percent = (mandatoryFilled / mandatoryTotal) * 100;
-    $(".form-completeness .progress-bar").css('width', percent + '%');
-    $('.form-completeness').attr('title', `Required for the vault: ${mandatoryTotal}, currently filled required fields: ${mandatoryFilled}`);
-
-    return mandatoryTotal == mandatoryFilled;
 }
