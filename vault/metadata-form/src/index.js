@@ -6,7 +6,7 @@ import { getTemplate } from '@rjsf/utils';
 import Select from 'react-select';
 import Geolocation from "./Geolocation";
 import Vocabulary from "./Vocabulary";
-import ROR from  "./ROR";
+import AffiliationIdentifier from  "./AffiliationIdentifier";
 import PersonIdentifier from "./PersonIdentifier";
 
 
@@ -116,7 +116,7 @@ const widgets = {
 const fields = {
     geo: Geolocation,
     vocabulary: Vocabulary,
-    ror: ROR,
+    affiliation_identifier: AffiliationIdentifier,
     person_identifier: PersonIdentifier
 };
 
