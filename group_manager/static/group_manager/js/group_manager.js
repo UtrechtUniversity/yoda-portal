@@ -570,7 +570,7 @@ $(function () {
 
     $('#f-group-create-prefix-datamanager').addClass('hidden')
 
-    $('#f-group-create-schema-id').select2('val', that.schemaID_default)
+    $('#f-group-create-schema-id').select2('val', that.schemaIdDefault)
     $('#f-group-create-expiration-date').val('')
     $('#f-group-create-category').select2('val', category)
     $('#f-group-create-subcategory').select2('val', subcategory)
@@ -644,7 +644,7 @@ $(function () {
     schemaIDs: [],
 
     // Default schema id for this yoda istance coming from the backend
-    schemaID_default: '',
+    schemaIdDefault: '',
 
     /// Get the name of an access level one lower than the current one for
     /// the given group.
@@ -1237,7 +1237,8 @@ $(function () {
                             )
           },
           initSelection: function ($el, callback) {
-            callback({ id: $el.val(), text: $el.val() })
+            const cb = { id: $el.val(), text: $el.val() }
+            callback(cb)
           }
         }).on('open', function () {
           $(this).select2('val', '')
@@ -1324,7 +1325,8 @@ $(function () {
                             )
           },
           initSelection: function ($el, callback) {
-            callback({ id: $el.val(), text: $el.val() })
+            const cb = { id: $el.val(), text: $el.val() }
+            callback(cb)
           }
         }).on('open', function () {
           $(this).select2('val', '')
@@ -1383,7 +1385,8 @@ $(function () {
                             )
           },
           initSelection: function ($el, callback) {
-            callback({ id: $el.val(), text: $el.val() })
+            const cb = { id: $el.val(), text: $el.val() }
+            callback(cb)
           }
         }).on('open', function () {
           $(this).select2('val', '')
@@ -1449,7 +1452,8 @@ $(function () {
                             )
           },
           initSelection: function ($el, callback) {
-            callback({ id: $el.val(), text: $el.val() })
+            const cb = { id: $el.val(), text: $el.val() }
+            callback(cb)
           }
         }).on('open', function () {
           $(this).select2('val', '')
@@ -1923,10 +1927,10 @@ $(function () {
          *
          * \todo Generate the group list in JS just like the user list.
          */
-    load: function (groupHierarchy, schemaIDs, schemaID_default, userType, userZone) {
+    load: function (groupHierarchy, schemaIDs, schemaIdDefault, userType, userZone) {
       this.groupHierarchy = groupHierarchy
       this.schemaIDs = schemaIDs
-      this.schemaID_default = schemaID_default
+      this.schemaIdDefault = schemaIdDefault
       this.isRodsAdmin = userType === 'rodsadmin'
       this.zone = userZone
       this.userNameFull = Yoda.user.username + '#' + userZone
