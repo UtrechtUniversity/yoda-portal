@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
 import Form from '@rjsf/bootstrap-4';
-import validator from '@rjsf/validator-ajv8';
+import { customizeValidator } from '@rjsf/validator-ajv8';
+import Ajv2019 from 'ajv/dist/2019';
 import { getTemplate } from '@rjsf/utils';
 import Select from 'react-select';
 import Geolocation from "./Geolocation";
@@ -22,6 +23,7 @@ let back   = false;
 
 let form = document.getElementById('form');
 
+const validator = customizeValidator({ AjvClass: Ajv2019 });
 
 const enumWidget = (props) => {
     let enumArray = props['schema']['enum'];
