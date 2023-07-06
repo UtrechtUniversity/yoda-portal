@@ -62,8 +62,8 @@ class PersonIdentifier extends React.Component {
     // Define format characters.
     const formatChars = {
       9: '[0-9]',
-      A: '[A-Z]',
-      X: '[X]'
+      A: '[A-Za-z]',
+      X: '[0-9X]'
     }
 
     // Selected scheme dependent PLACEHOLDER handling
