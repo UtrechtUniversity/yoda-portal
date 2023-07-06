@@ -108,10 +108,6 @@ class PersonIdentifier extends React.Component {
       requiredIdentifier = '*'
     }
 
-    // DEZE ERROR handling moet nog worden toegevoegd op de een of andere manier?
-    // const error = 'should be equal to one of the allowed values'
-    // if (false) { // && (this.props.rawErrors !== undefined && this.props.rawErrors.indexOf(error) >= 0) || (required && this.props.formData.Name_Identifier_Scheme === null)) {
-
     // Validation of values and consequences for customstyles of each field
     // if scheme is required and holds no value => mark as erroneous/missing
     let customStylesScheme = customStyles
@@ -130,9 +126,9 @@ class PersonIdentifier extends React.Component {
 
     // Validation of Identifier value
     let classesIdentifierField = 'form-control'
-    // ORCID requires specific pattern test held in metadata schema
-    // Should officially be taken from the metadata scheme (if then structure)
-    if (Name_Identifier_Scheme === 'ORCID') {
+
+    // Use pattern if exists for Identifier.
+    if (this.props.schema.properties.Name_Identifier.pattern) {
       const regex = new RegExp(this.props.schema.properties.Name_Identifier.pattern)
       if (!(regex.test(Name_Identifier))) {
         classesIdentifierField += ' is-invalid'
@@ -146,22 +142,19 @@ class PersonIdentifier extends React.Component {
     // Add extra element so user can easily access corresponding search functionality.
     let searchLink
     let searchUrl = ''
-    let searchLabel = ''
 
     // Now find possible href/labels if Name_Identifier_Scheme is present.
     if (!this.props.readonly && (typeof Name_Identifier_Scheme !== 'undefined') && Name_Identifier_Scheme.length > 0) {
       if (Name_Identifier_Scheme === 'ORCID') {
         searchUrl = 'https://orcid.org/orcid-search/search?searchQuery='
-        searchLabel = 'ORCID'
       } else if (Name_Identifier_Scheme === 'Author identifier (Scopus)') {
         searchUrl = 'https://www.scopus.com/freelookup/form/author.uri?zone=TopNavBar&origin='
-        searchLabel = 'Scopus Author Identifier'
       }
     }
 
     // Only present link if there is a label/href combination for a non readonly field
     if (searchUrl.length) {
-      searchLink = <a class='btn btn-sm btn-primary' href={searchUrl} target='_blank' rel='noreferrer'><i class='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup {searchLabel}</a>
+      searchLink = <a class='btn btn-sm btn-primary float-end' href={searchUrl} target='_blank' rel='noreferrer'><i class='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup {Name_Identifier_Scheme}</a>
     }
 
     return (
