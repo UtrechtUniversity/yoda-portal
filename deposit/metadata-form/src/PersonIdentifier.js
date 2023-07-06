@@ -59,6 +59,13 @@ class PersonIdentifier extends React.Component {
       mask = this.props.uiSchema.Name_Identifier['ui:field-mask-' + Name_Identifier_Scheme]
     }
 
+    // Define format characters.
+    const formatChars = {
+      9: '[0-9]',
+      A: '[A-Z]',
+      X: '[X]'
+    }
+
     // Selected scheme dependent PLACEHOLDER handling
     let placeholder = ''
     if (typeof this.props.uiSchema.Name_Identifier['ui:field-placeholder-' + Name_Identifier_Scheme] !== 'undefined') {
@@ -187,6 +194,7 @@ class PersonIdentifier extends React.Component {
               placeholder={placeholder}
               onChange={this.handleIdentifierChange}
               mask={mask}
+              formatChars={formatChars}
             />
 
             {searchLink}
