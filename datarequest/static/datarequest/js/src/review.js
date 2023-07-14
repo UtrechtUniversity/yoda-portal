@@ -196,6 +196,7 @@ class YodaForm extends React.Component {
                   uiSchema={this.props.uiSchema}
                   formData={this.props.formData}
                   idPrefix={"yoda"}
+                  fields={customReviewFields}
                   onSubmit={onSubmit}
                   showErrorList={false}
                   noHtml5Validate>
@@ -261,6 +262,10 @@ const fields = {
   DescriptionField: CustomDescriptionField,
   TitleField: CustomTitleField,
   DataSelection: DataSelectionCart
+};
+
+const customReviewFields = {
+  DescriptionField: CustomDescriptionField
 };
 
 function submitData(data)
