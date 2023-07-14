@@ -897,6 +897,8 @@ class DataSelectionTable extends React.Component {
   }
 
   render() {
+    // Hardcode cartColumns to match the most recent version of the data request schemas
+    let cartColumns = cartColumns1;
     const selectRow = {
       mode:          "checkbox",
       clickToSelect: true,
