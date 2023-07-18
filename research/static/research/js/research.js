@@ -193,7 +193,11 @@ $(function () {
       }
     })
     browse($(this).attr('data-collection'))
-    Yoda.set_message('success', 'Successfully cleaned up folder ' + $(this).attr('data-collection'))
+    if ($('#cleanup-files').html() === 'No files found requiring cleanup action.') {
+      Yoda.set_message('success', 'No files found requiring cleanup action')
+    } else {
+      Yoda.set_message('success', 'Successfully cleaned up folder ' + $(this).attr('data-collection'))
+    }
     $('#cleanup-collection').modal('hide')
   })
 
