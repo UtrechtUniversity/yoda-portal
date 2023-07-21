@@ -4,9 +4,11 @@ __copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
+import sys
+from timeit import default_timer as timer
 from typing import Any, Dict, Optional
 
-from flask import Blueprint, g, jsonify, request, Response
+from flask import Blueprint, current_app as app, g, jsonify, request, Response
 from irods import message, rule
 
 from errors import UnauthorizedAPIAccessError
@@ -52,6 +54,9 @@ def call(fn: str, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     def nrep_string_expr(s: str, m: int = 64) -> str:
         return ' ++\n'.join('"{}"'.format(escape_quotes(s[i * m:i * m + m])) for i in range(break_strings(len(s), m) + 1))
 
+    if app.config.get('LOG_API_CALL_DURATION', False):
+        begintime = timer()
+
     if data is None:
         data = {}
 
@@ -78,6 +83,14 @@ def call(fn: str, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     x = bytesbuf_to_str(x._values['MsParam_PI'][0]._values['inOutStruct']._values['stdoutBuf'])
 
     result = x.decode()
+
+    if app.config.get('LOG_API_CALL_DURATION', False):
+        endtime = timer()
+        callduration = round(endtime - begintime, 3)
+        print("API call {} with params {}: duration {} seconds".format(fn,
+                                                                       params,
+                                                                       str(callduration)),
+              file=sys.stderr)
 
     return json.loads(result)
 
