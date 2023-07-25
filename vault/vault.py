@@ -38,12 +38,12 @@ def index() -> Response:
 def download() -> Response:
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
-    READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
 
-    def read_file_chunks(path: str) -> Iterator[bytes]:
-        obj = g.irods.data_objects.get(path)
+    def read_file_chunks(data_object) -> Iterator[bytes]:
+        READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
+
         try:
-            with obj.open('r') as fd:
+            with data_object.open('r') as fd:
                 while True:
                     buf = fd.read(READ_BUFFER_SIZE)
                     if buf:
@@ -57,10 +57,14 @@ def download() -> Response:
             abort(500)
 
     if g.irods.data_objects.exists(path):
+        data_object = g.irods.data_objects.get(path)
+        size = data_object.replicas[0].size
+
         return Response(
-            stream_with_context(read_file_chunks(path)),
+            stream_with_context(read_file_chunks(data_object)),
             headers={
                 'Content-Disposition': f'attachment; filename={filename}',
+                'Content-Length': f'{size}',
                 'Content-Type': 'application/octet'
             }
         )
