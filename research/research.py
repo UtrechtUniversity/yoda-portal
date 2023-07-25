@@ -7,12 +7,16 @@ import io
 import os
 from typing import Iterator
 
-from flask import abort, Blueprint, g, jsonify, make_response, render_template, request, Response, stream_with_context
+from flask import (
+    abort, Blueprint, current_app as app, g, jsonify, make_response,
+    render_template, request, Response, session, stream_with_context
+)
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
 from werkzeug.utils import secure_filename
 
 import api
+import connman
 
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
@@ -39,17 +43,16 @@ def index() -> Response:
 def download() -> Response:
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
-    session = g.irods
-
     READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
 
     def read_file_chunks(path: str) -> Iterator[bytes]:
-        obj = session.data_objects.get(path)
+        obj = g.irods.data_objects.get(path)
         try:
             with obj.open('r') as fd:
                 while True:
                     buf = fd.read(READ_BUFFER_SIZE)
                     if buf:
+                        connman.extend(session.sid)
                         yield buf
                     else:
                         break
@@ -58,7 +61,7 @@ def download() -> Response:
         except Exception:
             abort(500)
 
-    if session.data_objects.exists(path):
+    if g.irods.data_objects.exists(path):
         return Response(
             stream_with_context(read_file_chunks(path)),
             headers={
@@ -78,9 +81,8 @@ def build_object_path(path: str, relative_path: str, filename: str) -> str:
     if relative_path:
         base_dir = os.path.join("/" + g.irods.zone, 'home', path, relative_path)
         # Ensure upload collection exists.
-        session = g.irods
-        if not session.collections.exists(base_dir):
-            session.collections.create(base_dir)
+        if not g.irods.collections.exists(base_dir):
+            g.irods.collections.create(base_dir)
     else:
         base_dir = os.path.join("/" + g.irods.zone, 'home', path)
 
@@ -113,7 +115,6 @@ def upload_get() -> Response:
         response.headers["Content-Type"] = "application/json"
         return response
 
-    session = g.irods
     object_path = build_object_path(filepath, flow_relative_path, flow_filename)
 
     # Partial file name for chunked uploads.
@@ -126,7 +127,7 @@ def upload_get() -> Response:
         return response
 
     try:
-        obj = session.data_objects.get(object_path)
+        obj = g.irods.data_objects.get(object_path)
 
         if obj.replicas[0].size > int(flow_chunk_size * (flow_chunk_number - 1)):
             # Chunk already exists.
@@ -168,7 +169,6 @@ def upload_post() -> Response:
         response.headers["Content-Type"] = "application/json"
         return response
 
-    session = g.irods
     object_path = build_object_path(filepath, flow_relative_path, flow_filename)
 
     # Partial file name for chunked uploads.
@@ -181,12 +181,12 @@ def upload_post() -> Response:
 
     try:
         if flow_chunk_number == 1:
-            with session.data_objects.open(object_path, 'w') as obj_desc:
+            with g.irods.data_objects.open(object_path, 'w') as obj_desc:
                 obj_desc.write(encode_unicode_content)
 
             obj_desc.close()
         else:
-            with session.data_objects.open(object_path, 'a') as obj_desc:
+            with g.irods.data_objects.open(object_path, 'a') as obj_desc:
                 obj_desc.seek(int(flow_chunk_size * (flow_chunk_number - 1)))
                 obj_desc.write(encode_unicode_content)
 
@@ -201,11 +201,11 @@ def upload_post() -> Response:
         final_object_path = build_object_path(filepath, flow_relative_path, flow_filename)
         try:
             # overwriting doesn't work using the move command, therefore unlink the previous file first
-            session.data_objects.unlink(final_object_path, force=True)
+            g.irods.data_objects.unlink(final_object_path, force=True)
         except Exception:
             # Probably there was no file present which is no erroneous situation
             pass
-        session.data_objects.move(object_path, final_object_path)
+        g.irods.data_objects.move(object_path, final_object_path)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
     response.headers["Content-Type"] = "application/json"
