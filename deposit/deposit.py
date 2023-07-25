@@ -60,6 +60,7 @@ def download() -> Response:
 
     def read_file_chunks(data_object) -> Iterator[bytes]:
         READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
+
         try:
             with data_object.open('r') as fd:
                 while True:
