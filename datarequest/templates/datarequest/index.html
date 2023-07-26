@@ -3,7 +3,7 @@
 {% block title %}{{ super() }} &dash; Datarequests overview{% endblock title %}
 
 {% block style %}
-<link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ url_for('datarequest_bp.static', filename='css/index.css') }}">
 {% endblock style %}
 
@@ -13,7 +13,7 @@
   dacrequests: '{{ dacrequests }}'
 }
 </script>
-<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
 <script src="{{ url_for('datarequest_bp.static', filename='js/index.js') }}"></script>
 {% endblock scripts %}
 

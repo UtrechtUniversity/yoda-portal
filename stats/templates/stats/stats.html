@@ -3,12 +3,12 @@
 {% block title %}{{ super() }} &dash; Statistics{% endblock title %}
 
 {% block style %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('stats_bp.static', filename='css/stats.css') }}">
 {% endblock style %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='lib/chartjs-4.2.0/chart.min.js') }}"></script>
     <script src="{{ url_for('stats_bp.static', filename='js/stats.js') }}"></script>
 {% endblock scripts %}
