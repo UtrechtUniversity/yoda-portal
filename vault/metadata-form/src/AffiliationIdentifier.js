@@ -72,44 +72,44 @@ class AffiliationIdentifier extends React.Component {
       })
     }
 
-    var parentContext = this.props.idSchema['$id'];
-    parentContext = parentContext.replace(this.props.idPrefix + '_', '');
-    parentContext = parentContext.replace('_Affiliation_', '');
+    let parentContext = this.props.idSchema.$id
+    parentContext = parentContext.replace(this.props.idPrefix + '_', '')
+    parentContext = parentContext.replace('_Affiliation_', '')
 
-    var parts = parentContext.split('_');
-    parts.pop();
-    parentContext = parts.join('_');
-    console.log(parentContext);
+    const parts = parentContext.split('_')
+    parts.pop()
+    parentContext = parts.join('_')
+    console.log(parentContext)
 
+    let bothRequired = false
     try {
-        var bothRequired = this.props.registry.rootSchema.properties[parentContext].items.required.includes('Affiliation');
-    }
-    catch(err) {
-        var bothRequired = false;
+      bothRequired = this.props.registry.rootSchema.properties[parentContext].items.required.includes('Affiliation')
+    } catch (err) {
+      bothRequired = false
     }
 
-    var reqName = '';
-    var classesName = 'select-box';
-    var reqIdf = '';
-    var classesIdf = 'form-control';
+    let reqName = ''
+    let classesName = 'select-box'
+    let reqIdf = ''
+    let classesIdf = 'form-control'
 
-    var namePresent = !(typeof Affiliation_Name === "undefined" || Affiliation_Name.length == 0)
-    var idfPresent = !(typeof Affiliation_Identifier === "undefined" || Affiliation_Identifier.length == 0)
+    const namePresent = !(typeof Affiliation_Name === 'undefined' || Affiliation_Name.length === 0)
+    const idfPresent = !(typeof Affiliation_Identifier === 'undefined' || Affiliation_Identifier.length === 0)
 
     // Specific class handling for both elements Name/Identifier
     if (namePresent) {
-        if (!idfPresent) {
-            classesIdf += ' is-invalid';
-        }
+      if (!idfPresent) {
+        classesIdf += ' is-invalid'
+      }
     } else if (idfPresent) { // als naam wel is ingeuvuld
-         classesName += ' is-invalid';
+      classesName += ' is-invalid'
     } else if (bothRequired) {
-        classesName += ' is-invalid';
-        classesIdf += ' is-invalid';
+      classesName += ' is-invalid'
+      classesIdf += ' is-invalid'
     }
 
     // set the customStyle for the select if invalid
-    if (classesName.search('is-invalid')>-1) {
+    if (classesName.search('is-invalid') > -1) {
       customStyles = {
         control: styles => ({
           ...styles,
@@ -124,15 +124,15 @@ class AffiliationIdentifier extends React.Component {
 
     // Handling of '*' in the label of both fields
     if (bothRequired) {
-        reqName = '*';
-        reqIdf = '*';
+      reqName = '*'
+      reqIdf = '*'
     } else {
-       if (!(typeof Affiliation_Name === "undefined" || Affiliation_Name.length == 0)) {
-           reqIdf = '*';
-       }
-       if (!(typeof Affiliation_Identifier === "undefined" || Affiliation_Identifier.length == 0)) {
-           reqName = '*';
-       }
+      if (!(typeof Affiliation_Name === 'undefined' || Affiliation_Name.length === 0)) {
+        reqIdf = '*'
+      }
+      if (!(typeof Affiliation_Identifier === 'undefined' || Affiliation_Identifier.length === 0)) {
+        reqName = '*'
+      }
     }
 
     return (
@@ -142,7 +142,7 @@ class AffiliationIdentifier extends React.Component {
           <CreatableSelect
             className='select-box is-invalid'
             options={this.options}
-            required={reqName == '*'}
+            required={reqName === '*'}
             isDisabled={this.props.readonly}
             placeholder={Affiliation_Name}
             onChange={this.handleChange}
@@ -158,16 +158,18 @@ class AffiliationIdentifier extends React.Component {
         <div className='col compound-field'>
           <div className='mb-0 form-group'>
             <label className='form-label'>{titleAffiliationIdentifier}{reqIdf}</label>
-            <input type='text' 
-               className={classesIdf} //'form-control is-invalid' 
-               readOnly={this.props.readonly} 
-               onChange={this.handleChangeIdentifier} 
-               value={Affiliation_Identifier} />
-          {helpAffiliationIdentifier && (
-            <small className='text-muted form-text'>
-              <p className='help-block'>{helpAffiliationIdentifier}</p>
-            </small>
-          )}
+            <input
+              type='text'
+              className={classesIdf} // 'form-control is-invalid'
+              readOnly={this.props.readonly}
+              onChange={this.handleChangeIdentifier}
+              value={Affiliation_Identifier}
+            />
+            {helpAffiliationIdentifier && (
+              <small className='text-muted form-text'>
+                <p className='help-block'>{helpAffiliationIdentifier}</p>
+              </small>
+            )}
           </div>
         </div>
       </div>
