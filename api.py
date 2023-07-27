@@ -86,11 +86,8 @@ def call(fn: str, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
     if app.config.get('LOG_API_CALL_DURATION', False):
         endtime = timer()
-        callduration = round(endtime - begintime, 3)
-        print("API call {} with params {}: duration {} seconds".format(fn,
-                                                                       params,
-                                                                       str(callduration)),
-              file=sys.stderr)
+        callduration = round((endtime - begintime) * 1000)
+        print("DEBUG: {:4d}ms api_{} {}".format(callduration, fn, params), file=sys.stderr)
 
     return json.loads(result)
 
