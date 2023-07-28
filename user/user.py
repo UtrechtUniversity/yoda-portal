@@ -339,7 +339,7 @@ def callback() -> Response:
             )
             log_error(f"OIDC error occurred for {str(email)}", True)
 
-        # Redirect to gate when exception has occured.
+        # Redirect to gate when exception has occurred.
         if exception_occurred:
             return redirect(url_for('user_bp.gate'))
 

@@ -31,7 +31,7 @@ jobs:
 
       - name: Check code for common misspellings
         run: |
-          codespell -q 3 --skip="*.r,*.xsd,*.json" || true
+          codespell -q 3 --skip="*.css,*.r,*.xsd,*.json,*.map,*.js" || true
 
       - name: Check McCabe complexity
         run: |
