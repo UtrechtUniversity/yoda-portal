@@ -11,6 +11,7 @@ from flask import (
     abort, Blueprint, current_app as app, g, jsonify, make_response,
     render_template, request, Response, session, stream_with_context
 )
+from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
 from werkzeug.utils import secure_filename
@@ -43,7 +44,7 @@ def download() -> Response:
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
 
-    def read_file_chunks(data_object) -> Iterator[bytes]:
+    def read_file_chunks(data_object: iRODSDataObject) -> Iterator[bytes]:
         READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
 
         try:
