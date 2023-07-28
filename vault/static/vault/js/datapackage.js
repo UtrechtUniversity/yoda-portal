@@ -11,7 +11,7 @@ $(document).ajaxSend(function (e, request, settings) {
 })
 
 let currentFolder
-let bounds = [[1, 1][1, 1]]
+let bounds = [[1, 1], [1, 1]]
 let mymap = null
 let maplayer = null
 
@@ -185,6 +185,13 @@ async function handleRestrictedMetadataInfo () {
   const formData = new FormData()
   formData.append(Yoda.csrf.tokenName, Yoda.csrf.tokenValue)
   formData.append('data', JSON.stringify(data))
+
+  const errorResult = (msg = 'Your request could not be completed due to an internal error') =>
+    Promise.reject({ // eslint-disable-line prefer-promise-reject-errors
+      data: null,
+      status: 'error_internal',
+      status_info: msg
+    })
 
   try {
     const r = await fetch('/open_search/metadata', {
