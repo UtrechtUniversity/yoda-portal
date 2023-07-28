@@ -7,6 +7,7 @@ import io
 from typing import Iterator
 
 from flask import abort, Blueprint, g, redirect, render_template, request, Response, session, stream_with_context, url_for
+from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 
 import api
@@ -60,7 +61,7 @@ def download() -> Response:
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
 
-    def read_file_chunks(data_object) -> Iterator[bytes]:
+    def read_file_chunks(data_object: iRODSDataObject) -> Iterator[bytes]:
         READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
 
         try:
