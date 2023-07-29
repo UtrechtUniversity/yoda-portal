@@ -27,6 +27,10 @@ $(function () {
     startBrowsing()
   }
 
+  $('.btn-go-to-research').on('click', function () {
+    window.location.href = '/research/?dir=' + encodeURIComponent('/' + $(this).attr('research-area'));
+  })
+
   $('.btn-group button.metadata-form').on('click', function () {
     showMetadataForm($(this).attr('data-path'))
   })
@@ -289,10 +293,6 @@ $(function () {
     vaultUnarchive($(this).attr('data-folder'))
   })
 
-  $('body').on('click', 'a.action-go-to-research', function () {
-    window.location.href = '/research/?dir=' + encodeURIComponent('/' + $(this).attr('research-path'))
-  })
-
   // FILE stage
   $('body').on('click', 'a.file-stage', function () {
     handleFileStage($(this).attr('data-collection'), $(this).attr('data-name'))
@@ -310,11 +310,25 @@ function changeBrowserUrl (path) {
 
 function browse (dir = '', changeHistory = false) {
   currentFolder = dir
+  handleGoToResearchButton(dir);
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
   metadataInfo(dir)
   topInformation(dir, true) // only here topInformation should show its alertMessage
   buildFileBrowser(dir)
+}
+
+function handleGoToResearchButton(dir) {
+  // Handle the button with which to return to the corresponding research area.
+  const parts = dir.split('/');
+
+  if (parts.length>1) {
+    console.log(parts[1])
+    $('.btn-go-to-research').attr("research-area", parts[1].replace('vault-', 'research-')).show()
+  }
+  else {
+    $('.btn-go-to-research').attr("research-area", "").hide();
+  }
 }
 
 function makeBreadcrumb (dir) {
@@ -336,6 +350,8 @@ function makeBreadcrumb (dir) {
 
     html += el[0].outerHTML
   }
+
+  console.log(html)
 
   $('ol.breadcrumb').html(html)
 }
@@ -746,18 +762,8 @@ function topInformation (dir, showAlert) {
       // Add checksum report
       actions['show-checksum-report'] = 'Show checksum report'
 
-      // Add go to research to actions.
-      if (typeof researchPath !== 'undefined') {
-        actions['go-to-research'] = 'Go to research'
-      }
-
       // Handle actions
       handleActionsList(actions, dir)
-
-      // Set research path.
-      if (typeof researchPath !== 'undefined') {
-        $('a.action-go-to-research').attr('research-path', researchPath)
-      }
 
       const statusBadge = '<span id="statusBadge" class="ml-2 badge rounded-pill bg-primary">' + statusText + '</span>'
 
@@ -789,8 +795,7 @@ function handleActionsList (actions, folder) {
   const possibleVaultActions = ['grant-vault-access', 'revoke-vault-access',
     'copy-vault-package-to-research',
     'check-for-unpreservable-files',
-    'show-checksum-report',
-    'go-to-research']
+    'show-checksum-report']
 
   $.each(possibleActions, function (index, value) {
     if (Object.prototype.hasOwnProperty.call(actions, value)) {
