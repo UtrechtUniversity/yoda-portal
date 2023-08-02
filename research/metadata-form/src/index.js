@@ -195,7 +195,7 @@ const CustomArrayFieldTemplate = (props) => {
                                         </div>
                                     )}
 
-                                    {el.hasRemove && (
+                                    {el.hasRemove && el.index>0 && (
                                         <div className="m-0 p-0">
                                             <button className="btn btn-light btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onDropIndexClick(el.index)}>
