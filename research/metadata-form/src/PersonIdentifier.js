@@ -135,16 +135,18 @@ class PersonIdentifier extends React.Component {
     // Validation of Identifier value
     let classesIdentifierField = 'form-control'
 
-    // Use pattern if exists for Identifier.
-    if (this.props.schema.properties.Name_Identifier.pattern) {
-      const regex = new RegExp(this.props.schema.properties.Name_Identifier.pattern)
-      if (!(regex.test(Name_Identifier))) {
+    // Identifier field 'invalid' handling
+    if ((typeof Name_Identifier !== 'undefined') && Name_Identifier.length > 0) {
+        // Identifier is present and possibly must be checked against a pattern
+        if (this.props.schema.properties.Name_Identifier.pattern) {
+            const regex = new RegExp(this.props.schema.properties.Name_Identifier.pattern)
+            if (!(regex.test(Name_Identifier))) {
+                classesIdentifierField += ' is-invalid'
+            }
+        }
+    }
+    else if (requiredIdentifier === '*') {
         classesIdentifierField += ' is-invalid'
-      }
-    } else if (requiredIdentifier === '*') {
-      if (typeof Name_Identifier === 'undefined' || Name_Identifier.length === 0) {
-        classesIdentifierField += ' is-invalid'
-      }
     }
 
     // Add extra element so user can easily access corresponding search functionality.

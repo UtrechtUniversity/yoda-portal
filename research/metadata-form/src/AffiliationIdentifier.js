@@ -13,6 +13,7 @@ class AffiliationIdentifier extends React.Component {
 
     // Placeholder for the vocabulary options to be collected externally
     this.options = [{ value: 'https://ror.org/04pp8hn57', label: 'Utrecht University' }]
+    this.is_new_affilation = false;
 
     const url = props.uiSchema['ui:data']
 
@@ -34,9 +35,13 @@ class AffiliationIdentifier extends React.Component {
   }
 
   handleChange = (event) => {
-    this.setFormData('Affiliation_Name', event.label)
+    this.setFormData('Affiliation_Name', event.label);
+    this.is_new_affilation = false;
     if (event.__isNew__ === undefined || event.__isNew__ === false) {
       this.setFormData('Affiliation_Identifier', event.value)
+    }
+    else if (event.__isNew__) {
+        this.is_new_affilation = true;
     }
   }
 
@@ -51,7 +56,14 @@ class AffiliationIdentifier extends React.Component {
   }
 
   render () {
+    console.log(this.options);
+
     const { Affiliation_Name, Affiliation_Identifier } = this.state
+
+    console.log(Affiliation_Name);
+    console.log(Affiliation_Identifier);
+    console.log(this.is_new_affilation);
+
 
     const titleAffiliationName = this.props.schema.properties.Affiliation_Name.title
     const titleAffiliationIdentifier = this.props.schema.properties.Affiliation_Identifier.title
@@ -133,6 +145,14 @@ class AffiliationIdentifier extends React.Component {
       if (!(typeof Affiliation_Identifier === 'undefined' || Affiliation_Identifier.length === 0)) {
         reqName = '*'
       }
+    }
+
+    // Handling of new Affiliation: this overrules all for the identifier field
+    // - Identifier is no longer required
+    // -a is-invalid indication must be removed.
+    if (this.is_new_affilation) {
+        reqIdf = '';
+        classesIdf = 'form-control'
     }
 
     let labelClasses = 'form-label';
