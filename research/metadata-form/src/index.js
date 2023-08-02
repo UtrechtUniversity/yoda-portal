@@ -203,6 +203,7 @@ const CustomArrayFieldTemplate = (props) => {
                                             </button>
                                         </div>
                                     )}
+
                                 </div>
                             </div>
                         )}
