@@ -99,9 +99,10 @@ class PersonIdentifier extends React.Component {
 
     // Check whether combination of 2 fields is a required 'field'
     let bothRequired = false
-    // Make sure required is actually present.
-    if (this.props.registry.rootSchema.properties[parentContext].items.required) {
+    try {
       bothRequired = this.props.registry.rootSchema.properties[parentContext].items.required.includes('Person_Identifier')
+    } catch (err) {
+      bothRequired = false
     }
 
     // If either one holds a value, the other becomes a required element - hoe dit te testen!!
@@ -110,9 +111,9 @@ class PersonIdentifier extends React.Component {
       requiredScheme = '*'
     }
 
-    let requiredIdentifier = ''
+    let requiredIdentifier = '';
     if (bothRequired || ((typeof Name_Identifier_Scheme !== 'undefined') && Name_Identifier_Scheme.length > 0)) {
-      requiredIdentifier = '*'
+      requiredIdentifier = '*';
     }
 
     // Validation of values and consequences for customstyles of each field
@@ -164,10 +165,20 @@ class PersonIdentifier extends React.Component {
       searchLink = <a class='btn btn-sm btn-primary float-end' href={searchUrl} target='_blank' rel='noreferrer'><i class='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup {Name_Identifier_Scheme}</a>
     }
 
+    // Hier moet nog in meegenomen worden of de parent daadwerkelijk verplicht is!!!! klopt dit!?
+    let labelClasses = 'form-label';
+    if (requiredScheme=='*') {
+        labelClasses += ' select-required';
+        if ((typeof Name_Identifier_Scheme !== 'undefined') && Name_Identifier_Scheme.length > 0) {
+            // select-filled only has meaning when in combination with select-required (for totalisation of completeness purposes)
+            labelClasses += ' select-filled';
+        }
+    }
+
     return (
       <div className='d-flex'>
         <div className='col compound-field'>
-          <label className='form-label'>{titleScheme}{requiredScheme}</label>
+          <label className={labelClasses}>{titleScheme}{requiredScheme}</label>
           <Select
             className='select-box'
             options={options}
@@ -186,7 +197,21 @@ class PersonIdentifier extends React.Component {
         <div className='col compound-field'>
           <div className='mb-0 form-group'>
             <label className='form-label'>{titleIdentifier}{requiredIdentifier}</label>
-            <InputMask
+            {requiredIdentifier=='*' && 
+            (<InputMask
+              className={classesIdentifierField}
+              required
+              readOnly={this.props.readonly}
+              isDisabled={this.props.readonly}
+              value={Name_Identifier}
+              placeholder={placeholder}
+              onChange={this.handleIdentifierChange}
+              mask={mask}
+              formatChars={formatChars}
+            />)}
+
+            {requiredIdentifier=='' &&
+            (<InputMask
               className={classesIdentifierField}
               readOnly={this.props.readonly}
               isDisabled={this.props.readonly}
@@ -195,7 +220,7 @@ class PersonIdentifier extends React.Component {
               onChange={this.handleIdentifierChange}
               mask={mask}
               formatChars={formatChars}
-            />
+            />)}
 
             {searchLink}
 

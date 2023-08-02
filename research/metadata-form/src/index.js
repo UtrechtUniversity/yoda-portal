@@ -35,8 +35,9 @@ const enumWidget = (props) => {
     let i = enumArray.indexOf(props['value']);
     let placeholder = enumNames[i] == null ? ' ' : enumNames[i];
 
-    let title = props.label || props.uiSchema["ui:title"]
-    let label = <label className="form-label">{title}</label>
+    // let title = props.label || props.uiSchema["ui:title"]
+    // met label en title wordt niks gedaan
+    // let label = <label className="form-label">{title}</label>
     let customStyles = {
         control: styles => ({
             ...styles,
@@ -82,8 +83,11 @@ const enumWidget = (props) => {
         required = formProperties.data.schema.required.includes(name_hierarchy[0]);
     }
 
+    let selectCompletenessClasses = '';
+
     if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) || (required && props.value == null)) {
-        label = <label className="text-danger form-label select-required">{title}*</label>
+        // label = <test className="text-danger form-label select-required">{title}*</test>
+        selectCompletenessClasses = 'select-required';
         customStyles = {
             control: styles => ({
                 ...styles,
@@ -95,12 +99,13 @@ const enumWidget = (props) => {
             })
         };
     } else if (required) {
-        label = <label className="form-label select-required select-filled">{title}*</label>
+        // label = <test className="form-label select-required select-filled">{title}*</test>
+        selectCompletenessClasses = 'select-required select-filled';
     }
 
     return (
         <div>
-
+            <selectTotals class={selectCompletenessClasses}></selectTotals>
             <Select className={'select-box'}
                     placeholder={placeholder}
                     required={required}

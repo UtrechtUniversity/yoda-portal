@@ -99,9 +99,10 @@ class PersonIdentifier extends React.Component {
 
     // Check whether combination of 2 fields is a required 'field'
     let bothRequired = false
-    // Make sure required is actually present.
-    if (this.props.registry.rootSchema.properties[parentContext].items.required) {
+    try {
       bothRequired = this.props.registry.rootSchema.properties[parentContext].items.required.includes('Person_Identifier')
+    } catch (err) {
+      bothRequired = false
     }
 
     // If either one holds a value, the other becomes a required element - hoe dit te testen!!
