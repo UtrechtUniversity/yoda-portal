@@ -35,9 +35,6 @@ const enumWidget = (props) => {
     let i = enumArray.indexOf(props['value']);
     let placeholder = enumNames[i] == null ? ' ' : enumNames[i];
 
-    // let title = props.label || props.uiSchema["ui:title"]
-    // met label en title wordt niks gedaan
-    // let label = <label className="form-label">{title}</label>
     let customStyles = {
         control: styles => ({
             ...styles,
@@ -83,10 +80,12 @@ const enumWidget = (props) => {
         required = formProperties.data.schema.required.includes(name_hierarchy[0]);
     }
 
+    // will hold classes (select-required, select-filled) as indications for totalization purposes.
+    // For that purpose element <selectTotals> will be added.
     let selectCompletenessClasses = '';
 
     if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) || (required && props.value == null)) {
-        // label = <test className="text-danger form-label select-required">{title}*</test>
+        // Indicate that this element is required and should be counted as total
         selectCompletenessClasses = 'select-required';
         customStyles = {
             control: styles => ({
@@ -99,7 +98,7 @@ const enumWidget = (props) => {
             })
         };
     } else if (required) {
-        // label = <test className="form-label select-required select-filled">{title}*</test>
+        // Indicate that this element is required and holds a value
         selectCompletenessClasses = 'select-required select-filled';
     }
 

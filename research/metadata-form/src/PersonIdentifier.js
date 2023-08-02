@@ -165,7 +165,6 @@ class PersonIdentifier extends React.Component {
       searchLink = <a class='btn btn-sm btn-primary float-end' href={searchUrl} target='_blank' rel='noreferrer'><i class='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup {Name_Identifier_Scheme}</a>
     }
 
-    // Hier moet nog in meegenomen worden of de parent daadwerkelijk verplicht is!!!! klopt dit!?
     let labelClasses = 'form-label';
     if (requiredScheme=='*') {
         labelClasses += ' select-required';

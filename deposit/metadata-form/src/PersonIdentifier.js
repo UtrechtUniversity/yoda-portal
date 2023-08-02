@@ -165,10 +165,19 @@ class PersonIdentifier extends React.Component {
       searchLink = <a class='btn btn-sm btn-primary float-end' href={searchUrl} target='_blank' rel='noreferrer'><i class='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup {Name_Identifier_Scheme}</a>
     }
 
+    let labelClasses = 'form-label';
+    if (requiredScheme=='*') {
+        labelClasses += ' select-required';
+        if ((typeof Name_Identifier_Scheme !== 'undefined') && Name_Identifier_Scheme.length > 0) {
+            // select-filled only has meaning when in combination with select-required (for totalisation of completeness purposes)
+            labelClasses += ' select-filled';
+        }
+    }
+
     return (
       <div className='d-flex'>
         <div className='col compound-field'>
-          <label className='form-label'>{titleScheme}{requiredScheme}</label>
+          <label className={labelClasses}>{titleScheme}{requiredScheme}</label>
           <Select
             className='select-box'
             options={options}
@@ -183,11 +192,24 @@ class PersonIdentifier extends React.Component {
             </small>
           )}
         </div>
-
         <div className='col compound-field'>
           <div className='mb-0 form-group'>
             <label className='form-label'>{titleIdentifier}{requiredIdentifier}</label>
-            <InputMask
+            {requiredIdentifier=='*' &&
+            (<InputMask
+              className={classesIdentifierField}
+              required
+              readOnly={this.props.readonly}
+              isDisabled={this.props.readonly}
+              value={Name_Identifier}
+              placeholder={placeholder}
+              onChange={this.handleIdentifierChange}
+              mask={mask}
+              formatChars={formatChars}
+            />)}
+
+            {requiredIdentifier=='' &&
+            (<InputMask
               className={classesIdentifierField}
               readOnly={this.props.readonly}
               isDisabled={this.props.readonly}
@@ -196,7 +218,7 @@ class PersonIdentifier extends React.Component {
               onChange={this.handleIdentifierChange}
               mask={mask}
               formatChars={formatChars}
-            />
+            />)}
 
             {searchLink}
 

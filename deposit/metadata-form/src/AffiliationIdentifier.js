@@ -135,12 +135,20 @@ class AffiliationIdentifier extends React.Component {
       }
     }
 
+    let labelClasses = 'form-label';
+    if (reqName=='*') {
+        labelClasses += ' select-required';
+        if (namePresent) {
+            // select-filled only has meaning when in combination with select-required (for totalisation of completeness purposes)
+            labelClasses += ' select-filled';
+        }
+    }
+
     return (
       <div className='d-flex'>
         <div className='col compound-field'>
-          <label className='form-label select-required select-filled'>{titleAffiliationName}{reqName}</label>
+          <label className={labelClasses}>{titleAffiliationName}{reqName}</label>
           <CreatableSelect
-            className='select-box is-invalid'
             options={this.options}
             required={reqName === '*'}
             isDisabled={this.props.readonly}
@@ -158,13 +166,26 @@ class AffiliationIdentifier extends React.Component {
         <div className='col compound-field'>
           <div className='mb-0 form-group'>
             <label className='form-label'>{titleAffiliationIdentifier}{reqIdf}</label>
-            <input
+
+            {reqIdf=='*' &&
+            (<input
+              type='text'
+              required
+              className={classesIdf} // 'form-control is-invalid'
+              readOnly={this.props.readonly}
+              onChange={this.handleChangeIdentifier}
+              value={Affiliation_Identifier}
+            />)}
+
+            {reqIdf=='' &&
+            (<input
               type='text'
               className={classesIdf} // 'form-control is-invalid'
               readOnly={this.props.readonly}
               onChange={this.handleChangeIdentifier}
               value={Affiliation_Identifier}
-            />
+            />)}
+
             {helpAffiliationIdentifier && (
               <small className='text-muted form-text'>
                 <p className='help-block'>{helpAffiliationIdentifier}</p>

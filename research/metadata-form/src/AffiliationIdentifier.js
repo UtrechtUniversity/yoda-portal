@@ -149,7 +149,6 @@ class AffiliationIdentifier extends React.Component {
         <div className='col compound-field'>
           <label className={labelClasses}>{titleAffiliationName}{reqName}</label>
           <CreatableSelect
-            className='select-box is-invalid'
             options={this.options}
             required={reqName === '*'}
             isDisabled={this.props.readonly}
