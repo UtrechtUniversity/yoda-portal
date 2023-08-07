@@ -15,9 +15,17 @@ $(document).ready(function () {
   })
 
   $('body').on('click', '#generateButton', function (e) {
-    const label = $('#f-token-label').val()
+    // Reset error messages.
+    const passwordGenerateError = document.getElementById('passwordGenerateError')
+    passwordGenerateError.setAttribute('hidden', true)
+    const passwordLabelError = document.getElementById('passwordLabelError')
+    passwordLabelError.setAttribute('hidden', true)
 
+    const labelInput = document.getElementById('f-token-label')
+    const label = document.getElementById('f-token-label').value
     const button = document.getElementById('generateButton')
+    const token = document.getElementById('tokenField')
+    labelInput.setAttribute('disabled', true)
     button.setAttribute('hidden', true)
 
     Yoda.call('token_delete_expired', {}).then(response => {
@@ -26,6 +34,7 @@ $(document).ready(function () {
           $('#f-token').val(data)
           const p = document.getElementById('passwordOk')
           p.removeAttribute('hidden')
+          token.removeAttribute('hidden')
         },
         (error) => {
           let errorId = 'passwordGenerateError'
@@ -35,15 +44,20 @@ $(document).ready(function () {
           const p = document.getElementById(errorId)
           p.removeAttribute('hidden')
           button.removeAttribute('hidden')
+          token.setAttribute('hidden', true)
+          labelInput.removeAttribute('disabled')
         }
       )
     })
   })
 
   $('.btn-copy-to-clipboard').on('click', function (event) {
+    const token = document.getElementById('f-token')
+    token.removeAttribute('disabled')
     $('#f-token').select()
     document.execCommand('copy')
     event.preventDefault()
+    token.setAttribute('disabled', true)
   })
 
   const passwordModal = document.getElementById('dataAccessPassword')
