@@ -3,27 +3,25 @@
 let currentSearchString
 let currentSearchType
 
-
 $(document).ready(function () {
   if ($('#file-browser').length &&
         $('#search-filter').val().length > 0) {
-
     currentSearchString = $('#search-filter').val()
 
     // Type handling
     // Itt search filter, moet er meer worden geregeld voor currentSearchType (de zoekterm kan gewoon worden overgenomen)
     // First take over what was passed through the URL
-    currentSearchType = $('#search_concept').attr('data-type')  // $('#searchType').val();
+    currentSearchType = $('#search_concept').attr('data-type') // $('#searchType').val();
     // validate against the known values in the search-panel list
-    $('#search-panel li a').each(function() {
-        if ($(this).attr('data-type')==currentSearchType) {
-            $('#search_concept').text($(this).text());
-            $('#search_concept').attr('data-type', currentSearchType);
-        }
-    });
+    $('#search-panel li a').each(function () {
+      if ($(this).attr('data-type') === currentSearchType) {
+        $('#search_concept').text($(this).text())
+        $('#search_concept').attr('data-type', currentSearchType)
+      }
+    })
 
-    if (currentSearchType == 'status') {
-      $('.search-status option[value="' + currentSearchString + '"]').attr("selected", "selected");
+    if (currentSearchType === 'status') {
+      $('.search-status option[value="' + currentSearchString + '"]').attr('selected', 'selected')
       $('.search-term').hide()
       $('.search-status').removeClass('hide').show()
       currentSearchType = 'status'
