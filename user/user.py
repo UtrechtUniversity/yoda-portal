@@ -152,7 +152,7 @@ def settings() -> Response:
 
         response = api.call('settings_save', data)
         if response['status'] == 'ok':
-	        # Save the color mode now so that the display changes immediately.
+            # Save the color mode now so that the display changes immediately.
             g.settings['color_mode'] = settings['color_mode']
             flash('Settings saved successfully', 'success')
         else:
