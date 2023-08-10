@@ -8,7 +8,7 @@ import os
 from typing import Iterator
 
 from flask import (
-    abort, Blueprint, current_app as app, g, jsonify, make_response,
+    abort, Blueprint, g, jsonify, make_response,
     render_template, request, Response, session, stream_with_context
 )
 from irods.data_object import iRODSDataObject
