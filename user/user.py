@@ -145,12 +145,15 @@ def settings() -> Response:
         settings['mail_notifications'] = request.form.get('mail_notifications', "OFF")
         settings['group_manager_view'] = request.form.get('group_manager_view', "TREE")
         settings['number_of_items'] = request.form.get('number_of_items', "10")
+        settings['color_mode'] = request.form.get('color_mode', "AUTO")
 
         # Save user settings and handle API response.
         data = {"settings": settings}
 
         response = api.call('settings_save', data)
         if response['status'] == 'ok':
+	        # Save the color mode now so that the display changes immediately.
+            g.settings['color_mode'] = settings['color_mode']
             flash('Settings saved successfully', 'success')
         else:
             flash('Saving settings failed!', 'danger')
