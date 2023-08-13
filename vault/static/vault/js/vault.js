@@ -310,6 +310,8 @@ function changeBrowserUrl (path) {
 
 function browse (dir = '', changeHistory = false) {
   currentFolder = dir
+  // remove hide class that could have been added when a erroneous vault path was used.
+  $('#file-browser_wrapper').removeClass('hide');
   handleGoToResearchButton(dir);
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
@@ -323,7 +325,6 @@ function handleGoToResearchButton(dir) {
   const parts = dir.split('/');
 
   if (parts.length>1) {
-    console.log(parts[1])
     $('.btn-go-to-research').attr("research-area", parts[1].replace('vault-', 'research-')).show()
   }
   else {
@@ -350,8 +351,6 @@ function makeBreadcrumb (dir) {
 
     html += el[0].outerHTML
   }
-
-  console.log(html)
 
   $('ol.breadcrumb').html(html)
 }
@@ -398,6 +397,7 @@ const getFolderContents = (() => {
     } else {
       // Nope, load new data via the API.
       const j = ++i
+
       const result = await Yoda.call('browse_folder',
         {
           coll: Yoda.basePath + currentFolder,
@@ -406,7 +406,9 @@ const getFolderContents = (() => {
           sort_order: args.order[0].dir,
           sort_on: ['name', 'size', 'modified'][args.order[0].column],
           space: 'Space.VAULT'
-        })
+        },
+        { quiet: true, rawResult: false }
+       )
 
       // If another requests has come while we were waiting, simply drop this one.
       if (i !== j) return null
@@ -524,6 +526,9 @@ const tableRenderer = {
 }
 
 function startBrowsing () {
+
+   // $('#file-browser_wrapper').removeClass('hide');
+
   $('#file-browser').DataTable({
     bFilter: false,
     bInfo: false,
@@ -630,7 +635,19 @@ window.addEventListener('popstate', function (e) {
 function topInformation (dir, showAlert) {
   if (typeof dir !== 'undefined') {
     Yoda.call('vault_collection_details',
-      { path: Yoda.basePath + dir }).then((data) => {
+      { path: Yoda.basePath + dir },
+      { quiet: true, rawResult: true }).then((dataRaw) => {
+
+      let data = dataRaw.data;
+      if (dataRaw.status == 'error_nonexistent') {
+          Yoda.set_message('error', 'The indicated path to the vault does not exists: ' + dir)
+          $('#file-browser_wrapper').addClass('hide');
+          $('.top-information').addClass('hide');
+
+          // no more action required here
+          return true;
+      }
+
       let statusText = ''
       let archiveBadge = ''
       const vaultStatus = data.status
@@ -991,7 +1008,7 @@ function metadataInfo (dir) {
   try {
     Yoda.call('meta_form_load',
       { coll: Yoda.basePath + dir },
-      { rawResult: true })
+      { quiet: true, rawResult: true })
       .then((result) => {
         if (!result || Object.keys(result.data).length === 0) { return console.info('No result data from meta_form_load') }
 

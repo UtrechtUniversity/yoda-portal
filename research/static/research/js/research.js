@@ -753,7 +753,6 @@ function handleGoToVaultButton(dir) {
   const parts = dir.split('/');
 
   if (parts.length>1) {
-    console.log(parts[1])
     $('.btn-go-to-vault').attr("vault-area", parts[1].replace('research-', 'vault-')).show()
   }
   else {
