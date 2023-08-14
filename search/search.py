@@ -14,9 +14,15 @@ search_bp = Blueprint('search_bp', __name__,
 @search_bp.route('/')
 def index() -> Response:
     searchTerm = request.args.get('q', None)
+    searchType = request.args.get('t', None)
 
     if searchTerm is None:
         searchTerm = ''
 
+    # validation of type && subtype!!
+    if searchType is None or searchType not in ['filename', 'folder', 'metadata', 'status', 'revision']:
+        searchType = 'filename'
+
     return render_template('search/search.html',
-                           searchTerm=searchTerm)
+                           searchTerm=searchTerm,
+                           searchType=searchType)

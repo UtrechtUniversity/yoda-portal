@@ -407,7 +407,11 @@ OpenSearchApi.call = async function (data = {}, options = {}) {
     formData.append('data', JSON.stringify(data))
 
     const errorResult = (msg = 'Your request could not be completed due to an internal error') =>
-      Promise.reject({ data: null, status: 'error_internal' })
+      Promise.reject({ // eslint-disable-line prefer-promise-reject-errors
+        data: null,
+        status: 'error_internal',
+        status_info: msg
+      })
 
     let r = {}
     try {
@@ -428,7 +432,7 @@ OpenSearchApi.call = async function (data = {}, options = {}) {
       // API responses should either produce 200, 400 or 500.
       // Any other status code indicates an internal error without (human-readable) information.
       console.error(`API Error: HTTP status ${r.status}`)
-      return Promise.reject({ data: null, status: r.status })
+      return Promise.reject({ data: null, status: r.status }) // eslint-disable-line prefer-promise-reject-errors
     }
 
     let j = {}

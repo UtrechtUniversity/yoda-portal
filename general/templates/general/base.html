@@ -9,15 +9,19 @@
 
             <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 
-            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.0.0/css/fontawesome.min.css') }}">
-            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.0.0/css/all.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.4.0/css/fontawesome.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.4.0/css/all.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
             {% block style %}{% endblock style %}
 
-            <script src="{{ url_for('static', filename='lib/bootstrap-5.2.0/js/bootstrap.bundle.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='lib/bootstrap-5.3.1/js/bootstrap.bundle.min.js') }}"></script>
             <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
+
+
             {% if g.user %}
-            <script src="{{ url_for('static', filename='lib/jquery-3.6.4/jquery-3.6.4.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='lib/jquery-3.7.0/jquery-3.7.0.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/yoda-top-search.js') }}"></script>
+
             {% endif %}
             <script>
                 Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'};
@@ -37,23 +41,63 @@
 
     <body class="d-flex flex-column min-vh-100">
         <header class="py-3">
-            <div class="container d-flex flex-wrap justify-content-center">
-                <a href="{{ url_for('general_bp.index') }}" class="mb-lg-0 me-lg-auto text-dark text-decoration-none">
-                    <img class="logo" src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo">
-                </a>
-                {% if g.user and request.path != "/open_search/" and request.path != "/search/" %}
-                    {% if config.get('OPEN_SEARCH_ENABLED') %}
-                    <form class="col-lg-4 mt-2 mb-lg-0 me-3" action="{{ url_for('open_search_bp.index') }}" method="get">
-                        <input type="search" name="q" class="search form-control" placeholder="Search..." aria-label="Search">
-                    </form>
-                    {% else %}
-                    <form class="col-lg-4 mt-2 mb-lg-0 me-3" action="{{ url_for('search_bp.index') }}" method="get">
-                        <input type="search" name="q" class="search form-control" placeholder="Search..." aria-label="Search">
-                    </form>
-                    {% endif %}
-                {% endif %}
-                <div class="mt-2 text-end">
-                    {% include 'user.html' %}
+            <div class="container">
+                <div class="row justify-content-between">
+                    <div class="col-2">
+                        <a href="{{ url_for('general_bp.index') }}" class="mb-lg-0 me-lg-auto text-dark text-decoration-none">
+                            <img class="logo" src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo">
+                        </a>
+                    </div>
+                    <div class="col-6 row">
+                        <div class="col-10">
+                            {% if g.user and request.path != "/open_search/" and request.path != "/search/" %}
+                                {% if config.get('OPEN_SEARCH_ENABLED') %}
+                                <form class="col-lg-4 mt-2 mb-lg-0 me-3" action="{{ url_for('open_search_bp.index') }}" method="get">
+                                    <input type="search" name="q" class="search form-control" placeholder="Search..." aria-label="Search">
+                                </form>
+                                {% else %}
+                                <div class="input-group col-lg-4 mt-2 mb-lg-0 me-3">
+
+                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span id="top_search_concept" data-type="filename">Search by filename</span>
+                                    </button>
+                                    <ul id="top-search-panel" class="dropdown-menu">
+                                        <li><a class="dropdown-item" data-type="filename">Search by filename</a></li>
+                                        <li><a class="dropdown-item" data-type="folder">Search by folder</a></li>
+                                        <li><a class="dropdown-item" data-type="metadata">Search by metadata</a></li>
+                                        <li><a class="dropdown-item" data-type="status">Search by status</a></li>
+                                        <li><a class="dropdown-item" data-type="revision">Search revision by name</a></li>
+                                    </ul>
+
+                                    <input type="text" id="q" class="form-control top-search-term" placeholder="Search term..." value="" maxlength="255">
+
+                                    <select id="top-search-status" class="form-control top-search-status hidden">
+                                        <option disabled selected value>Select status...</option>
+                                        <optgroup label="Research">
+                                            <option value="research:LOCKED">Locked</option>
+                                            <option value="research:SUBMITTED">Submitted for vault</option>
+                                            <option value="research:ACCEPTED">Accepted for vault</option>
+                                            <option value="research:REJECTED">Rejected for vault</option>
+                                            <option value="research:SECURED">Secured in vault</option>
+                                        </optgroup>
+                                        <optgroup label="Vault">
+                                            <option value="vault:UNPUBLISHED">Unpublished</option>
+                                            <option value="vault:SUBMITTED_FOR_PUBLICATION">Submitted for publication</option>
+                                            <option value="vault:APPROVED_FOR_PUBLICATION">Approved for publication</option>
+                                            <option value="vault:PUBLISHED">Published</option>
+                                            <option value="vault:DEPUBLISHED">Depublished</option>
+                                        </optgroup>
+                                    </select>
+
+                                    <button type="button" class="btn btn-outline-secondary top-start-search" data-items-per-page="25"><i class="fa-solid fa-search" aria-hidden="true"></i></button>
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="col-2 mt-2">
+                            {% include 'user.html' %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
