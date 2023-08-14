@@ -741,6 +741,8 @@ function changeBrowserUrl (path) {
 
 function browse (dir = '', changeHistory = false) {
   currentFolder = dir
+  // remove hide class that could have been added when a erroneous vault path was used.
+  $('#file-browser_wrapper').removeClass('hide');
   handleGoToVaultButton(dir);
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
@@ -833,7 +835,8 @@ const getFolderContents = (() => {
           sort_order: args.order[0].dir,
           sort_on: ['name', 'size', 'modified'][args.order[0].column - 1],
           space: 'Space.RESEARCH'
-        })
+        },
+        { quiet: true, rawResult: false })
 
       // If another requests has come while we were waiting, simply drop this one.
       if (i !== j) return null
@@ -1102,7 +1105,19 @@ window.addEventListener('popstate', function (e) {
 function topInformation (dir, showAlert) {
   if (typeof dir !== 'undefined') {
     Yoda.call('research_collection_details',
-      { path: Yoda.basePath + dir }).then((data) => {
+      { path: Yoda.basePath + dir },
+      { quiet: true, rawResult: true }).then((dataRaw) => {
+
+      if (dataRaw.status == 'error_nonexistent') {
+          Yoda.set_message('error', 'The indicated path to the vault does not exists: ' + dir)
+          $('#file-browser_wrapper').addClass('hide');
+          $('.top-information').addClass('hide');
+
+          // no more action required here
+          return true;
+      }
+
+      let data = dataRaw.data;
       let statusText = ''
       const basename = data.basename
       const status = data.status
