@@ -91,7 +91,6 @@ class AffiliationIdentifier extends React.Component {
     const parts = parentContext.split('_')
     parts.pop()
     parentContext = parts.join('_')
-    console.log(parentContext)
 
     let bothRequired = false
     try {
