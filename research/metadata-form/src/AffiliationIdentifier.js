@@ -186,7 +186,7 @@ class AffiliationIdentifier extends React.Component {
           <div className='mb-0 form-group'>
             <label className='form-label'>{titleAffiliationIdentifier}{reqIdf}</label>
 
-            {reqIdf=='*' && 
+            {reqIdf=='*' &&
             (<input
               type='text'
               required
@@ -204,6 +204,10 @@ class AffiliationIdentifier extends React.Component {
               onChange={this.handleChangeIdentifier}
               value={Affiliation_Identifier}
             />)}
+
+            <a className='btn btn-sm btn-primary float-end' href='https://ror.org/search' target='_blank' rel='noreferrer'>
+              <i className='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup ROR
+            </a>
 
             {helpAffiliationIdentifier && (
               <small className='text-muted form-text'>
