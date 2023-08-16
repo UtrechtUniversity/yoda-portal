@@ -101,11 +101,15 @@ class AffiliationIdentifier extends React.Component {
 
     // Identifier is present but Name is not.
     if (idfPresent && !namePresent) {
+      reqName = '*'
       classesName += ' is-invalid'
     }
 
     // Both Name and Identifier are required.
     if (bothRequired) {
+      reqName = '*'
+      reqIdf = '*'
+
       if (!namePresent) {
         classesName += ' is-invalid'
       }
@@ -125,19 +129,6 @@ class AffiliationIdentifier extends React.Component {
             border: '1px solid #dc3545'
           }
         })
-      }
-    }
-
-    // Handling of '*' in the label of both fields
-    if (bothRequired) {
-      reqName = '*'
-      reqIdf = '*'
-    } else {
-      if (!(typeof Affiliation_Name === 'undefined' || Affiliation_Name.length === 0)) {
-        reqIdf = '*'
-      }
-      if (!(typeof Affiliation_Identifier === 'undefined' || Affiliation_Identifier.length === 0)) {
-        reqName = '*'
       }
     }
 
