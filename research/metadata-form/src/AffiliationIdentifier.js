@@ -13,7 +13,7 @@ class AffiliationIdentifier extends React.Component {
 
     // Placeholder for the vocabulary options to be collected externally
     this.options = [{ value: 'https://ror.org/04pp8hn57', label: 'Utrecht University' }]
-    this.is_new_affilation = false;
+    this.is_new_affilation = false
 
     const url = props.uiSchema['ui:data']
 
@@ -35,13 +35,12 @@ class AffiliationIdentifier extends React.Component {
   }
 
   handleChange = (event) => {
-    this.setFormData('Affiliation_Name', event.label);
-    this.is_new_affilation = false;
+    this.setFormData('Affiliation_Name', event.label)
+    this.is_new_affilation = false
     if (event.__isNew__ === undefined || event.__isNew__ === false) {
       this.setFormData('Affiliation_Identifier', event.value)
-    }
-    else if (event.__isNew__) {
-        this.is_new_affilation = true;
+    } else if (event.__isNew__) {
+      this.is_new_affilation = true
     }
   }
 
@@ -56,14 +55,13 @@ class AffiliationIdentifier extends React.Component {
   }
 
   render () {
-    console.log(this.options);
+    console.log(this.options)
 
     const { Affiliation_Name, Affiliation_Identifier } = this.state
 
-    console.log(Affiliation_Name);
-    console.log(Affiliation_Identifier);
-    console.log(this.is_new_affilation);
-
+    console.log(Affiliation_Name)
+    console.log(Affiliation_Identifier)
+    console.log(this.is_new_affilation)
 
     const titleAffiliationName = this.props.schema.properties.Affiliation_Name.title
     const titleAffiliationIdentifier = this.props.schema.properties.Affiliation_Identifier.title
@@ -107,19 +105,22 @@ class AffiliationIdentifier extends React.Component {
     const namePresent = !(typeof Affiliation_Name === 'undefined' || Affiliation_Name.length === 0)
     const idfPresent = !(typeof Affiliation_Identifier === 'undefined' || Affiliation_Identifier.length === 0)
 
-    // Specific class handling for both elements Name/Identifier
-    if (namePresent) {
+    // Identifier is present but Name is not.
+    if (idfPresent && !namePresent) {
+      classesName += ' is-invalid'
+    }
+
+    // Both Name and Identifier are required.
+    if (bothRequired) {
+      if (!namePresent) {
+        classesName += ' is-invalid'
+      }
       if (!idfPresent) {
         classesIdf += ' is-invalid'
       }
-    } else if (idfPresent) { // als naam wel is ingeuvuld
-      classesName += ' is-invalid'
-    } else if (bothRequired) {
-      classesName += ' is-invalid'
-      classesIdf += ' is-invalid'
     }
 
-    // set the customStyle for the select if invalid
+    // Set the customStyle for the select if invalid.
     if (classesName.search('is-invalid') > -1) {
       customStyles = {
         control: styles => ({
@@ -150,17 +151,17 @@ class AffiliationIdentifier extends React.Component {
     // - Identifier is no longer required
     // -a is-invalid indication must be removed.
     if (this.is_new_affilation) {
-        reqIdf = '';
-        classesIdf = 'form-control'
+      reqIdf = ''
+      classesIdf = 'form-control'
     }
 
-    let labelClasses = 'form-label';
-    if (reqName=='*') {
-        labelClasses += ' select-required';
-        if (namePresent) {
-            // select-filled only has meaning when in combination with select-required (for totalisation of completeness purposes)
-            labelClasses += ' select-filled';
-        }
+    let labelClasses = 'form-label'
+    if (reqName === '*') {
+      labelClasses += ' select-required'
+      if (namePresent) {
+        // select-filled only has meaning when in combination with select-required (for totalisation of completeness purposes)
+        labelClasses += ' select-filled'
+      }
     }
 
     return (
@@ -186,24 +187,24 @@ class AffiliationIdentifier extends React.Component {
           <div className='mb-0 form-group'>
             <label className='form-label'>{titleAffiliationIdentifier}{reqIdf}</label>
 
-            {reqIdf=='*' &&
-            (<input
-              type='text'
-              required
-              className={classesIdf} // 'form-control is-invalid'
-              readOnly={this.props.readonly}
-              onChange={this.handleChangeIdentifier}
-              value={Affiliation_Identifier}
-            />)}
+            {reqIdf === '*' && (
+              <input
+                type='text'
+                required
+                className={classesIdf} // 'form-control is-invalid'
+                readOnly={this.props.readonly}
+                onChange={this.handleChangeIdentifier}
+                value={Affiliation_Identifier}
+              />)}
 
-            {reqIdf=='' &&
-            (<input
-              type='text'
-              className={classesIdf} // 'form-control is-invalid'
-              readOnly={this.props.readonly}
-              onChange={this.handleChangeIdentifier}
-              value={Affiliation_Identifier}
-            />)}
+            {reqIdf === '' && (
+              <input
+                type='text'
+                className={classesIdf} // 'form-control is-invalid'
+                readOnly={this.props.readonly}
+                onChange={this.handleChangeIdentifier}
+                value={Affiliation_Identifier}
+              />)}
 
             <a className='btn btn-sm btn-primary float-end' href='https://ror.org/search' target='_blank' rel='noreferrer'>
               <i className='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup ROR
