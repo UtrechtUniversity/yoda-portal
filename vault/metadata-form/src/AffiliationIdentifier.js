@@ -55,13 +55,7 @@ class AffiliationIdentifier extends React.Component {
   }
 
   render () {
-    console.log(this.options)
-
     const { Affiliation_Name, Affiliation_Identifier } = this.state
-
-    console.log(Affiliation_Name)
-    console.log(Affiliation_Identifier)
-    console.log(this.is_new_affilation)
 
     const titleAffiliationName = this.props.schema.properties.Affiliation_Name.title
     const titleAffiliationIdentifier = this.props.schema.properties.Affiliation_Identifier.title

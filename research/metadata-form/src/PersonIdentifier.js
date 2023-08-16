@@ -111,9 +111,9 @@ class PersonIdentifier extends React.Component {
       requiredScheme = '*'
     }
 
-    let requiredIdentifier = '';
+    let requiredIdentifier = ''
     if (bothRequired || ((typeof Name_Identifier_Scheme !== 'undefined') && Name_Identifier_Scheme.length > 0)) {
-      requiredIdentifier = '*';
+      requiredIdentifier = '*'
     }
 
     // Validation of values and consequences for customstyles of each field
@@ -135,18 +135,16 @@ class PersonIdentifier extends React.Component {
     // Validation of Identifier value
     let classesIdentifierField = 'form-control'
 
-    // Identifier field 'invalid' handling
-    if ((typeof Name_Identifier !== 'undefined') && Name_Identifier.length > 0) {
-        // Identifier is present and possibly must be checked against a pattern
-        if (this.props.schema.properties.Name_Identifier.pattern) {
-            const regex = new RegExp(this.props.schema.properties.Name_Identifier.pattern)
-            if (!(regex.test(Name_Identifier))) {
-                classesIdentifierField += ' is-invalid'
-            }
-        }
-    }
-    else if (requiredIdentifier === '*') {
+    // Use pattern if exists for Identifier.
+    if (this.props.schema.properties.Name_Identifier.pattern) {
+      const regex = new RegExp(this.props.schema.properties.Name_Identifier.pattern)
+      if (!(regex.test(Name_Identifier))) {
         classesIdentifierField += ' is-invalid'
+      }
+    } else if (requiredIdentifier === '*') {
+      if (typeof Name_Identifier === 'undefined' || Name_Identifier.length === 0) {
+        classesIdentifierField += ' is-invalid'
+      }
     }
 
     // Add extra element so user can easily access corresponding search functionality.
@@ -167,13 +165,13 @@ class PersonIdentifier extends React.Component {
       searchLink = <a class='btn btn-sm btn-primary float-end' href={searchUrl} target='_blank' rel='noreferrer'><i class='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup {Name_Identifier_Scheme}</a>
     }
 
-    let labelClasses = 'form-label';
-    if (requiredScheme=='*') {
-        labelClasses += ' select-required';
-        if ((typeof Name_Identifier_Scheme !== 'undefined') && Name_Identifier_Scheme.length > 0) {
-            // select-filled only has meaning when in combination with select-required (for totalisation of completeness purposes)
-            labelClasses += ' select-filled';
-        }
+    let labelClasses = 'form-label'
+    if (requiredScheme === '*') {
+      labelClasses += ' select-required'
+      if ((typeof Name_Identifier_Scheme !== 'undefined') && Name_Identifier_Scheme.length > 0) {
+        // select-filled only has meaning when in combination with select-required (for totalisation of completeness purposes)
+        labelClasses += ' select-filled'
+      }
     }
 
     return (
@@ -194,34 +192,33 @@ class PersonIdentifier extends React.Component {
             </small>
           )}
         </div>
-
         <div className='col compound-field'>
           <div className='mb-0 form-group'>
             <label className='form-label'>{titleIdentifier}{requiredIdentifier}</label>
-            {requiredIdentifier=='*' && 
-            (<InputMask
-              className={classesIdentifierField}
-              required
-              readOnly={this.props.readonly}
-              isDisabled={this.props.readonly}
-              value={Name_Identifier}
-              placeholder={placeholder}
-              onChange={this.handleIdentifierChange}
-              mask={mask}
-              formatChars={formatChars}
-            />)}
+            {requiredIdentifier === '*' && (
+              <InputMask
+                className={classesIdentifierField}
+                required
+                readOnly={this.props.readonly}
+                isDisabled={this.props.readonly}
+                value={Name_Identifier}
+                placeholder={placeholder}
+                onChange={this.handleIdentifierChange}
+                mask={mask}
+                formatChars={formatChars}
+              />)}
 
-            {requiredIdentifier=='' &&
-            (<InputMask
-              className={classesIdentifierField}
-              readOnly={this.props.readonly}
-              isDisabled={this.props.readonly}
-              value={Name_Identifier}
-              placeholder={placeholder}
-              onChange={this.handleIdentifierChange}
-              mask={mask}
-              formatChars={formatChars}
-            />)}
+            {requiredIdentifier === '' && (
+              <InputMask
+                className={classesIdentifierField}
+                readOnly={this.props.readonly}
+                isDisabled={this.props.readonly}
+                value={Name_Identifier}
+                placeholder={placeholder}
+                onChange={this.handleIdentifierChange}
+                mask={mask}
+                formatChars={formatChars}
+              />)}
 
             {searchLink}
 
