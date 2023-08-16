@@ -26,10 +26,6 @@ class Session(object):
         self.irods_time: float    = time.time()       # iRODS session start time
         self.lock: threading.Lock = threading.Lock()
 
-    def __del__(self) -> None:
-        self.irods.cleanup()
-        print(f"[gc/logout]: Cleanup session {self.sid}")
-
 
 sessions: Dict[int, Session] = dict()  # Custom session dict instead of Flask session (cannot pickle iRODS session)
 lock: threading.Lock = threading.Lock()
@@ -42,14 +38,14 @@ def gc() -> None:
             t = time.time()
             global sessions
 
-            # Remove sessions that exceed the Flask session TTL.
-            sessions = {k: v for k, v in sessions.items() if t - v.time < TTL or v.lock.locked()}
-
             # Cleanup iRODS sessions that exceed the iRODS session TTL.
             for _, s in sessions.items():
                 if t - s.irods_time > IRODS_TTL and not s.lock.locked():
                     s.irods.cleanup()
                     s.irods_time = time.time()
+
+            # Remove sessions that exceed the Flask session TTL.
+            sessions = {k: v for k, v in sessions.items() if t - v.time < TTL or v.lock.locked()}
 
         time.sleep(1)
 
@@ -104,7 +100,10 @@ def clean(sid: int) -> None:
     """
     global sessions
     if sid in sessions:
+        s: Session = sessions[sid]
+        s.irods.cleanup()
         del sessions[sid]
+        print(f"[logout]: Cleanup session {sid}")
 
 
 def extend(sid: int) -> None:
