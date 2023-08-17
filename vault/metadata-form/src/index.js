@@ -623,6 +623,20 @@ async function submitData(data) {
     // Disable buttons.
     $('.yodaButtons button').attr('disabled', true);
 
+    // Remove empty arrays and array items when saving.
+    for (const property in data) {
+        if (Array.isArray(data[property])) {
+            var unfiltered = data[property];
+            var filtered = unfiltered.filter(e => e);
+
+            if (filtered.length === 0) {
+                delete data[property];
+            } else {
+                data[property] = filtered;
+            }
+        }
+    }
+
     // Save.
     try {
         await Yoda.call('meta_form_save',
