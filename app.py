@@ -6,7 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 from os import path
 from typing import Dict, Optional
 
-from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
+from flask import Flask, g, jsonify, redirect, request, Response, send_from_directory, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 from jinja2 import ChoiceLoader, FileSystemLoader
@@ -157,6 +157,12 @@ def protect_pages() -> Optional[Response]:
                                                     'user_bp.callback',
                                                     'api_bp._call',
                                                     'static']:
+        # Possibility to check validity/presence of irods and flask session through dedicated endpoint api/ping
+        if '/api/ping' in request.full_path:
+            response = jsonify({'validity flask session': g.get('user', None) is not None,
+                                'validity irods session': g.get('irods', None) is not None})                
+            response.status_code = 200
+            return response
         return None
     elif g.get('user', None) is not None:
         return None
