@@ -2,8 +2,8 @@
 
 @import "node_modules/bootstrap/scss/functions";
 
-// These colors must be defined before importing the bootstrap variables but after the bootstrap functions.
-@import "uu/colors";
+// Any default variable overrides go here
+@import "uu/variables";
 
 // Variables-dark should be imported right after variables
 @import "node_modules/bootstrap/scss/variables";

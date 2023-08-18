@@ -1,10 +1,13 @@
 // colors
+$white: #fff;
 $primary: #007ecc;
 $grey: #e1e1e1;
 $black: #000;
 $gray-alt: #e9ecef;
 
-// Yoda Navbar
+/* Yoda Navbar
+   The navbar is navbar-dark, but the theming here is light colors.
+   In VU's index.scss the navbar's actual dark theme is set. */
 $navbar-bg: $grey;
 $navbar-dark-color: $primary;
 $navbar-dark-brand-color: $primary;

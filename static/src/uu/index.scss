@@ -1,14 +1,5 @@
-@import "variables";
 @import "font";
 @import "badge";
-
-/* Logo */
-.logo {
-    background-image: url("/static/img/logo.svg");
-    width: 176px;
-    display: block !important;
-    height: 48px;
-}
 
 // Dark theme specific settings
 [data-bs-theme="dark"] {
@@ -18,34 +9,7 @@
         --bs-breadcrumb-divider-color: var(--bs-gray-alt2);
         --bs-breadcrumb-item-active-color: var(--bs-gray-alt);
     }
-
-    /* Logo */
-    .logo {
-        background-image: url("/static/img/logo_white.svg");
-        background-size: 140.6px 48px;
-        width: 140.6px;
-        height: 48px;
-        display: block !important;
-    }
     
-    /* Tables */
-    .yoda-table th {
-        // border-color: $black-alt;
-        color: var(--bs-card-color);
-        background: $black-alt;
-    }
-
-    #file-browser th {
-        background: $black-alt;
-        border-color: $black-alt;
-        border-bottom: 1px solid transparent;
-        color: var(--bs-card-color);
-    }
-
-    .dataTables_wrapper .dataTables_info {
-        color: $white;
-    }
-
     /* Links */
     a {
         color: $white;
@@ -54,38 +18,5 @@
     /* Steps in datarequest */
     .bs-wizard > .bs-wizard-step .bs-wizard-stepnum {
         color: $gray-400;
-    }
-    
-    /* Select 2 selectors */
-    .select2-container {
-        color: var(--bs-body-color);
-        background: var(--bs-body-bg);
-    }
-
-    .select2-input {
-        color: var(--bs-body-color);
-        background: var(--bs-body-bg);
-    }
-
-    .select2-chosen {
-        color: var(--bs-body-color);
-        background: var(--bs-body-bg);
-    }
-
-    .select2-drop {
-        color: var(--bs-body-color);
-        background: var(--bs-body-bg);
-    }
-
-    .select2-container .select2-choice > .select2-chosen {
-        color: var(--bs-body-color);
-        background: var(--bs-body-bg);
-        border: var(--bs-border-width) solid var(--bs-border-color);
-        border-radius: var(--bs-border-radius);
-    }
-
-    .select2-drop-mask {
-        color: var(--bs-body-color);
-        background: var(--bs-body-bg);
     }
 }

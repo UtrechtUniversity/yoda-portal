@@ -1,11 +1,19 @@
-@import "variables";
 @import "font";
 @import "badge";
 
-img.logo {
-    height: 48px;
-}
-
 .breadcrumb_item,  .breadcrumb-item a {
    color: #fff !important;
+}
+
+// Dark theme specific settings
+[data-bs-theme="dark"] {
+    /* Links */
+    a {
+        color: $white;
+    }
+
+    /* Steps in datarequest */
+    .bs-wizard > .bs-wizard-step .bs-wizard-stepnum {
+        color: $white;
+    }
 }

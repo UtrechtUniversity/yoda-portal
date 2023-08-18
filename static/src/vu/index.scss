@@ -1,7 +1,63 @@
-@import "variables";
 @import "font";
 @import "badge";
 
-img.logo {
-    height: 48px;
+// Dark theme specific settings
+[data-bs-theme="dark"] {
+    // Custom dark mode navbar
+    .navbar {
+        --bs-navbar-dark-color: var(--bs-white);
+        --bs-navbar-dark-bg-color: var(--bs-black);
+        --bs-navbar-dark-hover-color: #000;
+        --bs-navbar-dark-disabled-color: rgba(255, 255, 255, 0.25);
+        --bs-navbar-active-color: #000;
+        color: $white;
+        background: $black;
+    }
+
+    .navbar-brand {
+        color: $white;
+    }
+
+    .nav-link {
+        color: $white;
+    }
+
+    .nav-link:hover {
+        color: var(--bs-nav-link-color);
+    }
+
+    .navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
+        color: var(--bs-nav-link-color);
+    }
+
+    .nav-link:active {
+        color: var(--bs-nav-link-color);
+    }
+
+    .nav-link.active {
+        color: var(--bs-nav-link-color);
+    }
+
+    /* Buttons */
+    .btn {
+        --bs-btn-color: $primary;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        --bs-breadcrumb-bg: var(--bs-secondary-bg);
+        // --bs-breadcrumb-bg: #fff;
+        --bs-breadcrumb-divider-color: $grey;
+        --bs-breadcrumb-item-active-color: $gray-alt;
+    }
+
+    /* Links */
+    a {
+        color: $white;
+    }
+
+    /* Steps in datarequest */
+    .bs-wizard > .bs-wizard-step .bs-wizard-stepnum {
+        color: $gray-alt;
+    }
 }
