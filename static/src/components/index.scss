@@ -4,7 +4,6 @@
 @import "links";
 @import "navbar";
 
-$black-alt: #333;
 
 /* Logo */
 .logo {
@@ -22,28 +21,24 @@ $black-alt: #333;
         background-image: url("/assets/img/logo_dark.svg");
         background-repeat: no-repeat;
         background-size: 140.6px 48px;
-        // width: 140.6px;
-        // min-width: 140.6px;
-        // height: 48px;
         display: block !important;
     }
 
     /* Tables */
     .yoda-table th {
-        // border-color: $black-alt;
         color: var(--bs-card-color);
-        background: $black-alt;
+        background: var( --bs-dark-bg-subtle);
     }
 
     #file-browser th {
-        background: $black-alt;
-        border-color: $black-alt;
+        background: var( --bs-dark-bg-subtle);
+        border-color: var( --bs-dark-bg-subtle);
         border-bottom: 1px solid transparent;
         color: var(--bs-card-color);
     }
 
     .dataTables_wrapper .dataTables_info {
-        color: $white;
+        color: var(--bs-white);
     }
 
     /* Select 2 selectors */

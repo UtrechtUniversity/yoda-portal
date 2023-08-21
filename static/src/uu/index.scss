@@ -10,8 +10,8 @@
         --bs-breadcrumb-item-active-color: var(--bs-gray-alt);
     }
     
-    /* Links */
-    a {
+    /* File browser rows */
+    .browse, .deposit-delete {
         color: $white;
     }
 

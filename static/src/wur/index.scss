@@ -2,13 +2,13 @@
 @import "badge";
 
 .breadcrumb_item,  .breadcrumb-item a {
-   color: #fff !important;
+   color: $white !important;
 }
 
 // Dark theme specific settings
 [data-bs-theme="dark"] {
-    /* Links */
-    a {
+    /* File browser rows */
+    .browse, .deposit-delete {
         color: $white;
     }
 
