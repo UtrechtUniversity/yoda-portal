@@ -13,6 +13,7 @@ class AffiliationIdentifier extends React.Component {
 
     // Placeholder for the vocabulary options to be collected externally
     this.options = [{ value: 'https://ror.org/04pp8hn57', label: 'Utrecht University' }]
+    this.is_new_affilation = false
 
     const url = props.uiSchema['ui:data']
 
@@ -35,8 +36,11 @@ class AffiliationIdentifier extends React.Component {
 
   handleChange = (event) => {
     this.setFormData('Affiliation_Name', event.label)
+    this.is_new_affilation = false
     if (event.__isNew__ === undefined || event.__isNew__ === false) {
       this.setFormData('Affiliation_Identifier', event.value)
+    } else if (event.__isNew__) {
+      this.is_new_affilation = true
     }
   }
 
@@ -79,7 +83,6 @@ class AffiliationIdentifier extends React.Component {
     const parts = parentContext.split('_')
     parts.pop()
     parentContext = parts.join('_')
-    console.log(parentContext)
 
     let bothRequired = false
     try {
@@ -96,19 +99,26 @@ class AffiliationIdentifier extends React.Component {
     const namePresent = !(typeof Affiliation_Name === 'undefined' || Affiliation_Name.length === 0)
     const idfPresent = !(typeof Affiliation_Identifier === 'undefined' || Affiliation_Identifier.length === 0)
 
-    // Specific class handling for both elements Name/Identifier
-    if (namePresent) {
+    // Identifier is present but Name is not.
+    if (idfPresent && !namePresent) {
+      reqName = '*'
+      classesName += ' is-invalid'
+    }
+
+    // Both Name and Identifier are required.
+    if (bothRequired) {
+      reqName = '*'
+      reqIdf = '*'
+
+      if (!namePresent) {
+        classesName += ' is-invalid'
+      }
       if (!idfPresent) {
         classesIdf += ' is-invalid'
       }
-    } else if (idfPresent) { // als naam wel is ingeuvuld
-      classesName += ' is-invalid'
-    } else if (bothRequired) {
-      classesName += ' is-invalid'
-      classesIdf += ' is-invalid'
     }
 
-    // set the customStyle for the select if invalid
+    // Set the customStyle for the select if invalid.
     if (classesName.search('is-invalid') > -1) {
       customStyles = {
         control: styles => ({
@@ -122,25 +132,28 @@ class AffiliationIdentifier extends React.Component {
       }
     }
 
-    // Handling of '*' in the label of both fields
-    if (bothRequired) {
-      reqName = '*'
-      reqIdf = '*'
-    } else {
-      if (!(typeof Affiliation_Name === 'undefined' || Affiliation_Name.length === 0)) {
-        reqIdf = '*'
-      }
-      if (!(typeof Affiliation_Identifier === 'undefined' || Affiliation_Identifier.length === 0)) {
-        reqName = '*'
+    // Handling of new Affiliation: this overrules all for the identifier field
+    // - Identifier is no longer required
+    // -a is-invalid indication must be removed.
+    if (this.is_new_affilation) {
+      reqIdf = ''
+      classesIdf = 'form-control'
+    }
+
+    let labelClasses = 'form-label'
+    if (reqName === '*') {
+      labelClasses += ' select-required'
+      if (namePresent) {
+        // select-filled only has meaning when in combination with select-required (for totalisation of completeness purposes)
+        labelClasses += ' select-filled'
       }
     }
 
     return (
       <div className='d-flex'>
         <div className='col compound-field'>
-          <label className='form-label select-required select-filled'>{titleAffiliationName}{reqName}</label>
+          <label className={labelClasses}>{titleAffiliationName}{reqName}</label>
           <CreatableSelect
-            className='select-box is-invalid'
             options={this.options}
             required={reqName === '*'}
             isDisabled={this.props.readonly}
@@ -158,13 +171,30 @@ class AffiliationIdentifier extends React.Component {
         <div className='col compound-field'>
           <div className='mb-0 form-group'>
             <label className='form-label'>{titleAffiliationIdentifier}{reqIdf}</label>
-            <input
-              type='text'
-              className={classesIdf} // 'form-control is-invalid'
-              readOnly={this.props.readonly}
-              onChange={this.handleChangeIdentifier}
-              value={Affiliation_Identifier}
-            />
+
+            {reqIdf === '*' && (
+              <input
+                type='text'
+                required
+                className={classesIdf} // 'form-control is-invalid'
+                readOnly={this.props.readonly}
+                onChange={this.handleChangeIdentifier}
+                value={Affiliation_Identifier}
+              />)}
+
+            {reqIdf === '' && (
+              <input
+                type='text'
+                className={classesIdf} // 'form-control is-invalid'
+                readOnly={this.props.readonly}
+                onChange={this.handleChangeIdentifier}
+                value={Affiliation_Identifier}
+              />)}
+
+            <a className='btn btn-sm btn-primary float-end' href='https://ror.org/search' target='_blank' rel='noreferrer'>
+              <i className='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup ROR
+            </a>
+
             {helpAffiliationIdentifier && (
               <small className='text-muted form-text'>
                 <p className='help-block'>{helpAffiliationIdentifier}</p>

@@ -36,8 +36,6 @@ const enumWidget = (props) => {
     let i = enumArray.indexOf(props['value']);
     let placeholder = enumNames[i] == null ? ' ' : enumNames[i];
 
-    let title = props.label || props.uiSchema["ui:title"]
-    let label = <label className="form-label">{title}</label>
     let customStyles = {
         control: styles => ({
             ...styles,
@@ -83,8 +81,13 @@ const enumWidget = (props) => {
         required = formProperties.data.schema.required.includes(name_hierarchy[0]);
     }
 
+    // will hold classes (select-required, select-filled) as indications for totalization purposes.
+    // For that purpose element <selectTotals> will be added.
+    let selectCompletenessClasses = '';
+
     if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) || (required && props.value == null)) {
-        label = <label className="text-danger form-label select-required">{title}*</label>
+        // Indicate that this element is required and should be counted as total
+        selectCompletenessClasses = 'select-required';
         customStyles = {
             control: styles => ({
                 ...styles,
@@ -96,11 +99,13 @@ const enumWidget = (props) => {
             })
         };
     } else if (required) {
-        label = <label className="form-label select-required select-filled">{title}*</label>
+        // Indicate that this element is required and holds a value
+        selectCompletenessClasses = 'select-required select-filled';
     }
 
     return (
         <div>
+            <selectTotals class={selectCompletenessClasses}></selectTotals>
             <Select className={'select-box'}
                     placeholder={placeholder}
                     required={required}
@@ -195,7 +200,7 @@ const CustomArrayFieldTemplate = (props) => {
                                         </div>
                                     )}
 
-                                    {el.hasRemove && (
+                                    {el.hasRemove && props.items.length > 1 && (
                                         <div className="m-0 p-0">
                                             <button className="btn btn-light btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onDropIndexClick(el.index)}>
@@ -617,6 +622,20 @@ $(_ => loadForm());
 async function submitData(data) {
     // Disable buttons.
     $('.yodaButtons button').attr('disabled', true);
+
+    // Remove empty arrays and array items when saving.
+    for (const property in data) {
+        if (Array.isArray(data[property])) {
+            var unfiltered = data[property];
+            var filtered = unfiltered.filter(e => e);
+
+            if (filtered.length === 0) {
+                delete data[property];
+            } else {
+                data[property] = filtered;
+            }
+        }
+    }
 
     // Save.
     try {

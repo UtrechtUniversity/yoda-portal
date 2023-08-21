@@ -19,7 +19,7 @@
 
         <div class="input-group mb-3">
             <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <span id="search_concept" data-type="filename">Search by filename</span>
+                <span id="search_concept" data-type="{{ searchType|safe }}">Search by filename</span>
             </button>
             <ul id="search-panel" class="dropdown-menu">
                 <li><a class="dropdown-item" data-type="filename">Search by filename</a></li>
