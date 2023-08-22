@@ -14,6 +14,10 @@
     height: 48px;
 }
 
+.breadcrumb-container {
+    background-color: $breadcrumb-bg;
+}
+
 // Dark theme specific settings
 [data-bs-theme="dark"] {
     /* Logo */
