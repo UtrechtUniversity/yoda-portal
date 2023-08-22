@@ -49,6 +49,9 @@
         --bs-breadcrumb-divider-color: $grey;
         --bs-breadcrumb-item-active-color: $gray-alt;
     }
+    .breadcrumb-container {
+        background-color: var(--bs-secondary-bg);
+    }
 
     /* File browser rows */
     .browse, .deposit-delete {

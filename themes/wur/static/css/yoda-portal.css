@@ -71,6 +71,11 @@ table.dataTable tbody tr td a:hover {
   height: 48px;
 }
 
+/* Breadcrumb */
+.breadcrumb-container {
+  background-color: #005172;
+}
+
 [data-bs-theme=dark] {
   /* Logo */
   /* Tables */

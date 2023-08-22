@@ -33,6 +33,9 @@
   --bs-breadcrumb-divider-color: var(--bs-gray-alt2);
   --bs-breadcrumb-item-active-color: var(--bs-gray-alt);
 }
+[data-bs-theme=dark] .breadcrumb-container {
+  background-color: var(--bs-tertiary-bg);
+}
 [data-bs-theme=dark] .browse, [data-bs-theme=dark] .deposit-delete, [data-bs-theme=dark] .page-link, [data-bs-theme=dark] .system-metadata-items, [data-bs-theme=dark] .name {
   color: #fff;
 }
@@ -68,6 +71,11 @@ table.dataTable tbody tr td a:hover {
   width: 190px;
   display: block !important;
   height: 48px;
+}
+
+/* Breadcrumb */
+.breadcrumb-container {
+  background-color: #e9ecef;
 }
 
 [data-bs-theme=dark] {

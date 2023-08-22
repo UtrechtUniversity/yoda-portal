@@ -25,6 +25,10 @@ $(function () {
     startBrowsing()
   }
 
+  $('.btn-go-to-vault').on('click', function () {
+    window.location.href = '/vault/?dir=' + encodeURIComponent('/' + $(this).attr('vault-area'));
+  })
+
   $('.btn-group button.metadata-form').on('click', function () {
     showMetadataForm($(this).attr('data-path'))
   })
@@ -507,10 +511,6 @@ $(function () {
     e.preventDefault()
   })
 
-  $('body').on('click', 'a.action-go-to-vault', function () {
-    window.location.href = '/vault/?dir=' + encodeURIComponent('/' + $(this).attr('vault-path'))
-  })
-
   $('body').on('click', "input:checkbox[name='multiSelect[]']", function () {
     if ($("input:checkbox[name='multiSelect[]']:checked").length) {
       $('#multiSelect').removeClass('hide')
@@ -741,10 +741,25 @@ function changeBrowserUrl (path) {
 
 function browse (dir = '', changeHistory = false) {
   currentFolder = dir
+  // remove hide class that could have been added when a erroneous vault path was used.
+  $('#file-browser_wrapper').removeClass('hide');
+  handleGoToVaultButton(dir);
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
   topInformation(dir, true) // only here topInformation should show its alertMessage
   buildFileBrowser(dir)
+}
+
+function handleGoToVaultButton(dir) {
+  // Handle the button with which to return to the corresponding research area.
+  const parts = dir.split('/');
+
+  if (parts.length>1) {
+    $('.btn-go-to-vault').attr("vault-area", parts[1].replace('research-', 'vault-')).show()
+  }
+  else {
+    $('.btn-go-to-vault').attr("vault-area", "").hide();
+  }
 }
 
 function makeBreadcrumb (dir) {
@@ -820,7 +835,8 @@ const getFolderContents = (() => {
           sort_order: args.order[0].dir,
           sort_on: ['name', 'size', 'modified'][args.order[0].column - 1],
           space: 'Space.RESEARCH'
-        })
+        },
+        { quiet: true, rawResult: false })
 
       // If another requests has come while we were waiting, simply drop this one.
       if (i !== j) return null
@@ -1089,7 +1105,19 @@ window.addEventListener('popstate', function (e) {
 function topInformation (dir, showAlert) {
   if (typeof dir !== 'undefined') {
     Yoda.call('research_collection_details',
-      { path: Yoda.basePath + dir }).then((data) => {
+      { path: Yoda.basePath + dir },
+      { quiet: true, rawResult: true }).then((dataRaw) => {
+
+      if (dataRaw.status == 'error_nonexistent') {
+          Yoda.set_message('error', 'The indicated path to the vault does not exists: ' + dir)
+          $('#file-browser_wrapper').addClass('hide');
+          $('.top-information').addClass('hide');
+
+          // no more action required here
+          return true;
+      }
+
+      let data = dataRaw.data;
       let statusText = ''
       const basename = data.basename
       const status = data.status
@@ -1216,18 +1244,8 @@ function topInformation (dir, showAlert) {
       // Add checksum report
       actions['show-checksum-report'] = 'Show checksum report'
 
-      // Add go to vault to actions.
-      if (typeof vaultPath !== 'undefined') {
-        actions['go-to-vault'] = 'Go to vault'
-      }
-
       // Handle actions
       handleActionsList(actions, dir)
-
-      // Set vault paths.
-      if (typeof vaultPath !== 'undefined') {
-        $('a.action-go-to-vault').attr('vault-path', vaultPath)
-      }
 
       const folderName = Yoda.htmlEncode(basename).replace(/ /g, '&nbsp;')
       const statusBadge = '<span id="statusBadge" class="ms-2 badge rounded-pill bg-primary">' + statusText + '</span>'
@@ -1263,8 +1281,7 @@ function handleActionsList (actions, folder) {
 
   const possibleVaultActions = ['cleanup',
     'check-for-unpreservable-files',
-    'show-checksum-report',
-    'go-to-vault']
+    'show-checksum-report']
 
   $.each(possibleActions, function (index, value) {
     if (Object.prototype.hasOwnProperty.call(actions, value)) {
