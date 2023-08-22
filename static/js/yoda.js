@@ -9,6 +9,14 @@
 // Namespace for JS functions shared across Yoda modules.
 const Yoda = {}
 
+Yoda.set_color_mode_auto = function (type, msg) {
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.setAttribute('data-bs-theme', 'dark')
+  } else {
+    document.documentElement.setAttribute('data-bs-theme', 'light')
+  }
+}
+
 Yoda.store_message = function (type, msg) {
   type = (type === 'error') ? 'danger' : type
 
