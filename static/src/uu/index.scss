@@ -5,11 +5,11 @@
 [data-bs-theme="dark"] {
     /* Breadcrumb */
     .breadcrumb {
-        --bs-breadcrumb-bg: var(--bs-black);
+        --bs-breadcrumb-bg: var(--bs-tertiary-bg);
         --bs-breadcrumb-divider-color: var(--bs-gray-alt2);
         --bs-breadcrumb-item-active-color: var(--bs-gray-alt);
     }
-    
+
     /* File browser rows */
     .browse, .deposit-delete {
         color: $white;

@@ -7,9 +7,9 @@
     .navbar {
         --bs-navbar-dark-color: var(--bs-white);
         --bs-navbar-dark-bg-color: var(--bs-black);
-        --bs-navbar-dark-hover-color: #000;
+        --bs-navbar-dark-hover-color: var(--bs-black);
         --bs-navbar-dark-disabled-color: rgba(255, 255, 255, 0.25);
-        --bs-navbar-active-color: #000;
+        --bs-navbar-active-color: var(--bs-black);
         color: $white;
         background: $black;
     }
@@ -46,7 +46,6 @@
     /* Breadcrumb */
     .breadcrumb {
         --bs-breadcrumb-bg: var(--bs-secondary-bg);
-        // --bs-breadcrumb-bg: #fff;
         --bs-breadcrumb-divider-color: $grey;
         --bs-breadcrumb-item-active-color: $gray-alt;
     }
