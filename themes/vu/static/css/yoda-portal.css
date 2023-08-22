@@ -67,6 +67,9 @@
   --bs-breadcrumb-divider-color: $grey;
   --bs-breadcrumb-item-active-color: $gray-alt;
 }
+[data-bs-theme=dark] .breadcrumb-container {
+  background-color: var(--bs-secondary-bg);
+}
 [data-bs-theme=dark] .browse, [data-bs-theme=dark] .deposit-delete {
   color: #fff;
 }
@@ -107,6 +110,7 @@ table.dataTable tbody tr td a:hover {
   height: 48px;
 }
 
+/* Breadcrumb */
 .breadcrumb-container {
   background-color: #e9ecef;
 }
