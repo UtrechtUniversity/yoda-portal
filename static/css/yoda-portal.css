@@ -33,7 +33,7 @@
   --bs-breadcrumb-divider-color: var(--bs-gray-alt2);
   --bs-breadcrumb-item-active-color: var(--bs-gray-alt);
 }
-[data-bs-theme=dark] .browse, [data-bs-theme=dark] .deposit-delete, [data-bs-theme=dark] .page-link {
+[data-bs-theme=dark] .browse, [data-bs-theme=dark] .deposit-delete, [data-bs-theme=dark] .page-link, [data-bs-theme=dark] .system-metadata-items {
   color: #fff;
 }
 [data-bs-theme=dark] .bs-wizard > .bs-wizard-step .bs-wizard-stepnum {

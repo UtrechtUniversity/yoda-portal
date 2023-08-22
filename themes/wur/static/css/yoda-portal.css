@@ -37,6 +37,9 @@
 [data-bs-theme=dark] .bs-wizard > .bs-wizard-step .bs-wizard-stepnum {
   color: #ffffff;
 }
+[data-bs-theme=dark] .logo {
+  background-size: unset;
+}
 
 .hidden {
   display: none !important;

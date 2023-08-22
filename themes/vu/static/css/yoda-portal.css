@@ -73,6 +73,9 @@
 [data-bs-theme=dark] .bs-wizard > .bs-wizard-step .bs-wizard-stepnum {
   color: #e9ecef;
 }
+[data-bs-theme=dark] .logo {
+  background-size: unset;
+}
 
 .hidden {
   display: none !important;
@@ -4424,14 +4427,14 @@ textarea.form-control-lg {
   --bs-card-title-color: ;
   --bs-card-subtitle-color: ;
   --bs-card-border-width: var(--bs-border-width);
-  --bs-card-border-color: #e1e1e1;
+  --bs-card-border-color: var(--bs-border-color-translucent);
   --bs-card-border-radius: var(--bs-border-radius);
   --bs-card-box-shadow: ;
   --bs-card-inner-border-radius: calc(var(--bs-border-radius) - (var(--bs-border-width)));
   --bs-card-cap-padding-y: 0.5rem;
   --bs-card-cap-padding-x: 1rem;
-  --bs-card-cap-bg: #e1e1e1;
-  --bs-card-cap-color: #007ecc;
+  --bs-card-cap-bg: rgba(var(--bs-body-color-rgb), 0.03);
+  --bs-card-cap-color: ;
   --bs-card-height: ;
   --bs-card-color: ;
   --bs-card-bg: var(--bs-body-bg);
