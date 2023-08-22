@@ -74,7 +74,7 @@
   color: #e9ecef;
 }
 [data-bs-theme=dark] .logo {
-  background-size: unset;
+  background-size: unset !important;
 }
 
 .hidden {
