@@ -1,11 +1,23 @@
-@import "variables";
 @import "font";
 @import "badge";
 
-img.logo {
-    height: 48px;
+.breadcrumb_item,  .breadcrumb-item a {
+   color: $white !important;
 }
 
-.breadcrumb_item,  .breadcrumb-item a {
-   color: #fff !important;
+// Dark theme specific settings
+[data-bs-theme="dark"] {
+    /* File browser rows */
+    .browse, .deposit-delete {
+        color: $white;
+    }
+
+    /* Steps in datarequest */
+    .bs-wizard > .bs-wizard-step .bs-wizard-stepnum {
+        color: $white;
+    }
+
+    .logo {
+        background-size: unset !important;
+    }
 }

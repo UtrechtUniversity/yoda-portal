@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" {% if g.settings and g.settings.color_mode and g.settings.color_mode == 'DARK' %} data-bs-theme="dark" {% else %} data-bs-theme="light" {% endif %}>
     <head>
         {% block head %}
             <meta charset="utf-8">
@@ -33,6 +33,9 @@
                 {% endif %}
                 {% if g.settings %}
                     Yoda.settings = {{ g.settings | tojson}}
+                    {% if g.settings.color_mode == 'AUTO' %}
+                        Yoda.set_color_mode_auto()
+                    {% endif %}
                 {% endif %}
             </script>
             {% block scripts %}{% endblock scripts %}
@@ -44,9 +47,7 @@
             <div class="container">
                 <div class="row justify-content-between">
                     <div class="col-2">
-                        <a href="{{ url_for('general_bp.index') }}" class="mb-lg-0 me-lg-auto text-dark text-decoration-none">
-                            <img class="logo" src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo">
-                        </a>
+                        <a href="{{ url_for('general_bp.index') }}" class="logo mb-lg-0 me-lg-auto text-dark text-decoration-none"></a>
                     </div>
                     <div class="col-6 row">
                         <div class="col-10">

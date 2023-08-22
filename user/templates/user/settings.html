@@ -43,6 +43,16 @@
                 <div id="number_of_items_help" class="form-text">
                     Set default number of items shown in the data tables.
                 </div>
+
+                <label for="color_mode" class="form-label">Color mode</label>
+                <select class="form-select" id="color_mode" name="color_mode" aria-describedby="color_mode_help">
+                    <option value="AUTO" {% if color_mode == 'AUTO' %}selected{% else %}{% endif %}>Auto</option>
+                    <option value="LIGHT" {% if color_mode == 'LIGHT' %}selected{% else %}{% endif %}>Light</option>
+                    <option value="DARK" {% if color_mode == 'DARK' %}selected{% else %}{% endif %}>Dark</option>
+                </select>
+                <div id="color_mode_help" class="form-text">
+                    Set the default color mode in Yoda.
+                </div>
                 <div class="input-group mt-3 mb-3">
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
