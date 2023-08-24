@@ -315,7 +315,15 @@ function browse (dir = '', changeHistory = false) {
   handleGoToResearchButton(dir);
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
-  metadataInfo(dir)
+
+  // Used to initially hide Metadata info, alerts
+  const pathParts = dir.split('/')
+  // Do not show metadata outside data package.
+  if (pathParts.length < 3) {
+    $('.metadata-info').hide()
+    $('.alert.is-archived').hide()
+    $('.alert.is-processing').hide()
+  }
   topInformation(dir, true) // only here topInformation should show its alertMessage
   buildFileBrowser(dir)
 }
@@ -752,6 +760,15 @@ function topInformation (dir, showAlert) {
           }
         }
 
+        // Vault in progress of being created
+        $('.alert.is-processing').hide()
+        if (vaultStatus === '' || vaultStatus === 'INCOMPLETE') {
+          $('.alert.is-processing').show()
+        }
+        else {
+          metadataInfo(dir)
+        }
+
         // Datamanager sees access buttons in vault.
         $('.top-info-buttons').show()
         if (isDatamanager) {
@@ -994,16 +1011,8 @@ async function handleFileStage (collection, fileName) {
 function metadataInfo (dir) {
   /* Loads metadata of the vault packages */
   const pathParts = dir.split('/')
-
-  // Do not show metadata outside data package.
-  if (pathParts.length < 3) {
-    $('.metadata-info').hide()
-    $('.alert.is-archived').hide()
-    return
-  } else {
-    pathParts.length = 3
-    dir = pathParts.join('/')
-  }
+  pathParts.length = 3
+  dir = pathParts.join('/')
 
   try {
     Yoda.call('meta_form_load',
