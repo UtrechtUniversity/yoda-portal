@@ -762,7 +762,7 @@ function topInformation (dir, showAlert) {
 
         // Vault in progress of being created
         $('.alert.is-processing').hide()
-        if (!vaultStatus || vaultStatus === "" || vaultStatus === 'INCOMPLETE' || vaultStatus === 'EMPTY') {
+        if (vaultStatus === '' || vaultStatus === 'INCOMPLETE') {
           $('.alert.is-processing').show()
         }
         else {
