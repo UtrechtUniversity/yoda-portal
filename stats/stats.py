@@ -27,6 +27,13 @@ def index() -> Response:
 def export() -> Response:
     response = api.call('resource_monthly_category_stats', data={})
 
+    if len(response['data']['dates']) == 0:
+        output = make_response('No storage data was found.')
+        output.headers["Content-Disposition"] = "attachment; filename=NoStorageDataFound.csv"
+        output.headers["Content-type"] = "text/csv"
+        return output
+    
+
     csv = "category;subcategory;groupname;"
 
     periods = ";".join(response['data']['dates'])
