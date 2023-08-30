@@ -568,7 +568,11 @@ $(function () {
 
     $('#f-group-create-sram-group').prop('checked', false)
 
-    $('#f-group-create-prefix-datamanager').addClass('hidden')
+    if (that.canCreateDatamanagerGroup(category)) { 
+      $('#f-group-create-prefix-datamanager').removeClass('hidden') 
+    } else { 
+      $('#f-group-create-prefix-datamanager').addClass('hidden') 
+    }
 
     $('#f-group-create-schema-id').select2('val', that.schemaIdDefault)
     $('#f-group-create-expiration-date').val('')
