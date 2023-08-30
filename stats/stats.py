@@ -32,7 +32,6 @@ def export() -> Response:
         output.headers["Content-Disposition"] = "attachment; filename=NoStorageDataFound.csv"
         output.headers["Content-type"] = "text/csv"
         return output
-    
 
     csv = "category;subcategory;groupname;"
 
