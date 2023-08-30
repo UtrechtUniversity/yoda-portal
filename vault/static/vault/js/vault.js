@@ -27,6 +27,10 @@ $(function () {
     startBrowsing()
   }
 
+  $('.btn-go-to-research').on('click', function () {
+    window.location.href = '/research/?dir=' + encodeURIComponent('/' + $(this).attr('research-area'));
+  })
+
   $('.btn-group button.metadata-form').on('click', function () {
     showMetadataForm($(this).attr('data-path'))
   })
@@ -289,10 +293,6 @@ $(function () {
     vaultUnarchive($(this).attr('data-folder'))
   })
 
-  $('body').on('click', 'a.action-go-to-research', function () {
-    window.location.href = '/research/?dir=' + encodeURIComponent('/' + $(this).attr('research-path'))
-  })
-
   // FILE stage
   $('body').on('click', 'a.file-stage', function () {
     handleFileStage($(this).attr('data-collection'), $(this).attr('data-name'))
@@ -310,11 +310,34 @@ function changeBrowserUrl (path) {
 
 function browse (dir = '', changeHistory = false) {
   currentFolder = dir
+  // remove hide class that could have been added when a erroneous vault path was used.
+  $('#file-browser_wrapper').removeClass('hide');
+  handleGoToResearchButton(dir);
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
-  metadataInfo(dir)
+
+  // Used to initially hide Metadata info, alerts
+  const pathParts = dir.split('/')
+  // Do not show metadata outside data package.
+  if (pathParts.length < 3) {
+    $('.metadata-info').hide()
+    $('.alert.is-archived').hide()
+    $('.alert.is-processing').hide()
+  }
   topInformation(dir, true) // only here topInformation should show its alertMessage
   buildFileBrowser(dir)
+}
+
+function handleGoToResearchButton(dir) {
+  // Handle the button with which to return to the corresponding research area.
+  const parts = dir.split('/');
+
+  if (parts.length>1) {
+    $('.btn-go-to-research').attr("research-area", parts[1].replace('vault-', 'research-')).show()
+  }
+  else {
+    $('.btn-go-to-research').attr("research-area", "").hide();
+  }
 }
 
 function makeBreadcrumb (dir) {
@@ -382,6 +405,7 @@ const getFolderContents = (() => {
     } else {
       // Nope, load new data via the API.
       const j = ++i
+
       const result = await Yoda.call('browse_folder',
         {
           coll: Yoda.basePath + currentFolder,
@@ -390,7 +414,9 @@ const getFolderContents = (() => {
           sort_order: args.order[0].dir,
           sort_on: ['name', 'size', 'modified'][args.order[0].column],
           space: 'Space.VAULT'
-        })
+        },
+        { quiet: true, rawResult: false }
+       )
 
       // If another requests has come while we were waiting, simply drop this one.
       if (i !== j) return null
@@ -508,6 +534,9 @@ const tableRenderer = {
 }
 
 function startBrowsing () {
+
+   // $('#file-browser_wrapper').removeClass('hide');
+
   $('#file-browser').DataTable({
     bFilter: false,
     bInfo: false,
@@ -614,7 +643,19 @@ window.addEventListener('popstate', function (e) {
 function topInformation (dir, showAlert) {
   if (typeof dir !== 'undefined') {
     Yoda.call('vault_collection_details',
-      { path: Yoda.basePath + dir }).then((data) => {
+      { path: Yoda.basePath + dir },
+      { quiet: true, rawResult: true }).then((dataRaw) => {
+
+      let data = dataRaw.data;
+      if (dataRaw.status == 'error_nonexistent') {
+          Yoda.set_message('error', 'The indicated path to the vault does not exists: ' + dir)
+          $('#file-browser_wrapper').addClass('hide');
+          $('.top-information').addClass('hide');
+
+          // no more action required here
+          return true;
+      }
+
       let statusText = ''
       let archiveBadge = ''
       const vaultStatus = data.status
@@ -719,6 +760,15 @@ function topInformation (dir, showAlert) {
           }
         }
 
+        // Vault in progress of being created
+        $('.alert.is-processing').hide()
+        if (vaultStatus === '' || vaultStatus === 'INCOMPLETE') {
+          $('.alert.is-processing').show()
+        }
+        else {
+          metadataInfo(dir)
+        }
+
         // Datamanager sees access buttons in vault.
         $('.top-info-buttons').show()
         if (isDatamanager) {
@@ -746,18 +796,8 @@ function topInformation (dir, showAlert) {
       // Add checksum report
       actions['show-checksum-report'] = 'Show checksum report'
 
-      // Add go to research to actions.
-      if (typeof researchPath !== 'undefined') {
-        actions['go-to-research'] = 'Go to research'
-      }
-
       // Handle actions
       handleActionsList(actions, dir)
-
-      // Set research path.
-      if (typeof researchPath !== 'undefined') {
-        $('a.action-go-to-research').attr('research-path', researchPath)
-      }
 
       const statusBadge = '<span id="statusBadge" class="ml-2 badge rounded-pill bg-primary">' + statusText + '</span>'
 
@@ -789,8 +829,7 @@ function handleActionsList (actions, folder) {
   const possibleVaultActions = ['grant-vault-access', 'revoke-vault-access',
     'copy-vault-package-to-research',
     'check-for-unpreservable-files',
-    'show-checksum-report',
-    'go-to-research']
+    'show-checksum-report']
 
   $.each(possibleActions, function (index, value) {
     if (Object.prototype.hasOwnProperty.call(actions, value)) {
@@ -972,21 +1011,13 @@ async function handleFileStage (collection, fileName) {
 function metadataInfo (dir) {
   /* Loads metadata of the vault packages */
   const pathParts = dir.split('/')
-
-  // Do not show metadata outside data package.
-  if (pathParts.length < 3) {
-    $('.metadata-info').hide()
-    $('.alert.is-archived').hide()
-    return
-  } else {
-    pathParts.length = 3
-    dir = pathParts.join('/')
-  }
+  pathParts.length = 3
+  dir = pathParts.join('/')
 
   try {
     Yoda.call('meta_form_load',
       { coll: Yoda.basePath + dir },
-      { rawResult: true })
+      { quiet: true, rawResult: true })
       .then((result) => {
         if (!result || Object.keys(result.data).length === 0) { return console.info('No result data from meta_form_load') }
 
