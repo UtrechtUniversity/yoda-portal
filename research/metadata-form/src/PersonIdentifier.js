@@ -7,7 +7,7 @@ import InputMask from 'react-input-mask'
 // The Person Identifier field will always be a combination of Name_Identifier_Scheme and Name_Identifier.
 // This is a given and therefore these names can be directly used inside this code.
 // Where it resides in, e.g. Creator or Contributor needs to be figured out here.
-// As only on this level, it becomes clear whehter the combination field is actually required or not.
+// As only on this level, it becomes clear whether the combination field is actually required or not.
 class PersonIdentifier extends React.Component {
   constructor (props) {
     super(props)
@@ -74,16 +74,87 @@ class PersonIdentifier extends React.Component {
       placeholder = this.props.uiSchema.Name_Identifier['ui:field-placeholder']
     }
 
-    const customStyles = {
-      control: styles => ({
-        ...styles,
-        border: '1px solid #ced4da',
-        boxShadow: 'none',
-        '&:hover': {
-          border: '1px solid #ced4da'
-        }
-      })
-    }
+    let customStyles = {
+        control: (styles) => ({
+            ...styles,
+            border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+            boxShadow: 'none',
+            '&:hover': {
+                border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+            }
+        })
+    };
+
+    const darkThemeColors = {
+        /* For theme color guidance: https://github.com/JedWatson/react-select/issues/3692#issuecomment-523425096 */
+        /*
+         * control/backgroundColor
+         * menu/backgroundColor
+         * option/color(selected)
+         */
+        neutral0: '#212529',
+
+        /*
+         * control/backgroundColor(disabled)
+         */
+        neutral5: '#212529',
+
+        /*
+         * control/borderColor(disabled)
+         * multiValue/backgroundColor
+         * indicators(separator)/backgroundColor(disabled)
+         */
+        neutral10: '#343a40',
+
+        /*
+         * control/borderColor
+         * option/color(disabled)
+         * indicators/color
+         * indicators(separator)/backgroundColor
+         * indicators(loading)/color
+         */
+        neutral20: '#343a40',
+
+        /*
+         * control/borderColor(focused)
+         * control/borderColor:hover
+         */
+        neutral30: '#343a40',
+
+        /*
+         * input/color
+         * multiValue(label)/color
+         * singleValue/color
+         * indicators/color(focused)
+         * indicators/color:hover(focused)
+         */
+        neutral80: 'var(--neutral-10)',
+        neutral90: 'var(--neutral-10)',
+
+         /*
+          * One of the few bootstrap variables we can use with themeing react-select!
+          * control/boxShadow(focused)
+          * control/borderColor(focused)
+          * control/borderColor:hover(focused)
+          * option/backgroundColor(selected)
+          * option/backgroundColor:active(selected)
+          */
+        primary: 'var(--bs-primary)',
+
+        /*
+         * option/backgroundColor(focused)
+         */
+        primary25: '#2b3035',
+
+        /*
+         * option/backgroundColor:active
+         */
+        primary50: '#2b3035',
+        primary75: '#2b3035',
+    };
+
+    // Check what theme is set
+    const colorMode = document.documentElement.getAttribute('data-bs-theme');
 
     // total: yoda_Creator_0_Person_Identifier_1
     // postfix: Person_Identifier-1   !!!! let op hier staat -1 ipv _1
@@ -185,6 +256,10 @@ class PersonIdentifier extends React.Component {
             placeholder={Name_Identifier_Scheme}
             onChange={this.handleChange}
             styles={customStylesScheme}
+            theme={(theme) => ({
+                ...theme,
+                colors: (colorMode === 'dark') ? {...theme.colors, ...darkThemeColors} : {...theme.colors},
+            })}
           />
           {helpScheme && (
             <small className='text-muted form-text'>

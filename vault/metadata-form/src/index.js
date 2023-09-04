@@ -9,6 +9,7 @@ import Geolocation from "./Geolocation";
 import Vocabulary from "./Vocabulary";
 import AffiliationIdentifier from  "./AffiliationIdentifier";
 import PersonIdentifier from "./PersonIdentifier";
+import { withTheme } from "@rjsf/core";
 
 
 const path = $('#form').attr('data-path');
@@ -17,7 +18,7 @@ let schema       = {};
 let uiSchema     = {};
 let yodaFormData = {};
 
-let actual_edit_mode = false; // if can edit, it is not diretly shown.
+let actual_edit_mode = false; // if can edit, it is not directly shown.
 let formProperties;
 
 let saving = false;
@@ -39,13 +40,85 @@ const enumWidget = (props) => {
     let customStyles = {
         control: styles => ({
             ...styles,
-            border: '1px solid #ced4da',
+            border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
             boxShadow: 'none',
             '&:hover': {
-                border: '1px solid #ced4da',
+                border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
             }
         })
     };
+
+    const darkThemeColors = {
+        /* For theme color guidance: https://github.com/JedWatson/react-select/issues/3692#issuecomment-523425096 */
+        /*
+         * control/backgroundColor
+         * menu/backgroundColor
+         * option/color(selected)
+         */
+        neutral0: '#212529',
+
+        /*
+         * control/backgroundColor(disabled)
+         */
+        neutral5: '#212529',
+
+        /*
+         * control/borderColor(disabled)
+         * multiValue/backgroundColor
+         * indicators(separator)/backgroundColor(disabled)
+         */
+        neutral10: '#343a40',
+
+        /*
+         * control/borderColor
+         * option/color(disabled)
+         * indicators/color
+         * indicators(separator)/backgroundColor
+         * indicators(loading)/color
+         */
+        neutral20: '#343a40',
+
+        /*
+         * control/borderColor(focused)
+         * control/borderColor:hover
+         */
+        neutral30: '#343a40',
+
+        /*
+         * input/color
+         * multiValue(label)/color
+         * singleValue/color
+         * indicators/color(focused)
+         * indicators/color:hover(focused)
+         */
+        neutral80: 'var(--neutral-10)',
+        neutral90: 'var(--neutral-10)',
+
+         /*
+          * One of the few bootstrap variables we can use with themeing react-select!
+          * control/boxShadow(focused)
+          * control/borderColor(focused)
+          * control/borderColor:hover(focused)
+          * option/backgroundColor(selected)
+          * option/backgroundColor:active(selected)
+          */
+        primary: 'var(--bs-primary)',
+
+        /*
+         * option/backgroundColor(focused)
+         */
+        primary25: '#2b3035',
+
+        /*
+         * option/backgroundColor:active
+         */
+        primary50: '#2b3035',
+        primary75: '#2b3035',
+    };
+
+    // Check what theme is set
+    const colorMode = document.documentElement.getAttribute('data-bs-theme');
+
     let required = props.required
     let error = "should be equal to one of the allowed values";
 
@@ -112,7 +185,12 @@ const enumWidget = (props) => {
                     isDisabled={props.readonly}
                     onChange={(event) => props.onChange(event.value)}
                     options={props['options']['enumOptions']}
-                    styles={customStyles} />
+                    styles={customStyles}
+                    theme={(theme) => ({
+                        ...theme,
+                        colors: (colorMode === 'dark') ? {...theme.colors, ...darkThemeColors} : {...theme.colors},
+                    })}
+            />
         </div>
     );
 };
