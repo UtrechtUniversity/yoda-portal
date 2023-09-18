@@ -229,12 +229,12 @@ def upload_post() -> Response:
 
     # Write chunk data.
     q.put(Chunk(
-	g.irods.data_objects,
-	object_path,
-	flow_chunk_number,
-	flow_chunk_size,
-	encode_unicode_content,
-	app.config.get('IRODS_DEFAULT_RESC')
+        g.irods.data_objects,
+        object_path,
+        flow_chunk_number,
+        flow_chunk_size,
+        encode_unicode_content,
+        app.config.get('IRODS_DEFAULT_RESC')
     ))
 
     # Rename partial file name when complete for chunked uploads.
