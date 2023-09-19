@@ -772,8 +772,11 @@ function startBrowsing () {
     serverSide: true,
     iDeferLoading: 0,
     order: [[1, 'asc']],
-    pageLength: parseInt(Yoda.settings.number_of_items)
+    pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
   })
+  $('#file-browser').on( 'length.dt', function (e, settings, len) {
+    Yoda.storage.session.set('pageLength', len)
+  });
   browse(currentFolder)
 }
 
