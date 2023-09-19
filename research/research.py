@@ -237,8 +237,8 @@ def upload_post() -> Response:
         app.config.get('IRODS_DEFAULT_RESC')
     ))
 
-    # Rename partial file name when complete for chunked uploads.
-    if flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
+    # check at the end, and after every Gb
+    if flow_total_chunks == flow_chunk_number or flow_chunk_number % 40 == 0:
         q.put(Chunk(None, None, 0, 0, None, None))
         q.join()
         if r.get():
@@ -247,6 +247,8 @@ def upload_post() -> Response:
             response.headers["Content-Type"] = "application/json"
             return response
 
+    # Rename partial file name when complete for chunked uploads.
+    if flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
         final_object_path = build_object_path(filepath, flow_relative_path, flow_filename)
         try:
             # overwriting doesn't work using the move command, therefore unlink the previous file first
