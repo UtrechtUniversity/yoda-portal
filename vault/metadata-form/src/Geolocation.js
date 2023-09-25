@@ -240,8 +240,8 @@ class Geolocation extends React.Component {
         >
           <MapContainer ref='map' center={[48.760, 13.275]} zoom={4} animate={false}>
             <TileLayer
-              attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+              attribution='&copy; <a href="https://tile.openstreetmap.org/{z}/{x}/{y}.png">OpenStreetMap contributors</a>'
+              url='https://tile.openstreetmap.org/{z}/{x}/{y}.png'
             />
             <FeatureGroup>
               <EditControl
