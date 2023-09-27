@@ -461,15 +461,6 @@ class YodaForm extends React.Component {
 
     onChange(form) {
         updateCompleteness();
-
-        // Turn save mode off.
-        saving = false;
-        const formContext = { saving: false };
-
-        this.setState({
-            formData: form.formData,
-            formContext: formContext
-        });
     }
 
     onError(form) {
@@ -564,6 +555,7 @@ class Container extends React.Component {
     saveMetadata() {
         saving = true;
         this.form.submitButton.click();
+        saving = false;
     }
 
     updateMetadata() {
