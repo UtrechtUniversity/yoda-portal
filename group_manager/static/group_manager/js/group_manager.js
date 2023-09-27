@@ -1550,6 +1550,22 @@ $(function () {
           )
       }
 
+      if ($('#f-group-' + action + '-expiration-date').val().length) {
+          let today = new Date().toISOString().substring(0,10);
+          let exp_date = new Date();
+          let parts = $('#f-group-' + action + '-expiration-date').val().split('-')
+          exp_date.setYear(parts[0]);
+          exp_date.setMonth(parts[1]-1);
+          exp_date.setDate(parts[2]);
+          exp_date = exp_date.toISOString().substring(0,10)
+
+          if (exp_date <= today) {
+              window.alert('Expiration date needs to be in the future')
+              resetSubmitButton()
+              return
+          }
+      }
+
       // all now bases upon update-fields. Create dialog is discarded
       const newProperties = {
         name: $('#f-group-' + action + '-name').attr('data-prefix') +
