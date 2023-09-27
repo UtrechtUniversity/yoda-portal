@@ -216,7 +216,7 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null) 
       dlgSelectAlertShow(e.status_info)
     }
   }
-  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Copy</span>')
 }
 
 async function moveFile (filepath, newFilepath, multiple, multipleIndex = null) {
@@ -260,7 +260,7 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null) 
       dlgSelectAlertShow(e.status_info)
     }
   }
-  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Move</span>')
 }
 
 async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = null) {
@@ -302,7 +302,7 @@ async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = 
       dlgSelectAlertShow(e.status_info)
     }
   }
-  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Copy</span>')
 }
 
 async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = null) {
@@ -346,7 +346,7 @@ async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = 
       dlgSelectAlertShow(e.status_info)
     }
   }
-  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action"></span>')
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Move</span>')
 }
 async function deleteFolder (collection, folderName, multipleIndex = null) {
   $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')

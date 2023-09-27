@@ -1213,8 +1213,10 @@ function topInformation (dir, showAlert) {
         $('.btn-group button.folder-create').attr('data-path', dir)
         $('.btn-group button.folder-create').prop('disabled', false)
 
-        $('a.folder-delete').removeClass('disabled')
         $('a.folder-rename').removeClass('disabled')
+        $('a.folder-copy').removeClass('disabled')
+        $('a.folder-move').removeClass('disabled')
+        $('a.folder-delete').removeClass('disabled')
         $('a.file-rename').removeClass('disabled')
         $('a.file-copy').removeClass('disabled')
         $('a.file-move').removeClass('disabled')
