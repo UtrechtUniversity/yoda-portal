@@ -186,7 +186,7 @@ function readCsvFile (e) {
       }
     })
     if (errorRows) {
-      $('#result-import-groups-csv').html('</br>The uploaded CSV contains following invalid header names:<br/><table>' + errorRows + '</table>')
+      $('#result-import-groups-csv').html('</br>The uploaded CSV contains the following invalid header names:<br/><table>' + errorRows + '</table>')
       return
     }
 
