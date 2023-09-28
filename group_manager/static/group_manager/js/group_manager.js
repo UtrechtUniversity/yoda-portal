@@ -1634,6 +1634,23 @@ $(function () {
         return
       }
 
+      // Check if group expiration date is valid.
+      if ($('#f-group-' + action + '-expiration-date').val().length) {
+        const today = new Date().toISOString().substring(0, 10)
+        let expirationDate = new Date()
+        const parts = $('#f-group-' + action + '-expiration-date').val().split('-')
+        expirationDate.setYear(parts[0])
+        expirationDate.setMonth(parts[1] - 1)
+        expirationDate.setDate(parts[2])
+        expirationDate = expirationDate.toISOString().substring(0, 10)
+
+        if (expirationDate <= today) {
+          window.alert('Expiration date needs to be in the future')
+          resetSubmitButton()
+          return
+        }
+      }
+
       // Check if group decription is valid.
       if (!newProperties.description.match(/^[a-zA-Z0-9,.()_ -]*$/)) {
         window.alert('The group description may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')
