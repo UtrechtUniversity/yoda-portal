@@ -170,20 +170,38 @@ function readCsvFile (e) {
     // first row will contain fixed definion
     const arKeys = result[0]
 
-    // First compress all columns to  keys: category, subcategory, groupname and usercount
+    // For compressing all columns to  keys: category, subcategory, groupname and usercount
     const presentationColumns = ['groupname', 'category', 'subcategory', 'users']
     const allCsvColumns = ['groupname', 'category', 'subcategory', 'manager', 'member', 'viewer']
 
+    // First validate the headers found values in csvHeader
+    // 'groupname', 'category', 'subcategory' MUST be present
+    // 'manager', 'member', 'viewer' like for instance manager:manager,member:member1,member:member2
+
+    // per csvHeader item check whether its valid
+    let errorRows = ''
+    csvHeader.split(',').forEach(function myFunction (item) {
+      if (!allCsvColumns.includes(item) && !allCsvColumns.includes(item.split(':')[0])) {
+        errorRows += '<tr><td> - ' + item + '</td></tr>'
+      }
+    })
+    if (errorRows) {
+      $('#result-import-groups-csv').html('</br>The uploaded CSV contains the following invalid header names:<br/><table>' + errorRows + '</table>')
+      return
+    }
+
     const newResult = []
     let rowNr = 0
+
     result.forEach(function myFunction (groupDef) {
       // initialise all columns that must be present in the view
       const row = []
+
       presentationColumns.forEach(function myFunction (column) {
         row[column] = ''
       })
 
-      // now loop through the received rows and put them in the right columns
+      // now loop through the received rows and put them in the right presentation columns
       for (const key of Object.keys(arKeys)) {
         allCsvColumns.forEach(function myFunction (column) {
           if (key === column) {
@@ -199,6 +217,7 @@ function readCsvFile (e) {
           }
         })
       }
+
       // only show row when all required data is present.
       let rowError = false
       presentationColumns.forEach(function myFunction (column) {
@@ -568,10 +587,10 @@ $(function () {
 
     $('#f-group-create-sram-group').prop('checked', false)
 
-    if (that.canCreateDatamanagerGroup(category)) { 
-      $('#f-group-create-prefix-datamanager').removeClass('hidden') 
-    } else { 
-      $('#f-group-create-prefix-datamanager').addClass('hidden') 
+    if (that.canCreateDatamanagerGroup(category)) {
+      $('#f-group-create-prefix-datamanager').removeClass('hidden')
+    } else {
+      $('#f-group-create-prefix-datamanager').addClass('hidden')
     }
 
     $('#f-group-create-schema-id').select2('val', that.schemaIdDefault)
