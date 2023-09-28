@@ -1550,22 +1550,6 @@ $(function () {
           )
       }
 
-      if ($('#f-group-' + action + '-expiration-date').val().length) {
-        const today = new Date().toISOString().substring(0, 10)
-        let expirationDate = new Date()
-        const parts = $('#f-group-' + action + '-expiration-date').val().split('-')
-        expirationDate.setYear(parts[0])
-        expirationDate.setMonth(parts[1] - 1)
-        expirationDate.setDate(parts[2])
-        expirationDate = expirationDate.toISOString().substring(0, 10)
-
-        if (expirationDate <= today) {
-          window.alert('Expiration date needs to be in the future')
-          resetSubmitButton()
-          return
-        }
-      }
-
       // all now bases upon update-fields. Create dialog is discarded
       const newProperties = {
         name: $('#f-group-' + action + '-name').attr('data-prefix') +
@@ -1629,6 +1613,23 @@ $(function () {
         window.alert('Please select a valid metadata schema as it is a required field.')
         resetSubmitButton()
         return
+      }
+
+      // Check if group expiration date is valid.
+      if ($('#f-group-' + action + '-expiration-date').val().length) {
+        const today = new Date().toISOString().substring(0, 10)
+        let expirationDate = new Date()
+        const parts = $('#f-group-' + action + '-expiration-date').val().split('-')
+        expirationDate.setYear(parts[0])
+        expirationDate.setMonth(parts[1] - 1)
+        expirationDate.setDate(parts[2])
+        expirationDate = expirationDate.toISOString().substring(0, 10)
+
+        if (expirationDate <= today) {
+          window.alert('Expiration date needs to be in the future')
+          resetSubmitButton()
+          return
+        }
       }
 
       // Check if group decription is valid.
