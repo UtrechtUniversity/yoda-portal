@@ -568,10 +568,10 @@ $(function () {
 
     $('#f-group-create-sram-group').prop('checked', false)
 
-    if (that.canCreateDatamanagerGroup(category)) { 
-      $('#f-group-create-prefix-datamanager').removeClass('hidden') 
-    } else { 
-      $('#f-group-create-prefix-datamanager').addClass('hidden') 
+    if (that.canCreateDatamanagerGroup(category)) {
+      $('#f-group-create-prefix-datamanager').removeClass('hidden')
+    } else {
+      $('#f-group-create-prefix-datamanager').addClass('hidden')
     }
 
     $('#f-group-create-schema-id').select2('val', that.schemaIdDefault)
@@ -1551,19 +1551,19 @@ $(function () {
       }
 
       if ($('#f-group-' + action + '-expiration-date').val().length) {
-          let today = new Date().toISOString().substring(0,10);
-          let exp_date = new Date();
-          let parts = $('#f-group-' + action + '-expiration-date').val().split('-')
-          exp_date.setYear(parts[0]);
-          exp_date.setMonth(parts[1]-1);
-          exp_date.setDate(parts[2]);
-          exp_date = exp_date.toISOString().substring(0,10)
+        const today = new Date().toISOString().substring(0, 10)
+        let expirationDate = new Date()
+        const parts = $('#f-group-' + action + '-expiration-date').val().split('-')
+        expirationDate.setYear(parts[0])
+        expirationDate.setMonth(parts[1] - 1)
+        expirationDate.setDate(parts[2])
+        expirationDate = expirationDate.toISOString().substring(0, 10)
 
-          if (exp_date <= today) {
-              window.alert('Expiration date needs to be in the future')
-              resetSubmitButton()
-              return
-          }
+        if (expirationDate <= today) {
+          window.alert('Expiration date needs to be in the future')
+          resetSubmitButton()
+          return
+        }
       }
 
       // all now bases upon update-fields. Create dialog is discarded
