@@ -72,7 +72,7 @@ function flatListGroups () {
   table += '</tbody></table>'
   $('#result-user-search-groups').html(table)
 
-  // Clicking a row must highlite rows in in both tree/flat list and present details in the corresponding panel
+  // Clicking a row must highlight rows in both tree/flat list and present details in the corresponding panel
   $('.user-search-result-group').on('click', function () {
     // $('#user-search-groups').modal('hide');
     const groupName = $(this).attr('user-search-result-group')
@@ -1745,6 +1745,7 @@ $(function () {
          */
     onClickGroupDelete: function (el) {
       const groupName = $('#group-list .group.active').attr('data-name')
+      const nextGroupName = $('#result-user-search-groups .user-search-result-group.active').next().attr('user-search-result-group') 
 
       $('#group-list .group.active')
         .addClass('delete-pending disabled')
@@ -1769,6 +1770,10 @@ $(function () {
               message: 'Removed group ' + groupName + '.'
             })
           )
+          
+          if (nextGroupName) {
+            Yoda.storage.session.set('selected-group', nextGroupName)
+          }
 
           $(window).on('beforeunload', function () {
             $(window).scrollTop(0)
