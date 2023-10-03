@@ -155,11 +155,11 @@ class AffiliationIdentifier extends React.Component {
     parts.pop()
     parentContext = parts.join('_')
 
-    let bothRequired = false
+    let affiliationRequired = false
     try {
-      bothRequired = this.props.registry.rootSchema.properties[parentContext].items.required.includes('Affiliation')
+      affiliationRequired = this.props.registry.rootSchema.properties[parentContext].items.required.includes('Affiliation')
     } catch (err) {
-      bothRequired = false
+      affiliationRequired = false
     }
 
     let reqName = ''
@@ -170,22 +170,18 @@ class AffiliationIdentifier extends React.Component {
     const namePresent = !(typeof Affiliation_Name === 'undefined' || Affiliation_Name.length === 0)
     const idfPresent = !(typeof Affiliation_Identifier === 'undefined' || Affiliation_Identifier.length === 0)
 
-    // Identifier is present but Name is not.
+    // Identifier is present but Name is not, name is required.
     if (idfPresent && !namePresent) {
       reqName = '*'
       classesName += ' is-invalid'
     }
 
-    // Both Name and Identifier are required.
-    if (bothRequired) {
+    // If Affiliation is required, Name is laways required.
+    if (affiliationRequired) {
       reqName = '*'
-      reqIdf = '*'
 
       if (!namePresent) {
         classesName += ' is-invalid'
-      }
-      if (!idfPresent) {
-        classesIdf += ' is-invalid'
       }
     }
 
