@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" {% if g.settings and g.settings.color_mode and g.settings.color_mode == 'DARK' %} data-bs-theme="dark" {% else %} data-bs-theme="light" {% endif %}>
+<html lang="en" {% if g.settings and g.settings.color_mode and g.settings.color_mode == 'DARK' %}data-bs-theme="dark"{% else %}data-bs-theme="light"{% endif %}>
     <head>
         {% block head %}
             <meta charset="utf-8">
@@ -36,6 +36,8 @@
                     {% if g.settings.color_mode == 'AUTO' %}
                         Yoda.set_color_mode_auto()
                     {% endif %}
+                {% else %}
+                  Yoda.set_color_mode_auto()
                 {% endif %}
             </script>
             {% block scripts %}{% endblock scripts %}
