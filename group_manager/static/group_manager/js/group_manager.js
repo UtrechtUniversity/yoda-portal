@@ -1662,7 +1662,7 @@ $(function () {
         group_expiration_date: newProperties.expiration_date,
         group_data_classification: newProperties.data_classification,
         group_category: newProperties.category,
-        group_subcategory: newProperties.subcategory,
+        group_subcategory: newProperties.subcategory
       }
 
       // Avoid trying to set a schema id for groups that

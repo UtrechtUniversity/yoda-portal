@@ -236,7 +236,10 @@ function search () {
       ajax: getSearchResults,
       processing: true,
       serverSide: true,
-      pageLength: $("select[name='search_length']").val()
+      pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
+    })
+    $('#search').on('length.dt', function (e, settings, len) {
+      Yoda.storage.session.set('pageLength', len)
     })
 
     if (currentSearchType === 'status') {

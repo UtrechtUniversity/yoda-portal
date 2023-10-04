@@ -416,7 +416,10 @@ function startBrowsingColl () {
       processing: true,
       serverSide: true,
       iDeferLoading: 0,
-      pageLength: parseInt(Yoda.settings.number_of_items)
+      pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
+    })
+    $('#folder-select-browser').on('length.dt', function (e, settings, len) {
+      Yoda.storage.session.set('pageLength', len)
     })
   }
   dlgBrowse(dlgCurrentFolder)

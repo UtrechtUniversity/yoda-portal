@@ -357,7 +357,6 @@ function startBrowsing () {
     serverSide: true,
     iDeferLoading: 0,
     order: [[0, 'asc']],
-    pageLength: parseInt(Yoda.settings.number_of_items),
     // "searching": true,
     fnDrawCallback: function () {
       $('#group-browser td').on('click', function () {
@@ -365,7 +364,11 @@ function startBrowsing () {
         getGroupDetails(groupName)
         $('#selected-group').text('Group ' + groupName)
       })
-    }
+    },
+    pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
+  })
+  $('#group-browser').on('length.dt', function (e, settings, len) {
+    Yoda.storage.session.set('pageLength', len)
   })
 
   const groupBrowser = $('#group-browser').DataTable()
