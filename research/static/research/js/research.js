@@ -26,7 +26,7 @@ $(function () {
   }
 
   $('.btn-go-to-vault').on('click', function () {
-    window.location.href = '/vault/?dir=' + encodeURIComponent('/' + $(this).attr('vault-area'));
+    window.location.href = '/vault/?dir=' + encodeURIComponent('/' + $(this).attr('vault-area'))
   })
 
   $('.btn-group button.metadata-form').on('click', function () {
@@ -742,23 +742,22 @@ function changeBrowserUrl (path) {
 function browse (dir = '', changeHistory = false) {
   currentFolder = dir
   // remove hide class that could have been added when a erroneous vault path was used.
-  $('#file-browser_wrapper').removeClass('hide');
-  handleGoToVaultButton(dir);
+  $('#file-browser_wrapper').removeClass('hide')
+  handleGoToVaultButton(dir)
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
   topInformation(dir, true) // only here topInformation should show its alertMessage
   buildFileBrowser(dir)
 }
 
-function handleGoToVaultButton(dir) {
+function handleGoToVaultButton (dir) {
   // Handle the button with which to return to the corresponding research area.
-  const parts = dir.split('/');
+  const parts = dir.split('/')
 
-  if (parts.length>1) {
-    $('.btn-go-to-vault').attr("vault-area", parts[1].replace('research-', 'vault-')).show()
-  }
-  else {
-    $('.btn-go-to-vault').attr("vault-area", "").hide();
+  if (parts.length > 1) {
+    $('.btn-go-to-vault').attr('vault-area', parts[1].replace('research-', 'vault-')).show()
+  } else {
+    $('.btn-go-to-vault').attr('vault-area', '').hide()
   }
 }
 
@@ -1002,9 +1001,9 @@ function startBrowsing () {
     order: [[1, 'asc']],
     pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
   })
-  $('#file-browser').on( 'length.dt', function (e, settings, len) {
+  $('#file-browser').on('length.dt', function (e, settings, len) {
     Yoda.storage.session.set('pageLength', len)
-  });
+  })
   browse(currentFolder)
 }
 
@@ -1110,17 +1109,16 @@ function topInformation (dir, showAlert) {
     Yoda.call('research_collection_details',
       { path: Yoda.basePath + dir },
       { quiet: true, rawResult: true }).then((dataRaw) => {
+      if (dataRaw.status === 'error_nonexistent') {
+        Yoda.set_message('error', 'The indicated path to the vault does not exists: ' + dir)
+        $('#file-browser_wrapper').addClass('hide')
+        $('.top-information').addClass('hide')
 
-      if (dataRaw.status == 'error_nonexistent') {
-          Yoda.set_message('error', 'The indicated path to the vault does not exists: ' + dir)
-          $('#file-browser_wrapper').addClass('hide');
-          $('.top-information').addClass('hide');
-
-          // no more action required here
-          return true;
+        // no more action required here
+        return true
       }
 
-      let data = dataRaw.data;
+      const data = dataRaw.data
       let statusText = ''
       const basename = data.basename
       const status = data.status
@@ -1128,7 +1126,6 @@ function topInformation (dir, showAlert) {
       let hasWriteRights = true
       const isDatamanager = data.is_datamanager
       const lockCount = data.lock_count
-      const vaultPath = data.vault_path
       let actions = []
 
       $('.btn-group button.metadata-form').hide()

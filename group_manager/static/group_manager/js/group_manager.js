@@ -1745,7 +1745,7 @@ $(function () {
          */
     onClickGroupDelete: function (el) {
       const groupName = $('#group-list .group.active').attr('data-name')
-      const nextGroupName = $('#result-user-search-groups .user-search-result-group.active').next().attr('user-search-result-group') 
+      const nextGroupName = $('#result-user-search-groups .user-search-result-group.active').next().attr('user-search-result-group')
 
       $('#group-list .group.active')
         .addClass('delete-pending disabled')
@@ -1770,7 +1770,7 @@ $(function () {
               message: 'Removed group ' + groupName + '.'
             })
           )
-          
+
           if (nextGroupName) {
             Yoda.storage.session.set('selected-group', nextGroupName)
           }
