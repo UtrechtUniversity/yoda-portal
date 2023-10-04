@@ -585,8 +585,6 @@ $(function () {
     $('#f-group-create-name').val('')
     $('#f-group-create-description').val('')
 
-    $('#f-group-create-sram-group').prop('checked', false)
-
     if (that.canCreateDatamanagerGroup(category)) {
       $('#f-group-create-prefix-datamanager').removeClass('hidden')
     } else {
@@ -1578,8 +1576,7 @@ $(function () {
         data_classification: $('#f-group-' + action + '-data-classification').val(),
         category: $('#f-group-' + action + '-category').val(),
         subcategory: $('#f-group-' + action + '-subcategory').val(),
-        expiration_date: $('#f-group-' + action + '-expiration-date').val(),
-        sram_group: $('#f-group-create-sram-group').prop('checked')
+        expiration_date: $('#f-group-' + action + '-expiration-date').val()
       }
 
       // specific datamanager-group testing dependent on mode
@@ -1666,7 +1663,6 @@ $(function () {
         group_data_classification: newProperties.data_classification,
         group_category: newProperties.category,
         group_subcategory: newProperties.subcategory,
-        group_sram_group: newProperties.sram_group
       }
 
       // Avoid trying to set a schema id for groups that
