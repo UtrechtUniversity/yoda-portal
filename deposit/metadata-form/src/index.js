@@ -256,7 +256,7 @@ const CustomArrayFieldTemplate = (props) => {
                                 <div className="d-flex flex-row">
                                     {el.hasMoveUp && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
+                                            <button className="btn btn-outline-secondary btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onReorderClick(
                                                         el.index,
                                                         el.index - 1
@@ -268,7 +268,7 @@ const CustomArrayFieldTemplate = (props) => {
 
                                     {el.hasMoveDown && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
+                                            <button className="btn btn-outline-secondary btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onReorderClick(
                                                         el.index,
                                                         el.index + 1
@@ -280,7 +280,7 @@ const CustomArrayFieldTemplate = (props) => {
 
                                     {el.hasRemove && props.items.length > 1 && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
+                                            <button className="btn btn-outline-secondary btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onDropIndexClick(el.index)}>
                                                 <i className="fa-solid fa-trash" aria-hidden="true"></i>
                                             </button>
