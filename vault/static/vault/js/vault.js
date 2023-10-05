@@ -648,7 +648,7 @@ function topInformation (dir, showAlert) {
       { quiet: true, rawResult: true }).then((dataRaw) => {
       const data = dataRaw.data
       if (dataRaw.status === 'error_nonexistent') {
-        Yoda.set_message('error', 'The indicated path to the vault does not exists: ' + dir)
+        Yoda.set_message('error', 'This vault space path does not exists: ' + dir)
         $('#file-browser_wrapper').addClass('hide')
         $('.top-information').addClass('hide')
 
