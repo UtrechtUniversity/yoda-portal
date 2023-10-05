@@ -61,7 +61,7 @@ $(function() {
             filters.push({"name": filterName, "value": filterValue });
         } else {
             $.each(filters, function(index, object) {
-                if (object['name'] == filterName && object['value'] == filterValue) {
+                if (typeof object !== 'undefined' && object['name'] == filterName && object['value'] == filterValue) {
                     filters.splice(index, 1);
                 }
             });
@@ -79,7 +79,7 @@ $(function() {
         // Delete current filter
         if (filters.length > 0) {
             $.each(filters, function (index, object) {
-                if (object['name'] == filterName) {
+                if (typeof object !== 'undefined' && object['name'] == filterName) {
                     filters.splice(index, 1);
                     return false;
                 }
@@ -124,7 +124,7 @@ $(function() {
     $("body").on("keyup", "input:text[id=Person]", delay(function (e) {
         let filterValue = $(this).val();
         $.each(filters, function(index, object) {
-            if (object['name'] == 'Person') {
+            if (typeof object !== 'undefined' && object['name'] == 'Person') {
                 filters.splice(index, 1);
             }
         });
