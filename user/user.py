@@ -429,14 +429,26 @@ def prepare_user() -> None:
         g.user = user_id
         g.irods = irods
 
-        # Check for notifications.
-        endpoints = ["static", "call", "upload_get", "upload_post"]
-        if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
-            response = api.call('notifications_load', data={})
-            g.notifications = len(response['data'])
-            # Load saved settings
-            response = api.call('settings_load', data={})
-            g.settings = response['data']
+        try:
+            # Check for notifications.
+            endpoints = ["static", "call", "upload_get", "upload_post"]
+            if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
+                response = api.call('notifications_load', data={})
+                g.notifications = len(response['data'])
+                # Load saved settings
+                response = api.call('settings_load', data={})
+                g.settings = response['data']
+        except PAM_AUTH_PASSWORD_FAILED:
+            # Password is not valid any more (probably OIDC access token).
+            connman.clean(session.sid)
+            session.clear()
+
+            # If the username matches the domain set for OIDC
+            if should_redirect_to_oidc(login_username):
+                return redirect(oidc_authorize_url(login_username))
+            # Else (i.e. it is an external user, local user, or OIDC is disabled)
+            else:
+                return redirect(url_for('user_bp.login'))
     else:
         redirect('user_bp.login')
 
