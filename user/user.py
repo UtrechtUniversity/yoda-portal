@@ -5,6 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 import json
 import re
+import secrets
 from typing import List
 
 import jwt
@@ -211,6 +212,9 @@ def callback() -> Response:
 
         return response
 
+    class StateMismatchError(Exception):
+        pass
+
     class UserinfoSubMismatchError(Exception):
         pass
 
@@ -222,6 +226,13 @@ def callback() -> Response:
     exception_occurred = "OPENID_ERROR"  # To identify exception in finally-clause
 
     try:
+        email = g.login_username.lower()
+
+        # Ensure that the request is not a forgery and that the user sending
+        # this connect request is the expected user.
+        if request.args['state'] != session.get('state'):
+            raise StateMismatchError
+
         token_response = token_request()
         js           = token_response.json()
         access_token = js['access_token']
@@ -251,8 +262,6 @@ def callback() -> Response:
 
         # Check if login email matches with user info email.
         email_identifier = app.config.get('OIDC_EMAIL_FIELD')
-        email = g.login_username.lower()
-
         userinfo_email = userinfo_payload[email_identifier]
         if not isinstance(userinfo_email, list):
             userinfo_email = [userinfo_email]
@@ -312,6 +321,10 @@ def callback() -> Response:
                 f'KeyError in callback for token_response + headers:\n{token_response.headers}\n{token_response.text}',
                 True
             )
+
+    except StateMismatchError:
+        # Invalid state parameter.
+        log_error("Invalid state parameter")
 
     except UserinfoSubMismatchError:
         # Possible Token substitution attack.
@@ -378,6 +391,11 @@ def should_redirect_to_oidc(username: str) -> bool:
 
 def oidc_authorize_url(username: str) -> str:
     authorize_url: str = app.config.get('OIDC_AUTH_URI')
+
+    # Generate a random string for the state parameter.
+    # https://www.rfc-editor.org/rfc/rfc6749#section-4.1.1
+    session['state'] = secrets.token_urlsafe(32)
+    authorize_url += '&state=' + session['state']
 
     if app.config.get('OIDC_LOGIN_HINT') and username:
         authorize_url += '&login_hint=' + username
