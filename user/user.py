@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
@@ -326,13 +326,20 @@ def callback() -> Response:
             f'Mismatch between email and user info email: {email} is not in {userinfo_email}',
             True
         )
+        exception_occurred = "USERINFO_EMAIL_MISMATCH_ERROR"
 
     except Exception:
         log_error(f"Unexpected exception during callback for username {email}", True)
 
     finally:
         if exception_occurred == "CAT_INVALID_USER_ERROR" or exception_occurred == "CAT_INVALID_AUTHENTICATION":
-            flash('Username/password was incorrect', 'danger')
+            flash('Username / password was incorrect', 'danger')
+        elif exception_occurred == "USERINFO_EMAIL_MISMATCH_ERROR":
+            flash(
+                'Unable to sign in. Please verify that your username has been entered correctly. '
+                'If your username has been entered correctly and this issue persists, please contact the system administrator',
+                'danger'
+            )
         elif exception_occurred == "OPENID_ERROR":
             flash(
                 'An error occurred during the OpenID Connect protocol. '
