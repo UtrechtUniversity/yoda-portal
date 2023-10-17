@@ -425,6 +425,8 @@ def prepare_user() -> None:
             connman.clean(session.sid)
             session.clear()
 
+            session['login_username'] = login_username
+
             # If the username matches the domain set for OIDC
             if should_redirect_to_oidc(login_username):
                 return redirect(oidc_authorize_url(login_username))
