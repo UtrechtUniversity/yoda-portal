@@ -27,7 +27,9 @@ $(function () {
 
   window.onbeforeunload = function(e){
     if(!$('#uploads').hasClass('hidden')) {
-      return e.returnValue
+      if ($('.uploads-total-progress-bar-perc').html() != '100%') {
+        return e.returnValue
+      }
     }
   }
 
