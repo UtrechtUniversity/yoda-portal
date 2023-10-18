@@ -25,6 +25,14 @@ $(function () {
     startBrowsing()
   }
 
+  window.onbeforeunload = function(e){
+    if(!$('#uploads').hasClass('hidden')) {
+      if ($('.uploads-total-progress-bar-perc').html() != '100%') {
+        return e.returnValue
+      }
+    }
+  }
+
   $('.btn-go-to-vault').on('click', function () {
     window.location.href = '/vault/?dir=' + encodeURIComponent('/' + $(this).attr('vault-area'))
   })

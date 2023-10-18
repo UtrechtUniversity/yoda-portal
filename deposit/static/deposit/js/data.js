@@ -20,6 +20,14 @@ $(function () {
     startBrowsing()
   }
 
+  window.onbeforeunload = function(e){
+    if(!$('#uploads').hasClass('hidden')) {
+      if ($('.uploads-total-progress-bar-perc').html() != '100%') {
+        return e.returnValue
+      }
+    }
+  }
+
   /// /////////////////////////////////////////////
   // File and folder management from context menu
   /// /////////////////////////////////////////////
