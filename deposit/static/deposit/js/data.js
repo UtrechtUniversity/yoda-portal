@@ -20,6 +20,12 @@ $(function () {
     startBrowsing()
   }
 
+  window.onbeforeunload = function(e){
+    if(!$('#uploads').hasClass('hidden')) {
+      return e.returnValue
+    }
+  }
+
   /// /////////////////////////////////////////////
   // File and folder management from context menu
   /// /////////////////////////////////////////////
