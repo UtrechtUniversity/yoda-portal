@@ -105,13 +105,13 @@ def download_report() -> Response:
         ext = '.csv'
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']},{result['checksum']} \n"
+                output += f"{result['name']},{result['size']},{result['checksum']} \n"
     else:
         mime = 'text/plain'
         ext = '.txt'
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']} {result['checksum']} \n"
+                output += f"{result['name']} {result['size']} {result['checksum']} \n"
 
     return Response(
         output,
