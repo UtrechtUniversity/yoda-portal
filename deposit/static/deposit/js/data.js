@@ -158,10 +158,11 @@ $(function () {
       { coll: Yoda.basePath + folder }).then((data) => {
       let table = '<table class="table table-striped"><tbody>'
 
-      table += '<thead><tr><th>Filename</th><th>Checksum</th></thead>'
+      table += '<thead><tr><th>Filename</th><th>Size</th><th>Checksum</th></tr></thead>'
       $.each(data, function (index, obj) {
         table += `<tr>
                      <td>${obj.name}</td>
+                     <td>${obj.size}</td>
                      <td>${obj.checksum}</td>
                 </tr>`
       })
