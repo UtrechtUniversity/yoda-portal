@@ -16,10 +16,7 @@ $(document).ready(function () {
   if ($('#file-browser').length && $('#search-filter').val().length > 0) {
     currentSearchStringRev = $('#search-filter').val()
     currentSearchTypeRev = $('#search_concept').attr('data-type')
-
-    if (currentSearchTypeRev === 'revision') {
-      startBrowsing()
-    }
+    browseRevisions()
   }
 
   // Click on file browser -> open revision details
@@ -43,36 +40,34 @@ $(document).ready(function () {
 })
 
 /// MAIN TABLE containing revisioned files
-function startBrowsing () {
-  $('#file-browser').DataTable({
-    bFilter: false,
-    bInfo: false,
-    bLengthChange: true,
-    language: {
-      emptyTable: 'No accessible files/folders present',
-      lengthMenu: '_MENU_'
-    },
-    dom: '<"top">frt<"bottom"lp><"clear">',
-    columns: [{ render: tableRenderer.name, orderable: false, data: 'main_original_dataname' },
-      { render: tableRenderer.count, orderable: false, data: 'revision_count' }
-    ],
-    ajax: getRevisionListContents,
-    processing: true,
-    serverSide: true,
-    iDeferLoading: 0,
-    ordering: false,
-    pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
-  })
-  $('#file-browser').on('length.dt', function (e, settings, len) {
-    Yoda.storage.session.set('pageLength', len)
-  })
-  browseRevisions()
-}
-
 function browseRevisions () {
   if (currentSearchTypeRev === 'revision') {
-    const fileBrowser = $('#file-browser').DataTable()
-    fileBrowser.ajax.reload()
+    // Destroy current Datatable.
+    const datatable = $('#file-browser').DataTable()
+    datatable.destroy()
+
+    $('#file-browser').DataTable({
+      bFilter: false,
+      bInfo: false,
+      bLengthChange: true,
+      language: {
+        emptyTable: 'Your search did not match any documents',
+        lengthMenu: '_MENU_'
+      },
+      dom: '<"top">rt<"bottom"lp><"clear">',
+      columns: [
+        { render: tableRenderer.name, orderable: false, data: 'main_original_dataname' },
+        { render: tableRenderer.count, orderable: false, data: 'revision_count' }
+      ],
+      ajax: getRevisionListContents,
+      processing: true,
+      serverSide: true,
+      ordering: false,
+      pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
+    })
+    $('#file-browser').on('length.dt', function (e, settings, len) {
+      Yoda.storage.session.set('pageLength', len)
+    })
   }
 }
 
