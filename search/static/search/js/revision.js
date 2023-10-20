@@ -24,6 +24,12 @@ $(document).ready(function () {
     clickFileForRevisionDetails($(this))
   })
 
+  $('#search-panel li').on('click', function () {
+    currentSearchStringRev = $('#search-filter').val()
+    currentSearchTypeRev = $('#search_concept').attr('data-type')
+    browseRevisions()
+  })
+
   $('.search-btn').on('click', function () {
     currentSearchStringRev = $('#search-filter').val()
     currentSearchTypeRev = $('#search_concept').attr('data-type')
