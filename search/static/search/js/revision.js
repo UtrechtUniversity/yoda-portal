@@ -70,8 +70,10 @@ function startBrowsing () {
 }
 
 function browseRevisions () {
-  const fileBrowser = $('#file-browser').DataTable()
-  fileBrowser.ajax.reload()
+  if (currentSearchTypeRev === 'revision') {
+    const fileBrowser = $('#file-browser').DataTable()
+    fileBrowser.ajax.reload()
+  }
 }
 
 // Fetches directory contents to populate the listing table.
