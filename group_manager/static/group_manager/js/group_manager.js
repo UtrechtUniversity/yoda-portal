@@ -565,6 +565,13 @@ $(function () {
     $('.users').addClass('hidden')
     $('.properties-create').removeClass('hidden')
 
+    // Make all kinds of group properties un-collapsed for consistency when switching back to group-properties-update
+    $(".collapsible-group-properties").addClass("show")
+    $('#properties-create-link, #properties-update-link').find('.triangle')
+      .removeClass('fa-caret-right')
+      .addClass('fa-caret-down')
+    Yoda.storage.session.set('is-collapsed', 'false')
+
     const selectedGroup = Yoda.storage.session.get('selected-group')
     const that = Yoda.groupManager
 
@@ -2017,12 +2024,30 @@ $(function () {
       })
       // }}}
 
-      // Set inial state of group create button {{{
+      // Set initial state of group create button {{{
       if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
         $('.create-button-new').removeClass('hidden')
       } else {
         $('.create-button-new').addClass('hidden')
       }
+      // }}}
+
+      // Group properties {{{
+      // When user collapses group properties
+      $('.properties').on('hide.bs.collapse', function (e) {
+        $('#properties-create-link, #properties-update-link').find('.triangle')
+          .removeClass('fa-caret-down')
+          .addClass('fa-caret-right')
+        Yoda.storage.session.set('is-collapsed', 'true')
+      })
+
+      // When user opens up group properties
+      $('.properties').on('show.bs.collapse', function (e) {
+        $('#properties-create-link, #properties-update-link').find('.triangle')
+          .removeClass('fa-caret-right')
+          .addClass('fa-caret-down')
+        Yoda.storage.session.set('is-collapsed', 'false')
+      })
       // }}}
 
       // Group list {{{
@@ -2214,6 +2239,15 @@ $(function () {
             a + '<td style="width: 26px;"></td></tr></table>'
           )
         }
+      }
+
+      const isCollapsed = Yoda.storage.session.get('is-collapsed')
+      if (isCollapsed !== null && isCollapsed === 'true') {
+        $(".collapsible-group-properties").removeClass("show")
+        // Make sure the triangle is facing the correct direction
+        $(".properties").find(".triangle")
+          .removeClass('fa-caret-down')
+          .addClass('fa-caret-right')
       }
 
       const selectedGroup = Yoda.storage.session.get('selected-group')
