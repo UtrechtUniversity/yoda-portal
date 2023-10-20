@@ -9,15 +9,15 @@
 let revisionTargetColl = ''
 let folderSelectBrowser = null
 let dlgCurrentFolder = ''
-let currentSearchString
-let currentSearchType
+let currentSearchStringRev
+let currentSearchTypeRev
 
 $(document).ready(function () {
   if ($('#file-browser').length && $('#search-filter').val().length > 0) {
-    currentSearchString = $('#search-filter').val()
-    currentSearchType = $('#search_concept').attr('data-type')
+    currentSearchStringRev = $('#search-filter').val()
+    currentSearchTypeRev = $('#search_concept').attr('data-type')
 
-    if (currentSearchType === 'revision') {
+    if (currentSearchTypeRev === 'revision') {
       startBrowsing()
     }
   }
@@ -28,15 +28,15 @@ $(document).ready(function () {
   })
 
   $('.search-btn').on('click', function () {
-    currentSearchString = $('#search-filter').val()
-    currentSearchType = $('#search_concept').attr('data-type')
+    currentSearchStringRev = $('#search-filter').val()
+    currentSearchTypeRev = $('#search_concept').attr('data-type')
     browseRevisions()
   })
 
   $('#search-filter').bind('keypress', function (e) {
     if (e.keyCode === 13) {
-      currentSearchString = $('#search-filter').val()
-      currentSearchType = $('#search_concept').attr('data-type')
+      currentSearchStringRev = $('#search-filter').val()
+      currentSearchTypeRev = $('#search_concept').attr('data-type')
       browseRevisions()
     }
   })
@@ -99,7 +99,7 @@ const getRevisionListContents = (() => {
   const get = async (args) => {
     // Check if we can use the cache.
     if (cache.length &&
-            currentSearchString === cacheSearchArg && /// DIT MOET SEARCH ARGUMENT WORDEN!!!
+            currentSearchStringRev === cacheSearchArg && /// DIT MOET SEARCH ARGUMENT WORDEN!!!
             // && args.order[0].dir    === cacheSortOrder
             // && args.order[0].column === cacheSortCol
             args.start >= cacheStart &&
@@ -111,7 +111,7 @@ const getRevisionListContents = (() => {
 
       const result = await Yoda.call('revisions_search_on_filename',
         {
-          searchString: currentSearchString, /// TOEVOEGEN SEARCH ARGUMENT
+          searchString: currentSearchStringRev, /// TOEVOEGEN SEARCH ARGUMENT
           offset: args.start,
           limit: batchSize
         })
@@ -123,7 +123,7 @@ const getRevisionListContents = (() => {
       total = result.total
       cacheStart = args.start
       cache = result.items
-      cacheSearchArg = currentSearchString
+      cacheSearchArg = currentSearchStringRev
       // cacheSortCol   = args.order[0].column;
       // cacheSortOrder = args.order[0].dir;
 
