@@ -81,6 +81,7 @@ table.dataTable tbody tr td a:hover {
   /* Tables */
   /* Select 2 selectors */
   /* Sweetalert selectors */
+  /* Group manager group properties header */
 }
 [data-bs-theme=dark] .logo {
   background-image: url("/assets/img/logo_dark.svg");
@@ -113,6 +114,9 @@ table.dataTable tbody tr td a:hover {
 }
 [data-bs-theme=dark] .sweet-alert {
   background-color: var(--bs-body-bg);
+}
+[data-bs-theme=dark] #properties-update-link {
+  color: var(--bs-card-title-color);
 }
 
 :root,

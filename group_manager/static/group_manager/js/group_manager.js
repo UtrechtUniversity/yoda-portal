@@ -2017,12 +2017,30 @@ $(function () {
       })
       // }}}
 
-      // Set inial state of group create button {{{
+      // Set initial state of group create button {{{
       if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
         $('.create-button-new').removeClass('hidden')
       } else {
         $('.create-button-new').addClass('hidden')
       }
+      // }}}
+
+      // Group properties {{{
+      // When user collapses group properties
+      $('.properties-update').on('hide.bs.collapse', function (e) {
+        $('#properties-update-link').find('.triangle')
+          .removeClass('fa-caret-down')
+          .addClass('fa-caret-right')
+        Yoda.storage.session.set('is-collapsed', 'true')
+      })
+
+      // When user opens up group properties
+      $('.properties-update').on('show.bs.collapse', function (e) {
+        $('#properties-update-link').find('.triangle')
+          .removeClass('fa-caret-right')
+          .addClass('fa-caret-down')
+        Yoda.storage.session.set('is-collapsed', 'false')
+      })
       // }}}
 
       // Group list {{{
@@ -2214,6 +2232,15 @@ $(function () {
             a + '<td style="width: 26px;"></td></tr></table>'
           )
         }
+      }
+
+      const isCollapsed = Yoda.storage.session.get('is-collapsed')
+      if (isCollapsed !== null && isCollapsed === 'true') {
+        $(".collapsible-group-properties").removeClass("show")
+        // Make sure the triangle is facing the correct direction
+        $(".properties-update").find(".triangle")
+          .removeClass('fa-caret-down')
+          .addClass('fa-caret-right')
       }
 
       const selectedGroup = Yoda.storage.session.get('selected-group')
