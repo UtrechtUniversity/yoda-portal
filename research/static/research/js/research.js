@@ -12,6 +12,7 @@ $(document).ajaxSend(function (e, request, settings) {
 
 let preservableFormatsLists = null
 let currentFolder
+let filenames = []
 
 $(function () {
   // Extract current location from query string (default to '').
@@ -330,6 +331,30 @@ $(function () {
           $self.find('.upload-retry').hide()
           $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
         })
+
+        if (filenames.includes(file.name)){
+          file.pause()
+          $self.find('.msg').text('Upload paused')
+          $self.find('.overwrite-div').removeClass('hidden')
+          $self.find('.upload-cancel').hide()
+          $self.find('.upload-pause').hide()
+          // Overwrite btn
+          $self.find('.upload-overwrite').on('click', function () {
+            file.resume()
+            $self.find('.overwrite-div').addClass('hidden')
+            $self.find('.upload-pause').show()
+            $self.find('.upload-cancel').show()
+            $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
+          })
+
+          // No Overwrite btn
+          $self.find('.upload-no-overwrite').on('click', function () {
+            file.cancel()
+            $self.find('.overwrite-div').addClass('hidden')
+            $self.remove()
+            file.remove()
+          })
+        }
       })
     }
     $('#uploads').removeClass('hidden')
@@ -347,6 +372,8 @@ $(function () {
     $('#' + file.uniqueIdentifier + ' .msg').html("<span class='text-success'>Upload complete</span>")
     const $self = $('#' + file.uniqueIdentifier)
     $self.find('.upload-btns').hide()
+    const path = $('.upload').attr('data-path')
+    browse(path)
   })
   r.on('fileError', function (file, message) {
     $('#' + file.uniqueIdentifier + ' .msg').html('Upload failed')
@@ -357,29 +384,10 @@ $(function () {
   r.on('fileProgress', function (file) {
     const percent = Math.floor(file.progress() * 100)
     $('#' + file.uniqueIdentifier + ' .progress-bar').css('width', percent + '%')
-
-    // presentation of totalised datasize percentages
-    let totalSize = 0
-    let totalSizeUploaded = 0
-    // presentation of totalised file counts
-    let countTotal = 0
-    let countTotalCompleted = 0
-    $.each(r.files, function (key, flowFile) {
-      // id has to be present in frontend as r.files contains all files (including the ones already uploaded)
-      if ($('#' + flowFile.uniqueIdentifier).length) {
-        // size totals
-        totalSize += flowFile.size
-        totalSizeUploaded += flowFile.size * flowFile.progress()
-        // count totals
-        countTotal++
-        if (flowFile.progress() === 1) {
-          countTotalCompleted++
-        }
-      }
-    })
-    $('.uploads-progress-information').html('&nbsp;-&nbsp;completed ' + countTotalCompleted.toString() + ' of ' + countTotal.toString())
-    $('.uploads-total-progress-bar').css('width', Math.floor((totalSizeUploaded / totalSize) * 100) + '%')
-    $('.uploads-total-progress-bar-perc').html(Math.floor((totalSizeUploaded / totalSize) * 100) + '%')
+    update_progress(r.files)
+  })
+  r.on('fileRemoved', function () {
+    update_progress(r.files)
   })
 
   $('body').on('dragbetterenter', function (event) {
@@ -542,6 +550,32 @@ $(function () {
 
   dragElement(document.getElementById('uploads'))
 })
+
+// Update upload progress bar
+function update_progress(files) {
+  // presentation of totalised datasize percentages
+  let totalSize = 0
+  let totalSizeUploaded = 0
+  // presentation of totalised file counts
+  let countTotal = 0
+  let countTotalCompleted = 0
+  $.each(files, function (key, flowFile) {
+    // id has to be present in frontend as r.files contains all files (including the ones already uploaded)
+    if ($('#' + flowFile.uniqueIdentifier).length) {
+      // size totals
+      totalSize += flowFile.size
+      totalSizeUploaded += flowFile.size * flowFile.progress()
+      // count totals
+      countTotal++
+      if (flowFile.progress() === 1) {
+        countTotalCompleted++
+      }
+    }
+  })
+  $('.uploads-progress-information').html('&nbsp;-&nbsp;completed ' + countTotalCompleted.toString() + ' of ' + countTotal.toString())
+  $('.uploads-total-progress-bar').css('width', Math.floor((totalSizeUploaded / totalSize) * 100) + '%')
+  $('.uploads-total-progress-bar-perc').html(Math.floor((totalSizeUploaded / totalSize) * 100) + '%')
+}
 
 // draggability of the upload overview div
 function dragElement (elmnt) {
@@ -850,10 +884,11 @@ const getFolderContents = (() => {
       if (i !== j) return null
 
       // Populate the 'size' of collections so datatables doesn't get confused.
+      filenames = []
       for (const x of result.items) {
+        filenames.push(x.name)
         if (x.type === 'coll') { x.size = 0 }
       }
-
       // Update cache info.
       total = result.total
       cacheStart = args.start
@@ -1422,6 +1457,15 @@ function logUpload (id, file) {
                   <div class="col-md-6">
                     <div class="upload-filename">${Yoda.htmlEncode(file.relativePath)}</div>
                     <div class="upload-btns btn-group btn-group-sm" role="group" aria-label="Basic example">
+                      <div class="overwrite-div hidden">
+                        Overwrite?
+                        <button type="button" class="btn btn-secondary upload-overwrite">
+                        Yes
+                        </button>
+                        <button type="button" class="btn btn-secondary upload-no-overwrite">
+                        No
+                        </button>
+                      </div>
                       <button type="button" class="btn btn-secondary upload-cancel me-1">
                         Cancel
                       </button>
