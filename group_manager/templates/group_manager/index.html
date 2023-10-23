@@ -91,13 +91,9 @@
     <div class="col-md-6">
         <div class="sticky-top">
             <!---  CREATE  -->
-            <div class="card properties-create properties hidden">
-                <a id="properties-create-link" href=".collapsible-group-properties" role="button" data-bs-toggle="collapse" aria-controls="group-properties-create">
-                    <div class="card-header">
-                        <i class="fa-solid fa-caret-down triangle" aria-hidden="true"></i> Create new group</span>
-                    </div>
-                </a>
-                <div class="card-body collapse show collapsible-group-properties" id="group-properties-create">
+            <div class="card properties-create hidden">
+                <div class="card-header">Create new group</div>
+                <div class="card-body" id="group-properties-create">
                     <form class="form-horizontal" id="f-group-create" action="{{ url_for('group_manager_bp.group_create') }}" method="POST">
                         <div class="mb-3 row">
                             <label class="col-sm-4 form-label" for="f-group-create-name">Group name
@@ -195,7 +191,7 @@
                 </div>
 
             <!---  UPDATE  -->
-            <div class="card properties-update properties">
+            <div class="card properties-update">
                 <a id="properties-update-link" href=".collapsible-group-properties" role="button" data-bs-toggle="collapse" aria-controls="group-properties">
                     <div class="card-header">
                         <i class="fa-solid fa-caret-down triangle" aria-hidden="true"></i> Group properties <span class="float-end" id="group-properties-group-name"></span>

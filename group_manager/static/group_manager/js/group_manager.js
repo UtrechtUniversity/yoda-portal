@@ -565,13 +565,6 @@ $(function () {
     $('.users').addClass('hidden')
     $('.properties-create').removeClass('hidden')
 
-    // Make all kinds of group properties un-collapsed for consistency when switching back to group-properties-update
-    $(".collapsible-group-properties").addClass("show")
-    $('#properties-create-link, #properties-update-link').find('.triangle')
-      .removeClass('fa-caret-right')
-      .addClass('fa-caret-down')
-    Yoda.storage.session.set('is-collapsed', 'false')
-
     const selectedGroup = Yoda.storage.session.get('selected-group')
     const that = Yoda.groupManager
 
@@ -2034,16 +2027,16 @@ $(function () {
 
       // Group properties {{{
       // When user collapses group properties
-      $('.properties').on('hide.bs.collapse', function (e) {
-        $('#properties-create-link, #properties-update-link').find('.triangle')
+      $('.properties-update').on('hide.bs.collapse', function (e) {
+        $('#properties-update-link').find('.triangle')
           .removeClass('fa-caret-down')
           .addClass('fa-caret-right')
         Yoda.storage.session.set('is-collapsed', 'true')
       })
 
       // When user opens up group properties
-      $('.properties').on('show.bs.collapse', function (e) {
-        $('#properties-create-link, #properties-update-link').find('.triangle')
+      $('.properties-update').on('show.bs.collapse', function (e) {
+        $('#properties-update-link').find('.triangle')
           .removeClass('fa-caret-right')
           .addClass('fa-caret-down')
         Yoda.storage.session.set('is-collapsed', 'false')
@@ -2245,7 +2238,7 @@ $(function () {
       if (isCollapsed !== null && isCollapsed === 'true') {
         $(".collapsible-group-properties").removeClass("show")
         // Make sure the triangle is facing the correct direction
-        $(".properties").find(".triangle")
+        $(".properties-update").find(".triangle")
           .removeClass('fa-caret-down')
           .addClass('fa-caret-right')
       }
