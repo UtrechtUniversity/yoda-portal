@@ -20,7 +20,7 @@ $(document).ready(function () {
   }
 
   // Click on file browser -> open revision details
-  $('#file-browser tbody').on('click', 'tr', function () {
+  $(document).on("click","#file-browser tbody tr",function() {
     clickFileForRevisionDetails($(this))
   })
 
