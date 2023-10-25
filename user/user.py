@@ -15,7 +15,7 @@ from irods.session import iRODSSession
 
 import api
 import connman
-from util import log_error
+from util import is_email_in_domains, log_error
 
 # Blueprint creation
 user_bp = Blueprint('user_bp', __name__,
@@ -365,13 +365,11 @@ def callback() -> Response:
 
 def should_redirect_to_oidc(username: str) -> bool:
     """Check if user should be redirected to OIDC based on domain."""
-    if '@' in username:
-        domains: List[str] = app.config.get('OIDC_DOMAINS', [])
-        user_domain = username.split('@')[1]
-        if app.config.get('OIDC_ENABLED') and user_domain in domains:
-            return True
-
-    return False
+    if app.config.get('OIDC_ENABLED'):
+        oidc_domain_list: List[str] = app.config.get('OIDC_DOMAINS', [])
+        return '@' in username and is_email_in_domains(username, oidc_domain_list)
+    else:
+        return False
 
 
 def oidc_authorize_url(username: str) -> str:
