@@ -427,7 +427,7 @@ const getFolderContents = (() => {
           search_groups: $('#search-group-table').val()
         })
 
-      // If another requests has come while we were waiting, simply drop this one.
+      // If another request has come while we were waiting, simply drop this one.
       if (i !== j) return null
 
       // Update cache info.

@@ -31,6 +31,11 @@ $(function () {
     window.location.href = '/research/?dir=' + encodeURIComponent('/' + $(this).attr('research-area'))
   })
 
+  $('.btn-go-to-group-manager').on('click', function () {
+    Yoda.storage.session.set('selected-group', $(this).attr('group'))
+    window.location.href = '/group_manager'
+  })
+
   $('.btn-group button.metadata-form').on('click', function () {
     showMetadataForm($(this).attr('data-path'))
   })
@@ -314,6 +319,7 @@ function browse (dir = '', changeHistory = false) {
   // remove hide class that could have been added when a erroneous vault path was used.
   $('#file-browser_wrapper').removeClass('hide')
   handleGoToResearchButton(dir)
+  handleGoToGroupManager(dir)
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
 
@@ -337,6 +343,17 @@ function handleGoToResearchButton (dir) {
     $('.btn-go-to-research').attr('research-area', parts[1].replace('vault-', 'research-')).show()
   } else {
     $('.btn-go-to-research').attr('research-area', '').hide()
+  }
+}
+
+function handleGoToGroupManager(dir) {
+  // Handle the button with which to return to the corresponding research area.
+  const parts = dir.split('/')
+
+  if (parts.length > 1) {
+    $('.btn-go-to-group-manager').attr('group', parts[1].replace('vault-', 'research-')).show()
+  } else {
+    $('.btn-go-to-group-manager').attr('group', '').hide()
   }
 }
 
