@@ -1,4 +1,4 @@
-name: "Python lint"
+name: "Python lint and unit tests"
 
 on: [push, pull_request]
 
@@ -28,6 +28,11 @@ jobs:
       - name: Check static typing
         run: |
           mypy . --explicit-package-bases || true
+
+      - name: Run unit tests
+        run: |
+          cd unit-tests
+          python -m unittest
 
       - name: Check code for common misspellings
         run: |
