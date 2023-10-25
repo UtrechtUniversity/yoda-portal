@@ -4,7 +4,6 @@ __copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
-import re
 import secrets
 from typing import List
 
@@ -16,7 +15,7 @@ from irods.session import iRODSSession
 
 import api
 import connman
-from util import log_error
+from util import is_email_in_domains, log_error
 
 # Blueprint creation
 user_bp = Blueprint('user_bp', __name__,
@@ -371,22 +370,11 @@ def callback() -> Response:
 
 def should_redirect_to_oidc(username: str) -> bool:
     """Check if user should be redirected to OIDC based on domain."""
-    if '@' in username:
-        domains: List[str] = app.config.get('OIDC_DOMAINS', [])
-        if app.config.get('OIDC_ENABLED'):
-            for domain in domains:
-                # Take subdomains into account..
-                parts = domain.split('.')
-                if parts[0] == '*':
-                    # Wildcard - search including subdomains.
-                    domain_pattern = "\@([0-9a-z]*\.){0,2}" + parts[-2] + "\." + parts[-1]
-                else:
-                    # No wildcard - search for exact match.
-                    domain_pattern = "@{}$".format(domain)
-                if re.search(domain_pattern, username) is not None:
-                    # If a match occurs between username (which is an email address) then user must be redirected.
-                    return True
-    return False
+    if app.config.get('OIDC_ENABLED'):
+        oidc_domain_list: List[str] = app.config.get('OIDC_DOMAINS', [])
+        return '@' in username and is_email_in_domains(username, oidc_domain_list)
+    else:
+        return False
 
 
 def oidc_authorize_url(username: str) -> str:
