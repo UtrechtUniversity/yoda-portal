@@ -7,59 +7,79 @@
 var revisionTargetColl = '',
     folderSelectBrowser = null,
     dlgCurrentFolder = '',
-    currentSearchArg = '',
+    currentSearchStringRev = null,
+    currentSearchTypeRev = null,
     mainTable = null;
 
 const browsePageItems = 10;
 
 $( document ).ready(function() {
     // Click on file browser -> open revision details
-    startBrowsing(browsePageItems);
+    if ($('#file-browser').length && $('#search-filter').val().length > 0) {
+      currentSearchStringRev = $('#search-filter').val()
+      currentSearchTypeRev = $('#search_concept').attr('data-type')
 
-    $('#file-browser tbody').on('click', 'tr', function () {
+      if (currentSearchTypeRev === 'revision') {
+        browseRevisions()
+      }
+    }
+
+    // Click on file browser -> open revision details
+    $(document).on("click","#file-browser tbody tr",function() {
         clickFileForRevisionDetails($(this), mainTable);
     });
 
+  $('#search-panel li').on('click', function () {
+    currentSearchStringRev = $('#search-filter').val()
+    currentSearchTypeRev = $('#search_concept').attr('data-type')
+    browseRevisions()
+  })
+
     $('.search-btn').on('click', function() {
+        currentSearchStringRev = $('#search-filter').val()
+        currentSearchTypeRev = $('#search_concept').attr('data-type')
         browseRevisions();
     });
 
     $("#search-filter").bind('keypress', function(e) {
         if (e.keyCode==13) {
+	    currentSearchStringRev = $('#search-filter').val()
+            currentSearchTypeRev = $('#search_concept').attr('data-type')
             browseRevisions();
         }
     });
 });
 
 /// MAIN TABLE containing revisioned files
-function startBrowsing(items) {
-    var mainTable = $('#file-browser').DataTable({
-        "bFilter": false,
-        "bInfo": false,
-        "bLengthChange": true,
-        "language": {
-            "emptyTable": "No accessible files/folders present",
-            "lengthMenu": "_MENU_"
-        },
-        "dom": '<"top">frt<"bottom"lp><"clear">',
-        'columns': [{render: tableRenderer.name,  orderable: false, data: 'main_original_dataname'},
-            {render: tableRenderer.count,    orderable: false, data: 'revision_count'}
-        ],
-        "ajax": getRevisionListContents,
-        "processing": true,
-        "serverSide": true,
-        "iDeferLoading": 0,
-        "ordering": false,
-        "pageLength": items
-    });
-    browseRevisions();
-}
-
 function browseRevisions()
-{   currentSearchArg = $("#search-filter").val();
+{   if (currentSearchTypeRev === 'revision') {
+      // Destroy current Datatable.
+      const datatable = $('#file-browser').DataTable()
+      datatable.destroy()
 
-    let fileBrowser = $('#file-browser').DataTable();
-    fileBrowser.ajax.reload();
+      $('#file-browser').DataTable({
+        bFilter: false,
+        bInfo: false,
+        bLengthChange: true,
+        language: {
+          emptyTable: 'Your search did not match any documents',
+          lengthMenu: '_MENU_'
+        },
+        dom: '<"top">rt<"bottom"lp><"clear">',
+        columns: [
+          { render: tableRenderer.name, orderable: false, data: 'main_original_dataname' },
+          { render: tableRenderer.count, orderable: false, data: 'revision_count' }
+        ],
+        ajax: getRevisionListContents,
+        processing: true,
+        serverSide: true,
+        ordering: false,
+        pageLength: 10
+      })
+      $('#file-browser').on('length.dt', function (e, settings, len) {
+        Yoda.storage.session.set('pageLength', len)
+      })
+    }
 }
 
 // Fetches directory contents to populate the listing table.
@@ -88,7 +108,7 @@ let getRevisionListContents = (() => {
     let get = async (args) => {
         // Check if we can use the cache.
         if (cache.length
-            && currentSearchArg        === cacheSearchArg    /// DIT MOET SEARCH ARGUMENT WORDEN!!!
+            && currentSearchStringRev     === cacheSearchArg    /// DIT MOET SEARCH ARGUMENT WORDEN!!!
             //&& args.order[0].dir    === cacheSortOrder
             //&& args.order[0].column === cacheSortCol
             && args.start               >= cacheStart
@@ -100,7 +120,7 @@ let getRevisionListContents = (() => {
             let j = ++i;
 
             let result = await Yoda.call('revisions_search_on_filename',
-                {'searchString':   currentSearchArg,   /// TOEVOEGEN SEARCH ARGUMENT
+                {'searchString':   currentSearchStringRev,   /// TOEVOEGEN SEARCH ARGUMENT
                     'offset':     args.start,
                     'limit':      batchSize});
 
@@ -111,7 +131,7 @@ let getRevisionListContents = (() => {
             total          = result.total;
             cacheStart     = args.start;
             cache          = result.items;
-            cacheSearchArg    = currentSearchArg;
+            cacheSearchArg    = currentSearchStringRev;
             //cacheSortCol   = args.order[0].column;
             //cacheSortOrder = args.order[0].dir;
 
