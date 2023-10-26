@@ -337,7 +337,7 @@ $(function () {
           $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
         })
 
-        if (filenames.includes(secure_filename(file.name))) {
+        if (filenames.includes(secureFilename(file.name))) {
           file.pause()
           $self.find('.msg').text('Upload paused')
           $self.find('.overwrite-div').removeClass('hidden')
@@ -388,10 +388,10 @@ $(function () {
   r.on('fileProgress', function (file) {
     const percent = Math.floor(file.progress() * 100)
     $('#' + file.uniqueIdentifier + ' .progress-bar').css('width', percent + '%')
-    update_progress(r.files)
+    updateProgress(r.files)
   })
   r.on('fileRemoved', function (file) {
-    update_progress(r.files)
+    updateProgress(r.files)
   })
 
   $('body').on('dragbetterenter', function (event) {
@@ -555,15 +555,15 @@ $(function () {
   dragElement(document.getElementById('uploads'))
 })
 
-function secure_filename (file) {
+function secureFilename (file) {
   let result = ''
-  result = file.replace(/[`~!@#$%^&*()|+\-=?;:'",<>\{\}\[\]\\\/]/gi, "")
-  result = result.replace(/ /g,"_")
+  result = file.replace(/[`~!@#$%^&*()|+\-=?;:'",<>{}[]\\\/]/gi, '')
+  result = result.replace(/ /g, '_')
   return result
 }
 
 // Update upload progress bar
-function update_progress(files) {
+function updateProgress (files) {
   // presentation of totalised datasize percentages
   let totalSize = 0
   let totalSizeUploaded = 0
@@ -583,9 +583,14 @@ function update_progress(files) {
       }
     }
   })
+
+  let percentage = 0
+  if (totalSize > 0) {
+    percentage = Math.floor((totalSizeUploaded / totalSize) * 100)
+  }
   $('.uploads-progress-information').html('&nbsp;-&nbsp;completed ' + countTotalCompleted.toString() + ' of ' + countTotal.toString())
-  $('.uploads-total-progress-bar').css('width', Math.floor((totalSizeUploaded / totalSize) * 100) + '%')
-  $('.uploads-total-progress-bar-perc').html(Math.floor((totalSizeUploaded / totalSize) * 100) + '%')
+  $('.uploads-total-progress-bar').css('width', percentage + '%')
+  $('.uploads-total-progress-bar-perc').html(percentage + '%')
 }
 
 // draggability of the upload overview div
@@ -816,7 +821,7 @@ function handleGoToVaultButton (dir) {
   }
 }
 
-function handleGoToGroupManager(dir) {
+function handleGoToGroupManager (dir) {
   // Handle the button with which to return to the corresponding research area.
   const parts = dir.split('/')
 
