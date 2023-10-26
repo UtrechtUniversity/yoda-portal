@@ -337,7 +337,7 @@ $(function () {
           $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
         })
 
-        if (filenames.includes(file.name)){
+        if (filenames.includes(secure_filename(file.name))) {
           file.pause()
           $self.find('.msg').text('Upload paused')
           $self.find('.overwrite-div').removeClass('hidden')
@@ -357,7 +357,6 @@ $(function () {
             file.cancel()
             $self.find('.overwrite-div').addClass('hidden')
             $self.remove()
-            file.remove()
           })
         }
       })
@@ -391,7 +390,7 @@ $(function () {
     $('#' + file.uniqueIdentifier + ' .progress-bar').css('width', percent + '%')
     update_progress(r.files)
   })
-  r.on('fileRemoved', function () {
+  r.on('fileRemoved', function (file) {
     update_progress(r.files)
   })
 
@@ -555,6 +554,13 @@ $(function () {
 
   dragElement(document.getElementById('uploads'))
 })
+
+function secure_filename (file) {
+  let result = ''
+  result = file.replace(/[`~!@#$%^&*()|+\-=?;:'",<>\{\}\[\]\\\/]/gi, "")
+  result = result.replace(/ /g,"_")
+  return result
+}
 
 // Update upload progress bar
 function update_progress(files) {
