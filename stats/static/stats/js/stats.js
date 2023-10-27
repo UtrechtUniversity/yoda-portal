@@ -50,6 +50,11 @@ function getGroupDetails (group) {
     while (nrOfPoints < data.research.length) {
       chartTotals[nrOfPoints] = data.research[nrOfPoints] + data.vault[nrOfPoints] + data.revision[nrOfPoints]
       totals[nrOfPoints] = data.total[nrOfPoints]
+      // This can happen when old statistics data has been upgraded
+      if (totals[nrOfPoints] > chartTotals[nrOfPoints]) {
+        chartTotals[nrOfPoints] = totals[nrOfPoints]
+      }
+
       nrOfPoints++
     }
     if (group.startsWith('grp') || group.startsWith('intake')) {
@@ -249,29 +254,13 @@ function chartToggleData (legendButton) { // eslint-disable-line no-unused-vars
   const visibilityData = chart.isDatasetVisible(legendButton)
   chartVisibilityStatus[legendButton] = !visibilityData
 
-  // calculate new totals.
-  const newTotals = []
-  let i = 0
-  const length = chart.config.data.datasets[0].data.length
-  while (i < length) {
-    newTotals[i] = 0
-    let j = 0
-    while (j < 3) {
-      if (chartVisibilityStatus[j]) {
-        newTotals[i] = newTotals[i] + chart.config.data.datasets[j].data[i]
-      }
-      j++
-    }
-    i++
-  }
+  chartFilterDate()
 
   if (visibilityData) {
-    chart.config.data.datasets[3].data = newTotals
     chart.hide(legendButton)
     // set the button labels correctly including strike through
     document.getElementById('legend-' + chartDatasetLabels[legendButton].toLowerCase()).innerHTML = '<strike>' + chartDatasetLabels[legendButton] + '</strike>'
   } else {
-    chart.config.data.datasets[3].data = newTotals
     chart.show(legendButton)
     // set the button labels correctly
     document.getElementById('legend-' + chartDatasetLabels[legendButton].toLowerCase()).innerHTML = chartDatasetLabels[legendButton]
@@ -305,26 +294,29 @@ function chartFilterDate () {
 
   // Split into relevant data only.
   let i = 0
-  while (i < 3) {
+  while (i < 4) {
     filterDatapoints[i] = arAllDatapoints[i].slice(indexstartdate, indexenddate + 1)
     i++
   }
 
-  // New totalization per day.
-  filterDatapoints[3] = []
   let day = 0
 
   while (day < filterDatapoints[0].length) {
-    filterDatapoints[3][day] = filterDatapoints[0][day] + filterDatapoints[1][day] + filterDatapoints[2][day]
     let newTotal = 0
     let j = 0
+    const allAreVisible = chartVisibilityStatus[0] && chartVisibilityStatus[1] && chartVisibilityStatus[2]
     while (j < 3) {
       if (chartVisibilityStatus[j]) {
         newTotal = newTotal + filterDatapoints[j][day]
       }
       j++
     }
-    filterDatapoints[3][day] = newTotal
+    // Handling the case where old statistics data has been upgraded.
+    // If all categories are visible, display the old statistics total.
+    // If even one category is not visible, default to the calculated total of the visible categories.
+    if (!allAreVisible || filterDatapoints[3][day] <= newTotal) {
+      filterDatapoints[3][day] = newTotal
+    }
 
     day++
   }
