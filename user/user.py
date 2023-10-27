@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
+import secrets
 from typing import List
 
 import jwt
@@ -205,6 +206,9 @@ def callback() -> Response:
 
         return response
 
+    class StateMismatchError(Exception):
+        pass
+
     class UserinfoSubMismatchError(Exception):
         pass
 
@@ -216,6 +220,13 @@ def callback() -> Response:
     exception_occurred = "OPENID_ERROR"  # To identify exception in finally-clause
 
     try:
+        email = g.login_username.lower()
+
+        # Ensure that the request is not a forgery and that the user sending
+        # this connect request is the expected user.
+        if request.args['state'] != session.get('state'):
+            raise StateMismatchError
+
         token_response = token_request()
         js           = token_response.json()
         access_token = js['access_token']
@@ -245,8 +256,6 @@ def callback() -> Response:
 
         # Check if login email matches with user info email.
         email_identifier = app.config.get('OIDC_EMAIL_FIELD')
-        email = g.login_username.lower()
-
         userinfo_email = userinfo_payload[email_identifier]
         if not isinstance(userinfo_email, list):
             userinfo_email = [userinfo_email]
@@ -307,6 +316,10 @@ def callback() -> Response:
                 True
             )
 
+    except StateMismatchError:
+        # Invalid state parameter.
+        log_error("Invalid state parameter")
+
     except UserinfoSubMismatchError:
         # Possible Token substitution attack.
         log_error(
@@ -320,13 +333,20 @@ def callback() -> Response:
             f'Mismatch between email and user info email: {email} is not in {userinfo_email}',
             True
         )
+        exception_occurred = "USERINFO_EMAIL_MISMATCH_ERROR"
 
     except Exception:
         log_error(f"Unexpected exception during callback for username {email}", True)
 
     finally:
         if exception_occurred == "CAT_INVALID_USER_ERROR" or exception_occurred == "CAT_INVALID_AUTHENTICATION":
-            flash('Username/password was incorrect', 'danger')
+            flash('Username / password was incorrect', 'danger')
+        elif exception_occurred == "USERINFO_EMAIL_MISMATCH_ERROR":
+            flash(
+                'Unable to sign in. Please verify that your username has been entered correctly. '
+                'If your username has been entered correctly and this issue persists, please contact the system administrator',
+                'danger'
+            )
         elif exception_occurred == "OPENID_ERROR":
             flash(
                 'An error occurred during the OpenID Connect protocol. '
@@ -356,6 +376,11 @@ def should_redirect_to_oidc(username: str) -> bool:
 
 def oidc_authorize_url(username: str) -> str:
     authorize_url: str = app.config.get('OIDC_AUTH_URI')
+
+    # Generate a random string for the state parameter.
+    # https://www.rfc-editor.org/rfc/rfc6749#section-4.1.1
+    session['state'] = secrets.token_urlsafe(32)
+    authorize_url += '&state=' + session['state']
 
     if app.config.get('OIDC_LOGIN_HINT') and username:
         authorize_url += '&login_hint=' + username
@@ -414,11 +439,25 @@ def prepare_user() -> None:
         g.user = user_id
         g.irods = irods
 
-        # Check for notifications.
-        endpoints = ["static", "call", "upload_get", "upload_post"]
-        if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
-            response = api.call('notifications_load', data={})
-            g.notifications = len(response['data'])
+        try:
+            # Check for notifications.
+            endpoints = ["static", "call", "upload_get", "upload_post"]
+            if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
+                response = api.call('notifications_load', data={})
+                g.notifications = len(response['data'])
+        except PAM_AUTH_PASSWORD_FAILED:
+            # Password is not valid any more (probably OIDC access token).
+            connman.clean(session.sid)
+            session.clear()
+
+            session['login_username'] = login_username
+
+            # If the username matches the domain set for OIDC
+            if should_redirect_to_oidc(login_username):
+                return redirect(oidc_authorize_url(login_username))
+            # Else (i.e. it is an external user, local user, or OIDC is disabled)
+            else:
+                return redirect(url_for('user_bp.login'))
     else:
         redirect('user_bp.login')
 
