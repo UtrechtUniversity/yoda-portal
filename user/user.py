@@ -6,6 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 import json
 import secrets
 from typing import List
+from uuid import uuid4
 
 import jwt
 import requests
@@ -404,6 +405,9 @@ def irods_login(username: str, password: str) -> None:
 
     # This implicitly creates connections, and raises an exception on failure
     _ = irods.server_version
+
+    # Regenerate Flask session identifier.
+    session.sid = str(uuid4())
 
     session['user_id'] = username
     session['password'] = password
