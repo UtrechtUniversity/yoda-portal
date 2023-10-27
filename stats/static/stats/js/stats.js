@@ -11,11 +11,11 @@ $(document).ready(function () {
   })
 
   $('#startdate_min').on('click', function () {
-    $('#startdate').val(chartDateLabels[0])
+    $('#startdate').val(getISODateString(chartDateLabels[0]))
     chartFilterDate()
   })
   $('#enddate_max').on('click', function () {
-    $('#enddate').val(chartDateLabels[chartDateLabels.length - 1])
+    $('#enddate').val(getISODateString(chartDateLabels[chartDateLabels.length - 1]))
     chartFilterDate()
   })
 })
@@ -271,8 +271,8 @@ function chartToggleData (legendButton) { // eslint-disable-line no-unused-vars
 function chartFilterDate () {
   const dates = [...chartDateLabels]
 
-  const startdate = document.getElementById('startdate').value
-  const enddate = document.getElementById('enddate').value
+  const startdate = new Date(document.getElementById('startdate').value)
+  const enddate = new Date(document.getElementById('enddate').value)
 
   // check datepicker values against the values in the array of dates present and select the nearest to the picked date.
   const nearstartdate = getNearestDate(startdate)
@@ -492,15 +492,22 @@ function humanReadableSize (size) {
   return (Math.floor(size * 10) / 10 + '') + '&nbsp;' + szs[szi]
 }
 
+function getISODateString (dateString) {
+  // Given a date string in locale format
+  // Return string in ISO 8601 formatted date yyyy-mm-dd (no time or timezone, does not correct for timezone)
+  const newDate = new Date(dateString)
+  return newDate.toISOString().split('T')[0]
+}
+
 function getNearestDate (findDate) {
   // Find the nearest date in chartDateLabels
-  const dates = [...chartDateLabels]
+  // Return string in ISO 8601 formatted date yyyy-mm-dd (no time or timezone)
+  const dates = chartDateLabels.map(x => new Date(x))
 
-  const findMe = new Date(findDate)
   const [closest] = dates.sort((a, b) => {
-    const [aDate, bDate] = [a, b].map(d => Math.abs(new Date(d) - findMe))
+    const [aDate, bDate] = [a, b].map(d => Math.abs(d - findDate))
 
     return aDate - bDate
   })
-  return closest
+  return closest.toISOString().split('T')[0]
 }
