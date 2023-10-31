@@ -19,7 +19,7 @@
 
         <div class="input-group mb-3">
             <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <span id="search_concept" data-type="{{ searchType|safe }}">Search by filename</span>
+                <span id="search_concept" data-type="{{ searchType }}">Search by filename</span>
             </button>
             <ul id="search-panel" class="dropdown-menu">
                 <li><a class="dropdown-item" data-type="filename">Search by filename</a></li>
@@ -28,7 +28,7 @@
                 <li><a class="dropdown-item" data-type="status">Search by status</a></li>
                 <li><a class="dropdown-item" data-type="revision">Search revision by name</a></li>
             </ul>
-            <input type="text" class="form-control search-term" id="search-filter" placeholder="Search term..." value="{{ searchTerm|safe }}" maxlength="255">
+            <input type="text" class="form-control search-term" id="search-filter" placeholder="Search term..." value="{{ searchTerm }}" maxlength="255">
             <button type="button" class="btn btn-outline-secondary search-term" data-items-per-page="25"><i class="fa-solid fa-search" aria-hidden="true"></i></button>
 
             <select name="status" class="form-control search-status hide">
