@@ -25,7 +25,7 @@ let back   = false;
 
 let form = document.getElementById('form');
 
-const validator = customizeValidator({ AjvClass: Ajv2019 });
+const validator = customizeValidator({ AjvClass: Ajv2019, ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
 
 const enumWidget = (props) => {
     let enumArray = props['schema']['enum'];
