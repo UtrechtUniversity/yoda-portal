@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
 from typing import Iterator
 from uuid import UUID
 
-from flask import abort, Blueprint, g, render_template, request, Response, stream_with_context
+from flask import abort, Blueprint, g, render_template, request, Response, session, stream_with_context
+from irods.data_object import iRODSDataObject
+from irods.exception import CAT_NO_ACCESS_PERMISSION
 
 import api
+import connman
 
 vault_bp = Blueprint('vault_bp', __name__,
                      template_folder='templates',
@@ -34,25 +37,33 @@ def index() -> Response:
 def download() -> Response:
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
-    session = g.irods
 
-    READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
+    def read_file_chunks(data_object: iRODSDataObject) -> Iterator[bytes]:
+        READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
 
-    def read_file_chunks(path: str) -> Iterator[bytes]:
-        obj = session.data_objects.get(path)
-        with obj.open('r') as fd:
-            while True:
-                buf = fd.read(READ_BUFFER_SIZE)
-                if buf:
-                    yield buf
-                else:
-                    break
+        try:
+            with data_object.open('r') as fd:
+                while True:
+                    buf = fd.read(READ_BUFFER_SIZE)
+                    if buf:
+                        connman.extend(session.sid)
+                        yield buf
+                    else:
+                        break
+        except CAT_NO_ACCESS_PERMISSION:
+            abort(403)
+        except Exception:
+            abort(500)
 
-    if session.data_objects.exists(path):
+    if g.irods.data_objects.exists(path):
+        data_object = g.irods.data_objects.get(path)
+        size = data_object.replicas[0].size
+
         return Response(
-            stream_with_context(read_file_chunks(path)),
+            stream_with_context(read_file_chunks(data_object)),
             headers={
                 'Content-Disposition': f'attachment; filename={filename}',
+                'Content-Length': f'{size}',
                 'Content-Type': 'application/octet'
             }
         )
@@ -121,13 +132,13 @@ def download_report() -> Response:
         ext = '.csv'
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']},{result['checksum']} \n"
+                output += f"{result['name']},{result['size']},{result['checksum']} \n"
     else:
         mime = 'text/plain'
         ext = '.txt'
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']} {result['checksum']} \n"
+                output += f"{result['name']} {result['size']} {result['checksum']} \n"
 
     return Response(
         output,

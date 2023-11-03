@@ -72,7 +72,7 @@ function flatListGroups () {
   table += '</tbody></table>'
   $('#result-user-search-groups').html(table)
 
-  // Clicking a row must highlite rows in in both tree/flat list and present details in the corresponding panel
+  // Clicking a row must highlight rows in both tree/flat list and present details in the corresponding panel
   $('.user-search-result-group').on('click', function () {
     // $('#user-search-groups').modal('hide');
     const groupName = $(this).attr('user-search-result-group')
@@ -170,20 +170,38 @@ function readCsvFile (e) {
     // first row will contain fixed definion
     const arKeys = result[0]
 
-    // First compress all columns to  keys: category, subcategory, groupname and usercount
+    // For compressing all columns to  keys: category, subcategory, groupname and usercount
     const presentationColumns = ['groupname', 'category', 'subcategory', 'users']
     const allCsvColumns = ['groupname', 'category', 'subcategory', 'manager', 'member', 'viewer']
 
+    // First validate the headers found values in csvHeader
+    // 'groupname', 'category', 'subcategory' MUST be present
+    // 'manager', 'member', 'viewer' like for instance manager:manager,member:member1,member:member2
+
+    // per csvHeader item check whether its valid
+    let errorRows = ''
+    csvHeader.split(',').forEach(function myFunction (item) {
+      if (!allCsvColumns.includes(item) && !allCsvColumns.includes(item.split(':')[0])) {
+        errorRows += '<tr><td> - ' + item + '</td></tr>'
+      }
+    })
+    if (errorRows) {
+      $('#result-import-groups-csv').html('</br>The uploaded CSV contains the following invalid header names:<br/><table>' + errorRows + '</table>')
+      return
+    }
+
     const newResult = []
     let rowNr = 0
+
     result.forEach(function myFunction (groupDef) {
       // initialise all columns that must be present in the view
       const row = []
+
       presentationColumns.forEach(function myFunction (column) {
         row[column] = ''
       })
 
-      // now loop through the received rows and put them in the right columns
+      // now loop through the received rows and put them in the right presentation columns
       for (const key of Object.keys(arKeys)) {
         allCsvColumns.forEach(function myFunction (column) {
           if (key === column) {
@@ -199,6 +217,7 @@ function readCsvFile (e) {
           }
         })
       }
+
       // only show row when all required data is present.
       let rowError = false
       presentationColumns.forEach(function myFunction (column) {
@@ -546,14 +565,14 @@ $(function () {
     $('.users').addClass('hidden')
     $('.properties-create').removeClass('hidden')
 
-    const selectedGroup = Yoda.storage.session.get('selected-group');
-    const that = Yoda.groupManager;
+    const selectedGroup = Yoda.storage.session.get('selected-group')
+    const that = Yoda.groupManager
 
     // take over category and subcategory from previously selected group.
-    var category = '', subcategory = '';
+    let category = ''; let subcategory = ''
     if (selectedGroup !== null && selectedGroup in Yoda.groupManager.groups) {
-        category = that.groups[selectedGroup].category;
-        subcategory = that.groups[selectedGroup].subcategory;
+      category = that.groups[selectedGroup].category
+      subcategory = that.groups[selectedGroup].subcategory
     }
 
     const $prefixDiv = $('#f-group-create-prefix-div')
@@ -566,12 +585,14 @@ $(function () {
     $('#f-group-create-name').val('')
     $('#f-group-create-description').val('')
 
-    $('#f-group-create-sram-group').prop('checked', false)
+    if (that.canCreateDatamanagerGroup(category)) {
+      $('#f-group-create-prefix-datamanager').removeClass('hidden')
+    } else {
+      $('#f-group-create-prefix-datamanager').addClass('hidden')
+    }
 
-    $('#f-group-create-prefix-datamanager').addClass('hidden')
-
-    $('#f-group-create-schema-id').select2('val', that.schemaID_default);
-    $('#f-group-create-expiration-date').val('');
+    $('#f-group-create-schema-id').select2('val', that.schemaIdDefault)
+    $('#f-group-create-expiration-date').val('')
     $('#f-group-create-category').select2('val', category)
     $('#f-group-create-subcategory').select2('val', subcategory)
     $('#f-group-create-name').focus()
@@ -644,7 +665,7 @@ $(function () {
     schemaIDs: [],
 
     // Default schema id for this yoda istance coming from the backend
-    schemaID_default: '',
+    schemaIdDefault: '',
 
     /// Get the name of an access level one lower than the current one for
     /// the given group.
@@ -1237,7 +1258,8 @@ $(function () {
                             )
           },
           initSelection: function ($el, callback) {
-            callback({ id: $el.val(), text: $el.val() })
+            const cb = { id: $el.val(), text: $el.val() }
+            callback(cb)
           }
         }).on('open', function () {
           $(this).select2('val', '')
@@ -1324,7 +1346,8 @@ $(function () {
                             )
           },
           initSelection: function ($el, callback) {
-            callback({ id: $el.val(), text: $el.val() })
+            const cb = { id: $el.val(), text: $el.val() }
+            callback(cb)
           }
         }).on('open', function () {
           $(this).select2('val', '')
@@ -1383,7 +1406,8 @@ $(function () {
                             )
           },
           initSelection: function ($el, callback) {
-            callback({ id: $el.val(), text: $el.val() })
+            const cb = { id: $el.val(), text: $el.val() }
+            callback(cb)
           }
         }).on('open', function () {
           $(this).select2('val', '')
@@ -1449,7 +1473,8 @@ $(function () {
                             )
           },
           initSelection: function ($el, callback) {
-            callback({ id: $el.val(), text: $el.val() })
+            const cb = { id: $el.val(), text: $el.val() }
+            callback(cb)
           }
         }).on('open', function () {
           $(this).select2('val', '')
@@ -1551,8 +1576,7 @@ $(function () {
         data_classification: $('#f-group-' + action + '-data-classification').val(),
         category: $('#f-group-' + action + '-category').val(),
         subcategory: $('#f-group-' + action + '-subcategory').val(),
-        expiration_date: $('#f-group-' + action + '-expiration-date').val(),
-        sram_group: $('#f-group-create-sram-group').prop('checked')
+        expiration_date: $('#f-group-' + action + '-expiration-date').val()
       }
 
       // specific datamanager-group testing dependent on mode
@@ -1607,6 +1631,23 @@ $(function () {
         return
       }
 
+      // Check if group expiration date is valid.
+      if ($('#f-group-' + action + '-expiration-date').val().length) {
+        const today = new Date().toISOString().substring(0, 10)
+        let expirationDate = new Date()
+        const parts = $('#f-group-' + action + '-expiration-date').val().split('-')
+        expirationDate.setYear(parts[0])
+        expirationDate.setMonth(parts[1] - 1)
+        expirationDate.setDate(parts[2])
+        expirationDate = expirationDate.toISOString().substring(0, 10)
+
+        if (expirationDate <= today) {
+          window.alert('Expiration date needs to be in the future')
+          resetSubmitButton()
+          return
+        }
+      }
+
       // Check if group decription is valid.
       if (!newProperties.description.match(/^[a-zA-Z0-9,.()_ -]*$/)) {
         window.alert('The group description may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')
@@ -1621,8 +1662,7 @@ $(function () {
         group_expiration_date: newProperties.expiration_date,
         group_data_classification: newProperties.data_classification,
         group_category: newProperties.category,
-        group_subcategory: newProperties.subcategory,
-        group_sram_group: newProperties.sram_group
+        group_subcategory: newProperties.subcategory
       }
 
       // Avoid trying to set a schema id for groups that
@@ -1701,6 +1741,7 @@ $(function () {
          */
     onClickGroupDelete: function (el) {
       const groupName = $('#group-list .group.active').attr('data-name')
+      const nextGroupName = $('#result-user-search-groups .user-search-result-group.active').next().attr('user-search-result-group')
 
       $('#group-list .group.active')
         .addClass('delete-pending disabled')
@@ -1725,6 +1766,10 @@ $(function () {
               message: 'Removed group ' + groupName + '.'
             })
           )
+
+          if (nextGroupName) {
+            Yoda.storage.session.set('selected-group', nextGroupName)
+          }
 
           $(window).on('beforeunload', function () {
             $(window).scrollTop(0)
@@ -1923,10 +1968,10 @@ $(function () {
          *
          * \todo Generate the group list in JS just like the user list.
          */
-    load: function (groupHierarchy, schemaIDs, schemaID_default, userType, userZone) {
+    load: function (groupHierarchy, schemaIDs, schemaIdDefault, userType, userZone) {
       this.groupHierarchy = groupHierarchy
       this.schemaIDs = schemaIDs
-      this.schemaID_default = schemaID_default
+      this.schemaIdDefault = schemaIdDefault
       this.isRodsAdmin = userType === 'rodsadmin'
       this.zone = userZone
       this.userNameFull = Yoda.user.username + '#' + userZone
@@ -1972,12 +2017,30 @@ $(function () {
       })
       // }}}
 
-      // Set inial state of group create button {{{
+      // Set initial state of group create button {{{
       if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
         $('.create-button-new').removeClass('hidden')
       } else {
         $('.create-button-new').addClass('hidden')
       }
+      // }}}
+
+      // Group properties {{{
+      // When user collapses group properties
+      $('.properties-update').on('hide.bs.collapse', function (e) {
+        $('#properties-update-link').find('.triangle')
+          .removeClass('fa-caret-down')
+          .addClass('fa-caret-right')
+        Yoda.storage.session.set('is-collapsed', 'true')
+      })
+
+      // When user opens up group properties
+      $('.properties-update').on('show.bs.collapse', function (e) {
+        $('#properties-update-link').find('.triangle')
+          .removeClass('fa-caret-right')
+          .addClass('fa-caret-down')
+        Yoda.storage.session.set('is-collapsed', 'false')
+      })
       // }}}
 
       // Group list {{{
@@ -2169,6 +2232,15 @@ $(function () {
             a + '<td style="width: 26px;"></td></tr></table>'
           )
         }
+      }
+
+      const isCollapsed = Yoda.storage.session.get('is-collapsed')
+      if (isCollapsed !== null && isCollapsed === 'true') {
+        $(".collapsible-group-properties").removeClass("show")
+        // Make sure the triangle is facing the correct direction
+        $(".properties-update").find(".triangle")
+          .removeClass('fa-caret-down')
+          .addClass('fa-caret-right')
       }
 
       const selectedGroup = Yoda.storage.session.get('selected-group')

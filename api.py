@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import base64
 import json
+import sys
+import zlib
+from timeit import default_timer as timer
 from typing import Any, Dict, Optional
 
-from flask import Blueprint, g, jsonify, request, Response
+from flask import Blueprint, current_app as app, g, jsonify, request, Response
 from irods import message, rule
 
 from errors import UnauthorizedAPIAccessError
@@ -50,13 +54,20 @@ def call(fn: str, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         return (N - 1) // m + 1
 
     def nrep_string_expr(s: str, m: int = 64) -> str:
-        return ' ++\n'.join('"{}"'.format(escape_quotes(s[i * m:i * m + m])) for i in range(break_strings(len(s), m) + 1))
+        return '++\n'.join('"{}"'.format(escape_quotes(s[i * m:i * m + m])) for i in range(break_strings(len(s), m) + 1))
+
+    if app.config.get('LOG_API_CALL_DURATION', False):
+        begintime = timer()
 
     if data is None:
         data = {}
 
     params = json.dumps(data)
-    arg_str_expr = nrep_string_expr(params)
+
+    # Compress params and encode as base64 to reduce size (max rule length in iRODS is 20KB)
+    compressed_params = zlib.compress(params.encode())
+    base64_encoded_params = base64.b64encode(compressed_params)
+    arg_str_expr = nrep_string_expr(base64_encoded_params.decode('utf-8'))
 
     # Set parameters as variable instead of parameter input to circumvent iRODS string limits.
     rule_body = ''' *x={}
@@ -78,6 +89,11 @@ def call(fn: str, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     x = bytesbuf_to_str(x._values['MsParam_PI'][0]._values['inOutStruct']._values['stdoutBuf'])
 
     result = x.decode()
+
+    if app.config.get('LOG_API_CALL_DURATION', False):
+        endtime = timer()
+        callduration = round((endtime - begintime) * 1000)
+        print("DEBUG: {:4d}ms api_{} {}".format(callduration, fn, params), file=sys.stderr)
 
     return json.loads(result)
 

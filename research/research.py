@@ -5,23 +5,69 @@ __license__   = 'GPLv3, see LICENSE'
 
 import io
 import os
+import queue
+import threading
 from typing import Iterator
 
 from flask import (
     abort, Blueprint, current_app as app, g, jsonify, make_response,
-    render_template, request, Response, stream_with_context
+    render_template, request, Response, session, stream_with_context
 )
+from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
 from werkzeug.utils import secure_filename
 
 import api
+import connman
 from util import log_error
 
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
                         static_folder='static/research',
                         static_url_path='/assets')
+
+
+class Chunk:
+    def __init__(self, data_objects, path, number, size, data, resource):
+        self.data_objects = data_objects
+        self.path = path
+        self.number = number
+        self.size = size
+        self.data = data
+        self.resource = resource
+
+
+q = queue.Queue(4)
+r = queue.Queue(1)
+
+
+def irods_writer() -> None:
+    failure = False
+    while True:
+        chunk = q.get()
+        if chunk.path:
+            if not failure:
+                try:
+                    with chunk.data_objects.open(chunk.path, 'a', chunk.resource) as obj_desc:
+                        obj_desc.seek(int(chunk.size * (chunk.number - 1)))
+                        obj_desc.write(chunk.data)
+                except Exception:
+                    failure = True
+                    log_error("Chunk upload failed for {}".format(chunk.path))
+                finally:
+                    try:
+                        obj_desc.close()
+                    except Exception:
+                        pass
+        else:
+            # report back about failures
+            r.put(failure)
+            failure = False
+        q.task_done()
+
+
+threading.Thread(target=irods_writer, name='irods-writer', daemon=True).start()
 
 
 @research_bp.route('/')
@@ -41,17 +87,16 @@ def index() -> Response:
 def download() -> Response:
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
-    session = g.irods
 
-    READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
+    def read_file_chunks(data_object: iRODSDataObject) -> Iterator[bytes]:
+        READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
 
-    def read_file_chunks(path: str) -> Iterator[bytes]:
-        obj = session.data_objects.get(path)
         try:
-            with obj.open('r') as fd:
+            with data_object.open('r') as fd:
                 while True:
                     buf = fd.read(READ_BUFFER_SIZE)
                     if buf:
+                        connman.extend(session.sid)
                         yield buf
                     else:
                         break
@@ -60,11 +105,15 @@ def download() -> Response:
         except Exception:
             abort(500)
 
-    if session.data_objects.exists(path):
+    if g.irods.data_objects.exists(path):
+        data_object = g.irods.data_objects.get(path)
+        size = data_object.replicas[0].size
+
         return Response(
-            stream_with_context(read_file_chunks(path)),
+            stream_with_context(read_file_chunks(data_object)),
             headers={
                 'Content-Disposition': f'attachment; filename={filename}',
+                'Content-Length': f'{size}',
                 'Content-Type': 'application/octet'
             }
         )
@@ -80,9 +129,8 @@ def build_object_path(path: str, relative_path: str, filename: str) -> str:
     if relative_path:
         base_dir = os.path.join("/" + g.irods.zone, 'home', path, relative_path)
         # Ensure upload collection exists.
-        session = g.irods
-        if not session.collections.exists(base_dir):
-            session.collections.create(base_dir)
+        if not g.irods.collections.exists(base_dir):
+            g.irods.collections.create(base_dir)
     else:
         base_dir = os.path.join("/" + g.irods.zone, 'home', path)
 
@@ -115,7 +163,6 @@ def upload_get() -> Response:
         response.headers["Content-Type"] = "application/json"
         return response
 
-    session = g.irods
     object_path = build_object_path(filepath, flow_relative_path, flow_filename)
 
     # Partial file name for chunked uploads.
@@ -128,7 +175,7 @@ def upload_get() -> Response:
         return response
 
     try:
-        obj = session.data_objects.get(object_path)
+        obj = g.irods.data_objects.get(object_path)
 
         if obj.replicas[0].size > int(flow_chunk_size * (flow_chunk_number - 1)):
             # Chunk already exists.
@@ -170,7 +217,6 @@ def upload_post() -> Response:
         response.headers["Content-Type"] = "application/json"
         return response
 
-    session = g.irods
     object_path = build_object_path(filepath, flow_relative_path, flow_filename)
 
     # Partial file name for chunked uploads.
@@ -182,31 +228,35 @@ def upload_post() -> Response:
     encode_unicode_content = iRODSMessage.encode_unicode(chunk_data.stream.read())
 
     # Write chunk data.
-    try:
-        with session.data_objects.open(object_path, 'a', rescName=app.config.get('IRODS_DEFAULT_RESC')) as obj_desc:
-            obj_desc.seek(int(flow_chunk_size * (flow_chunk_number - 1)))
-            obj_desc.write(encode_unicode_content)
-    except Exception:
-        log_error("Chunk upload failed for {}".format(object_path))
-        response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
-        response.headers["Content-Type"] = "application/json"
-        return response
-    finally:
-        try:
-            obj_desc.close()
-        except Exception:
-            pass
+    q.put(Chunk(
+        g.irods.data_objects,
+        object_path,
+        flow_chunk_number,
+        flow_chunk_size,
+        encode_unicode_content,
+        app.config.get('IRODS_DEFAULT_RESC')
+    ))
+
+    # check at the end, and after every Gb
+    if flow_total_chunks == flow_chunk_number or flow_chunk_number % 40 == 0:
+        q.put(Chunk(None, None, 0, 0, None, None))
+        q.join()
+        if r.get():
+            # failure in upload writer thread
+            response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
+            response.headers["Content-Type"] = "application/json"
+            return response
 
     # Rename partial file name when complete for chunked uploads.
     if flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
         final_object_path = build_object_path(filepath, flow_relative_path, flow_filename)
         try:
             # overwriting doesn't work using the move command, therefore unlink the previous file first
-            session.data_objects.unlink(final_object_path, force=True)
+            g.irods.data_objects.unlink(final_object_path, force=True)
         except Exception:
             # Probably there was no file present which is no erroneous situation
             pass
-        session.data_objects.move(object_path, final_object_path)
+        g.irods.data_objects.move(object_path, final_object_path)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
     response.headers["Content-Type"] = "application/json"
@@ -233,13 +283,13 @@ def download_report() -> Response:
         ext = '.csv'
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']},{result['checksum']} \n"
+                output += f"{result['name']},{result['size']},{result['checksum']} \n"
     else:
         mime = 'text/plain'
         ext = '.txt'
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']} {result['checksum']} \n"
+                output += f"{result['name']} {result['size']} {result['checksum']} \n"
 
     return Response(
         output,

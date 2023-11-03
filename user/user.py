@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
+import secrets
 from typing import List
 
 import jwt
@@ -14,7 +15,7 @@ from irods.session import iRODSSession
 
 import api
 import connman
-from util import log_error
+from util import is_email_in_domains, log_error
 
 # Blueprint creation
 user_bp = Blueprint('user_bp', __name__,
@@ -144,12 +145,15 @@ def settings() -> Response:
         settings['mail_notifications'] = request.form.get('mail_notifications', "OFF")
         settings['group_manager_view'] = request.form.get('group_manager_view', "TREE")
         settings['number_of_items'] = request.form.get('number_of_items', "10")
+        settings['color_mode'] = request.form.get('color_mode', "AUTO")
 
         # Save user settings and handle API response.
         data = {"settings": settings}
 
         response = api.call('settings_save', data)
         if response['status'] == 'ok':
+            # Save the color mode now so that the display changes immediately.
+            g.settings['color_mode'] = settings['color_mode']
             flash('Settings saved successfully', 'success')
         else:
             flash('Saving settings failed!', 'danger')
@@ -207,6 +211,9 @@ def callback() -> Response:
 
         return response
 
+    class StateMismatchError(Exception):
+        pass
+
     class UserinfoSubMismatchError(Exception):
         pass
 
@@ -218,6 +225,13 @@ def callback() -> Response:
     exception_occurred = "OPENID_ERROR"  # To identify exception in finally-clause
 
     try:
+        email = g.login_username.lower()
+
+        # Ensure that the request is not a forgery and that the user sending
+        # this connect request is the expected user.
+        if request.args['state'] != session.get('state'):
+            raise StateMismatchError
+
         token_response = token_request()
         js           = token_response.json()
         access_token = js['access_token']
@@ -247,8 +261,6 @@ def callback() -> Response:
 
         # Check if login email matches with user info email.
         email_identifier = app.config.get('OIDC_EMAIL_FIELD')
-        email = g.login_username.lower()
-
         userinfo_email = userinfo_payload[email_identifier]
         if not isinstance(userinfo_email, list):
             userinfo_email = [userinfo_email]
@@ -309,6 +321,10 @@ def callback() -> Response:
                 True
             )
 
+    except StateMismatchError:
+        # Invalid state parameter.
+        log_error("Invalid state parameter")
+
     except UserinfoSubMismatchError:
         # Possible Token substitution attack.
         log_error(
@@ -322,13 +338,20 @@ def callback() -> Response:
             f'Mismatch between email and user info email: {email} is not in {userinfo_email}',
             True
         )
+        exception_occurred = "USERINFO_EMAIL_MISMATCH_ERROR"
 
     except Exception:
         log_error(f"Unexpected exception during callback for username {email}", True)
 
     finally:
         if exception_occurred == "CAT_INVALID_USER_ERROR" or exception_occurred == "CAT_INVALID_AUTHENTICATION":
-            flash('Username/password was incorrect', 'danger')
+            flash('Username / password was incorrect', 'danger')
+        elif exception_occurred == "USERINFO_EMAIL_MISMATCH_ERROR":
+            flash(
+                'Unable to sign in. Please verify that your username has been entered correctly. '
+                'If your username has been entered correctly and this issue persists, please contact the system administrator',
+                'danger'
+            )
         elif exception_occurred == "OPENID_ERROR":
             flash(
                 'An error occurred during the OpenID Connect protocol. '
@@ -338,7 +361,7 @@ def callback() -> Response:
             )
             log_error(f"OIDC error occurred for {str(email)}", True)
 
-        # Redirect to gate when exception has occured.
+        # Redirect to gate when exception has occurred.
         if exception_occurred:
             return redirect(url_for('user_bp.gate'))
 
@@ -347,17 +370,20 @@ def callback() -> Response:
 
 def should_redirect_to_oidc(username: str) -> bool:
     """Check if user should be redirected to OIDC based on domain."""
-    if '@' in username:
-        domains: List[str] = app.config.get('OIDC_DOMAINS', [])
-        user_domain = username.split('@')[1]
-        if app.config.get('OIDC_ENABLED') and user_domain in domains:
-            return True
-
-    return False
+    if app.config.get('OIDC_ENABLED'):
+        oidc_domain_list: List[str] = app.config.get('OIDC_DOMAINS', [])
+        return '@' in username and is_email_in_domains(username, oidc_domain_list)
+    else:
+        return False
 
 
 def oidc_authorize_url(username: str) -> str:
     authorize_url: str = app.config.get('OIDC_AUTH_URI')
+
+    # Generate a random string for the state parameter.
+    # https://www.rfc-editor.org/rfc/rfc6749#section-4.1.1
+    session['state'] = secrets.token_urlsafe(32)
+    authorize_url += '&state=' + session['state']
 
     if app.config.get('OIDC_LOGIN_HINT') and username:
         authorize_url += '&login_hint=' + username
@@ -416,14 +442,28 @@ def prepare_user() -> None:
         g.user = user_id
         g.irods = irods
 
-        # Check for notifications.
-        endpoints = ["static", "call", "upload_get", "upload_post"]
-        if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
-            response = api.call('notifications_load', data={})
-            g.notifications = len(response['data'])
-            # Load saved settings
-            response = api.call('settings_load', data={})
-            g.settings = response['data']
+        try:
+            # Check for notifications.
+            endpoints = ["static", "call", "upload_get", "upload_post"]
+            if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
+                response = api.call('notifications_load', data={})
+                g.notifications = len(response['data'])
+                # Load saved settings
+                response = api.call('settings_load', data={})
+                g.settings = response['data']
+        except PAM_AUTH_PASSWORD_FAILED:
+            # Password is not valid any more (probably OIDC access token).
+            connman.clean(session.sid)
+            session.clear()
+
+            session['login_username'] = login_username
+
+            # If the username matches the domain set for OIDC
+            if should_redirect_to_oidc(login_username):
+                return redirect(oidc_authorize_url(login_username))
+            # Else (i.e. it is an external user, local user, or OIDC is disabled)
+            else:
+                return redirect(url_for('user_bp.login'))
     else:
         redirect('user_bp.login')
 
@@ -439,4 +479,4 @@ def get_login_placeholder() -> str:
     if len(oidc_domains) == 0 or oidc_domains[0] == "":
         return "j.a.smith@uu.nl"
     else:
-        return "j.a.smith@" + oidc_domains[0]
+        return "j.a.smith@" + oidc_domains[0].replace("*.", "")

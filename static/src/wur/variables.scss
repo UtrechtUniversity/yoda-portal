@@ -8,15 +8,15 @@ $navhover: #000;
 
 // Yoda Navbar
 $navbar-bg: $wurgreen;
-$navbar-dark-color: #fff;
-$navbar-dark-brand-color: #fff;
-$navbar-dark-brand-hover-color: #fff;
+$navbar-dark-color: $white;
+$navbar-dark-brand-color: $white;
+$navbar-dark-brand-hover-color: $white;
 $navbar-dark-hover-color: $navhover;
 $navbar-dark-active-color: $navhover;
 
 // Bootstrap card
 $card-cap-bg: $wurblue;
-$card-cap-color: #fff;
+$card-cap-color: $white;
 $card-border-color: $wurblue;
 
 // Bootstrap breadcrumb
@@ -30,6 +30,7 @@ $link-color: $black;
 
 // Bootstrap list group
 $list-group-active-color: $black;
+$list-group-disabled-color: $black;
 
 // Bootstrap bage
 $badge-font-size: .65em;

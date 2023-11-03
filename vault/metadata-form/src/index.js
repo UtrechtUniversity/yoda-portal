@@ -1,12 +1,16 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
 import Form from "@rjsf/bootstrap-4";
-import validator from '@rjsf/validator-ajv8';
+import { customizeValidator } from '@rjsf/validator-ajv8';
+import Ajv2019 from 'ajv/dist/2019';
 import { getTemplate } from '@rjsf/utils';
 import Select from 'react-select';
 import Geolocation from "./Geolocation";
 import Vocabulary from "./Vocabulary";
-import ROR from  "./ROR";
+import AffiliationIdentifier from  "./AffiliationIdentifier";
+import PersonIdentifier from "./PersonIdentifier";
+import { withTheme } from "@rjsf/core";
+
 
 const path = $('#form').attr('data-path');
 
@@ -14,12 +18,14 @@ let schema       = {};
 let uiSchema     = {};
 let yodaFormData = {};
 
-let actual_edit_mode = false; // if can edit, it is not diretly shown.
+let actual_edit_mode = false; // if can edit, it is not directly shown.
 let formProperties;
 
 let saving = false;
 
 let form = document.getElementById('form');
+
+const validator = customizeValidator({ AjvClass: Ajv2019, ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
 
 const enumWidget = (props) => {
     let enumArray = props['schema']['enum'];
@@ -31,18 +37,88 @@ const enumWidget = (props) => {
     let i = enumArray.indexOf(props['value']);
     let placeholder = enumNames[i] == null ? ' ' : enumNames[i];
 
-    let title = props.label || props.uiSchema["ui:title"]
-    let label = <label className="form-label">{title}</label>
     let customStyles = {
         control: styles => ({
             ...styles,
-            border: '1px solid #ced4da',
+            border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
             boxShadow: 'none',
             '&:hover': {
-                border: '1px solid #ced4da',
+                border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
             }
         })
     };
+
+    const darkThemeColors = {
+        /* For theme color guidance: https://github.com/JedWatson/react-select/issues/3692#issuecomment-523425096 */
+        /*
+         * control/backgroundColor
+         * menu/backgroundColor
+         * option/color(selected)
+         */
+        neutral0: '#212529',
+
+        /*
+         * control/backgroundColor(disabled)
+         */
+        neutral5: '#212529',
+
+        /*
+         * control/borderColor(disabled)
+         * multiValue/backgroundColor
+         * indicators(separator)/backgroundColor(disabled)
+         */
+        neutral10: '#343a40',
+
+        /*
+         * control/borderColor
+         * option/color(disabled)
+         * indicators/color
+         * indicators(separator)/backgroundColor
+         * indicators(loading)/color
+         */
+        neutral20: '#343a40',
+
+        /*
+         * control/borderColor(focused)
+         * control/borderColor:hover
+         */
+        neutral30: '#343a40',
+
+        /*
+         * input/color
+         * multiValue(label)/color
+         * singleValue/color
+         * indicators/color(focused)
+         * indicators/color:hover(focused)
+         */
+        neutral80: 'var(--neutral-10)',
+        neutral90: 'var(--neutral-10)',
+
+         /*
+          * One of the few bootstrap variables we can use with themeing react-select!
+          * control/boxShadow(focused)
+          * control/borderColor(focused)
+          * control/borderColor:hover(focused)
+          * option/backgroundColor(selected)
+          * option/backgroundColor:active(selected)
+          */
+        primary: 'var(--bs-primary)',
+
+        /*
+         * option/backgroundColor(focused)
+         */
+        primary25: '#2b3035',
+
+        /*
+         * option/backgroundColor:active
+         */
+        primary50: '#2b3035',
+        primary75: '#2b3035',
+    };
+
+    // Check what theme is set
+    const colorMode = document.documentElement.getAttribute('data-bs-theme');
+
     let required = props.required
     let error = "should be equal to one of the allowed values";
 
@@ -78,8 +154,13 @@ const enumWidget = (props) => {
         required = formProperties.data.schema.required.includes(name_hierarchy[0]);
     }
 
+    // will hold classes (select-required, select-filled) as indications for totalization purposes.
+    // For that purpose element <selectTotals> will be added.
+    let selectCompletenessClasses = '';
+
     if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) || (required && props.value == null)) {
-        label = <label className="text-danger form-label select-required">{title}*</label>
+        // Indicate that this element is required and should be counted as total
+        selectCompletenessClasses = 'select-required';
         customStyles = {
             control: styles => ({
                 ...styles,
@@ -91,18 +172,25 @@ const enumWidget = (props) => {
             })
         };
     } else if (required) {
-        label = <label className="form-label select-required select-filled">{title}*</label>
+        // Indicate that this element is required and holds a value
+        selectCompletenessClasses = 'select-required select-filled';
     }
 
     return (
         <div>
+            <selectTotals class={selectCompletenessClasses}></selectTotals>
             <Select className={'select-box'}
                     placeholder={placeholder}
                     required={required}
                     isDisabled={props.readonly}
                     onChange={(event) => props.onChange(event.value)}
                     options={props['options']['enumOptions']}
-                    styles={customStyles} />
+                    styles={customStyles}
+                    theme={(theme) => ({
+                        ...theme,
+                        colors: (colorMode === 'dark') ? {...theme.colors, ...darkThemeColors} : {...theme.colors},
+                    })}
+            />
         </div>
     );
 };
@@ -114,7 +202,8 @@ const widgets = {
 const fields = {
     geo: Geolocation,
     vocabulary: Vocabulary,
-    ror: ROR
+    affiliation_identifier: AffiliationIdentifier,
+    person_identifier: PersonIdentifier
 };
 
 const CustomArrayFieldTemplate = (props) => {
@@ -167,7 +256,7 @@ const CustomArrayFieldTemplate = (props) => {
                                 <div className="d-flex flex-row">
                                     {el.hasMoveUp && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
+                                            <button className="btn btn-outline-secondary btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onReorderClick(
                                                         el.index,
                                                         el.index - 1
@@ -179,7 +268,7 @@ const CustomArrayFieldTemplate = (props) => {
 
                                     {el.hasMoveDown && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
+                                            <button className="btn btn-outline-secondary btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onReorderClick(
                                                         el.index,
                                                         el.index + 1
@@ -189,9 +278,9 @@ const CustomArrayFieldTemplate = (props) => {
                                         </div>
                                     )}
 
-                                    {el.hasRemove && (
+                                    {el.hasRemove && props.items.length > 1 && (
                                         <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
+                                            <button className="btn btn-outline-secondary btn-sm" type="button" tabindex="-1"
                                                     onClick={el.onDropIndexClick(el.index)}>
                                                 <i className="fa-solid fa-trash" aria-hidden="true"></i>
                                             </button>
@@ -372,15 +461,6 @@ class YodaForm extends React.Component {
 
     onChange(form) {
         updateCompleteness();
-
-        // Turn save mode off.
-        saving = false;
-        const formContext = { saving: false };
-
-        this.setState({
-            formData: form.formData,
-            formContext: formContext
-        });
     }
 
     onError(form) {
@@ -428,7 +508,7 @@ class YodaButtons extends React.Component {
     }
 
     renderSaveButton() {
-        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary">Save</button>);
+        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary float-start">Save</button>);
     }
 
     renderUpdateButton() {
@@ -475,6 +555,7 @@ class Container extends React.Component {
     saveMetadata() {
         saving = true;
         this.form.submitButton.click();
+        saving = false;
     }
 
     updateMetadata() {
@@ -611,6 +692,20 @@ $(_ => loadForm());
 async function submitData(data) {
     // Disable buttons.
     $('.yodaButtons button').attr('disabled', true);
+
+    // Remove empty arrays and array items when saving.
+    for (const property in data) {
+        if (Array.isArray(data[property])) {
+            var unfiltered = data[property];
+            var filtered = unfiltered.filter(e => e);
+
+            if (filtered.length === 0) {
+                delete data[property];
+            } else {
+                data[property] = filtered;
+            }
+        }
+    }
 
     // Save.
     try {

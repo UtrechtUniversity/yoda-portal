@@ -4,11 +4,11 @@
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/vault.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.css') }}">
 {% endblock style %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='lib/datatables-1.11.2/datatables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
 <script>
@@ -126,9 +126,8 @@
             </div>
             <div class="modal-body">
                 <p>
-                    This overview shows files and their checksums.
-                    These checksums can de used to verify data integrity.
-                    The checksum algorithm used is <a href="https://en.wikipedia.org/wiki/SHA-2" title="SHA-256 checksum algorithm">SHA-256</a>.
+                    This overview shows files and their sizes and checksums and can be used to verify data integrity.
+                    The checksum algorithm used is <a href="https://en.wikipedia.org/wiki/SHA-2" target="_blank" title="SHA-256 checksum algorithm">SHA-256</a>.
                 </p>
                 <div id="checksumReport"></div>
             </div>
@@ -266,14 +265,22 @@
     </div>
 </div>
 
-<nav aria-label="breadcrumb flex-column">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item">Vault</li>
-    </ol>
+<nav aria-label="breadcrumb">
+    <div class="breadcrumb-container">
+        <button class="btn btn-sm btn-secondary float-end btn-go-to-research mt-2 me-2" research-area="">Go to research</button>
+        <button class="btn btn-sm btn-secondary float-end btn-go-to-group-manager mt-2 me-2" group="">Go to group manager</button>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">Vault</li>
+        </ol>
+    </div>
 </nav>
 
 <div class="alert is-archived alert-info hide">
     This data package is archived on tape. Unarchive this data package to access the contents of this data package.
+</div>
+
+<div class="alert is-processing alert-info hide">
+    This data package is being created, please come back later.
 </div>
 
 <section class="metadata-info container hide">

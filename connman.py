@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import threading
@@ -9,7 +9,8 @@ from typing import Dict, Optional
 
 from irods.session import iRODSSession
 
-TTL = 60 * 30
+TTL = 60 * 30   # Time to live (TTL) for Flask sessions.
+IRODS_TTL = 60  # Time to live (TTL) for iRODS sessions.
 
 
 class Session(object):
@@ -19,18 +20,15 @@ class Session(object):
         :param sid:   Flask session identifier
         :param irods: iRODS session
         """
-        self.sid: int            = sid
-        self.irods: iRODSSession = irods
-        self.time: float         = time.time()
-        self.lock                = threading.Lock()
-
-    def __del__(self) -> None:
-        self.irods.cleanup()
-        print(f"[gc/logout]: Dropped iRODS session of session {self.sid}")
+        self.sid: int             = sid               # Flask session identifier
+        self.time: float          = time.time()       # Flask session start time
+        self.irods: iRODSSession  = irods             # iRODS session
+        self.irods_time: float    = time.time()       # iRODS session start time
+        self.lock: threading.Lock = threading.Lock()
 
 
 sessions: Dict[int, Session] = dict()  # Custom session dict instead of Flask session (cannot pickle iRODS session)
-lock = threading.Lock()
+lock: threading.Lock = threading.Lock()
 
 
 def gc() -> None:
@@ -39,6 +37,14 @@ def gc() -> None:
         with lock:
             t = time.time()
             global sessions
+
+            # Cleanup iRODS sessions that exceed the iRODS session TTL.
+            for _, s in sessions.items():
+                if t - s.irods_time > IRODS_TTL and not s.lock.locked():
+                    s.irods.cleanup()
+                    s.irods_time = time.time()
+
+            # Remove sessions that exceed the Flask session TTL.
             sessions = {k: v for k, v in sessions.items() if t - v.time < TTL or v.lock.locked()}
 
         time.sleep(1)
@@ -69,6 +75,7 @@ def add(sid: int, irods: iRODSSession) -> None:
     s: Session = Session(sid, irods)
     sessions[sid] = s
     s.time = time.time()
+    s.irods_time = time.time()
     s.lock.acquire()
     print(f"[login]: Successfully connected to iRODS for session {sid}'")
 
@@ -82,6 +89,7 @@ def release(sid: int) -> None:
     if sid in sessions:
         s: Session = sessions[sid]
         s.time = time.time()
+        s.irods_time = time.time()
         s.lock.release()
 
 
@@ -92,4 +100,19 @@ def clean(sid: int) -> None:
     """
     global sessions
     if sid in sessions:
+        s: Session = sessions[sid]
+        s.irods.cleanup()
         del sessions[sid]
+        print(f"[logout]: Cleanup session {sid}")
+
+
+def extend(sid: int) -> None:
+    """Extend session TTLs.
+
+    :param sid: Flask session identifier
+    """
+    global sessions
+    if sid in sessions:
+        s: Session = sessions[sid]
+        s.time = time.time()
+        s.irods_time = time.time()

@@ -3,7 +3,7 @@
         <button type="button" class="btn btn-primary dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         {{ g.user }} {% if g.notifications %}<i class="fa-solid fa-bell" aria-hidden="true"></i>{% endif %}
         </button>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
             <a class="dropdown-item" href="{{ url_for('user_bp.notifications') }}">
                 Notifications {% if g.notifications %}<span class="badge bg-primary">{{ g.notifications }}</span>{% endif %}
             </a>

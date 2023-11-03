@@ -11,11 +11,11 @@ $(document).ready(function () {
   })
 
   $('#startdate_min').on('click', function () {
-    $('#startdate').val(chartDateLabels[0])
+    $('#startdate').val(getISODateString(chartDateLabels[0]))
     chartFilterDate()
   })
   $('#enddate_max').on('click', function () {
-    $('#enddate').val(chartDateLabels[chartDateLabels.length - 1])
+    $('#enddate').val(getISODateString(chartDateLabels[chartDateLabels.length - 1]))
     chartFilterDate()
   })
 })
@@ -50,6 +50,11 @@ function getGroupDetails (group) {
     while (nrOfPoints < data.research.length) {
       chartTotals[nrOfPoints] = data.research[nrOfPoints] + data.vault[nrOfPoints] + data.revision[nrOfPoints]
       totals[nrOfPoints] = data.total[nrOfPoints]
+      // This can happen when old statistics data has been upgraded
+      if (totals[nrOfPoints] > chartTotals[nrOfPoints]) {
+        chartTotals[nrOfPoints] = totals[nrOfPoints]
+      }
+
       nrOfPoints++
     }
     if (group.startsWith('grp') || group.startsWith('intake')) {
@@ -249,29 +254,13 @@ function chartToggleData (legendButton) { // eslint-disable-line no-unused-vars
   const visibilityData = chart.isDatasetVisible(legendButton)
   chartVisibilityStatus[legendButton] = !visibilityData
 
-  // calculate new totals.
-  const newTotals = []
-  let i = 0
-  const length = chart.config.data.datasets[0].data.length
-  while (i < length) {
-    newTotals[i] = 0
-    let j = 0
-    while (j < 3) {
-      if (chartVisibilityStatus[j]) {
-        newTotals[i] = newTotals[i] + chart.config.data.datasets[j].data[i]
-      }
-      j++
-    }
-    i++
-  }
+  chartFilterDate()
 
   if (visibilityData) {
-    chart.config.data.datasets[3].data = newTotals
     chart.hide(legendButton)
     // set the button labels correctly including strike through
     document.getElementById('legend-' + chartDatasetLabels[legendButton].toLowerCase()).innerHTML = '<strike>' + chartDatasetLabels[legendButton] + '</strike>'
   } else {
-    chart.config.data.datasets[3].data = newTotals
     chart.show(legendButton)
     // set the button labels correctly
     document.getElementById('legend-' + chartDatasetLabels[legendButton].toLowerCase()).innerHTML = chartDatasetLabels[legendButton]
@@ -282,8 +271,8 @@ function chartToggleData (legendButton) { // eslint-disable-line no-unused-vars
 function chartFilterDate () {
   const dates = [...chartDateLabels]
 
-  const startdate = document.getElementById('startdate').value
-  const enddate = document.getElementById('enddate').value
+  const startdate = new Date(document.getElementById('startdate').value)
+  const enddate = new Date(document.getElementById('enddate').value)
 
   // check datepicker values against the values in the array of dates present and select the nearest to the picked date.
   const nearstartdate = getNearestDate(startdate)
@@ -305,26 +294,29 @@ function chartFilterDate () {
 
   // Split into relevant data only.
   let i = 0
-  while (i < 3) {
+  while (i < 4) {
     filterDatapoints[i] = arAllDatapoints[i].slice(indexstartdate, indexenddate + 1)
     i++
   }
 
-  // New totalization per day.
-  filterDatapoints[3] = []
   let day = 0
 
   while (day < filterDatapoints[0].length) {
-    filterDatapoints[3][day] = filterDatapoints[0][day] + filterDatapoints[1][day] + filterDatapoints[2][day]
     let newTotal = 0
     let j = 0
+    const allAreVisible = chartVisibilityStatus[0] && chartVisibilityStatus[1] && chartVisibilityStatus[2]
     while (j < 3) {
       if (chartVisibilityStatus[j]) {
         newTotal = newTotal + filterDatapoints[j][day]
       }
       j++
     }
-    filterDatapoints[3][day] = newTotal
+    // Handling the case where old statistics data has been upgraded.
+    // If all categories are visible, display the old statistics total.
+    // If even one category is not visible, default to the calculated total of the visible categories.
+    if (!allAreVisible || filterDatapoints[3][day] <= newTotal) {
+      filterDatapoints[3][day] = newTotal
+    }
 
     day++
   }
@@ -357,7 +349,6 @@ function startBrowsing () {
     serverSide: true,
     iDeferLoading: 0,
     order: [[0, 'asc']],
-    pageLength: parseInt(Yoda.settings.number_of_items),
     // "searching": true,
     fnDrawCallback: function () {
       $('#group-browser td').on('click', function () {
@@ -365,7 +356,11 @@ function startBrowsing () {
         getGroupDetails(groupName)
         $('#selected-group').text('Group ' + groupName)
       })
-    }
+    },
+    pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
+  })
+  $('#group-browser').on('length.dt', function (e, settings, len) {
+    Yoda.storage.session.set('pageLength', len)
   })
 
   const groupBrowser = $('#group-browser').DataTable()
@@ -424,7 +419,7 @@ const getFolderContents = (() => {
           search_groups: $('#search-group-table').val()
         })
 
-      // If another requests has come while we were waiting, simply drop this one.
+      // If another request has come while we were waiting, simply drop this one.
       if (i !== j) return null
 
       // Update cache info.
@@ -497,15 +492,22 @@ function humanReadableSize (size) {
   return (Math.floor(size * 10) / 10 + '') + '&nbsp;' + szs[szi]
 }
 
+function getISODateString (dateString) {
+  // Given a date string in locale format
+  // Return string in ISO 8601 formatted date yyyy-mm-dd (no time or timezone, does not correct for timezone)
+  const newDate = new Date(dateString)
+  return newDate.toISOString().split('T')[0]
+}
+
 function getNearestDate (findDate) {
   // Find the nearest date in chartDateLabels
-  const dates = [...chartDateLabels]
+  // Return string in ISO 8601 formatted date yyyy-mm-dd (no time or timezone)
+  const dates = chartDateLabels.map(x => new Date(x))
 
-  const findMe = new Date(findDate)
   const [closest] = dates.sort((a, b) => {
-    const [aDate, bDate] = [a, b].map(d => Math.abs(new Date(d) - findMe))
+    const [aDate, bDate] = [a, b].map(d => Math.abs(d - findDate))
 
     return aDate - bDate
   })
-  return closest
+  return closest.toISOString().split('T')[0]
 }

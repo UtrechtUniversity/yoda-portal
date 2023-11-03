@@ -1,7 +1,25 @@
-@import "variables";
 @import "font";
 @import "badge";
 
-img.logo {
-    height: 48px;
+// Dark theme specific settings
+[data-bs-theme="dark"] {
+    /* Breadcrumb */
+    .breadcrumb {
+        --bs-breadcrumb-bg: var(--bs-tertiary-bg);
+        --bs-breadcrumb-divider-color: var(--bs-gray-alt2);
+        --bs-breadcrumb-item-active-color: var(--bs-gray-alt);
+    }
+    .breadcrumb-container {
+        background-color: var(--bs-tertiary-bg);
+    }
+
+    /* File browser rows */
+    .browse, .deposit-delete, .page-link, .system-metadata-items, .name, .dlg-browse {
+        color: $white;
+    }
+
+    /* Steps in datarequest */
+    .bs-wizard > .bs-wizard-step .bs-wizard-stepnum {
+        color: $gray-400;
+    }
 }

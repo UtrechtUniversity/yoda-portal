@@ -5,10 +5,27 @@ let currentSearchType
 
 $(document).ready(function () {
   if ($('#file-browser').length &&
-        $('#search-filter').val().length > 0 &&
-        $('#search_concept').attr('data-type') === 'filename') {
+        $('#search-filter').val().length > 0) {
     currentSearchString = $('#search-filter').val()
-    currentSearchType = $('#search_concept').attr('data-type')
+
+    // Type handling
+    // Itt search filter, moet er meer worden geregeld voor currentSearchType (de zoekterm kan gewoon worden overgenomen)
+    // First take over what was passed through the URL
+    currentSearchType = $('#search_concept').attr('data-type') // $('#searchType').val();
+    // validate against the known values in the search-panel list
+    $('#search-panel li a').each(function () {
+      if ($(this).attr('data-type') === currentSearchType) {
+        $('#search_concept').text($(this).text())
+        $('#search_concept').attr('data-type', currentSearchType)
+      }
+    })
+
+    if (currentSearchType === 'status') {
+      $('.search-status option[value="' + currentSearchString + '"]').attr('selected', 'selected')
+      $('.search-term').hide()
+      $('.search-status').removeClass('hide').show()
+      currentSearchType = 'status'
+    }
     search()
   }
 
@@ -81,11 +98,12 @@ const getSearchResults = (() => {
     const data = await get(args)
     if (data === null) { return }
 
-    cb({
+    const callback = {
       data,
       recordsTotal: total,
       recordsFiltered: total
-    })
+    }
+    cb(callback)
   })()
 
   return fn
@@ -218,7 +236,10 @@ function search () {
       ajax: getSearchResults,
       processing: true,
       serverSide: true,
-      pageLength: $("select[name='search_length']").val()
+      pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
+    })
+    $('#search').on('length.dt', function (e, settings, len) {
+      Yoda.storage.session.set('pageLength', len)
     })
 
     if (currentSearchType === 'status') {
