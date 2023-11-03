@@ -10,7 +10,7 @@ import Vocabulary from "./Vocabulary";
 import AffiliationIdentifier from  "./AffiliationIdentifier";
 import PersonIdentifier from "./PersonIdentifier";
 import { withTheme } from "@rjsf/core";
-
+import KeywordSelector from "./KeywordSelector";
 
 const path = $('#form').attr('data-path');
 
@@ -96,7 +96,7 @@ const enumWidget = (props) => {
         neutral90: 'var(--neutral-10)',
 
          /*
-          * One of the few bootstrap variables we can use with theming react-select!
+          * One of the few bootstrap variables we can use with themeing react-select!
           * control/boxShadow(focused)
           * control/borderColor(focused)
           * control/borderColor:hover(focused)
@@ -144,7 +144,7 @@ const enumWidget = (props) => {
     });
 
     // If the final item was not numeric, it is not yet added to the name_hierarchy array
-    // Therefore, do it now explicitly
+    // Therefore, do it now explicitely
     if (!last_was_numeric) {
         name_hierarchy[level_counter] = level_name;
     }
@@ -204,7 +204,8 @@ const fields = {
     geo: Geolocation,
     vocabulary: Vocabulary,
     affiliation_identifier: AffiliationIdentifier,
-    person_identifier: PersonIdentifier
+    person_identifier: PersonIdentifier,
+    keyword_selector: KeywordSelector
 };
 
 const CustomArrayFieldTemplate = (props) => {
@@ -462,16 +463,7 @@ class YodaForm extends React.Component {
     }
 
     onChange(form) {
-        // Turn save mode off.
-        saving = false;
-        const formContext = { saving: false };
-
-        this.setState({
-            formData: form.formData,
-            formContext: formContext
-        });
-
-        // Update form completeness bar
+        console.log(form);
         updateCompleteness();
     }
 
@@ -482,6 +474,7 @@ class YodaForm extends React.Component {
     }
 
     transformErrors(errors) {
+        console.log(errors);
         // Strip errors when saving.
         if (saving) {
             return errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies' && e.name !== 'enum' && e.name !== 'type');
@@ -521,34 +514,19 @@ class YodaButtons extends React.Component {
     }
 
     renderSaveButton() {
-        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary float-start me-3" title="Save metadata">Save</button>);
+        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary float-start">Save</button>);
     }
 
     renderDeleteButton() {
-        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn me-3" title="Delete all metadata">Delete</button>);
+        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn float-end">Delete all metadata </button>);
     }
 
     renderCloneButton() {
-        return (<button onClick={this.props.cloneMetadata} type="button" className="btn btn-primary clone-metadata-btn me-3" title="Clone from parent folder">Clone</button>);
+        return (<button onClick={this.props.cloneMetadata} type="button" className="btn btn-primary clone-metadata-btn float-end">Clone from parent folder</button>);
     }
 
     renderFormCompleteness() {
-        return (<div><span className="text-sm float-start text-muted text-center ms-3 mt-1">Required for Vault:</span><div className="form-completeness progress float-start ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
-    }
-
-    renderCloseButton() {
-        return(<a class="btn btn-secondary" href={"/research/browse?dir=" + encodeURIComponent(path)} title="Close metadata form">Close</a>);
-    }
-
-    renderCompletenessBar() {
-        let completenessBar = [];
-
-        if (formProperties.data.can_edit) {
-            completenessBar.push(this.renderFormCompleteness());
-        }
-
-        return (<div>{completenessBar}</div>);
-
+        return (<div><span className="text-sm float-start text-muted text-center ms-3 mt-1">Required for the vault:</span><div className="form-completeness progress float-start ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
     }
 
     renderButtons() {
@@ -556,6 +534,7 @@ class YodaButtons extends React.Component {
 
         if (formProperties.data.can_edit) {
             buttons.push(this.renderSaveButton());
+            buttons.push(this.renderFormCompleteness());
 
             // Delete and clone are mutually exclusive.
             if (formProperties.data.metadata !== null)
@@ -563,24 +542,15 @@ class YodaButtons extends React.Component {
             else if (formProperties.data.can_clone)
                 buttons.push(this.renderCloneButton());
         }
-
-        buttons.push(this.renderCloseButton());
-
         return (<div>{buttons}</div>);
     }
 
     render() {
         return (
-            <div className="card-header bg-body sticky-top">
-                <div className="row">
-                    <h5 className="col-sm-4 float-start">
-                        Metadata form - {path}
-                    </h5>
-                    <div className="col-sm-8 yodaButtons">
-                        {this.renderCompletenessBar()}
-                        <div className="float-end">
-                            {this.renderButtons()}
-                        </div>
+            <div className="form-group">
+                <div className="row yodaButtons">
+                    <div className="col-sm-12">
+                        {this.renderButtons()}
                     </div>
                 </div>
             </div>
@@ -628,9 +598,10 @@ class Container extends React.Component {
                 <YodaButtons saveMetadata={this.saveMetadata}
                              deleteMetadata={deleteMetadata}
                              cloneMetadata={this.cloneMetadata} />
-                <div className="card-body">
-                    <YodaForm ref={(form) => {this.form=form;}}/>
-                </div>
+                <YodaForm ref={(form) => {this.form=form;}}/>
+                <YodaButtons saveMetadata={this.saveMetadata}
+                             deleteMetadata={deleteMetadata}
+                             cloneMetadata={this.cloneMetadata} />
             </div>
         );
     }
@@ -677,7 +648,7 @@ function loadForm() {
             formProperties = data;
 
             if (formProperties.data !== null) {
-                // These are only present when there is a form to show (i.e. no
+                // These ary only present when there is a form to show (i.e. no
                 // validation errors, and no transformation needed).
                 schema       = formProperties.data.schema;
                 uiSchema     = formProperties.data.uischema;
@@ -751,12 +722,6 @@ function loadForm() {
                     // Avoid flashing things on screen.
                     $('#metadata-form').fadeIn(220);
                     $('#metadata-form').removeClass('hide');
-                }
-
-                // If maintenance banner is visible, add padding to metadata form header
-                if ($('#maintenance-banner').length || $('.non-production').length) {
-                    $('#metadata-form .card-header').addClass('pt-4 pb-3');
-                    $('#metadata-form .card-header').css('top', '0.5rem');
                 }
 
                 // Specific required textarea handling
