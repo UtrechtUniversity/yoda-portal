@@ -461,6 +461,7 @@ class YodaForm extends React.Component {
     }
 
     onChange(form) {
+        console.log(form);
         updateCompleteness();
     }
 
@@ -471,6 +472,7 @@ class YodaForm extends React.Component {
     }
 
     transformErrors(errors) {
+        console.log(errors);
         // Strip errors when saving.
         if (saving) {
             return errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies' && e.name !== 'enum' && e.name !== 'type');

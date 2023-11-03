@@ -109,6 +109,8 @@ class KeywordSelector extends React.Component {
             $('#modal-list-group-item-' + node.id).remove();
             $("#tree").jstree("uncheck_node", node.id);
         });
+
+        console.log(node);
     }
 
     removeItem(node) {
