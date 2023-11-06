@@ -593,6 +593,7 @@ $(function () {
 
     const defaultSchema = new Option(that.schemaIdDefault, that.schemaIdDefault, true, true)
     $('#f-group-create-schema-id').append(defaultSchema).trigger('change')
+    $('#f-group-create-schema-id').val(that.schemaIdDefault).trigger('change')
 
     $('#f-group-create-expiration-date').val('')
 
