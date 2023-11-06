@@ -580,7 +580,7 @@ $(function () {
 
     $('#f-group-create-data-classification').val('unspecified').trigger('change')
 
-    $('#f-group-create-prefix-div a[data-value="' + that.GROUP_DEFAULT_PREFIX + '"]').click()
+    $('#f-group-create-prefix-div a[data-value="' + that.GROUP_DEFAULT_PREFIX + '"]').trigger('click')
 
     $('#f-group-create-name').val('')
     $('#f-group-create-description').val('')
@@ -591,11 +591,18 @@ $(function () {
       $('#f-group-create-prefix-datamanager').addClass('hidden')
     }
 
-    $('#f-group-create-schema-id').select2('val', that.schemaIdDefault)
+    const defaultSchema = new Option(that.schemaIdDefault, that.schemaIdDefault, true, true)
+    $('#f-group-create-schema-id').append(defaultSchema).trigger('change')
+
     $('#f-group-create-expiration-date').val('')
-    $('#f-group-create-category').select2('val', category)
-    $('#f-group-create-subcategory').select2('val', subcategory)
-    $('#f-group-create-name').focus()
+
+    const defaultCategory = new Option(category, category, true, true)
+    $('#f-group-create-category').append(defaultCategory).trigger('change')
+
+    const defaultSubcategory = new Option(subcategory, subcategory, true, true)
+    $('#f-group-create-subcategory').append(defaultSubcategory).trigger('change')
+
+    $('#f-group-create-name').trigger('focus')
   })
 
   // Intercept group creation submission of form
@@ -664,7 +671,7 @@ $(function () {
     // All possible schema-id's
     schemaIDs: [],
 
-    // Default schema id for this yoda istance coming from the backend
+    // Default schema id for this yoda instance coming from the backend
     schemaIdDefault: '',
 
     /// Get the name of an access level one lower than the current one for
@@ -941,17 +948,13 @@ $(function () {
         const defaultCategory = new Option(group.category, group.category, true, true)
         $groupProperties.find('#f-group-update-category')
           .append(defaultCategory).trigger('change')
-          // TODO added disabled back?
-          // .prop('disabled', !canEditCategory)
-          // .select2({
-          //   data: [{ id: group.category, text: group.category }],
-          //   disabled: !canEditCategory
-          // })
+          .prop('disabled', !canEditCategory)
+
+        const defaultSubcategory = new Option(group.subcategory, group.subcategory, true, true)
         $groupProperties.find('#f-group-update-subcategory')
-          .select2({
-            data: [{ id: group.subcategory, text: group.subcategory }],
-            disabled: !userCanManage
-          })
+          .append(defaultSubcategory).trigger('change')
+          .prop('disabled', !userCanManage)
+
         $groupProperties.find('#inputGroupPrepend')
           .html(function () {
             const matches = groupName.match(that.GROUP_PREFIXES_RE, '')
@@ -996,10 +999,7 @@ $(function () {
         if (that.prefixHasDataClassification(prefix)) {
           $groupProperties.find('.data-classification').show()
           $('#f-group-update-data-classification')
-            .prop('disabled', true)
-            // .select2({
-            //   disabled: !userCanManage
-            // })
+            .prop('disabled', !userCanManage)
         } else {
           $groupProperties.find('.data-classification').hide()
           $('#f-group-update-data-classification').prop('disabled', true)
@@ -1198,13 +1198,19 @@ $(function () {
             type: 'post',
             dataType: 'json',
             data: function (params) {
-              return { query: params.term }
+              if (!params.term) {
+                return { query: '' }
+              } else {
+                return { query: params.term }
+              }
             },
             processResults: function (data, params) {
               const categories = data.categories
               const results = []
-              const query = params.term
-              console.log('Here is the query', query)
+              let query = ''
+              if (('term' in params) && params.term) {
+                query = params.term
+              }
               let inputMatches = false
 
               // For legacy reasons we allow selecting existing categories with illegal names.
@@ -1259,8 +1265,7 @@ $(function () {
             }
           },
           templateResult: function (result) {
-            // TODO how to escape this text as it was before?
-            return $('<span>' + result.text +
+            return $('<span>' + jQuery.fn.select2.defaults.defaults.escapeMarkup(result.text) +
                             (
                               'exists' in result && !result.exists
                                 ? ' <span class="grey">(create)</span>'
@@ -1268,10 +1273,6 @@ $(function () {
                             ) +
                             '</span>')
           }
-          // initSelection: function ($el, callback) {
-          //   const cb = { id: $el.val(), text: $el.val() }
-          //   callback(cb)
-          // }
         }).on('select2:open', function () {
           $('select').val('')
         }).on('select2:change', function () {
@@ -1302,21 +1303,29 @@ $(function () {
         const $el = $(this)
 
         $el.select2({
+          placeholder: 'Select a subcategory or enter a new name',
           ajax: {
             quietMillis: 200,
             url: '/group_manager/get_subcategories',
             type: 'post',
             dataType: 'json',
-            data: function (term, page) {
-              return {
-                category: $($el.attr('data-category')).val(),
-                query: term
+            data: function (params) {
+              const request = {
+                query: '',
+                category: $($el.attr('data-category')).val()
               }
+              if (params.term) {
+                request.query = params.term
+              }
+              return request
             },
-            results: function (data) {
+            processResults: function (data, params) {
               const subcategories = data.subcategories
               const results = []
-              const query = $el.data('select2').search.val()
+              let query = ''
+              if (('term' in params) && params.term) {
+                query = params.term
+              }
               let inputMatches = false
 
               subcategories.forEach(function (subcategory) {
@@ -1349,17 +1358,14 @@ $(function () {
             }
           },
           templateResult: function (result) {
-            return result.text +
+            return $('<span>' + jQuery.fn.select2.defaults.defaults.escapeMarkup(result.text) +
                             (
                               'exists' in result && !result.exists
                                 ? ' <span class="grey">(create)</span>'
                                 : ''
-                            )
+                            ) +
+                            '</span>')
           }
-          // initSelection: function ($el, callback) {
-          //   const cb = { id: $el.val(), text: $el.val() }
-          //   callback(cb)
-          // }
         }).on('open', function () {
           $(this).val('')
         })
@@ -1377,14 +1383,20 @@ $(function () {
             url: '/group_manager/get_schemas',
             type: 'post',
             dataType: 'json',
-            data: function (term, page) {
-              return { query: term }
+            data: function (params) {
+              if (!params.term) {
+                return { query: '' }
+              } else {
+                return { query: params.term }
+              }
             },
-
-            results: function (data) {
+            processResults: function (data, params) {
               const schemas = data.schemas
               const results = []
-              const query = $el.data('select2').search.val()
+              let query = ''
+              if (('term' in params) && params.term) {
+                query = params.term
+              }
 
               schemas.forEach(function (schema) {
                 if (schema.startsWith(query)) {
@@ -1409,17 +1421,14 @@ $(function () {
             }
           },
           templateResult: function (result) {
-            return result.text +
+            return $('<span>' + jQuery.fn.select2.defaults.defaults.escapeMarkup(result.text) +
                             (
                               'exists' in result && !result.exists
                                 ? ' <span class="grey">(create)</span>'
                                 : ''
-                            )
+                            ) +
+                            '</span>')
           }
-          // initSelection: function ($el, callback) {
-          //   const cb = { id: $el.val(), text: $el.val() }
-          //   callback(cb)
-          // }
         }).on('open', function () {
           $(this).val('')
         }).on('change', function () {
@@ -1441,16 +1450,21 @@ $(function () {
             url: '/group_manager/get_users',
             type: 'post',
             dataType: 'json',
-            data: function (term, page) {
-              return {
-                query: term.toLowerCase()
+            data: function (params) {
+              if (!params.term) {
+                return { query: '' }
+              } else {
+                return { query: params.term.toLowerCase()}
               }
             },
-            results: function (data) {
+            processResults: function (data, params) {
               const users = data.users
-              const query = $el.data('select2').search.val().toLowerCase()
+              let query = ''
               const results = []
               let inputMatches = false
+              if (('term' in params) && params.term) {
+                query = params.term.toLowerCase()
+              }
 
               users.forEach(function (userName) {
                 // Exclude users already in the group.
@@ -1476,19 +1490,16 @@ $(function () {
             }
           },
           templateResult: function (result) {
-            return result.text +
+            return $('<span>' + jQuery.fn.select2.defaults.defaults.escapeMarkup(result.text) +
                             (
                               'exists' in result && !result.exists
                                 ? ' <span class="grey">(create)</span>'
                                 : ''
-                            )
+                            ) +
+                            '</span>')
           }
-          // initSelection: function ($el, callback) {
-          //   const cb = { id: $el.val(), text: $el.val() }
-          //   callback(cb)
-          // }
         }).on('open', function () {
-          $(this).select2('val', '')
+          $(this).val('')
         })
       })
 
@@ -1541,8 +1552,7 @@ $(function () {
           minimumInputLength: 3
         }).on('select2:open', function () {
           $(this).val('')
-        }).on('select2:change', function () {
-          console.log("Hey there! I am running on change")
+        }).on('change', function () {
           treeListGroups()
           flatListGroups()
         })
@@ -1639,6 +1649,8 @@ $(function () {
 
       // Check if schema id is valid.
       if (this.prefixHasSchemaId(this.getPrefix(newProperties.name)) && !this.schemaIDs.includes(newProperties.schema_id)) {
+        console.log(this.schemaIDs)
+        console.log(newProperties.schema_id)
         window.alert('Please select a valid metadata schema as it is a required field.')
         resetSubmitButton()
         return
@@ -1852,7 +1864,7 @@ $(function () {
             access: 'normal'
           }
 
-          $(el).find('#f-user-create-name').select2('val', '')
+          $(el).find('#f-user-create-name').val('')
 
           that.deselectGroup()
           that.selectGroup(groupName)
@@ -2016,6 +2028,9 @@ $(function () {
 
       const that = this
       const $groupList = $('#group-list')
+      
+      // Setting the Select2 default theme
+      $.fn.select2.defaults.set('theme', 'bootstrap-5')
 
       // Attach event handlers {{{
       // Generic {{{
@@ -2047,7 +2062,7 @@ $(function () {
         Yoda.storage.session.set('is-collapsed', 'true')
       })
 
-      // When user opens up group properties
+      // When user opens group properties
       $('.properties-update').on('show.bs.collapse', function (e) {
         $('#properties-update-link').find('.triangle')
           .removeClass('fa-caret-right')
@@ -2249,9 +2264,9 @@ $(function () {
 
       const isCollapsed = Yoda.storage.session.get('is-collapsed')
       if (isCollapsed !== null && isCollapsed === 'true') {
-        $(".collapsible-group-properties").removeClass("show")
+        $('.collapsible-group-properties').removeClass('show')
         // Make sure the triangle is facing the correct direction
-        $(".properties-update").find(".triangle")
+        $('.properties-update').find('.triangle')
           .removeClass('fa-caret-down')
           .addClass('fa-caret-right')
       }
