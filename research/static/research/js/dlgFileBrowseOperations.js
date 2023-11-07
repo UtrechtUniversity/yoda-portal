@@ -211,8 +211,8 @@ $(document).on('click', '.multi-cancel-button', function () {
   const index = $(this).closest('tr').attr('class').split('-').pop()
 
   $('.multi-select-table tr.row-' + index + ' td.item-progress').text('Overwrite cancelled')
-  if (($('#mutli-select-progress .dlg-action-button span.action').text() === 'Copy and Overwrite All') || ($('#mutli-select-progress .dlg-action-button span.action').text() === 'Move and Overwrite All')) {
-    $('#mutli-select-progress .dlg-action-button').prop('disabled', true)
+  if (($('#mutli-select-progress .dlg-multi-action-button span.action').text() === 'Copy and overwrite all') || ($('#mutli-select-progress .dlg-multi-action-button span.action').text() === 'Move and overwrite all')) {
+    $('#mutli-select-progress .dlg-multi-action-button').prop('disabled', true)
   }
 })
 
@@ -258,9 +258,10 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null, 
           filepath.substring(0, filepath.lastIndexOf('/')) +
           '">No</button>')
 
-          $('#mutli-select-progress .dlg-action-button').html('<span class="action">Copy and Overwrite All</span>')
-          $('#mutli-select-progress .dlg-action-button').attr('data-action', 'copy')
-          $('#mutli-select-progress .dlg-action-button').removeClass('hidden')
+          $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Copy and overwrite all</span>')
+          $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'copy')
+          $('#mutli-select-progress .dlg-multi-action-button').attr('data-overwrite', true)
+          $('#mutli-select-progress .dlg--multiaction-button').removeClass('hidden')
         } else {
           $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text(result.status_info)
         }
@@ -296,7 +297,8 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null, 
     const result = await Yoda.call('research_file_move',
       {
         filepath: Yoda.basePath + filepath,
-        new_filepath: Yoda.basePath + newFilepath
+        new_filepath: Yoda.basePath + newFilepath,
+        overwrite: overwrite
       },
       { quiet: true, rawResult: true }
     )
@@ -326,9 +328,9 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null, 
           filepath.substring(0, filepath.lastIndexOf('/')) +
           '">No</button>')
 
-          $('#mutli-select-progress .dlg-action-button').html('<span class="action">Move and Overwrite All</span>')
-          $('#mutli-select-progress .dlg-action-button').attr('data-action', 'move')
-          $('#mutli-select-progress .dlg-action-button').removeClass('hidden')
+          $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Move and overwrite all</span>')
+          $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'move')
+          $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
         } else {
           $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text(result.status_info)
         }
@@ -392,16 +394,16 @@ async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = 
           folderPath.substring(0, folderPath.lastIndexOf('/')) +
           '">No</button>')
 
-          $('#mutli-select-progress .dlg-action-button').html('<span class="action">Copy and Overwrite All</span>')
-          $('#mutli-select-progress .dlg-action-button').attr('data-action', 'copy')
-          $('#mutli-select-progress .dlg-action-button').removeClass('hidden')
+          $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Copy and overwrite all</span>')
+          $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'copy')
+          $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
         } else {
           $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text(result.status_info)
         }
       } else {
         if (result.status_info.includes('already exists')) {
           dlgSelectAlertShow(result.status_info + '. Do you want to overwrite?')
-          $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Copy and Overwrite</span>')
+          $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Copy and overwrite</span>')
           $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-copy')
         } else {
           dlgSelectAlertShow(result.status_info)
@@ -459,16 +461,16 @@ async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = 
           folderPath.substring(0, folderPath.lastIndexOf('/')) +
           '">No</button>')
 
-          $('#mutli-select-progress .dlg-action-button').html('<span class="action">Move and Overwrite All</span>')
-          $('#mutli-select-progress .dlg-action-button').attr('data-action', 'move')
-          $('#mutli-select-progress .dlg-action-button').removeClass('hidden')
+          $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Move and overwrite all</span>')
+          $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'move')
+          $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
         } else {
           $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text(result.status_info)
         }
       } else {
         if (result.status_info.includes('already exists')) {
           dlgSelectAlertShow(result.status_info + '. Do you want to overwrite?') // Change button to move and overwrite
-          $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Move and Overwrite</span>')
+          $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Move and overwrite</span>')
           $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-move')
         } else {
           dlgSelectAlertShow(result.status_info)
