@@ -82,7 +82,7 @@ function flatListGroups () {
 }
 
 function treeListGroups () {
-  const search = $('#search').val()
+  const search = $('#search').select2('data')[0].id
   let username = ''
   let groupname = ''
 
@@ -1275,13 +1275,16 @@ $(function () {
                             '</span>')
           }
         }).on('select2:open', function () {
-          $('select').val('')
-        }).on('select2:change', function () {
-          $($(this).attr('data-subcategory')).val('')
+          // Clear selected category on open
+          $(this).val(null)
+          // $(this).val(null).trigger('change')
+        }).on('change', function () {
+          // Reset the subcategory value
+          $($(this).attr('data-subcategory')).val(null).trigger('change')
 
           // bring over the category value to the schema-id if exists.
-          if (that.schemaIDs.includes($(this).val(''))) {
-            $('#f-group-create-schema-id').val('').trigger($(this).val(''))
+          if (that.schemaIDs.includes($(this).select2('data')[0].id)) {
+            $('#f-group-create-schema-id').val($(this).select2('data')[0].id).trigger('change')
           }
 
           if (this.id === 'f-group-create-category') {
@@ -1367,8 +1370,8 @@ $(function () {
                             ) +
                             '</span>')
           }
-        }).on('open', function () {
-          $(this).val('')
+        }).on('select2:open', function () {
+          $(this).val(null)
         })
       })
 
@@ -1380,6 +1383,7 @@ $(function () {
 
         $el.select2({
           ajax: {
+            placeholder: 'Select a schema',
             quietMillis: 200,
             url: '/group_manager/get_schemas',
             type: 'post',
@@ -1430,8 +1434,8 @@ $(function () {
                             ) +
                             '</span>')
           }
-        }).on('open', function () {
-          $(this).val('')
+        }).on('select2:open', function () {
+          $(this).val(null)
         }).on('change', function () {
         })
       })
@@ -1444,6 +1448,7 @@ $(function () {
 
         $el.select2({
           allowClear: true,
+          placeholder: 'Click here to add a user...',
           openOnEnter: false,
           minimumInputLength: 3,
           ajax: {
@@ -1455,7 +1460,7 @@ $(function () {
               if (!params.term) {
                 return { query: '' }
               } else {
-                return { query: params.term.toLowerCase()}
+                return { query: params.term.toLowerCase() }
               }
             },
             processResults: function (data, params) {
@@ -1499,8 +1504,8 @@ $(function () {
                             ) +
                             '</span>')
           }
-        }).on('open', function () {
-          $(this).val('')
+        }).on('select2:open', function () {
+          $(this).val(null)
         })
       })
 
@@ -1552,7 +1557,7 @@ $(function () {
           openOnEnter: false,
           minimumInputLength: 3
         }).on('select2:open', function () {
-          $(this).val('')
+          $(this).val(null)
         }).on('change', function () {
           treeListGroups()
           flatListGroups()
@@ -1576,6 +1581,8 @@ $(function () {
                   ? 'create'
                   : 'update'
 
+      const schema_id = (action === 'create') ? $('#f-group-' + action + '-schema-id').select2('data')[0].id : $('#f-group-' + action + '-schema-id').val();
+
       $(button).addClass('disabled').val(
         action === 'create'
           ? 'Adding group...'
@@ -1596,10 +1603,10 @@ $(function () {
         name: $('#f-group-' + action + '-name').attr('data-prefix') +
                                    $('#f-group-' + action + '-name').val(),
         description: $('#f-group-' + action + '-description').val(),
-        schema_id: $('#f-group-' + action + '-schema-id').val(),
-        data_classification: $('#f-group-' + action + '-data-classification').val(),
-        category: $('#f-group-' + action + '-category').val(),
-        subcategory: $('#f-group-' + action + '-subcategory').val(),
+        schema_id,
+        data_classification: $('#f-group-' + action + '-data-classification').select2('data')[0].id,
+        category: $('#f-group-' + action + '-category').select2('data')[0].id,
+        subcategory: $('#f-group-' + action + '-subcategory').select2('data')[0].id,
         expiration_date: $('#f-group-' + action + '-expiration-date').val()
       }
 
@@ -1650,8 +1657,6 @@ $(function () {
 
       // Check if schema id is valid.
       if (this.prefixHasSchemaId(this.getPrefix(newProperties.name)) && !this.schemaIDs.includes(newProperties.schema_id)) {
-        console.log(this.schemaIDs)
-        console.log(newProperties.schema_id)
         window.alert('Please select a valid metadata schema as it is a required field.')
         resetSubmitButton()
         return
@@ -1884,7 +1889,7 @@ $(function () {
           $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once')
 
           // open the select-user select2 for ease of use
-          $('.selectify-user-name').select2('open')
+          $('.selectify-user-name').trigger('select2:open')
         } else {
           // Something went wrong. :(
           if ('message' in result) { window.alert(result.message) } else {
@@ -2191,12 +2196,12 @@ $(function () {
         that.deselectUser()
         $(this).find('.user-create-text').attr('hidden', '')
         $(this).find('form').removeClass('hidden')
-        $(this).find('form').find('#f-user-create-name').select2('open')
+        $(this).find('form').find('#f-user-create-name').trigger('select2:open')
       })
 
-      $('#f-user-create-name').on('select2-close', function () {
+      $('#f-user-create-name').on('select2:close', function () {
         // Remove the new user name input on unfocus if nothing was entered.
-        if ($(this).val().length === 0) {
+        if ($(this).select2('data')[0].id.length === 0) {
           $(this).parents('.list-group-item').find('.user-create-text').removeAttr('hidden')
         }
       })
