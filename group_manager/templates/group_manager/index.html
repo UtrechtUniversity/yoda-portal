@@ -5,13 +5,12 @@
 {% block style %}
     <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='css/group_manager.css') }}">
     <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2/select2-bootstrap-5-theme.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2-bootstrap-5-theme/select2-bootstrap-5-theme.css') }}">
 {% endblock style %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='lib/jquery-migrate-3.4.1/jquery-migrate-3.4.1.min.js') }}"></script>
     <script src="{{ url_for('group_manager_bp.static', filename='js/group_manager.js') }}"></script>
-    <script src="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.full.js') }}"></script>
+    <script src="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.full.min.js') }}"></script>
     <script>
     $(function() {
         Yoda.groupManager.load({{ group_hierarchy | safe }}, {{ schema_ids | safe }}, '{{ schema_id_default }}', '{{ user_type }}', '{{ user_zone }}');

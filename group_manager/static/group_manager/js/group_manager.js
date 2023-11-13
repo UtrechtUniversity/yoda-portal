@@ -1288,7 +1288,11 @@ $(function () {
           }
 
           if (this.id === 'f-group-create-category') {
-            if (that.canCreateDatamanagerGroup(this.value)) { $('#f-group-create-prefix-datamanager').removeClass('hidden') } else { $('#f-group-create-prefix-datamanager').addClass('hidden') }
+            if (that.canCreateDatamanagerGroup(this.value)) {
+              $('#f-group-create-prefix-datamanager').removeClass('hidden')
+            } else {
+              $('#f-group-create-prefix-datamanager').addClass('hidden')
+            }
 
             if ($('#f-group-create-name').attr('data-prefix') === 'datamanager-') {
               // Reset the group name + prefix by pretending that
