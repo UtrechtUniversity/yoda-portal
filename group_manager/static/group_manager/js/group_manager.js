@@ -82,7 +82,7 @@ function flatListGroups () {
 }
 
 function treeListGroups () {
-  const search = $('#search').val()
+  const search = $('#search').select2('data')[0].id
   let username = ''
   let groupname = ''
 
@@ -580,7 +580,7 @@ $(function () {
 
     $('#f-group-create-data-classification').val('unspecified').trigger('change')
 
-    $('#f-group-create-prefix-div a[data-value="' + that.GROUP_DEFAULT_PREFIX + '"]').click()
+    $('#f-group-create-prefix-div a[data-value="' + that.GROUP_DEFAULT_PREFIX + '"]').trigger('click')
 
     $('#f-group-create-name').val('')
     $('#f-group-create-description').val('')
@@ -591,11 +591,19 @@ $(function () {
       $('#f-group-create-prefix-datamanager').addClass('hidden')
     }
 
-    $('#f-group-create-schema-id').select2('val', that.schemaIdDefault)
+    const defaultSchema = new Option(that.schemaIdDefault, that.schemaIdDefault, true, true)
+    $('#f-group-create-schema-id').append(defaultSchema).trigger('change')
+    $('#f-group-create-schema-id').val(that.schemaIdDefault).trigger('change')
+
     $('#f-group-create-expiration-date').val('')
-    $('#f-group-create-category').select2('val', category)
-    $('#f-group-create-subcategory').select2('val', subcategory)
-    $('#f-group-create-name').focus()
+
+    const defaultCategory = new Option(category, category, true, true)
+    $('#f-group-create-category').append(defaultCategory).trigger('change')
+
+    const defaultSubcategory = new Option(subcategory, subcategory, true, true)
+    $('#f-group-create-subcategory').append(defaultSubcategory).trigger('change')
+
+    $('#f-group-create-name').trigger('focus')
   })
 
   // Intercept group creation submission of form
@@ -664,7 +672,7 @@ $(function () {
     // All possible schema-id's
     schemaIDs: [],
 
-    // Default schema id for this yoda istance coming from the backend
+    // Default schema id for this yoda instance coming from the backend
     schemaIdDefault: '',
 
     /// Get the name of an access level one lower than the current one for
@@ -938,12 +946,16 @@ $(function () {
         $groupProperties.find('.placeholder-text').addClass('hidden')
         $groupProperties.find('form').removeClass('hidden')
 
+        const defaultCategory = new Option(group.category, group.category, true, true)
         $groupProperties.find('#f-group-update-category')
-          .select2('data', { id: group.category, text: group.category })
-          .select2('readonly', !canEditCategory)
+          .append(defaultCategory).trigger('change')
+          .prop('disabled', !canEditCategory)
+
+        const defaultSubcategory = new Option(group.subcategory, group.subcategory, true, true)
         $groupProperties.find('#f-group-update-subcategory')
-          .select2('data', { id: group.subcategory, text: group.subcategory })
-          .select2('readonly', !userCanManage)
+          .append(defaultSubcategory).trigger('change')
+          .prop('disabled', !userCanManage)
+
         $groupProperties.find('#inputGroupPrepend')
           .html(function () {
             const matches = groupName.match(that.GROUP_PREFIXES_RE, '')
@@ -983,15 +995,15 @@ $(function () {
         // Creation date of this group
         $groupProperties.find('#f-group-update-creation-date')
           .val(group.creation_date)
-          .prop('readonly', true)
+          .prop('disabled', true)
 
         if (that.prefixHasDataClassification(prefix)) {
           $groupProperties.find('.data-classification').show()
           $('#f-group-update-data-classification')
-            .select2('readonly', !userCanManage)
+            .prop('disabled', !userCanManage)
         } else {
           $groupProperties.find('.data-classification').hide()
-          $('#f-group-update-data-classification').select2('readonly', true)
+          $('#f-group-update-data-classification').prop('disabled', true)
         }
 
         if (group.data_classification === null) {
@@ -1175,27 +1187,31 @@ $(function () {
 
       $(sel).filter('.selectify-category').each(function () {
         const $el = $(this)
-
-        $el.attr(
-          'placeholder',
-          (that.isMemberOfGroup('priv-category-add') || that.isRodsAdmin)
-            ? 'Select a category or enter a new name'
-            : 'Select a category'
-        )
+        const placeholder = (that.isMemberOfGroup('priv-category-add') || that.isRodsAdmin)
+          ? 'Select a category or enter a new name'
+          : 'Select a category'
 
         $el.select2({
+          placeholder,
           ajax: {
             quietMillis: 200,
             url: '/group_manager/get_categories',
             type: 'post',
             dataType: 'json',
-            data: function (term, page) {
-              return { query: term }
+            data: function (params) {
+              if (!params.term) {
+                return { query: '' }
+              } else {
+                return { query: params.term }
+              }
             },
-            results: function (data) {
+            processResults: function (data, params) {
               const categories = data.categories
               const results = []
-              const query = $el.data('select2').search.val()
+              let query = ''
+              if (('term' in params) && params.term) {
+                query = params.term
+              }
               let inputMatches = false
 
               // For legacy reasons we allow selecting existing categories with illegal names.
@@ -1249,30 +1265,34 @@ $(function () {
               return { results }
             }
           },
-          formatResult: function (result, $container, query, escaper) {
-            return escaper(result.text) +
+          templateResult: function (result) {
+            return $('<span>' + jQuery.fn.select2.defaults.defaults.escapeMarkup(result.text) +
                             (
                               'exists' in result && !result.exists
                                 ? ' <span class="grey">(create)</span>'
                                 : ''
-                            )
-          },
-          initSelection: function ($el, callback) {
-            const cb = { id: $el.val(), text: $el.val() }
-            callback(cb)
+                            ) +
+                            '</span>')
           }
-        }).on('open', function () {
-          $(this).select2('val', '')
+        }).on('select2:open', function () {
+          // Clear selected category on open
+          $(this).val(null)
+          // $(this).val(null).trigger('change')
         }).on('change', function () {
-          $($(this).attr('data-subcategory')).select2('val', '')
+          // Reset the subcategory value
+          $($(this).attr('data-subcategory')).val(null).trigger('change')
 
           // bring over the category value to the schema-id if exists.
-          if (that.schemaIDs.includes($(this).select2('val'))) {
-            $('#f-group-create-schema-id').select2('val', $(this).select2('val'))
+          if (that.schemaIDs.includes($(this).select2('data')[0].id)) {
+            $('#f-group-create-schema-id').val($(this).select2('data')[0].id).trigger('change')
           }
 
           if (this.id === 'f-group-create-category') {
-            if (that.canCreateDatamanagerGroup(this.value)) { $('#f-group-create-prefix-datamanager').removeClass('hidden') } else { $('#f-group-create-prefix-datamanager').addClass('hidden') }
+            if (that.canCreateDatamanagerGroup(this.value)) {
+              $('#f-group-create-prefix-datamanager').removeClass('hidden')
+            } else {
+              $('#f-group-create-prefix-datamanager').addClass('hidden')
+            }
 
             if ($('#f-group-create-name').attr('data-prefix') === 'datamanager-') {
               // Reset the group name + prefix by pretending that
@@ -1291,21 +1311,29 @@ $(function () {
         const $el = $(this)
 
         $el.select2({
+          placeholder: 'Select a subcategory or enter a new name',
           ajax: {
             quietMillis: 200,
             url: '/group_manager/get_subcategories',
             type: 'post',
             dataType: 'json',
-            data: function (term, page) {
-              return {
-                category: $($el.attr('data-category')).val(),
-                query: term
+            data: function (params) {
+              const request = {
+                query: '',
+                category: $($el.attr('data-category')).val()
               }
+              if (params.term) {
+                request.query = params.term
+              }
+              return request
             },
-            results: function (data) {
+            processResults: function (data, params) {
               const subcategories = data.subcategories
               const results = []
-              const query = $el.data('select2').search.val()
+              let query = ''
+              if (('term' in params) && params.term) {
+                query = params.term
+              }
               let inputMatches = false
 
               subcategories.forEach(function (subcategory) {
@@ -1337,20 +1365,17 @@ $(function () {
               return { results }
             }
           },
-          formatResult: function (result, $container, query, escaper) {
-            return escaper(result.text) +
+          templateResult: function (result) {
+            return $('<span>' + jQuery.fn.select2.defaults.defaults.escapeMarkup(result.text) +
                             (
                               'exists' in result && !result.exists
                                 ? ' <span class="grey">(create)</span>'
                                 : ''
-                            )
-          },
-          initSelection: function ($el, callback) {
-            const cb = { id: $el.val(), text: $el.val() }
-            callback(cb)
+                            ) +
+                            '</span>')
           }
-        }).on('open', function () {
-          $(this).select2('val', '')
+        }).on('select2:open', function () {
+          $(this).val(null)
         })
       })
 
@@ -1362,18 +1387,25 @@ $(function () {
 
         $el.select2({
           ajax: {
+            placeholder: 'Select a schema',
             quietMillis: 200,
             url: '/group_manager/get_schemas',
             type: 'post',
             dataType: 'json',
-            data: function (term, page) {
-              return { query: term }
+            data: function (params) {
+              if (!params.term) {
+                return { query: '' }
+              } else {
+                return { query: params.term }
+              }
             },
-
-            results: function (data) {
+            processResults: function (data, params) {
               const schemas = data.schemas
               const results = []
-              const query = $el.data('select2').search.val()
+              let query = ''
+              if (('term' in params) && params.term) {
+                query = params.term
+              }
 
               schemas.forEach(function (schema) {
                 if (schema.startsWith(query)) {
@@ -1397,20 +1429,17 @@ $(function () {
               return { results }
             }
           },
-          formatResult: function (result, $container, query, escaper) {
-            return escaper(result.text) +
+          templateResult: function (result) {
+            return $('<span>' + jQuery.fn.select2.defaults.defaults.escapeMarkup(result.text) +
                             (
                               'exists' in result && !result.exists
                                 ? ' <span class="grey">(create)</span>'
                                 : ''
-                            )
-          },
-          initSelection: function ($el, callback) {
-            const cb = { id: $el.val(), text: $el.val() }
-            callback(cb)
+                            ) +
+                            '</span>')
           }
-        }).on('open', function () {
-          $(this).select2('val', '')
+        }).on('select2:open', function () {
+          $(this).val(null)
         }).on('change', function () {
         })
       })
@@ -1423,6 +1452,7 @@ $(function () {
 
         $el.select2({
           allowClear: true,
+          placeholder: 'Click here to add a user...',
           openOnEnter: false,
           minimumInputLength: 3,
           ajax: {
@@ -1430,16 +1460,21 @@ $(function () {
             url: '/group_manager/get_users',
             type: 'post',
             dataType: 'json',
-            data: function (term, page) {
-              return {
-                query: term.toLowerCase()
+            data: function (params) {
+              if (!params.term) {
+                return { query: '' }
+              } else {
+                return { query: params.term.toLowerCase() }
               }
             },
-            results: function (data) {
+            processResults: function (data, params) {
               const users = data.users
-              const query = $el.data('select2').search.val().toLowerCase()
+              let query = ''
               const results = []
               let inputMatches = false
+              if (('term' in params) && params.term) {
+                query = params.term.toLowerCase()
+              }
 
               users.forEach(function (userName) {
                 // Exclude users already in the group.
@@ -1464,20 +1499,17 @@ $(function () {
               return { results }
             }
           },
-          formatResult: function (result, $container, query, escaper) {
-            return escaper(result.text) +
+          templateResult: function (result) {
+            return $('<span>' + jQuery.fn.select2.defaults.defaults.escapeMarkup(result.text) +
                             (
                               'exists' in result && !result.exists
                                 ? ' <span class="grey">(create)</span>'
                                 : ''
-                            )
-          },
-          initSelection: function ($el, callback) {
-            const cb = { id: $el.val(), text: $el.val() }
-            callback(cb)
+                            ) +
+                            '</span>')
           }
-        }).on('open', function () {
-          $(this).select2('val', '')
+        }).on('select2:open', function () {
+          $(this).val(null)
         })
       })
 
@@ -1510,7 +1542,7 @@ $(function () {
           userList.push({ id: 'user:' + uniqueUsers[val], text: uniqueUsers[val].split('#')[0] })
         }
 
-        // only unique usernames
+        // only unique group names
         const uniqueGroups = [...new Set(groupnames)]
         uniqueGroups.sort()
         const groupList = []
@@ -1524,11 +1556,12 @@ $(function () {
         const $el = $(this)
         $el.select2({
           data,
+          placeholder: 'Click here to search...',
           allowClear: true,
           openOnEnter: false,
           minimumInputLength: 3
-        }).on('open', function () {
-          $(this).select2('val', '')
+        }).on('select2:open', function () {
+          $(this).val(null)
         }).on('change', function () {
           treeListGroups()
           flatListGroups()
@@ -1552,6 +1585,8 @@ $(function () {
                   ? 'create'
                   : 'update'
 
+      const schema_id = (action === 'create') ? $('#f-group-' + action + '-schema-id').select2('data')[0].id : $('#f-group-' + action + '-schema-id').val();
+
       $(button).addClass('disabled').val(
         action === 'create'
           ? 'Adding group...'
@@ -1567,15 +1602,15 @@ $(function () {
           )
       }
 
-      // all now bases upon update-fields. Create dialog is discarded
+      // all now based upon update-fields. Create dialog is discarded
       const newProperties = {
         name: $('#f-group-' + action + '-name').attr('data-prefix') +
                                    $('#f-group-' + action + '-name').val(),
         description: $('#f-group-' + action + '-description').val(),
-        schema_id: $('#f-group-' + action + '-schema-id').val(),
-        data_classification: $('#f-group-' + action + '-data-classification').val(),
-        category: $('#f-group-' + action + '-category').val(),
-        subcategory: $('#f-group-' + action + '-subcategory').val(),
+        schema_id,
+        data_classification: $('#f-group-' + action + '-data-classification').select2('data')[0].id,
+        category: $('#f-group-' + action + '-category').select2('data')[0].id,
+        subcategory: $('#f-group-' + action + '-subcategory').select2('data')[0].id,
         expiration_date: $('#f-group-' + action + '-expiration-date').val()
       }
 
@@ -1839,7 +1874,7 @@ $(function () {
             access: 'normal'
           }
 
-          $(el).find('#f-user-create-name').select2('val', '')
+          $(el).find('#f-user-create-name').val('')
 
           that.deselectGroup()
           that.selectGroup(groupName)
@@ -1858,7 +1893,7 @@ $(function () {
           $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once')
 
           // open the select-user select2 for ease of use
-          $('.selectify-user-name').select2('open')
+          $('.selectify-user-name').trigger('select2:open')
         } else {
           // Something went wrong. :(
           if ('message' in result) { window.alert(result.message) } else {
@@ -2003,6 +2038,9 @@ $(function () {
 
       const that = this
       const $groupList = $('#group-list')
+      
+      // Setting the Select2 default theme
+      $.fn.select2.defaults.set('theme', 'bootstrap-5')
 
       // Attach event handlers {{{
       // Generic {{{
@@ -2034,7 +2072,7 @@ $(function () {
         Yoda.storage.session.set('is-collapsed', 'true')
       })
 
-      // When user opens up group properties
+      // When user opens group properties
       $('.properties-update').on('show.bs.collapse', function (e) {
         $('#properties-update-link').find('.triangle')
           .removeClass('fa-caret-right')
@@ -2162,12 +2200,12 @@ $(function () {
         that.deselectUser()
         $(this).find('.user-create-text').attr('hidden', '')
         $(this).find('form').removeClass('hidden')
-        $(this).find('form').find('#f-user-create-name').select2('open')
+        $(this).find('form').find('#f-user-create-name').trigger('select2:open')
       })
 
-      $('#f-user-create-name').on('select2-close', function () {
+      $('#f-user-create-name').on('select2:close', function () {
         // Remove the new user name input on unfocus if nothing was entered.
-        if ($(this).val().length === 0) {
+        if ($(this).select2('data')[0].id.length === 0) {
           $(this).parents('.list-group-item').find('.user-create-text').removeAttr('hidden')
         }
       })
@@ -2236,9 +2274,9 @@ $(function () {
 
       const isCollapsed = Yoda.storage.session.get('is-collapsed')
       if (isCollapsed !== null && isCollapsed === 'true') {
-        $(".collapsible-group-properties").removeClass("show")
+        $('.collapsible-group-properties').removeClass('show')
         // Make sure the triangle is facing the correct direction
-        $(".properties-update").find(".triangle")
+        $('.properties-update').find('.triangle')
           .removeClass('fa-caret-down')
           .addClass('fa-caret-right')
       }
