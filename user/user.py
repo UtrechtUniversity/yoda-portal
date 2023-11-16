@@ -367,9 +367,10 @@ def should_redirect_to_oidc(username: str) -> bool:
     """Check if user should be redirected to OIDC based on domain."""
     if app.config.get('OIDC_ENABLED'):
         oidc_domain_list: List[str] = app.config.get('OIDC_DOMAINS', [])
-        return '@' in username and is_email_in_domains(username, oidc_domain_list)
-    else:
-        return False
+        if app.config.get('OIDC_ALWAYS_REDIRECT') or is_email_in_domains(username, oidc_domain_list):
+            return '@' in username
+
+    return False
 
 
 def oidc_authorize_url(username: str) -> str:
