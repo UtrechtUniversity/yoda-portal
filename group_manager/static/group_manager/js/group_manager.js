@@ -802,12 +802,17 @@ $(function () {
     canCreateDatamanagerGroup: function (categoryName) {
       return (// if the category name can legally be translated to a group name ...
         categoryName.match(/^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/) &&
-                    // ... and the datamanager group DOES NOT yet exist ...
-                    !(('datamanager-' + categoryName) in this.groups) &&
-                    // ... and the user is rodsadmin.
-                    this.isRodsAdmin)
+        // ... and the datamanager group DOES NOT yet exist ...
+        !(('datamanager-' + categoryName) in this.groups) &&
+        // ... then the user must either be rodsadmin ...
+        (this.isRodsAdmin ||
+        // ... or the user is in priv-*-add ...
+        (this.userNameFull in this.groups['priv-category-add'].members &&
+        this.userNameFull in this.groups['priv-group-add'].members &&
+        // ... and the user must be a manager of at least one group in the category
+        this.isManagerInCategory(categoryName))))
 
-      // (previously, priv-category-add was sufficient where we now require rodsadmin)
+      // (previously, priv-category-add was sufficient where we now require rodsadmin in most cases)
     },
 
     /**
@@ -821,10 +826,15 @@ $(function () {
     canUpdateDatamanagerGroup: function (categoryName) {
       return (// if the category name can legally be translated to a group name ...
         categoryName.match(/^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/) &&
-                    // ... and the datamanager group DOES exist ...
-                    (('datamanager-' + categoryName) in this.groups) &&
-                    // ... and the user is rodsadmin.
-                    this.isRodsAdmin)
+        // ... and the datamanager group DOES exist ...
+        (('datamanager-' + categoryName) in this.groups) &&
+        // ... then the user must either be rodsadmin ...
+        (this.isRodsAdmin ||
+        // ... or the user is in priv-*-add ...
+        (this.userNameFull in this.groups['priv-category-add'].members &&
+        this.userNameFull in this.groups['priv-group-add'].members &&
+        // ... and the user must be a manager of at least one group in the category
+        this.isManagerInCategory(categoryName))))
     },
 
     // }}}
@@ -898,6 +908,7 @@ $(function () {
          */
     selectGroup: function (groupName) {
       const group = this.groups[groupName]
+      const categoryName = group.category
       const userCanManage = this.canManageGroup(groupName)
 
       // TRee
@@ -930,8 +941,8 @@ $(function () {
 
       $('#group-properties .delete-button').toggleClass(
         'hidden',
-        !!(!userCanManage || groupName.match(that.GROUP_PREFIXES_RESERVED_RE) ||
-                   (groupName.match(/^datamanager-/) && !this.isRodsAdmin))
+        !(this.isRodsAdmin || (userCanManage && !(groupName.match(that.GROUP_PREFIXES_RESERVED_RE))) ||
+                   (groupName.match(/^datamanager-/) && Yoda.canUpdateDatamanagerGroup(categoryName)))
       )
 
       // The category of a datamanager group cannot be changed - the
@@ -1585,7 +1596,15 @@ $(function () {
                   ? 'create'
                   : 'update'
 
-      const schema_id = (action === 'create') ? $('#f-group-' + action + '-schema-id').select2('data')[0].id : $('#f-group-' + action + '-schema-id').val();
+      const schema_id =
+        (action === 'create')
+          ? $('#f-group-' + action + '-schema-id').select2('data')[0].id
+          : $('#f-group-' + action + '-schema-id').val()
+
+      const data_classification =
+        $('#f-group-' + action + '-data-classification').select2('data').length
+          ? $('#f-group-' + action + '-data-classification').select2('data')[0].id
+          : ''
 
       $(button).addClass('disabled').val(
         action === 'create'
@@ -1608,7 +1627,7 @@ $(function () {
                                    $('#f-group-' + action + '-name').val(),
         description: $('#f-group-' + action + '-description').val(),
         schema_id,
-        data_classification: $('#f-group-' + action + '-data-classification').select2('data')[0].id,
+        data_classification,
         category: $('#f-group-' + action + '-category').select2('data')[0].id,
         subcategory: $('#f-group-' + action + '-subcategory').select2('data')[0].id,
         expiration_date: $('#f-group-' + action + '-expiration-date').val()
