@@ -10,7 +10,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v3
         with:
-          node-version: 17
+          node-version: 18
 
       - name: Install standard
         run: |
