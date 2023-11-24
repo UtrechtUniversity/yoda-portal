@@ -346,7 +346,7 @@ function handleGoToResearchButton (dir) {
   }
 }
 
-function handleGoToGroupManager(dir) {
+function handleGoToGroupManager (dir) {
   // Handle the button with which to return to the corresponding research area.
   const parts = dir.split('/')
 

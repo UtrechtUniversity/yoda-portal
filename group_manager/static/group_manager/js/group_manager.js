@@ -1,4 +1,4 @@
-/* global FileReader */
+/* global FileReader, jQuery, Option */
 'use strict'
 
 function flatListGroups () {
@@ -1596,11 +1596,13 @@ $(function () {
                   ? 'create'
                   : 'update'
 
+      // eslint-disable-next-line camelcase
       const schema_id =
         (action === 'create')
           ? $('#f-group-' + action + '-schema-id').select2('data')[0].id
           : $('#f-group-' + action + '-schema-id').val()
 
+      // eslint-disable-next-line camelcase
       const data_classification =
         $('#f-group-' + action + '-data-classification').select2('data').length
           ? $('#f-group-' + action + '-data-classification').select2('data')[0].id
@@ -1626,7 +1628,9 @@ $(function () {
         name: $('#f-group-' + action + '-name').attr('data-prefix') +
                                    $('#f-group-' + action + '-name').val(),
         description: $('#f-group-' + action + '-description').val(),
+        // eslint-disable-next-line camelcase
         schema_id,
+        // eslint-disable-next-line camelcase
         data_classification,
         category: $('#f-group-' + action + '-category').select2('data')[0].id,
         subcategory: $('#f-group-' + action + '-subcategory').select2('data')[0].id,
@@ -2057,7 +2061,7 @@ $(function () {
 
       const that = this
       const $groupList = $('#group-list')
-      
+
       // Setting the Select2 default theme
       $.fn.select2.defaults.set('theme', 'bootstrap-5')
 
