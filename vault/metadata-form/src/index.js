@@ -19,13 +19,16 @@ let uiSchema     = {};
 let yodaFormData = {};
 
 let actual_edit_mode = false; // if can edit, it is not directly shown.
+
+let validator;
 let formProperties;
 
 let saving = false;
 
 let form = document.getElementById('form');
 
-const validator = customizeValidator({ AjvClass: Ajv2019, ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
+const validatorAjvDraft7 = customizeValidator({ ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
+const validatorAjv2019 = customizeValidator({ AjvClass: Ajv2019, ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
 
 const enumWidget = (props) => {
     let enumArray = props['schema']['enum'];
@@ -643,6 +646,13 @@ function loadForm() {
             $('#no-metadata').removeClass('hide');
 
         } else {
+            // Select validator based on schema.
+            if (schema.$schema == "http://json-schema.org/draft-07/schema") {
+                validator = validatorAjvDraft7
+            } else {
+                validator = validatorAjv2019
+            }
+
             // Metadata present or user has write access, load the form and must be in actual_edit_mode as chosen by user
             if (formProperties.data.can_edit && actual_edit_mode) {
                 uiSchema = formProperties.data.uischema; // take over original ui-shema again- not the readonly one
