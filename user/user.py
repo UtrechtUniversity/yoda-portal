@@ -14,7 +14,6 @@ from flask import (
     current_app as app,
     flash,
     g,
-    Markup,
     redirect,
     render_template,
     request,
@@ -105,38 +104,12 @@ def login() -> Response:
             return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         except CAT_INVALID_USER:
-            first_message = 'Your user is not part of the Yoda system (yet).'
-            website_message = (f'Go to <a href="{app.config.get("LOGIN_HELP_CONTACT_WEBSITE")}" '
-                               'class="alert-link">this</a> page to learn about gaining access.')
-            email_message = (f'Contact <a href="mailto:{app.config.get("LOGIN_HELP_CONTACT_EMAIL")}" '
-                             'class="alert-link">this</a> email for help getting access.')
-
-            if (app.config.get("LOGIN_HELP_CONTACT_WEBSITE") and app.config.get("LOGIN_HELP_CONTACT_EMAIL")):
-                message = Markup(
-                    f'{first_message} '
-                    f'{website_message} '
-                    f'{email_message}'
-                )
-            elif (app.config.get("LOGIN_HELP_CONTACT_WEBSITE")):
-                message = Markup(
-                    f'{first_message} '
-                    f'{website_message}'
-                )
-            elif (app.config.get("LOGIN_HELP_CONTACT_EMAIL")):
-                message = Markup(
-                    f'{first_message} '
-                    f'{email_message}'
-                )
-            else:
-                message = Markup(
-                    f'{first_message}'
-                )
-            flash(
-                message,
-                'danger')
-
             log_error("iRODSException CAT_INVALID_USER for login of user " + str(username), True)
-            return render_template('user/login.html', login_placeholder=get_login_placeholder())
+            return render_template(
+                'user/login.html',
+                login_placeholder=get_login_placeholder(),
+                alert_user_not_in_instance=True
+            )
 
         except iRODSException:
             flash(

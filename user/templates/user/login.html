@@ -3,6 +3,18 @@
 {% block title %}{{ super() }} &dash; Sign in{% endblock title %}
 
 {% block content %}
+<div
+    id="alert-user-not-in-instance"
+    {% if alert_user_not_in_instance is defined and alert_user_not_in_instance %}
+    class="alert alert-danger alert-dismissible fade show" 
+    {% else %}
+    class="alert alert-danger alert-dismissible fade hidden" 
+    {% endif %}
+    role="alert">
+    Your user is not part of this Yoda instance (yet).
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
 <div class="row">
     <div class="offset-md-2 col-md-8">
         <div class="card">
