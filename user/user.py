@@ -10,7 +10,18 @@ from uuid import uuid4
 
 import jwt
 import requests
-from flask import Blueprint, current_app as app, flash, g, redirect, render_template, request, Response, session, url_for
+from flask import (
+    Blueprint,
+    current_app as app,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    Response,
+    session,
+    url_for
+)
 from irods.exception import CAT_INVALID_AUTHENTICATION, CAT_INVALID_USER, iRODSException, PAM_AUTH_PASSWORD_FAILED
 from irods.session import iRODSSession
 
@@ -92,6 +103,14 @@ def login() -> Response:
             flash('Username/password was incorrect', 'danger')
             log_error("iRODS authentication failed for user " + username)
             return render_template('user/login.html', login_placeholder=get_login_placeholder())
+
+        except CAT_INVALID_USER:
+            log_error("iRODSException CAT_INVALID_USER for login of user " + str(username), True)
+            return render_template(
+                'user/login.html',
+                login_placeholder=get_login_placeholder(),
+                alert_user_not_in_instance=True
+            )
 
         except iRODSException:
             flash(
