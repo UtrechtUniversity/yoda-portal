@@ -155,7 +155,7 @@ function startBrowsing(items)
         "processing": true,
         "serverSide": true,
         "iDeferLoading": 0,
-        "pageLength": items
+        "pageLength": parseInt(items)
     });
 
     buildFileBrowser();
@@ -215,7 +215,7 @@ function convertToHumanReadableStatus(status) {
             return "Data ready";
         default:
             return "Unknown status";
-    } 
+    }
 }
 
 
