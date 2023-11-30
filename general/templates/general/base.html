@@ -42,6 +42,7 @@
     </head>
 
     <body class="d-flex flex-column min-vh-100">
+        {% if config.get('YODA_ENVIRONMENT') != "production" %}{% include 'environment.html' %}{% endif %}
         <header class="py-3">
             <div class="container">
                 <div class="row">
