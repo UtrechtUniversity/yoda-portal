@@ -49,7 +49,8 @@
                     <div class="col-md-2">
                         <a href="{{ url_for('general_bp.index') }}" class="logo mb-lg-0 me-lg-auto text-dark text-decoration-none"></a>
                     </div>
-                    <div class="col-md-4 offset-md-4">
+                    <div class="col"></div>
+                    <div class="col-md-5">
                         {% if g.user and request.path != "/open_search/" and request.path != "/search/" %}
                             {% if config.get('OPEN_SEARCH_ENABLED') %}
                             <form class="mt-2 mb-lg-0 me-3" action="{{ url_for('open_search_bp.index') }}" method="get">
@@ -92,7 +93,7 @@
                             {% endif %}
                         {% endif %}
                     </div>
-                    <div class="col-2 mt-2 text-end">
+                    <div class="col-md-auto mt-2 text-end">
                         {% include 'user.html' %}
                     </div>
                 </div>
