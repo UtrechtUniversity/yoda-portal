@@ -14,13 +14,13 @@ from flask import (
     current_app as app,
     flash,
     g,
+    Markup,
     redirect,
     render_template,
     request,
     Response,
     session,
-    url_for,
-    Markup
+    url_for
 )
 from irods.exception import CAT_INVALID_AUTHENTICATION, CAT_INVALID_USER, iRODSException, PAM_AUTH_PASSWORD_FAILED
 from irods.session import iRODSSession
@@ -107,9 +107,9 @@ def login() -> Response:
         except CAT_INVALID_USER:
             first_message = 'Your user is not part of the Yoda system (yet).'
             website_message = (f'Go to <a href="{app.config.get("LOGIN_HELP_CONTACT_WEBSITE")}" '
-                                'class="alert-link">this</a> page to learn about gaining access.')
+                               'class="alert-link">this</a> page to learn about gaining access.')
             email_message = (f'Contact <a href="mailto:{app.config.get("LOGIN_HELP_CONTACT_EMAIL")}" '
-                              'class="alert-link">this</a> email for help getting access.')
+                             'class="alert-link">this</a> email for help getting access.')
 
             if (app.config.get("LOGIN_HELP_CONTACT_WEBSITE") and app.config.get("LOGIN_HELP_CONTACT_EMAIL")):
                 message = Markup(
