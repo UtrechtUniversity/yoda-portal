@@ -19,6 +19,10 @@
     background-color: $breadcrumb-bg;
 }
 
+.non-production {
+    z-index: 1021 !important;
+}
+
 // Dark theme specific settings
 [data-bs-theme="dark"] {
     /* Logo */
