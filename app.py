@@ -5,16 +5,11 @@ __license__   = 'GPLv3, see LICENSE'
 
 from os import path
 from typing import Dict, Optional
-from re import fullmatch
-from werkzeug.security import safe_join
-from werkzeug.utils import secure_filename
 
 from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 from jinja2 import ChoiceLoader, FileSystemLoader
-
-from util import get_validated_static_path
 
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
@@ -27,6 +22,7 @@ from research.research import research_bp
 from search.search import search_bp
 from stats.stats import stats_bp
 from user.user import user_bp
+from util import get_validated_static_path
 from vault.vault import vault_bp
 
 
@@ -127,11 +123,16 @@ def static_loader() -> Optional[Response]:
 
     :returns: Static file
     """
-    result = get_validated_static_path(request.full_path, request.path, app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
+    result = get_validated_static_path(
+        request.full_path,
+        request.path,
+        app.config.get('YODA_THEME_PATH'),
+        app.config.get('YODA_THEME')
+    )
     if result is not None:
         static_dir, asset_name = result
         return send_from_directory(static_dir, asset_name)
- 
+
 
 @app.before_request
 def protect_pages() -> Optional[Response]:
