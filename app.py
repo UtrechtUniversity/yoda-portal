@@ -5,11 +5,16 @@ __license__   = 'GPLv3, see LICENSE'
 
 from os import path
 from typing import Dict, Optional
+from re import fullmatch
+from werkzeug.security import safe_join
+from werkzeug.utils import secure_filename
 
 from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 from jinja2 import ChoiceLoader, FileSystemLoader
+
+from util import get_validated_static_path
 
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
@@ -105,7 +110,7 @@ csrf = CSRFProtect(app)
 
 
 @app.before_request
-def static_loader() -> Response:
+def static_loader() -> Optional[Response]:
     """
     Static files handling - recognisable through '/assets/'
     Override requested static file if present in user_static_area
@@ -122,31 +127,11 @@ def static_loader() -> Response:
 
     :returns: Static file
     """
-    if '/assets/' in request.full_path:
-        user_static_area = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
-        asset_dir, asset_name = path.split(request.path)
-        parts = request.full_path.split('/')
-
-        if parts[1] == 'assets':
-            # Main assets
-            static_dir = asset_dir.replace('/assets', user_static_area + '/static')
-            user_static_filename = path.join(static_dir, asset_name)
-            if not path.exists(user_static_filename):
-                static_dir = asset_dir.replace('/assets', '/var/www/yoda/static')
-        else:
-            # Module specific assets
-            module = parts[1]
-            specific_file_location = asset_dir.replace('/' + module + '/assets/', '')
-            module_static_area = path.join(module, 'static', module)
-            user_static_filename = path.join(user_static_area, module_static_area, specific_file_location, asset_name)
-
-            if path.exists(user_static_filename):
-                static_dir = path.join(user_static_area, module_static_area, specific_file_location)
-            else:
-                static_dir = asset_dir.replace('/' + module + '/assets', '/var/www/yoda/' + module_static_area)
-
+    result = get_validated_static_path(request.full_path, request.path, app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
+    if result is not None:
+        static_dir, asset_name = result
         return send_from_directory(static_dir, asset_name)
-
+ 
 
 @app.before_request
 def protect_pages() -> Optional[Response]:

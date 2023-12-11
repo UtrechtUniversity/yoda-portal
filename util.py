@@ -5,7 +5,12 @@ __license__   = 'GPLv3, see LICENSE'
 
 import sys
 import traceback
-from typing import List
+from typing import List, Optional, Tuple
+
+from os import path
+from re import fullmatch
+from werkzeug.security import safe_join
+from werkzeug.utils import secure_filename
 
 
 def log_error(message: str, print_exception: bool = False) -> None:
@@ -40,3 +45,53 @@ def is_email_in_domains(email: str, domain_list: List[str]) -> bool:
                 return True
 
     return False
+
+
+def get_validated_static_path(full_path, request_path, yoda_theme_path, yoda_theme) -> Optional[Tuple[str, str]]:
+    """
+    Static files handling - recognisable through '/assets/'
+    Confirms that input path is valid and return corresponding static path
+    
+    :returns: Tuple of static directory and filename for correct path, None for incorrect path
+    """
+    # Only allow printable ascii
+    if fullmatch('[ -~]*', full_path) is not None and '/assets/' in full_path:
+        user_static_area = path.join(yoda_theme_path, yoda_theme)
+        parts = full_path.split('/')
+        
+        # Trim empty string and file name from path
+        parts = parts[1:-1]
+        _, asset_name = path.split(request_path)
+        # Make sure asset_name is safe
+        if asset_name != secure_filename(asset_name):
+            return
+
+        if parts[0] == 'assets':
+            # Main assets
+            static_dir = safe_join(user_static_area + '/static', *parts[1:])
+            if not static_dir:
+                return
+            user_static_filename = path.join(static_dir, asset_name)
+            if not path.exists(user_static_filename):
+                static_dir = safe_join('/var/www/yoda/static', *parts[1:])
+        else:
+            # Module specific assets
+            module = parts[0]
+            # Make sure module name is safe
+            if module != secure_filename(module):
+                return
+
+            module_static_area = path.join(module, 'static', module)
+            user_static_filename = safe_join(path.join(user_static_area, module_static_area), *parts[2:], asset_name)
+            if not user_static_filename:
+                return
+
+            if path.exists(user_static_filename):
+                static_dir = path.join(user_static_area, module_static_area, *parts[2:])
+            else:
+                static_dir = path.join('/var/www/yoda/', module_static_area, *parts[2:])
+
+        full_path = path.join(static_dir, asset_name)
+        # Check that path is correct
+        if path.exists(full_path):
+            return static_dir, asset_name
