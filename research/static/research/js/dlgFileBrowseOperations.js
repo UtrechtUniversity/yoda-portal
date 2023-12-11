@@ -12,18 +12,22 @@ $(document).ready(function () {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'file-move')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move')
       $('#dlg-file-browse-operations .card-title span.action').text('move')
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', "")
     } else if ($(this).hasClass('folder-move')) {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-move')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move')
       $('#dlg-file-browse-operations .card-title span.action').text('move')
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', "")
     } else if ($(this).hasClass('file-copy')) {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'file-copy')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy')
       $('#dlg-file-browse-operations .card-title span.action').text('copy')
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', "")
     } else {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-copy')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy')
       $('#dlg-file-browse-operations .card-title span.action').text('copy')
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', "")
     }
 
     // Set filename in modal & button attribute
@@ -94,19 +98,13 @@ $(document).ready(function () {
       if (action === 'file-move') {
         moveFile(path, newPath, false, null, overwrite)
       } else if (action === 'file-copy') {
+        console.log('in file copy')
+        console.log(overwrite)
         copyFile(path, newPath, false, null, overwrite)
       } else if (action === 'folder-move') {
-        if ($('#dlg-file-browse-operations .dlg-action-button span.action').text() === 'Move and Overwrite') {
-          overwriteFolder(path, newPath, false, action)
-        } else {
-          moveFolder(path, newPath, false)
-        }
+        moveFolder(path, newPath, false, null, overwrite)
       } else if (action === 'folder-copy') {
-        if ($('#dlg-file-browse-operations .dlg-action-button span.action').text() === 'Copy and Overwrite') {
-          overwriteFolder(path, newPath, false, action)
-        } else {
-          copyFolder(path, newPath, false)
-        }
+        copyFolder(path, newPath, false, null, overwrite)
       }
     } else {
       // Multiple items
@@ -197,9 +195,20 @@ $(document).on('click', '.multi-overwrite-button', function () {
   console.log(newPath)
 
   if (type === 'data') {
-    copyFile(currentPath, newPath, true, index, true)
+    if (action == 'copy') {
+      copyFile(currentPath, newPath, true, index, true)
+    }
+    else if (action == 'move') {
+      moveFile(currentPath, newPath, true, index, true)
+    }
   } else {
-    overwriteFolder(currentPath, newPath, true, action, index)
+    if (action == 'copy') {
+      copyFolder(currentPath, newPath, true, index, true)
+    }
+    else if (action == 'move') {
+      moveFolder(currentPath, newPath, true, index, true)
+    }
+    
   }
 })
 
@@ -211,9 +220,9 @@ $(document).on('click', '.multi-cancel-button', function () {
   const index = $(this).closest('tr').attr('class').split('-').pop()
 
   $('.multi-select-table tr.row-' + index + ' td.item-progress').text('Overwrite cancelled')
-  if (($('#mutli-select-progress .dlg-multi-action-button span.action').text() === 'Copy and overwrite all') || ($('#mutli-select-progress .dlg-multi-action-button span.action').text() === 'Move and overwrite all')) {
-    $('#mutli-select-progress .dlg-multi-action-button').prop('disabled', true)
-  }
+  // if (($('#mutli-select-progress .dlg-multi-action-button span.action').text() === 'Copy and overwrite all') || ($('#mutli-select-progress .dlg-multi-action-button span.action').text() === 'Move and overwrite all')) {
+  //   $('#mutli-select-progress .dlg-multi-action-button').prop('disabled', true)
+  // }
 })
 
 async function copyFile (filepath, newFilepath, multiple, multipleIndex = null, overwrite = false) {
@@ -223,7 +232,6 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null, 
     dlgSelectAlertHide()
     $('#dlg-file-browse-operations .dlg-action-button').html('Copying <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
-  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Copy</span>')
 
   try {
     const result = await Yoda.call('research_file_copy',
@@ -258,10 +266,10 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null, 
           filepath.substring(0, filepath.lastIndexOf('/')) +
           '">No</button>')
 
-          $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Copy and overwrite all</span>')
-          $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'copy')
-          $('#mutli-select-progress .dlg-multi-action-button').attr('data-overwrite', true)
-          $('#mutli-select-progress .dlg--multiaction-button').removeClass('hidden')
+          // $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Copy and overwrite all</span>')
+          // $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'copy')
+          // $('#mutli-select-progress .dlg-multi-action-button').attr('data-overwrite', true)
+          // $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
         } else {
           $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text(result.status_info)
         }
@@ -283,6 +291,7 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null, 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Copy</span>')
 }
 
 async function moveFile (filepath, newFilepath, multiple, multipleIndex = null, overwrite = false) {
@@ -292,13 +301,13 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null, 
     dlgSelectAlertHide()
     $('#dlg-file-browse-operations .dlg-action-button').html('Moving <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
-  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Move</span>')
+
   try {
     const result = await Yoda.call('research_file_move',
       {
         filepath: Yoda.basePath + filepath,
         new_filepath: Yoda.basePath + newFilepath,
-        overwrite: overwrite
+        overwrite
       },
       { quiet: true, rawResult: true }
     )
@@ -328,9 +337,10 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null, 
           filepath.substring(0, filepath.lastIndexOf('/')) +
           '">No</button>')
 
-          $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Move and overwrite all</span>')
-          $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'move')
-          $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
+          // $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Move and overwrite all</span>')
+          // $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'move')
+          // $('#mutli-select-progress .dlg-multi-action-button').attr('data-overwrite', true)
+          // $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
         } else {
           $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text(result.status_info)
         }
@@ -352,21 +362,23 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null, 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Move</span>')
 }
 
-async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = null) {
+async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = null, overwrite = false) {
   if (multiple) {
     $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   } else {
     dlgSelectAlertHide()
     $('#dlg-file-browse-operations .dlg-action-button').html('Copying <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
-  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Copy</span>')
+
   try {
     const result = await Yoda.call('research_folder_copy',
       {
         folder_path: Yoda.basePath + folderPath,
-        new_folder_path: Yoda.basePath + newFolderpath
+        new_folder_path: Yoda.basePath + newFolderpath,
+        overwrite
       },
       { quiet: true, rawResult: true }
     )
@@ -394,9 +406,10 @@ async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = 
           folderPath.substring(0, folderPath.lastIndexOf('/')) +
           '">No</button>')
 
-          $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Copy and overwrite all</span>')
-          $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'copy')
-          $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
+          // $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Copy and overwrite all</span>')
+          // $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'copy')
+          // $('#mutli-select-progress .dlg-multi-action-button').attr('data-overwrite', true)
+          // $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
         } else {
           $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text(result.status_info)
         }
@@ -405,6 +418,7 @@ async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = 
           dlgSelectAlertShow(result.status_info + '. Do you want to overwrite?')
           $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Copy and overwrite</span>')
           $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-copy')
+          $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', true)
         } else {
           dlgSelectAlertShow(result.status_info)
         }
@@ -417,21 +431,23 @@ async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Copy</span>')
 }
 
-async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = null) {
+async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = null, overwrite = false) {
   if (multiple) {
     $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   } else {
     dlgSelectAlertHide()
     $('#dlg-file-browse-operations .dlg-action-button').html('Moving <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
   }
-  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Move</span>')
+
   try {
     const result = await Yoda.call('research_folder_move',
       {
         folder_path: Yoda.basePath + folderPath,
-        new_folder_path: Yoda.basePath + newFolderpath
+        new_folder_path: Yoda.basePath + newFolderpath,
+        overwrite
       },
       { quiet: true, rawResult: true }
     )
@@ -461,9 +477,10 @@ async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = 
           folderPath.substring(0, folderPath.lastIndexOf('/')) +
           '">No</button>')
 
-          $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Move and overwrite all</span>')
-          $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'move')
-          $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
+          // $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">Move and overwrite all</span>')
+          // $('#mutli-select-progress .dlg-multi-action-button').attr('data-action', 'move')
+          // $('#mutli-select-progress .dlg-multi-action-button').attr('data-overwrite', true)
+          // $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
         } else {
           $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text(result.status_info)
         }
@@ -472,6 +489,7 @@ async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = 
           dlgSelectAlertShow(result.status_info + '. Do you want to overwrite?') // Change button to move and overwrite
           $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Move and overwrite</span>')
           $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-move')
+          $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', true)
         } else {
           dlgSelectAlertShow(result.status_info)
         }
@@ -484,6 +502,7 @@ async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = 
       dlgSelectAlertShow(e.status_info)
     }
   }
+  $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Move</span>')
 }
 async function deleteFolder (collection, folderName, multipleIndex = null) {
   $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
@@ -528,53 +547,6 @@ async function deleteFile (collection, fileName, multipleIndex = null) {
     }
   } catch (e) { // API ERROR
     $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text(dlgSelectAlertShow(e.status_info))
-  }
-}
-
-async function overwriteFolder (folderPath, newFolderPath, multiple, action, multipleIndex = null) {
-  if (multiple) {
-    $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  } else {
-    dlgSelectAlertHide()
-    $('#dlg-file-browse-operations .dlg-action-button').html('Overwriting <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  }
-
-  try {
-    const result = await Yoda.call('research_overwrite_folder',
-      {
-        folder_path: Yoda.basePath + folderPath,
-        new_folder_path: Yoda.basePath + newFolderPath,
-        action
-      },
-      { quiet: true, rawResult: true }
-    )
-
-    if (result.status === 'ok') {
-      if (multiple) {
-        $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text('Overwrite completed')
-        browse(currentBrowseFolder, true)
-      } else {
-        Yoda.set_message('success', 'The folder has been successfully overwritten.')
-        $('#dlg-file-browse-operations').modal('hide')
-      }
-    } else { // non api error
-      if (multiple) {
-        $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text(result.status_info)
-      } else {
-        dlgSelectAlertShow(result.status_info)
-      }
-    }
-  } catch (e) { // API ERROR
-    if (multiple) {
-      $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text(dlgSelectAlertShow(e.status_info))
-    } else {
-      dlgSelectAlertShow(e.status_info)
-    }
-  }
-  if (action === 'folder-copy' || action === 'copy') {
-    $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Copy</span>')
-  } else {
-    $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">Move</span>')
   }
 }
 
