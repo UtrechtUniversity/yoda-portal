@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Unit tests for portal utility functions.
-"""
+"""Unit tests for portal utility functions."""
 
-__copyright__ = "Copyright (c) 2023, Utrecht University"
-__license__   = "GPLv3, see LICENSE"
+__copyright__ = 'Copyright (c) 2023, Utrecht University'
+__license__   = 'GPLv3, see LICENSE'
 
 import sys
 from unittest import TestCase

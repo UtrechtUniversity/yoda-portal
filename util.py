@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-__copyright__ = "Copyright (c) 2021-2022, Utrecht University"
-__license__ = "GPLv3, see LICENSE"
+__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__license__   = 'GPLv3, see LICENSE'
 
 import sys
 import traceback
