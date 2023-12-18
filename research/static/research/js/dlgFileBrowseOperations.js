@@ -215,6 +215,13 @@ $(document).on('click', '.multi-cancel-button', function () {
   const index = $(this).closest('tr').attr('class').split('-').pop()
 
   $('.multi-select-table tr.row-' + index + ' td.item-progress').text('Overwrite cancelled')
+  if (($('#mutli-select-progress .dlg-multi-action-button span.action').text() === 'Copy and overwrite all') || ($('#mutli-select-progress .dlg-multi-action-button span.action').text() === 'Move and overwrite all')) {
+    $('#mutli-select-progress .dlg-multi-action-button').prop('disabled', true)
+  }
+})
+
+$(document).on('click', '.dlg-multi-action-button', function () {
+  $('.multi-overwrite-button').click()
 })
 
 async function copyFile (filepath, newFilepath, multiple, multipleIndex = null, overwrite = false) {
@@ -238,6 +245,7 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null, 
     if (result.status === 'ok') {
       if (multiple) {
         $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text('Copy completed')
+        $('#mutli-select-progress .dlg-multi-action-button').prop('disabled', true)
         browse(currentBrowseFolder, true)
       } else {
         Yoda.set_message('success', 'The file has been successfully copied.')
@@ -291,6 +299,7 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null, 
     if (result.status === 'ok') {
       if (multiple) {
         $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text('Move completed')
+        $('#mutli-select-progress .dlg-multi-action-button').prop('disabled', true)
         browse(currentBrowseFolder, true)
       } else {
         Yoda.set_message('success', 'The file has been successfully moved.')
@@ -346,6 +355,7 @@ async function copyFolder (folderPath, newFolderpath, multiple, multipleIndex = 
     if (result.status === 'ok') {
       if (multiple) {
         $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text('Copy completed')
+        $('#mutli-select-progress .dlg-multi-action-button').prop('disabled', true)
         browse(currentBrowseFolder, true)
       } else {
         Yoda.set_message('success', 'The folder has been successfully copied.')
@@ -399,6 +409,7 @@ async function moveFolder (folderPath, newFolderpath, multiple, multipleIndex = 
     if (result.status === 'ok') {
       if (multiple) {
         $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').text('Move completed')
+        $('#mutli-select-progress .dlg-multi-action-button').prop('disabled', true)
         browse(currentBrowseFolder, true)
       } else {
         Yoda.set_message('success', 'The folder has been successfully moved.')
@@ -721,6 +732,12 @@ function createOverwriteBtn(multipleIndex, path, type, action) {
   cancelOverwriteBtn = '<button type="button" class="btn btn-primary ms-2 multi-cancel-button" data-type="' + type + '" data-name="' +
   fileName + '" data-action="' + action + '" data-collection="' + filePath + '">No</button>'
   $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').append(overwriteBtn + cancelOverwriteBtn)
+
+  // Create Overwrite All button
+  $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">' + action.charAt(0).toUpperCase() + action.slice(1) 
+  + ' and overwrite all</span>')
+  $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
+  $('#mutli-select-progress .dlg-multi-action-button').prop('disabled', false)
 }
 
 function changeActionBtn(action) {
@@ -728,6 +745,6 @@ function changeActionBtn(action) {
     $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">' + action + ' and overwrite</span>')
   }
   else {
-    $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">' + action + 'Move</span>')
+    $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">' + action + '</span>')
   }
 }
