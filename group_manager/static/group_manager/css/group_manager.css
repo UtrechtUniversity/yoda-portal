@@ -92,7 +92,7 @@
 }
 
 .table-striped tbody tr.active td {
-    background-color: #ffcd00;
+    background-color: var(--bs-primary);
 }
 
 .placeholder-text {

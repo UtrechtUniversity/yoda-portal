@@ -6,10 +6,22 @@ __license__   = 'GPLv3, see LICENSE'
 import json
 import secrets
 from typing import List
+from uuid import uuid4
 
 import jwt
 import requests
-from flask import Blueprint, current_app as app, flash, g, redirect, render_template, request, Response, session, url_for
+from flask import (
+    Blueprint,
+    current_app as app,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    Response,
+    session,
+    url_for
+)
 from irods.exception import CAT_INVALID_AUTHENTICATION, CAT_INVALID_USER, iRODSException, PAM_AUTH_PASSWORD_FAILED
 from irods.session import iRODSSession
 
@@ -91,6 +103,14 @@ def login() -> Response:
             flash('Username/password was incorrect', 'danger')
             log_error("iRODS authentication failed for user " + username)
             return render_template('user/login.html', login_placeholder=get_login_placeholder())
+
+        except CAT_INVALID_USER:
+            log_error("iRODSException CAT_INVALID_USER for login of user " + str(username), True)
+            return render_template(
+                'user/login.html',
+                login_placeholder=get_login_placeholder(),
+                alert_user_not_in_instance=True
+            )
 
         except iRODSException:
             flash(
@@ -372,9 +392,10 @@ def should_redirect_to_oidc(username: str) -> bool:
     """Check if user should be redirected to OIDC based on domain."""
     if app.config.get('OIDC_ENABLED'):
         oidc_domain_list: List[str] = app.config.get('OIDC_DOMAINS', [])
-        return '@' in username and is_email_in_domains(username, oidc_domain_list)
-    else:
-        return False
+        if app.config.get('OIDC_ALWAYS_REDIRECT') or is_email_in_domains(username, oidc_domain_list):
+            return '@' in username
+
+    return False
 
 
 def oidc_authorize_url(username: str) -> str:
@@ -408,6 +429,9 @@ def irods_login(username: str, password: str) -> None:
 
     # This implicitly creates connections, and raises an exception on failure
     _ = irods.server_version
+
+    # Regenerate Flask session identifier.
+    session.sid = str(uuid4())
 
     session['user_id'] = username
     session['password'] = password

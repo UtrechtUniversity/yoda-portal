@@ -4,14 +4,13 @@
 
 {% block style %}
     <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='css/group_manager.css') }}">
-    <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.css') }}">
-    <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2/select2-bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('group_manager_bp.static', filename='lib/select2-bootstrap-5-theme/select2-bootstrap-5-theme.css') }}">
 {% endblock style %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='lib/jquery-migrate-3.4.1/jquery-migrate-3.4.1.min.js') }}"></script>
     <script src="{{ url_for('group_manager_bp.static', filename='js/group_manager.js') }}"></script>
-    <script src="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.min.js') }}"></script>
+    <script src="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.full.min.js') }}"></script>
     <script>
     $(function() {
         Yoda.groupManager.load({{ group_hierarchy | safe }}, {{ schema_ids | safe }}, '{{ schema_id_default }}', '{{ user_type }}', '{{ user_zone }}');
@@ -45,7 +44,9 @@
                 </ul>
             </div>
             <div class="mb-1">
-                <input name="user_name" id="search" class="form-control form-control-sm selectify-search mt-1" type="hidden" required placeholder="Click here to search..."/>
+                <select name="user_name" id="search" class="form-control form-control-sm selectify-search mt-1" required>
+                    <option></option>
+                </select>
             </div>
             <div class="tab-content" id="pills-tabContent">
                 <div class="tab-pane {% if show_list == "TREE" %} show active {% endif %}" id="pills-tree" role="tabpanel" aria-labelledby="pills-tree-tab">
@@ -108,7 +109,7 @@
                                             <li id="f-group-create-prefix-datamanager"><a href="#" data-value="datamanager-">datamanager-&nbsp;</a></li>
                                             <li><a href="#" data-value="research-">research-&nbsp;</a></li>
                                             {% if config.get('DEPOSIT_ENABLED', False) %}
-                                                <li><a href="#" data-value="deposit-">deposit-&nbsp;</a></li>
+                                            <li id="f-group-create-prefix-deposit"><a href="#" data-value="deposit-">deposit-&nbsp;</a></li>
                                             {% endif %}
                                             {% if config.get('INTAKE_ENABLED', False) %}
                                                 <li><a href="#" data-value="intake-">intake-&nbsp;</a></li>
@@ -125,7 +126,9 @@
                                 <i class="fa-solid fa-question-circle" aria-hidden="true" title="Category for this group (may only contain lowercase letters (a-z) and hyphens (-))"></i>
                             </label>
                             <div class="col-sm-8">
-                                <input name="group_category" id="f-group-create-category" class="form-control selectify-category" type="hidden" placeholder="Select a category or enter a new name" required data-subcategory="#f-group-create-subcategory" />
+                                <select name="group_category" id="f-group-create-category" class="form-control selectify-category" required data-subcategory="#f-group-create-subcategory">
+                                    <option></option>
+                                </select>
                             </div>
                         </div>
 
@@ -134,7 +137,9 @@
                                 <i class="fa-solid fa-question-circle" aria-hidden="true" title="Subcategory for this group (may only contain letters a-z, numbers, spaces, comma's, periods, parentheses, underscores (_) and hyphens (-))"></i>
                             </label>
                             <div class="col-sm-8">
-                                <input name="group_subcategory" id="f-group-create-subcategory" class="form-control selectify-subcategory" type="hidden" placeholder="Select a subcategory or enter a new name" required data-category="#f-group-create-category" />
+                                <select name="group_subcategory" id="f-group-create-subcategory" class="form-control selectify-subcategory" required data-category="#f-group-create-category">
+                                    <option></option>
+                                </select>
                             </div>
                         </div>
 
@@ -143,7 +148,9 @@
                                 <i class="fa-solid fa-question-circle" aria-hidden="true" title="Metadata schema for this group, this cannot be changed after group creation"></i>
                             </label>
                             <div class="col-sm-8">
-                                <input name="group_schema_id" id="f-group-create-schema-id" class="form-control selectify-schema-id" placeholder="Select a schema" required />
+                                <select name="group_schema_id" id="f-group-create-schema-id" class="form-control selectify-schema-id" required >
+                                    <option></option>
+                                </select>
                             </div>
                         </div>
 
@@ -223,7 +230,9 @@
                                 <i class="fa-solid fa-question-circle" aria-hidden="true" title="Category for this group (may only contain lowercase letters (a-z) and hyphens (-))"></i>
                             </label>
                             <div class="col-sm-8">
-                                <input name="group_category" id="f-group-update-category" class="form-control selectify-category" type="hidden" placeholder="Select a category or enter a new name" required data-subcategory="#f-group-update-subcategory" />
+                                <select name="group_category" id="f-group-update-category" class="form-control selectify-category" required data-subcategory="#f-group-update-subcategory">
+                                    <option></option>
+                                </select>
                             </div>
                         </div>
 
@@ -232,7 +241,9 @@
                                 <i class="fa-solid fa-question-circle" aria-hidden="true" title="Subcategory for this group (may only contain letters a-z, numbers, spaces, comma's, periods, parentheses, underscores (_) and hyphens (-))"></i>
                             </label>
                             <div class="col-sm-8">
-                                <input name="group_subcategory" id="f-group-update-subcategory" class="form-control selectify-subcategory" type="hidden" placeholder="Select a subcategory or enter a new name" required data-category="#f-group-update-category" />
+                                <select name="group_subcategory" id="f-group-update-subcategory" class="form-control selectify-subcategory" required data-category="#f-group-update-category">
+                                    <option></option>
+                                </select>
                             </div>
                         </div>
 
@@ -313,7 +324,9 @@
                     <form action="{{ url_for('group_manager_bp.user_create') }}" method="POST" class="form-inline" id="f-user-create">
                         <input name="group_name" id="f-user-create-group" type="hidden" />
                         <div class="input-group">
-                            <input name="user_name" id="f-user-create-name" class="form-control form-control-sm selectify-user-name" type="hidden" required placeholder="Click here to add a user..." data-group="#f-user-create-group" />
+                            <select name="user_name" id="f-user-create-name" class="form-control form-control-sm selectify-user-name" required data-group="#f-user-create-group" >
+                                <option></option>
+                            </select>
                             <div class="input-group-btn">
                                 <input id="f-user-create-submit" class="btn btn-primary btn-block btn-sm ms-2" type="submit" value="Add" />
                             </div>

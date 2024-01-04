@@ -1,0 +1,7 @@
+{% if config.get('YODA_ENVIRONMENT') == "development" %}
+<div class="non-production sticky-top text-bg-danger text-center fw-bold lh-1 p-1">This is a development environment!</div>
+{% elif config.get('YODA_ENVIRONMENT') == "testing" %}
+<div class="non-production sticky-top text-bg-warning text-center fw-bold lh-1 p-1">This is a testing environment!</div>
+{% elif config.get('YODA_ENVIRONMENT') == "acceptance" %}
+<div class="non-production sticky-top text-bg-success text-center fw-bold lh-1 p-1">This is an acceptance environment!</div>
+{% endif %}

@@ -76,6 +76,10 @@ table.dataTable tbody tr td a:hover {
   background-color: #005172;
 }
 
+.non-production {
+  z-index: 1021 !important;
+}
+
 [data-bs-theme=dark] {
   /* Logo */
   /* Tables */
@@ -102,7 +106,7 @@ table.dataTable tbody tr td a:hover {
 [data-bs-theme=dark] .dataTables_wrapper .dataTables_info {
   color: var(--bs-white);
 }
-[data-bs-theme=dark] .select2-container, [data-bs-theme=dark] .select2-input, [data-bs-theme=dark] .select2-chosen, [data-bs-theme=dark] .select2-drop, [data-bs-theme=dark] .select2-drop-mask {
+[data-bs-theme=dark] .select2-container, [data-bs-theme=dark] .select2-search-container, [data-bs-theme=dark] .select2-input, [data-bs-theme=dark] .select2-chosen, [data-bs-theme=dark] .select2-drop, [data-bs-theme=dark] .select2-drop-mask {
   color: var(--bs-body-color);
   background: var(--bs-body-bg);
 }

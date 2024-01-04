@@ -346,7 +346,7 @@ function handleGoToResearchButton (dir) {
   }
 }
 
-function handleGoToGroupManager(dir) {
+function handleGoToGroupManager (dir) {
   // Handle the button with which to return to the corresponding research area.
   const parts = dir.split('/')
 
@@ -666,7 +666,7 @@ function topInformation (dir, showAlert) {
       { quiet: true, rawResult: true }).then((dataRaw) => {
       const data = dataRaw.data
       if (dataRaw.status === 'error_nonexistent') {
-        Yoda.set_message('error', 'This vault space path does not exists: ' + dir)
+        Yoda.set_message('error', 'This vault space path does not exist: ' + dir)
         $('#file-browser_wrapper').addClass('hide')
         $('.top-information').addClass('hide')
 

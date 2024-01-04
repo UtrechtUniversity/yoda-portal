@@ -1,6 +1,9 @@
 {
   "standard": {
-    "globals": [ "Yoda", "$" ],
+    "globals": [
+      "Yoda",
+      "$"
+    ],
     "ignore": [
       "**/lib/",
       "**/intake/",
@@ -8,5 +11,8 @@
       "metadata-form.js",
       "datarequest/static/**"
     ]
+  },
+  "dependencies": {
+    "standard": "^17.1.0"
   }
 }

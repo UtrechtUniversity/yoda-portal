@@ -18,13 +18,15 @@ let schema       = {};
 let uiSchema     = {};
 let yodaFormData = {};
 
+let validator;
 let formProperties;
 
 let saving = false;
 
 let form = document.getElementById('form');
 
-const validator = customizeValidator({ AjvClass: Ajv2019, ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
+const validatorAjvDraft7 = customizeValidator({ ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
+const validatorAjv2019 = customizeValidator({ AjvClass: Ajv2019, ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
 
 const enumWidget = (props) => {
     let enumArray = props['schema']['enum'];
@@ -702,6 +704,13 @@ function loadForm() {
                 }
 
             } else {
+                // Select validator based on schema.
+                if (schema.$schema == "http://json-schema.org/draft-07/schema") {
+                    validator = validatorAjvDraft7
+                } else {
+                    validator = validatorAjv2019
+                }
+
                 // Metadata present or user has write access, load the form.
                 if (!formProperties.data.can_edit)
                     uiSchema['ui:readonly'] = true;
