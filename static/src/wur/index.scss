@@ -5,6 +5,16 @@
    color: $white !important;
 }
 
+/* Font color in group manager */
+#pills-list-tab, #pills-tree-tab {
+    color: var(--bs-card-cap-color)
+}
+
+/* Folder icons in group manager */
+.user-search-result-group.table-active .fa-folder {
+    color: var(--bs-black)
+}
+
 // Dark theme specific settings
 [data-bs-theme="dark"] {
     /* File browser rows */
@@ -19,5 +29,11 @@
 
     .logo {
         background-size: unset !important;
+    }
+
+    /* Ensure disabled items in lists (e.g. group manager) have same color
+as active items even in dark mode */
+    .list-group-item.disabled {
+        color: $white;
     }
 }

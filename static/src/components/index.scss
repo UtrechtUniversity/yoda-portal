@@ -23,6 +23,21 @@
     z-index: 1021 !important;
 }
 
+/* Group manager */
+.list-group-item a {
+    color: var(--bs-list-group-color)
+}
+
+/* Folder icons in group manager */
+.user-search-result-group .fa-folder {
+    color: var(--bs-body-color)
+}
+
+/* List group collapsible categories and subcategories */
+.list-group-item.active, .list-group-item.active a {
+    color: var(--bs-list-group-active-color)
+}
+
 // Dark theme specific settings
 [data-bs-theme="dark"] {
     /* Logo */

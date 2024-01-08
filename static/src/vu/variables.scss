@@ -26,8 +26,13 @@ $link-color: $black;
 // Bootstrap list group
 $list-group-active-color: $black;
 
-// Bootstrap bage
+// Bootstrap badge
 $badge-font-size: .65em;
+
+// Group manager table
+// Active color is black in light mode
+$table-active-color: $black;
+$table-active-bg: $primary;
 
 // Bootstrap dropdown z-index
 $zindex-dropdown: 1021;
