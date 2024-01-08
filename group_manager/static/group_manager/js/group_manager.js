@@ -911,14 +911,14 @@ $(function () {
       const categoryName = group.category
       const userCanManage = this.canManageGroup(groupName)
 
-      // TRee
+      // Tree
       const $groupList = $('#group-list')
       const $group = $groupList.find('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]')
       const $oldGroup = $groupList.find('.active')
 
       // group list handling row activation
       const listgroup = $('#tbl-list-groups tr[user-search-result-group="' + Yoda.escapeQuotes(groupName) + '"]')
-      listgroup.addClass('active').siblings().removeClass('active')
+      listgroup.addClass('table-active').siblings().removeClass('table-active')
 
       if ($group.is($oldGroup)) { return }
 
@@ -1570,7 +1570,8 @@ $(function () {
           placeholder: 'Click here to search...',
           allowClear: true,
           openOnEnter: false,
-          minimumInputLength: 3
+          minimumInputLength: 3,
+          width: 'element'
         }).on('select2:open', function () {
           $(this).val(null)
         }).on('change', function () {

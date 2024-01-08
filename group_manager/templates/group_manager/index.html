@@ -337,11 +337,11 @@
                     <div class="input-group-sm float-start">
                         Change role:
 
-                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="reader" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Viewer rights"><i class="fa-solid fa-eye" aria-hidden="true"></i> Viewer</a>
-                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="normal" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Member rights"><i class="fa-solid fa-user" aria-hidden="true"></i> Member</a>
-                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="manager" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Manager rights"><i class="fa-solid fa-crown" aria-hidden="true"></i> Manager</a>
+                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="reader" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Viewer rights"><i class="fa-solid fa-eye" aria-hidden="true"></i> <span class="d-none d-xl-inline-block">Viewer</span></a>
+                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="normal" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Member rights"><i class="fa-solid fa-user" aria-hidden="true"></i> <span class="d-none d-xl-inline-block">Member</span></a>
+                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="manager" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Manager rights"><i class="fa-solid fa-crown" aria-hidden="true"></i> <span class="d-none d-xl-inline-block">Manager</span></a>
 
-                        <a class="btn btn-sm btn-danger disabled delete-button ms-2" id="btn-remove-user-from-group" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group"><i class="fa-solid fa-trash" aria-hidden="true"></i> Remove member(s)</a>
+                        <a class="btn btn-sm btn-danger disabled delete-button ms-2" id="btn-remove-user-from-group" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group"><i class="fa-solid fa-trash" aria-hidden="true"></i> <span class="d-none d-xxl-inline-block">Remove member(s)</span></a>
                     </div>
                 </div>
             </div>
