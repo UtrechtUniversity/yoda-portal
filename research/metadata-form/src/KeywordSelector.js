@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import axios from "axios";
 
 var self = null;
+let json = {};
 
 const customModalStyles = {
     content : {
@@ -21,15 +22,13 @@ class KeywordSelector extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            ...props.formData,
-            json: ""
+            ...props.formData
         };
 
         const url = 'https://raw.githubusercontent.com/UtrechtUniversity/yoda-ruleset/epos-keyword-selector/vocabularies/epos-keywords.json';
         const loadData = async () => {
             await axios.get(url).then((res) => {
-                let json = res.data;
-                this.setState({ json: json });
+                this.json = res.data;
             });
         };
         loadData();
@@ -37,7 +36,7 @@ class KeywordSelector extends React.Component {
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.afterOpenModal = this.afterOpenModal.bind(this);
-        this.setFormData = this.setFormData.bind(this);
+        this.addKeyword = this.addKeyword.bind(this);
     }
 
     openModal(e) {
@@ -56,7 +55,9 @@ class KeywordSelector extends React.Component {
 
     afterOpenModal(e) {
         self = this;
+
         $.jstree.defaults.core.themes.responsive = true;
+
         $('#tree').jstree({
             plugins: ["checkbox", "wholerow", "search"],
             "types": {
@@ -65,7 +66,7 @@ class KeywordSelector extends React.Component {
                 }
             },
             'core': {
-                'data': this.state.json
+                'data': this.json
             },
             checkbox: {
                 three_state : false, // to avoid that fact that checking a node also check others
@@ -91,13 +92,12 @@ class KeywordSelector extends React.Component {
                 $('#tree').jstree('search', searchString);
             });
         });
-
     }
 
-    setFormData(fieldName, fieldValue) {
-        this.setState({
-            [fieldName]: fieldValue
-        }, () => this.props.onChange(this.state));
+    addKeyword(keyword, valueUri) {
+        this.setState({"keywords": [
+                {"keyword": keyword, "valueURI": valueUri}
+        ]}, () => this.props.onChange(this.state));
     }
 
     addItem(node) {
@@ -110,7 +110,7 @@ class KeywordSelector extends React.Component {
             $("#tree").jstree("uncheck_node", node.id);
         });
 
-        console.log(node);
+        this.addKeyword(node.text, node.original.extra.uri);
     }
 
     removeItem(node) {
@@ -160,6 +160,10 @@ class KeywordSelector extends React.Component {
                                 {this.props.uiSchema["ui:description"]}
                             </small>
                         </small>
+                        {this.props.formData.Keywords &&
+                         this.props.formData.Keywords.map(el => (
+                        <div>test</div>
+                        ))}
                     </div>
                 </div>
             </div>

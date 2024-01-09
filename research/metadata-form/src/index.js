@@ -463,9 +463,20 @@ class YodaForm extends React.Component {
     }
 
     onChange(form) {
-        console.log(form);
+        if ("keywords" in form.formData.Keywords) {
+            let keywords = [];
+            form.formData.Keyword = form.formData.Keyword.filter(x => x);
+            form.formData.Keywords.keywords.forEach(keyword => {
+                form.formData.Keyword.push(keyword.keyword);
+                keywords.push({"Keyword": keyword.keyword, "Uri": keyword.valueUri});
+            })
+            delete form.formData.Keywords.keywords;
+            form.formData.Keywords = keywords;
+            this.setState({ formData: form.formData });
+        }
         updateCompleteness();
     }
+
 
     onError(form) {
         let formContext = {...this.state.formContext};
