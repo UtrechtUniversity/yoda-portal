@@ -16,8 +16,8 @@ from flask import (
 from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
-from werkzeug.utils import secure_filename
 from requests.utils import quote
+from werkzeug.utils import secure_filename
 
 import api
 import connman
