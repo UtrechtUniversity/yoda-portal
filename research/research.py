@@ -17,6 +17,7 @@ from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
 from werkzeug.utils import secure_filename
+from requests.utils import quote
 
 import api
 import connman
@@ -185,7 +186,7 @@ def upload_get() -> Response:
         else:
             raise Exception
     except Exception:
-        # Chunk does not exists and needs to be uploaded.
+        # Chunk does not exist and needs to be uploaded.
         response = make_response(jsonify({"message": "Chunk not found"}), 204)
         response.headers["Content-Type"] = "application/json"
         return response
@@ -266,8 +267,11 @@ def upload_post() -> Response:
 @research_bp.route('/metadata/form')
 def form() -> Response:
     path = request.args.get('path')
+    escape_path = quote(path)
+    if path != escape_path:
+        abort(404)
 
-    return render_template('research/metadata-form.html', path=path)
+    return render_template('research/metadata-form.html', path=escape_path)
 
 
 @research_bp.route('/browse/download_checksum_report')
