@@ -159,7 +159,8 @@ function readCsvFile (e) {
     // ensure correct seperator ','
     contents = contents.replaceAll(';', ',')
 
-    // required to be able to, in a simple manner, add header and data row to the tr's in the table to pass to the backend
+    // required to be able to, in a simple manner, add header and data row
+    // to the tr's in the table to pass to the backend
     const csvHeader = contents.slice(0, contents.indexOf('\n'))
     const csvRows = contents.slice(contents.indexOf('\n') + 1).split('\n')
     const csvRowsCorrected = []
@@ -167,26 +168,25 @@ function readCsvFile (e) {
     // parse the csv file data to be able to present in a table
     const result = csvToArray(contents)
 
-    // first row will contain fixed definion
-    const arKeys = result[0]
-
-    // For compressing all columns to  keys: category, subcategory, groupname and usercount
-    const presentationColumns = ['groupname', 'category', 'subcategory', 'users']
-    const allCsvColumns = ['groupname', 'category', 'subcategory', 'manager', 'member', 'viewer']
+    // For compressing all columns to keys: category, subcategory, groupname, schema, expiration, and usercount
+    const presentationColumns = ['groupname', 'category', 'subcategory', 'schema_id', 'expiration_date', 'users']
+    // Only the columns that directly display their values
+    const directlyPresentColumns = ['groupname', 'category', 'subcategory', 'schema_id', 'expiration_date']
+    const allCsvColumns = ['groupname', 'category', 'subcategory', 'manager', 'member', 'viewer', 'schema_id', 'expiration_date']
 
     // First validate the headers found values in csvHeader
     // 'groupname', 'category', 'subcategory' MUST be present
-    // 'manager', 'member', 'viewer' like for instance manager:manager,member:member1,member:member2
+    // 'manager', 'member', 'viewer', 'expiration_date', 'schema_id' like for instance manager,member,member
 
     // per csvHeader item check whether its valid
     let errorRows = ''
     csvHeader.split(',').forEach(function myFunction (item) {
-      if (!allCsvColumns.includes(item) && !allCsvColumns.includes(item.split(':')[0])) {
-        errorRows += '<tr><td> - ' + item + '</td></tr>'
+      if (!allCsvColumns.includes(item)) {
+        errorRows += '<li>' + item + '</li>'
       }
     })
     if (errorRows) {
-      $('#result-import-groups-csv').html('</br>The uploaded CSV contains the following invalid header names:<br/><table>' + errorRows + '</table>')
+      $('#result-import-groups-csv').html('</br>The uploaded CSV contains the following invalid header names:<br/><ul>' + errorRows + '</ul>')
       return
     }
 
@@ -202,26 +202,22 @@ function readCsvFile (e) {
       })
 
       // now loop through the received rows and put them in the right presentation columns
-      for (const key of Object.keys(arKeys)) {
-        allCsvColumns.forEach(function myFunction (column) {
-          if (key === column) {
-            row[column] = groupDef[key]
-          } else if (key.startsWith(column)) {
-            if (groupDef[key] !== '\r') {
-              if (row.users === '') {
-                row.users = '1'
-              } else {
-                row.users = (parseInt(row.users) + 1).toString()
-              }
-            }
+      allCsvColumns.forEach(function myFunction (column) {
+        if (groupDef[column] !== undefined && directlyPresentColumns.includes(column)) {
+          row[column] = groupDef[column][0]
+        } else if (groupDef[column] !== undefined && groupDef[column] !== '\r') {
+          if (row.users === '') {
+            row.users = groupDef[column].length.toString()
+          } else {
+            row.users = (parseInt(row.users) + groupDef[column].length).toString()
           }
-        })
-      }
+        }
+      })
 
       // only show row when all required data is present.
       let rowError = false
       presentationColumns.forEach(function myFunction (column) {
-        if (!rowError && (row[column] === undefined || row[column] === '')) {
+        if (!rowError && (row[column] === undefined || row[column] === '') && column !== 'schema_id' && column !== 'expiration_date') {
           rowError = true
         }
       })
@@ -235,7 +231,7 @@ function readCsvFile (e) {
     // build the header row of the table
     let table = '<table class="table table-striped"><thead><tr><th></th>'
     presentationColumns.forEach(function myFunction (column) {
-      table += '<th>' + column + '</th>'
+      table += '<th>' + column.replace('_', ' ') + '</th>'
     })
     table += '<td></td></tr></thead><tbody>'
 
@@ -268,11 +264,21 @@ function csvToArray (str, delimiter = ',') {
   const arr = rows.map(function (row) {
     const values = row.split(delimiter)
     const el = headers.reduce(function (object, header, index) {
-      object[header] = values[index]
+      if (values[index] != null && values[index] !== '') {
+        if (!(header in object)) {
+          object[header] = []
+        }
+
+        object[header].push(values[index])
+      }
       return object
     }, {})
     return el
   })
+
+  if (arr.length > 0 && jQuery.isEmptyObject(arr[arr.length - 1])) {
+    return arr.slice(0, arr.length - 1)
+  }
 
   return arr
 }

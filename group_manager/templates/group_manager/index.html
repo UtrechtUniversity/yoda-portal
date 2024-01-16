@@ -398,22 +398,24 @@
                   </dl>
 
                   <p>
-                    The remainder of the columns should have a label that starts with a prefix which indicates the role of each group member.
+                    The file can optionally include the labels <b>schema_id</b> and <b>expiration_date</b>, each can be included up to one time.
+                    The remainder of the columns should have a label that indicates the role of each group member.
+                    Columns of these types may appear multiple times.
                     Columns may appear in any order and empty data cells are ignored: groups can differ in number of members.
                   </p>
                   <dl class="row">
-                    <dt class="col-sm-2">manager:</dt>
+                    <dt class="col-sm-2">manager</dt>
                     <dd class="col-sm-10">User that will be given the role of manager</dd>
-                    <dt class="col-sm-2">member:</dt>
+                    <dt class="col-sm-2">member</dt>
                     <dd class="col-sm-10">User that will be given the role of member with read/write</dd>
-                    <dt class="col-sm-2">viewer:</dt>
+                    <dt class="col-sm-2">viewer</dt>
                     <dd class="col-sm-10">User that will be given the role of viewer with read</dd>
                   </dl>
 
                   <h5>Example:</h5>
-<pre>category,subcategory,groupname,manager:manager,member:member1,member:member2
-departmentx,teama,groupteama,m.manager@example.com,m.member@example.com,n.member@example.com
-departmentx,teamb,groupteamb,m.manager@example.com,p.member@example.com,</pre>
+<pre>category,subcategory,groupname,manager,member,member,schema_id,expiration_date
+departmentx,teama,groupteama,m.manager@example.com,m.member@example.com,n.member@example.com,default-3,2026-01-01
+departmentx,teamb,groupteamb,m.manager@example.com,p.member@example.com,,,</pre>
                 </div>
               </div>
             </div>
