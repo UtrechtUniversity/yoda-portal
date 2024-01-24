@@ -193,6 +193,26 @@ function readCsvFile (e) {
     const newResult = []
     let rowNr = 0
 
+    // Verify that CSV data does not have duplicate groups, since this can result in unexpected problems, such
+    // as trying to create the same group twice.
+    let groupsSeen = new Set()
+    let duplicateGroups = new Set()
+
+    result.forEach(function scanDuplicates (groupDef) {
+        let groupname = groupDef.groupname[0]
+
+        if (groupsSeen.has(groupname)) {
+          duplicateGroups.add(groupname)
+        } else {
+          groupsSeen.add(groupname)
+        }
+    } );
+
+    if (duplicateGroups.size > 0 ) {
+      $('#result-import-groups-csv').html('<br>The uploaded CSV data contains one or more duplicate group names: ' + Array.from(duplicateGroups).join(','))
+      return
+    }
+
     result.forEach(function myFunction (groupDef) {
       // initialise all columns that must be present in the view
       const row = []
