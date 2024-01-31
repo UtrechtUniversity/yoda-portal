@@ -154,14 +154,19 @@ function readCsvFile (e) {
     let contents = e.target.result
 
     // remove unwanted characters
-    contents = contents.replaceAll('"', '').replaceAll("'", '').replaceAll(' ', '')
+    contents = contents.replaceAll('"', '').replaceAll("'", '').replaceAll(' ', '').replaceAll('\r', '')
+
+    // remove extra newline at end of file
+    if (contents[contents.length - 1] === '\n') {
+      contents = contents.slice(0, contents.length - 1)
+    }
 
     // ensure correct seperator ','
     contents = contents.replaceAll(';', ',')
 
     // required to be able to, in a simple manner, add header and data row
     // to the tr's in the table to pass to the backend
-    const csvHeader = contents.slice(0, contents.indexOf('\n'))
+    const csvHeader = contents.slice(0, contents.indexOf('\n')).trim()
     const csvRows = contents.slice(contents.indexOf('\n') + 1).split('\n')
     const csvRowsCorrected = []
 
