@@ -82,7 +82,7 @@ const getSearchResults = (() => {
       offset: args.start,
       limit: $("select[name='search_length']").val(),
       sort_order: args.order[0].dir,
-      sort_on: ['name', 'size', 'modified'][args.order[0].column]
+      sort_on: ['name', 'modified'][args.order[0].column]
     })
 
     // If another requests has come while we were waiting, simply drop this one.
@@ -187,7 +187,6 @@ function search () {
       },
       {
         render: resultsRenderer.date,
-        orderable: false,
         data: 'modify_time'
       }
       ]
