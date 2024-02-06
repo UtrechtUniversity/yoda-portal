@@ -20,7 +20,7 @@
         <div class="card">
             <div class="card-header clearfix">
                 <h3 class="card-title float-start">
-                    Metadata form - {{ path | trim | safe }}
+                    Metadata form - {{ path | trim }}
                 </h3>
                 <div class="input-group-sm has-feedback float-end">
                     <a class="btn btn-secondary" href="/vault/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
@@ -45,7 +45,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title float-start">
-                    Metadata form - {{ path | trim | safe }}
+                    Metadata form - {{ path | trim }}
                 </h5>
                 <div class="input-group-sm has-feedback float-end close-button">
                     <a class="btn btn-secondary btn-sm" href="/vault/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
@@ -56,13 +56,13 @@
                     <p>There is no metadata present for this folder.</p>
                 </div>
                 <div id="form"
-                     data-path="{{ path | safe }}">
+                     data-path="{{ path }}">
                     <p>Loading metadata <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
                 </div>
             </div>
             <div class="card-footer">
                 <h5 class="card-title float-start">
-                    Metadata form - {{ path | trim | safe }}
+                    Metadata form - {{ path | trim }}
                 </h5>
                 <div class="input-group-sm has-feedback float-end close-button">
                     <a class="btn btn-secondary btn-sm" href="/vault/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>

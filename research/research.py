@@ -16,7 +16,6 @@ from flask import (
 from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 from irods.message import iRODSMessage
-from requests.utils import quote
 from werkzeug.utils import secure_filename
 
 import api
@@ -267,11 +266,7 @@ def upload_post() -> Response:
 @research_bp.route('/metadata/form')
 def form() -> Response:
     path = request.args.get('path')
-    escape_path = quote(path)
-    if path != escape_path:
-        abort(404)
-
-    return render_template('research/metadata-form.html', path=escape_path)
+    return render_template('research/metadata-form.html', path=path)
 
 
 @research_bp.route('/browse/download_checksum_report')
