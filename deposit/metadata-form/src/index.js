@@ -115,11 +115,11 @@ const enumWidget = (props) => {
          * option/backgroundColor:active
          */
         primary50: '#2b3035',
-        primary75: '#2b3035',
+        primary75: '#2b3035'
     };
 
     // Check what theme is set
-    const colorMode = document.documentElement.getAttribute('data-bs-theme');
+    const colorMode = document.documentElement.getAttribute('data-bs-theme')
 
     let required = props.required
     let error = "should be equal to one of the allowed values";

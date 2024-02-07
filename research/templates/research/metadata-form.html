@@ -22,7 +22,7 @@
         <div class="card">
             <div class="card-header clearfix">
                 <h5 class="card-title float-start">
-                    Metadata form - {{ path | trim | safe }}
+                    Metadata form - {{ path | trim }}
                 </h5>
                 <div class="input-group-sm has-feedback float-end">
                     <a class="btn btn-secondary" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
@@ -51,7 +51,7 @@
         <div class="card">
             <div class="card-header clearfix">
                 <h5 class="card-title float-start">
-                    Metadata form - {{ path | trim | safe }}
+                    Metadata form - {{ path | trim }}
                 </h5>
                 <div class="input-group-sm has-feedback float-end close-button hide">
                     <a class="btn btn-secondary" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
@@ -77,7 +77,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title float-start">
-                    Metadata form - {{ path | trim | replace(" ", "&nbsp;") | safe }}
+                    Metadata form - {{ path | trim }}
                 </h5>
                 <div class="input-group-sm has-feedback float-end close-button">
                     <a class="btn btn-secondary btn-sm" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
@@ -91,7 +91,7 @@
                     <p>There is no metadata present for this folder and the folder is locked.</p>
                 </div>
                 <div id="form"
-                     data-path="{{ path | safe }}"
+                     data-path="{{ path }}"
                      data-csrf_token_name="{{ tokenName | urlencode }}"
                      data-csrf_token_hash="{{ tokenHash | urlencode }}">
                     <p>Loading metadata <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
@@ -99,7 +99,7 @@
             </div>
             <div class="card-footer">
                 <h5 class="card-title float-start">
-                    Metadata form - {{ path | trim | replace(" ", "&nbsp;") | safe }}
+                    Metadata form - {{ path | trim }}
                 </h5>
                 <div class="input-group-sm has-feedback float-end close-button">
                     <a class="btn btn-secondary btn-sm" href="/research/browse?dir={{ path | urlencode | replace("/", "%2F") }}">Close</a>
