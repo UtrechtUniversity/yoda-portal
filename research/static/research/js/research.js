@@ -13,6 +13,7 @@ $(document).ajaxSend(function (e, request, settings) {
 let preservableFormatsLists = null
 let currentFolder
 let filenames = []
+let hasReadRights = true
 
 $(function () {
   // Extract current location from query string (default to '').
@@ -21,6 +22,9 @@ $(function () {
 
   // Canonicalize path somewhat, for convenience.
   currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '')
+
+  // Needed for the table to show the links depending on permissions
+  topInformation(currentFolder, true)
 
   if ($('#file-browser').length) {
     startBrowsing()
@@ -402,31 +406,6 @@ $(function () {
   $('body').on('dragbetterleave', function (event) {
     $('.upload-drop').removeClass('drag-upload')
     $('#messages').html('')
-  })
-
-  $('body').on('click', 'a.view-video', function () {
-    const path = $(this).attr('data-path')
-    const viewerHtml = `<video width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></video>`
-    $('#viewer').html(viewerHtml)
-    $('#viewMedia').modal('show')
-  })
-
-  $('body').on('click', 'a.view-audio', function () {
-    const path = $(this).attr('data-path')
-    const viewerHtml = `<audio width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></audio>`
-    $('#viewer').html(viewerHtml)
-    $('#viewMedia').modal('show')
-  })
-
-  $('body').on('click', 'a.view-image', function () {
-    const path = $(this).attr('data-path')
-    const viewerHtml = `<img width="640" src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}" />`
-    $('#viewer').html(viewerHtml)
-    $('#viewMedia').modal('show')
-  })
-
-  $('#viewMedia.modal').on('hidden.bs.modal', function () {
-    $('#viewer').html('')
   })
 
   $('body').on('click', 'a.action-lock', function () {
@@ -832,6 +811,38 @@ function handleGoToGroupManager (dir) {
   }
 }
 
+function determineFileIcon (name, rowType, fileType) {
+  // Determine icon
+  if (rowType === 'coll') {
+    return 'fa-folder'
+  } else if (Yoda.isTextExtension(name)) {
+    return 'fa-file-lines'
+  } else if (fileType) {
+    switch (fileType) {
+      case 'audio':
+        return 'fa-file-audio'
+      case 'video':
+        return 'fa-file-video'
+      case 'image':
+        return 'fa-file-image'
+    }
+  } else {
+    return 'fa-file'
+  }
+}
+
+function determineNameHTML (name, row, tgt, fileType, icon) {
+  if (row.type === 'coll') {
+    return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+  } else if (hasReadRights && Yoda.isTextExtension(name) && row.size < 4 * 1024 * 1024) {
+    return `<a href="/fileviewer?file=${encodeURIComponent(tgt)}" target="_blank" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+  } else if (hasReadRights && fileType) {
+    return `<a href="/fileviewer?file=${encodeURIComponent(tgt)}" target="_blank" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+  } else {
+    return `<i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}`
+  }
+}
+
 function makeBreadcrumb (dir) {
   const pathParts = dir.split('/').filter(x => x.length)
 
@@ -960,7 +971,10 @@ const tableRenderer = {
   },
   name: (name, _, row) => {
     const tgt = `${currentFolder}/${name}`
-    if (row.type === 'coll') { return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>` } else return `<i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}`
+    const fileType = Yoda.viewableExtensionType(name)
+    const icon = determineFileIcon(name, row.type, fileType)
+
+    return determineNameHTML(name, row, tgt, fileType, icon)
   },
   size: (size, _, row) => {
     if (row.type === 'coll') {
@@ -1014,20 +1028,7 @@ const tableRenderer = {
         // no context menu for data objects migrating from or to tape archive
         return ''
       } else {
-        // Render context menu for files.
-        const viewExts = {
-          image: ['jpg', 'jpeg', 'gif', 'png', 'webp'],
-          audio: ['aac', 'flac', 'mp3', 'ogg', 'wav'],
-          video: ['mp4', 'ogg', 'webm']
-        }
-        const ext = row.name.replace(/.*\./, '').toLowerCase()
-
         actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
-
-        // Generate dropdown "view" actions for different media types.
-        for (const type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-          actions.append(`<a class="dropdown-item view-${type}" data-path="${Yoda.htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`)
-        }
 
         actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this file">Rename</a>`)
         actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this file">Copy</a>`)
@@ -1182,7 +1183,7 @@ function topInformation (dir, showAlert) {
       { path: Yoda.basePath + dir },
       { quiet: true, rawResult: true }).then((dataRaw) => {
       if (dataRaw.status === 'error_nonexistent') {
-        Yoda.set_message('error', 'This research space path does not exists: ' + dir)
+        Yoda.set_message('error', 'This research space path does not exist: ' + dir)
         $('#file-browser_wrapper').addClass('hide')
         $('.top-information').addClass('hide')
 
@@ -1253,6 +1254,12 @@ function topInformation (dir, showAlert) {
         $('.btn-group button.metadata-form').show()
 
         $('.btn-group button.folder-status').attr('data-datamanager', isDatamanager)
+      }
+
+      if (userType === 'none') {
+        hasReadRights = false
+      } else {
+        hasReadRights = true
       }
 
       if (userType === 'reader' || userType === 'none') {

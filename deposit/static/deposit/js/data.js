@@ -12,6 +12,7 @@ $(document).ajaxSend(function (e, request, settings) {
 
 let currentFolder
 let filenames = []
+const hasReadRights = true
 
 $(function () {
   // Canonicalize path somewhat, for convenience.
@@ -315,31 +316,6 @@ $(function () {
     $('#messages').html('')
   })
 
-  $('body').on('click', 'a.view-video', function () {
-    const path = $(this).attr('data-path')
-    const viewerHtml = `<video width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></video>`
-    $('#viewer').html(viewerHtml)
-    $('#viewMedia').modal('show')
-  })
-
-  $('body').on('click', 'a.view-audio', function () {
-    const path = $(this).attr('data-path')
-    const viewerHtml = `<audio width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></audio>`
-    $('#viewer').html(viewerHtml)
-    $('#viewMedia').modal('show')
-  })
-
-  $('body').on('click', 'a.view-image', function () {
-    const path = $(this).attr('data-path')
-    const viewerHtml = `<img width="640" src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}" />`
-    $('#viewer').html(viewerHtml)
-    $('#viewMedia').modal('show')
-  })
-
-  $('#viewMedia.modal').on('hidden.bs.modal', function () {
-    $('#viewer').html('')
-  })
-
   $('body').on('click', '.browse', function (e) {
     browse($(this).attr('data-path'), true)
     // Dismiss stale messages.
@@ -569,6 +545,38 @@ async function handleFileDelete (collection, fileName) {
   $('#file-delete .btn-confirm-file-delete').html('Delete file')
 }
 
+function determineFileIcon (name, rowType, fileType) {
+  // Determine icon
+  if (rowType === 'coll') {
+    return 'fa-folder'
+  } else if (Yoda.isTextExtension(name)) {
+    return 'fa-file-lines'
+  } else if (fileType) {
+    switch (fileType) {
+      case 'audio':
+        return 'fa-file-audio'
+      case 'video':
+        return 'fa-file-video'
+      case 'image':
+        return 'fa-file-image'
+    }
+  } else {
+    return 'fa-file'
+  }
+}
+
+function determineNameHTML (name, row, tgt, fileType, icon) {
+  if (row.type === 'coll') {
+    return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+  } else if (hasReadRights && Yoda.isTextExtension(name) && row.size < 4 * 1024 * 1024) {
+    return `<a href="/fileviewer?file=${encodeURIComponent(tgt)}" target="_blank" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+  } else if (hasReadRights && fileType) {
+    return `<a href="/fileviewer?file=${encodeURIComponent(tgt)}" target="_blank" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+  } else {
+    return `<i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}`
+  }
+}
+
 function fileMgmtDialogAlert (dlgName, alert) {
   // Alerts regarding folder/file management
   // Inside the modals
@@ -735,7 +743,10 @@ const tableRenderer = {
   },
   name: (name, _, row) => {
     const tgt = `${currentFolder}/${name}`
-    if (row.type === 'coll') { return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>` } else return `<i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}`
+    const fileType = Yoda.viewableExtensionType(name)
+    const icon = determineFileIcon(name, row.type, fileType)
+
+    return determineNameHTML(name, row, tgt, fileType, icon)
   },
   size: (size, _, row) => {
     if (row.type === 'coll') {
@@ -774,20 +785,7 @@ const tableRenderer = {
       actions.append(`<a href="#" class="dropdown-item folder-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this folder">Move</a>`)
       actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
     } else {
-      // Context menu for files
-      const viewExts = {
-        image: ['jpg', 'jpeg', 'gif', 'png', 'webp'],
-        audio: ['aac', 'flac', 'mp3', 'ogg', 'wav'],
-        video: ['mp4', 'ogg', 'webm']
-      }
-      const ext = row.name.replace(/.*\./, '').toLowerCase()
-
       actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
-
-      // Generate dropdown "view" actions for different media types.
-      for (const type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-        actions.append(`<a class="dropdown-item view-${type}" data-path="${Yoda.htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`)
-      }
 
       actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this file">Rename</a>`)
       actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this file">Copy</a>`)

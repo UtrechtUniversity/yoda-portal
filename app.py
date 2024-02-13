@@ -19,6 +19,7 @@ from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
 from open_search.open_search import open_search_bp
 from research.research import research_bp
+from fileviewer.fileviewer import fileviewer_bp
 from search.search import search_bp
 from stats.stats import stats_bp
 from user.user import user_bp
@@ -86,6 +87,7 @@ Session(app)
 with app.app_context():
     app.register_blueprint(general_bp)
     app.register_blueprint(group_manager_bp, url_prefix='/group_manager')
+    app.register_blueprint(fileviewer_bp, url_prefix='/fileviewer')
     app.register_blueprint(research_bp, url_prefix='/research')
     app.register_blueprint(stats_bp, url_prefix='/stats')
     app.register_blueprint(user_bp, url_prefix='/user')
