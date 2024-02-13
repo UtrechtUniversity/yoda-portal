@@ -9,20 +9,19 @@ import threading
 from typing import Iterator
 
 from flask import (
-    abort, Blueprint, current_app as app, g,
+    abort, Blueprint, g,
     render_template, request, Response, session, stream_with_context
 )
 from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 
-import api
 import connman
 from util import log_error
 
 fileviewer_bp = Blueprint('fileviewer_bp', __name__,
-                        template_folder='templates',
-                        static_folder='static/fileviewer',
-                        static_url_path='/assets')
+                          template_folder='templates',
+                          static_folder='static/fileviewer',
+                          static_url_path='/assets')
 
 
 class Chunk:
