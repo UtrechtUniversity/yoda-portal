@@ -36,7 +36,12 @@ async function getTextObj (currentFileExtension) {
       })
     let textWithSyntax
     if (data.length && currentFileExtension.length) {
-      textWithSyntax = hljs.highlight(data, { language: currentFileExtension }).value
+      try {
+        textWithSyntax = hljs.highlight(data, { language: currentFileExtension }).value
+      } catch (errorHighlighting) {
+        // Fallback to not highlighting document
+        textWithSyntax = hljs.highlight(data, { language: 'txt' }).value
+      }
       $('#file-contents').html(textWithSyntax)
       $('#file-errors').hide()
       $('#file-output').show()
