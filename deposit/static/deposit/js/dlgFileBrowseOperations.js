@@ -545,7 +545,11 @@ const tableRendererColl = {
 }
 
 function dlgBrowse (dir) {
-  dir = decodeURIComponent(dir)
+  // Only decode if the directory has 'deposit-' prefix
+  if ((dir.substring(dir.lastIndexOf("/")+1)).includes('deposit-')) {
+    dir = decodeURIComponent(dir)
+  }
+
   dlgCurrentFolder = dir
 
   dlgSelectAlertHide()
