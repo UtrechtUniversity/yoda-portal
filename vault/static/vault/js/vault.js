@@ -307,8 +307,8 @@ function browse (dir = '', changeHistory = false) {
     $('.alert.is-archived').hide()
     $('.alert.is-processing').hide()
   }
-  topInformation(dir, true) // only here topInformation should show its alertMessage
-  buildFileBrowser(dir)
+  // only here topInformation should show its alertMessage and rebuild the file browser
+  topInformation(dir, true, true)
 }
 
 function handleGoToResearchButton (dir) {
@@ -657,7 +657,7 @@ window.addEventListener('popstate', function (e) {
   browse('dir' in query ? query.dir : '')
 })
 
-function topInformation (dir, showAlert) {
+function topInformation (dir, showAlert, rebuildFileBrowser = false) {
   if (typeof dir !== 'undefined') {
     Yoda.call('vault_collection_details',
       { path: Yoda.basePath + dir },
@@ -689,15 +689,12 @@ function topInformation (dir, showAlert) {
       $('.top-information').hide()
       $('.top-info-buttons').hide()
 
-      if (hasDatamanager && isDatamanager) {
-        // Datamanager case
+      if (userType !== 'none' || isDatamanager) {
+        // Datamanager, Researcher, normal, groupmanager cases
         hasReadRights = true
-      } else if (userType === 'none') {
-        // Technicaladmin case
-        hasReadRights = false
       } else {
-        // Researcher case
-        hasReadRights = true
+        // Anyone else case
+        hasReadRights = false
       }
 
       // is vault package
@@ -837,6 +834,9 @@ function topInformation (dir, showAlert) {
       if (typeof vaultStatus !== 'undefined') {
         $('.top-information').show()
         $('.top-info-buttons').show()
+      }
+      if (rebuildFileBrowser) {
+        buildFileBrowser(dir)
       }
     })
   } else {
