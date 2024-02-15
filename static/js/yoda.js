@@ -231,6 +231,41 @@ Yoda.htmlEncode = function (value) {
   return textarea.innerHTML
 }
 
+Yoda.isTextExtension = function (filename) {
+  // Get if file has a text file extension
+  const parts = filename.split('.')
+  // Only get last extension
+  if (parts.length > 1) {
+    return Yoda.textFileExtensions.includes(parts[parts.length - 1].toLowerCase())
+  }
+
+  return false
+}
+
+Yoda.viewableExtensionType = function (filename) {
+  // Returns false if not a viewable ext type,
+  // otherwise return extension type name
+
+  // Render context menu for files.
+  const viewExts = {
+    image: ['jpg', 'jpeg', 'gif', 'png'],
+    audio: ['mp3', 'ogg', 'wav'],
+    video: ['mp4', 'ogg', 'webm']
+  }
+  const parts = filename.split('.')
+  // Only get last extension
+  if (parts.length > 1) {
+    const extension = parts[parts.length - 1].toLowerCase()
+    for (const key in viewExts) {
+      if (viewExts[key].includes(extension)) {
+        return key
+      }
+    }
+  }
+
+  return false
+}
+
 // DOM ready.
 const onReady = (callback) => {
   if (document.readyState !== 'loading') {

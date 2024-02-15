@@ -18,7 +18,7 @@
 // Dark theme specific settings
 [data-bs-theme="dark"] {
     /* File browser rows */
-    .browse, .deposit-delete {
+    .browse, .deposit-delete, #file-browser a {
         color: $white;
     }
 

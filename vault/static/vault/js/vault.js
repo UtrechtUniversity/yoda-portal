@@ -13,6 +13,7 @@ $(document).ajaxSend(function (e, request, settings) {
 let preservableFormatsLists = null
 let currentFolder
 let dataPackage = null
+let hasReadRights = true
 
 $(function () {
   // Extract current location from query string (default to '').
@@ -38,31 +39,6 @@ $(function () {
 
   $('.btn-group button.metadata-form').on('click', function () {
     showMetadataForm($(this).attr('data-path'))
-  })
-
-  $('body').on('click', 'a.view-video', function () {
-    const path = $(this).attr('data-path')
-    const viewerHtml = `<video width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></video>`
-    $('#viewer').html(viewerHtml)
-    $('#viewMedia').modal('show')
-  })
-
-  $('body').on('click', 'a.view-audio', function () {
-    const path = $(this).attr('data-path')
-    const viewerHtml = `<audio width="640" controls autoplay><source src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}"></audio>`
-    $('#viewer').html(viewerHtml)
-    $('#viewMedia').modal('show')
-  })
-
-  $('body').on('click', 'a.view-image', function () {
-    const path = $(this).attr('data-path')
-    const viewerHtml = `<img width="640" src="browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(path))}" />`
-    $('#viewer').html(viewerHtml)
-    $('#viewMedia').modal('show')
-  })
-
-  $('#viewMedia.modal').on('hidden.bs.modal', function () {
-    $('#viewer').html('')
   })
 
   // Show checksum report
@@ -331,8 +307,8 @@ function browse (dir = '', changeHistory = false) {
     $('.alert.is-archived').hide()
     $('.alert.is-processing').hide()
   }
-  topInformation(dir, true) // only here topInformation should show its alertMessage
-  buildFileBrowser(dir)
+  // only here topInformation should show its alertMessage and rebuild the file browser
+  topInformation(dir, true, true)
 }
 
 function handleGoToResearchButton (dir) {
@@ -354,6 +330,38 @@ function handleGoToGroupManager (dir) {
     $('.btn-go-to-group-manager').attr('group', parts[1].replace('vault-', 'research-')).show()
   } else {
     $('.btn-go-to-group-manager').attr('group', '').hide()
+  }
+}
+
+function determineFileIcon (name, rowType, fileType) {
+  // Determine icon
+  if (rowType === 'coll') {
+    return 'fa-folder'
+  } else if (Yoda.isTextExtension(name)) {
+    return 'fa-file-lines'
+  } else if (fileType) {
+    switch (fileType) {
+      case 'audio':
+        return 'fa-file-audio'
+      case 'video':
+        return 'fa-file-video'
+      case 'image':
+        return 'fa-file-image'
+    }
+  } else {
+    return 'fa-file'
+  }
+}
+
+function determineNameHTML (name, row, tgt, fileType, icon) {
+  if (row.type === 'coll') {
+    return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+  } else if (hasReadRights && Yoda.isTextExtension(name) && row.size < 4 * 1024 * 1024) {
+    return `<a href="/fileviewer?file=${encodeURIComponent(tgt)}" target="_blank" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+  } else if (hasReadRights && fileType) {
+    return `<a href="/fileviewer?file=${encodeURIComponent(tgt)}" target="_blank" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+  } else {
+    return `<i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}`
   }
 }
 
@@ -478,7 +486,10 @@ const getFolderContents = (() => {
 const tableRenderer = {
   name: (name, _, row) => {
     const tgt = `${currentFolder}/${name}`
-    if (row.type === 'coll') { return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>` } else return `<i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}`
+    const fileType = Yoda.viewableExtensionType(name)
+    const icon = determineFileIcon(name, row.type, fileType)
+
+    return determineNameHTML(name, row, tgt, fileType, icon)
   },
   size: (size, _, row) => {
     if (row.type === 'coll') {
@@ -524,20 +535,7 @@ const tableRenderer = {
       // no context menu for data objects migrating from or to tape archive
       return ''
     } else {
-      // Render context menu for files.
-      const viewExts = {
-        image: ['jpg', 'jpeg', 'gif', 'png', 'webp'],
-        audio: ['aac', 'flac', 'mp3', 'ogg', 'wav'],
-        video: ['mp4', 'ogg', 'webm']
-      }
-      const ext = row.name.replace(/.*\./, '').toLowerCase()
-
       actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
-
-      // Generate dropdown "view" actions for different media types.
-      for (const type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) {
-        actions.append(`<a class="dropdown-item view-${type}" data-path="${Yoda.htmlEncode(currentFolder + '/' + row.name)}" title="View this file">View</a>`)
-      }
     }
 
     const dropdown = $(`<div class="dropdown">
@@ -659,7 +657,7 @@ window.addEventListener('popstate', function (e) {
   browse('dir' in query ? query.dir : '')
 })
 
-function topInformation (dir, showAlert) {
+function topInformation (dir, showAlert, rebuildFileBrowser = false) {
   if (typeof dir !== 'undefined') {
     Yoda.call('vault_collection_details',
       { path: Yoda.basePath + dir },
@@ -679,6 +677,7 @@ function topInformation (dir, showAlert) {
       const vaultStatus = data.status
       const vaultActionPending = data.vault_action_pending
       const hasWriteRights = 'yes'
+      const userType = data.member_type
       const hasDatamanager = data.has_datamanager
       const isDatamanager = data.is_datamanager
       const researchGroupAccess = data.research_group_access
@@ -689,6 +688,14 @@ function topInformation (dir, showAlert) {
       $('.btn-group button.metadata-form').hide()
       $('.top-information').hide()
       $('.top-info-buttons').hide()
+
+      if (userType !== 'none' || isDatamanager) {
+        // Datamanager, Researcher, normal, groupmanager cases
+        hasReadRights = true
+      } else {
+        // Anyone else case
+        hasReadRights = false
+      }
 
       // is vault package
       if (typeof vaultStatus !== 'undefined') {
@@ -827,6 +834,9 @@ function topInformation (dir, showAlert) {
       if (typeof vaultStatus !== 'undefined') {
         $('.top-information').show()
         $('.top-info-buttons').show()
+      }
+      if (rebuildFileBrowser) {
+        buildFileBrowser(dir)
       }
     })
   } else {

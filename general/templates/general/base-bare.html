@@ -1,0 +1,67 @@
+{# This file contains no header and no navigation panel #}
+<!DOCTYPE html>
+<html lang="en" {% if g.settings and g.settings.color_mode and g.settings.color_mode == 'DARK' %}data-bs-theme="dark"{% else %}data-bs-theme="light"{% endif %}>
+    <head>
+        {% block head %}
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+
+            <title>{% block title %}{{ config.get('PORTAL_TITLE_TEXT') }}{% endblock title %}</title>
+
+            <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.4.0/css/fontawesome.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.4.0/css/all.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
+            {% block style %}{% endblock style %}
+
+            <script src="{{ url_for('static', filename='lib/bootstrap-5.3.1/js/bootstrap.bundle.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
+            {% if g.user %}
+            <script src="{{ url_for('static', filename='lib/jquery-3.7.0/jquery-3.7.0.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/yoda-top-search.js') }}"></script>
+            {% endif %}
+            <script>
+                Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'};
+                Yoda.textFileExtensions = {{ config.get('TEXT_FILE_EXTENSIONS') | safe }}
+                {% if g.user %}
+                Yoda.basePath = '/{{ g.irods.zone }}/home';
+                Yoda.user = {
+                    username: '{{ g.user }}',
+                };
+                {% endif %}
+                {% if g.settings %}
+                    Yoda.settings = {{ g.settings | tojson }}
+                    {% if g.settings.color_mode == 'AUTO' %}
+                        Yoda.set_color_mode_auto()
+                    {% endif %}
+                {% else %}
+                  Yoda.set_color_mode_auto()
+                {% endif %}
+            </script>
+            {% block scripts %}{% endblock scripts %}
+        {% endblock head %}
+    </head>
+
+    <body class="d-flex flex-column min-vh-100">
+        {% if config.get('YODA_ENVIRONMENT') != "production" %}{% include 'environment.html' %}{% endif %}
+
+        {% block container %}
+        <div class="page p-3">
+            <div class="container">
+                <div id="messages">
+                    {% for category, message in get_flashed_messages(with_categories=true) %}
+                        {% if category is sameas 'error' %} {% set category = 'danger' %} {% endif %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% block content %}{% endblock content %}
+            </div>
+        </div>
+        {% endblock container %}
+    </body>
+</html>
