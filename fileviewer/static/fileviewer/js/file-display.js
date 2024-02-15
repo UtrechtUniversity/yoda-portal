@@ -1,3 +1,4 @@
+/* global hljs */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
