@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import sys
 import traceback
-from os import path
-from re import fullmatch
+from os import name, path
+from re import compile, fullmatch
 from typing import List, Optional, Tuple
 
 from werkzeug.security import safe_join
@@ -45,6 +45,47 @@ def is_email_in_domains(email: str, domain_list: List[str]) -> bool:
                 return True
 
     return False
+
+
+def unicode_secure_filename(filename):
+    """
+    Secure filename handling
+    Based on werkzeug secure_filename but allows unicode characters
+
+    :param full_path: Full path of request
+
+    :returns: Tuple of static directory and filename for correct path, None for incorrect path
+    """
+    # Blacklist of characters to strip
+    # No control characters, no delete, no slashes. Otherwise all other characters ok
+    remove_chars_re = compile('[\u0000-\u001F\u007F\\\/]')
+    # From werkzeug
+    windows_device_files = {
+        "CON",
+        "PRN",
+        "AUX",
+        "NUL",
+        *(f"COM{i}" for i in range(10)),
+        *(f"LPT{i}" for i in range(10)),
+    }
+
+    filename = str(remove_chars_re.sub('', filename))
+    for sep in path.sep, path.altsep:
+        if sep:
+            filename = filename.replace(sep, '')
+
+    # on nt a couple of special files are present in each folder.  We
+    # have to ensure that the target file is not such a filename.  In
+    # this case we prepend an underline
+    if name == 'nt' and filename and \
+       filename.split('.')[0].upper() in windows_device_files:
+        filename = '_' + filename
+
+    # Last pass for a file trying to simply go up a level with ..
+    if filename == '..':
+        return ''
+
+    return filename
 
 
 def get_validated_static_path(
