@@ -52,9 +52,9 @@ def unicode_secure_filename(filename):
     Secure filename handling
     Based on werkzeug secure_filename but allows unicode characters
 
-    :param full_path: Full path of request
+    :param filename: Filename of file to check
 
-    :returns: Tuple of static directory and filename for correct path, None for incorrect path
+    :returns: Filename with bad characters removed
     """
     # Blacklist of characters to strip
     # No control characters, no delete, no slashes. Otherwise all other characters ok
