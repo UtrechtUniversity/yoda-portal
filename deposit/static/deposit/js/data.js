@@ -219,7 +219,8 @@ $(function () {
       $('.uploads-total-progress-bar-perc').html('0%')
 
       $.each(files, function (key, file) {
-        logUpload(file.uniqueIdentifier, file)
+        const secureFile = secureFilename(file.name)
+        logUpload(file.uniqueIdentifier, secureFile)
 
         const $self = $('#' + file.uniqueIdentifier)
         // Pause btn
@@ -249,7 +250,7 @@ $(function () {
           $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
         })
 
-        if (filenames.includes(secureFilename(file.name))) {
+        if (filenames.includes(secureFile)) {
           file.pause()
           $self.find('.msg').text('Upload paused')
           $self.find('.overwrite-div').removeClass('hidden')
@@ -359,9 +360,14 @@ $(function () {
 })
 
 function secureFilename (file) {
+  // mirrors behaviour of unicode_secure_filename in util.py
   let result = ''
-  result = file.replace(/[`~!@#$%^&*()|+\-=?;:'",<>{}[]\\\/]/gi, '')
-  result = result.replace(/ /g, '_')
+  result = file.replace(/[\u{0000}-\u{001F}\u{007F}\\\/]/gu, '')
+
+  if (result === '..') {
+    return ''
+  }
+
   return result
 }
 
@@ -849,7 +855,7 @@ window.addEventListener('popstate', function (e) {
 function logUpload (id, file) {
   const log = `<div class="row upload-row mb-1" id="${id}">
                   <div class="col-md-6">
-                    <div class="upload-filename text-break">${Yoda.htmlEncode(file.relativePath)}</div>
+                    <div class="upload-filename text-break">${Yoda.htmlEncode(file)}</div>
                     <div class="upload-btns btn-group btn-group-sm ms-3" role="group" aria-label="Basic example">
                       <div class="overwrite-div hidden">
                         Overwrite?
