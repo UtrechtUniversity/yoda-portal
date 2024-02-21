@@ -1,11 +1,12 @@
 python-irodsclient==2.0.0
-Flask==2.3.2
-flask-session2==1.3.1
+Flask==3.0.2
+flask-session==0.6.0
 Flask-WTF==1.2.1
-mod-wsgi==4.9.4
+mod-wsgi==5.0.0
 pyjwt[crypto]==2.8.0
 requests==2.31.0
 opensearch-py==1.0.0
 irods-avu-json==2.2.0
+MarkupSafe==2.1.5
 python-magic==0.4.27
-Werkzeug==2.3.7
+Werkzeug==3.0.1
