@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
@@ -11,10 +11,11 @@ from typing import List, Optional
 
 import magic
 from flask import (
-    abort, Blueprint, current_app as app, escape, g, jsonify, make_response, redirect,
+    abort, Blueprint, current_app as app, g, jsonify, make_response, redirect,
     render_template, request, Response, send_file, session, url_for
 )
 from irods.message import iRODSMessage
+from markupsafe import escape
 from werkzeug.utils import secure_filename
 
 import api
