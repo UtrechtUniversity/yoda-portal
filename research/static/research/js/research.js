@@ -14,6 +14,7 @@ let preservableFormatsLists = null
 let currentFolder
 let filenames = []
 let hasReadRights = true
+let uploadFolder = false
 
 $(function () {
   // Extract current location from query string (default to '').
@@ -272,6 +273,14 @@ $(function () {
     handleFileStage($(this).attr('data-collection'), $(this).attr('data-name'))
   })
 
+  $('.upload-folder').on('click', function () {
+    uploadFolder = true
+  })
+
+  $('.upload-file').on('click', function (){
+    uploadFolder = false
+  })
+
   // Flow.js upload handler
   const r = new Flow({
     target: '/research/upload',
@@ -344,27 +353,29 @@ $(function () {
           $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
         })
 
-        if (filenames.includes(secureFile)) {
-          file.pause()
-          $self.find('.msg').text('Upload paused')
-          $self.find('.overwrite-div').removeClass('hidden')
-          $self.find('.upload-cancel').hide()
-          $self.find('.upload-pause').hide()
-          // Overwrite btn
-          $self.find('.upload-overwrite').on('click', function () {
-            file.resume()
-            $self.find('.overwrite-div').addClass('hidden')
-            $self.find('.upload-pause').show()
-            $self.find('.upload-cancel').show()
-            $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-          })
+        if(!(uploadFolder)) {
+          if (filenames.includes(secureFile)) {
+            file.pause()
+            $self.find('.msg').text('Upload paused')
+            $self.find('.overwrite-div').removeClass('hidden')
+            $self.find('.upload-cancel').hide()
+            $self.find('.upload-pause').hide()
+            // Overwrite btn
+            $self.find('.upload-overwrite').on('click', function () {
+              file.resume()
+              $self.find('.overwrite-div').addClass('hidden')
+              $self.find('.upload-pause').show()
+              $self.find('.upload-cancel').show()
+              $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
+            })
 
-          // No Overwrite btn
-          $self.find('.upload-no-overwrite').on('click', function () {
-            file.cancel()
-            $self.find('.overwrite-div').addClass('hidden')
-            $self.remove()
-          })
+            // No Overwrite btn
+            $self.find('.upload-no-overwrite').on('click', function () {
+              file.cancel()
+              $self.find('.overwrite-div').addClass('hidden')
+              $self.remove()
+            })
+          }
         }
       })
     }
