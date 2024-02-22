@@ -218,7 +218,9 @@ $(function () {
       $('.uploads-total-progress-bar').css('width', '0%')
       $('.uploads-total-progress-bar-perc').html('0%')
 
-      $.each(files, function (key, file) {
+      const sortedFiles = files.sort((a, b) => a.name.localeCompare(b.name))
+
+      $.each(sortedFiles, function (key, file) {
         const secureFile = secureFilename(file.name)
         logUpload(file.uniqueIdentifier, secureFile)
 
