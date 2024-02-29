@@ -324,6 +324,7 @@ $(function () {
       $.each(sortedFiles, function (key, file) {
         const secureFile = secureFilename(file.name)
         logUpload(file.uniqueIdentifier, secureFile)
+        const folderName = file.relativePath.substring(0, file.relativePath.indexOf("/"))
 
         const $self = $('#' + file.uniqueIdentifier)
         // Pause btn
@@ -353,7 +354,32 @@ $(function () {
           $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
         })
 
-        if(!(uploadFolder)) {
+        if (uploadFolder) {
+          console.log('in here')
+          if (filenames.includes(folderName)) {
+            file.pause()
+            $self.find('.msg').text('Upload paused')
+            $self.find('.overwrite-div').removeClass('hidden')
+            $self.find('.upload-cancel').hide()
+            $self.find('.upload-pause').hide()
+            // Overwrite btn
+            $self.find('.upload-overwrite').on('click', function () {
+              file.resume()
+              $self.find('.overwrite-div').addClass('hidden')
+              $self.find('.upload-pause').show()
+              $self.find('.upload-cancel').show()
+              $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
+            })
+
+            // No Overwrite btn
+            $self.find('.upload-no-overwrite').on('click', function () {
+              file.cancel()
+              $self.find('.overwrite-div').addClass('hidden')
+              $self.remove()
+            })
+          }
+        }
+        else {
           if (filenames.includes(secureFile)) {
             file.pause()
             $self.find('.msg').text('Upload paused')
