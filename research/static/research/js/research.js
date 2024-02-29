@@ -1207,6 +1207,7 @@ function topInformation (dir, showAlert) {
       let hasWriteRights = true
       const isDatamanager = data.is_datamanager
       const lockCount = data.lock_count
+      const isLocked = data.is_locked
       let actions = []
 
       $('.btn-group button.metadata-form').hide()
@@ -1268,6 +1269,10 @@ function topInformation (dir, showAlert) {
         hasReadRights = false
       } else {
         hasReadRights = true
+      }
+
+      if (isLocked) {
+        hasWriteRights = false
       }
 
       if (userType === 'reader' || userType === 'none') {
