@@ -14,6 +14,7 @@ let preservableFormatsLists = null
 let currentFolder
 let filenames = []
 let hasReadRights = true
+let uploadFolder = false
 
 $(function () {
   // Extract current location from query string (default to '').
@@ -272,6 +273,14 @@ $(function () {
     handleFileStage($(this).attr('data-collection'), $(this).attr('data-name'))
   })
 
+  $('.upload-folder').on('click', function () {
+    uploadFolder = true
+  })
+
+  $('.upload-file').on('click', function (){
+    uploadFolder = false
+  })
+
   // Flow.js upload handler
   const r = new Flow({
     target: '/research/upload',
@@ -315,6 +324,8 @@ $(function () {
       $.each(sortedFiles, function (key, file) {
         const secureFile = secureFilename(file.name)
         logUpload(file.uniqueIdentifier, secureFile)
+        const folderName = file.relativePath.substring(0, file.relativePath.indexOf("/"))
+        let overwrite = false
 
         const $self = $('#' + file.uniqueIdentifier)
         // Pause btn
@@ -344,7 +355,17 @@ $(function () {
           $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
         })
 
-        if (filenames.includes(secureFile)) {
+        if (uploadFolder) {
+          if (filenames.includes(folderName)) {
+            overwrite = true
+          }
+        }
+        else {
+          if (filenames.includes(secureFile)) {
+            overwrite = true
+          }
+        }
+        if (overwrite) {
           file.pause()
           $self.find('.msg').text('Upload paused')
           $self.find('.overwrite-div').removeClass('hidden')
