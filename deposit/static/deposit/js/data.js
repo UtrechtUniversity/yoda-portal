@@ -13,6 +13,7 @@ $(document).ajaxSend(function (e, request, settings) {
 let currentFolder
 let filenames = []
 const hasReadRights = true
+let uploadFolder = false
 
 $(function () {
   // Canonicalize path somewhat, for convenience.
@@ -175,6 +176,15 @@ $(function () {
     })
   })
 
+  $('.upload-folder').on('click', function(){
+    uploadFolder = true
+    console.log(uploadFolder)
+  })
+
+  $('.upload').on('click', function(){
+    uploadFolder = false
+  })
+
   // Handle action menu
   const actions = []
   actions['show-checksum-report'] = 'Show checksum report'
@@ -252,27 +262,29 @@ $(function () {
           $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
         })
 
-        if (filenames.includes(secureFile)) {
-          file.pause()
-          $self.find('.msg').text('Upload paused')
-          $self.find('.overwrite-div').removeClass('hidden')
-          $self.find('.upload-cancel').hide()
-          $self.find('.upload-pause').hide()
-          // Overwrite btn
-          $self.find('.upload-overwrite').on('click', function () {
-            file.resume()
-            $self.find('.overwrite-div').addClass('hidden')
-            $self.find('.upload-pause').show()
-            $self.find('.upload-cancel').show()
-            $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-          })
+        if (!(uploadFolder)) {
+          if (filenames.includes(secureFile)) {
+            file.pause()
+            $self.find('.msg').text('Upload paused')
+            $self.find('.overwrite-div').removeClass('hidden')
+            $self.find('.upload-cancel').hide()
+            $self.find('.upload-pause').hide()
+            // Overwrite btn
+            $self.find('.upload-overwrite').on('click', function () {
+              file.resume()
+              $self.find('.overwrite-div').addClass('hidden')
+              $self.find('.upload-pause').show()
+              $self.find('.upload-cancel').show()
+              $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
+            })
 
-          // No Overwrite btn
-          $self.find('.upload-no-overwrite').on('click', function () {
-            file.cancel()
-            $self.find('.overwrite-div').addClass('hidden')
-            $self.remove()
-          })
+            // No Overwrite btn
+            $self.find('.upload-no-overwrite').on('click', function () {
+              file.cancel()
+              $self.find('.overwrite-div').addClass('hidden')
+              $self.remove()
+            })
+          }
         }
       })
     }
