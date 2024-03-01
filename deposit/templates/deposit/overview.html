@@ -9,7 +9,6 @@
 
 {% block scripts %}
 <script>
-    var browseStartDir = dir = path = {{ path|tojson|safe }};
     var view = 'browse';
 </script>
 <script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
@@ -22,7 +21,7 @@
         <h2>My pending deposits</h2>
     </div>
     <div class="col-md-6">
-        <a class="btn btn-primary float-end" href="/deposit/data" title="Start new deposit">Start new deposit</a>
+        <a class="btn btn-primary float-end" id="deposit-create-start" href="#" title="Start new deposit">Start new deposit</a>
         <a class="btn btn-secondary float-end me-3" href="https://dag.sites.uu.nl/depositing-data/during-depositing/" target="_blank" title="Guidance"><i class="fa-solid fa-info-circle"></i> Guidance</a>
     </div>
 
@@ -43,6 +42,24 @@
 </div>
 
 <!-- Modals -->
+<div class="modal" tabindex="-1" role="dialog" id="deposit-create">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Create new deposit</h5>
+                <p>For which deposit group would you like to create a new deposit?</p>
+                <div id="radio-button-deposit-groups"></div>
+            </div>
+            <div class="modal-footer">
+                <form>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
+                    <a type="submit" role="button" class="btn btn-primary btn-confirm-deposit-create" data-group="" href="/deposit/data?group=deposit-othergroup" title="Create deposit">Create deposit</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal" tabindex="-1" role="dialog" id="deposit-delete">
     <div class="modal-dialog">
         <div class="modal-content">
