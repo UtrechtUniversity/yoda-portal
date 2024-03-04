@@ -25,7 +25,7 @@ jobs:
       with:
         path: yoda
         repository: UtrechtUniversity/yoda
-        ref: development
+        ref: ${{ steps.extract_branch.outputs.branch }}
 
     - name: Authenticate to the container registry
       uses: docker/login-action@v2
@@ -41,3 +41,5 @@ jobs:
         file: yoda/docker/images/yoda_portal/Dockerfile
         push: true
         tags: ghcr.io/utrechtuniversity/yoda-portal:${{ steps.extract_branch.outputs.branch }}
+        build-args: |
+          TAG=${{ steps.extract_branch.outputs.branch }}
