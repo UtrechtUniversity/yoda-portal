@@ -147,3 +147,11 @@
     max-height: 500px;
     overflow-y: auto;
 }
+
+#group-manager-text {
+	height: 50px;
+}
+
+.div-show-search-groups {
+	height: 42px;
+}
