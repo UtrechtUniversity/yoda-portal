@@ -186,7 +186,7 @@ function readCsvFile (e) {
     // per csvHeader item check whether its valid
     let errorRows = ''
     csvHeader.split(',').forEach(function myFunction (item) {
-      if (!allCsvColumns.includes(item)) {
+      if (! (allCsvColumns.includes(item) || /^(manager|member|viewer):/.test(item)) ){
         errorRows += '<li>' + item + '</li>'
       }
     })
@@ -283,8 +283,17 @@ function readCsvFile (e) {
 }
 
 function csvToArray (str, delimiter = ',') {
-  const headers = str.slice(0, str.indexOf('\n')).split(delimiter)
+  var headers = str.slice(0, str.indexOf('\n')).split(delimiter)
   const rows = str.slice(str.indexOf('\n') + 1).split('\n')
+
+  // If we have headers with legacy suffixes, normalize them by removing each suffix
+  // e.g. "manager:manager1" becomes "manager".
+  headers.forEach(function(element, number, headers) {
+        const header_value = headers[number]
+        if ( /^(manager|member|viewer):/.test(header_value) ) {
+               headers[number] = header_value.substring(0, header_value.indexOf(':'))
+        }
+  });
 
   const arr = rows.map(function (row) {
     const values = row.split(delimiter)
