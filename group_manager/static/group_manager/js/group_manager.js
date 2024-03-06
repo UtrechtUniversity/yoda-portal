@@ -2112,9 +2112,10 @@ $(function () {
 
       // Set initial state of group create button {{{
       if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
-        $('.create-button-new').removeClass('hidden')
+        $('.div-show-search-groups').removeClass('d-none')
       } else {
-        $('.create-button-new').addClass('hidden')
+        $('.div-show-search-groups').addClass('d-none')
+        $('#group-manager-text').appendTo('#group-manager-no-add')
       }
       // }}}
 
@@ -2292,11 +2293,6 @@ $(function () {
       if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
         const $groupPanel = $('.card.groups')
         $groupPanel.find('.create-button').removeClass('disabled')
-      }
-
-      if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
-        // show import button only for rodsadmin and members of priv-group-add
-        $('.import-groups-csv').removeClass('hidden')
       }
 
       let a = ''
