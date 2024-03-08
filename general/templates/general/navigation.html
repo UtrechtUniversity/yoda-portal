@@ -1,6 +1,6 @@
 <nav class="navbar navbar-dark navbar-expand-md mb-3">
     <div class="container">
-        <a class="navbar-brand" href="{{ url_for('general_bp.index') }}">Yoda Portal</a>
+        <a class="navbar-brand" href="{{ url_for('general_bp.index') }}" title="Link to home page">Yoda Portal</a>
         {% if g.user %}
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#yodaNavbar" aria-controls="yodaNavbar" aria-expanded="true" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -9,7 +9,7 @@
             <div class="nav navbar-nav">
             {% for module in config.get('modules') %}
                 {% if module.function != "stats_bp.index" and module.function != "group_manager_bp.index" %}
-                <a class="nav-link {% if request.path == url_for(module.function) %}active{% endif %}" href="{{ url_for(module.function) }}">{{ module.name }}</a>
+                <a class="nav-link {% if request.path == url_for(module.function) %}active{% endif %}" href="{{ url_for(module.function) }}" title="Link to {{ module.name }}">{{ module.name }}</a>
                 {% endif %}
             {% endfor %}
             </div>
