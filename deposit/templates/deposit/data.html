@@ -53,19 +53,6 @@
     </div>
 </div>
 
-<div class="modal" tabindex="-1" role="dialog" id="viewMedia">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div id="viewer"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="row mt-2 mb-1">
     <div class="col-9">
         <h2>Upload data</h2>
@@ -300,7 +287,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel">Cancel</button>
-                <button type="button" class="btn btn-primary dlg-action-button" data-action="" data-name="" data-collection=""><span class="action"></span></button>
+                <button type="button" class="btn btn-primary dlg-action-button" data-action="" data-name="" data-collection="" data-overwrite=""><span class="action"></span></button>
             </div>
         </div>
     </div>
@@ -351,6 +338,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="finishMultiSelect" data-bs-dismiss="modal" title="Close">Close</button>
+                <button type="button" class="btn btn-primary dlg-multi-action-button hidden"><span class="action"></span></button>
             </div>
         </div>
     </div>

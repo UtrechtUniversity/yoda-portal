@@ -20,17 +20,13 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-6">
-        <h1>Group manager</h1>
+    <div class="col-md-6" id="group-manager-no-add">
     </div>
-    <div class="col-md-6 div-show-search-groups">
-        <button type="button" class="btn btn-primary import-groups-csv float-end me-2 hidden" title="Import groups from CSV"><i class="fa-solid fa-file-csv" aria-hidden="true"></i> Import groups</button>
-        <button type="button" class="btn btn-primary create-button-new float-end me-2 hidden" title="Create new group"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add group </button>
-    </div>
-</div>
-
-<div class="row">
+    {# Placeholder to hold space after the group manager header #}
     <div class="col-md-6">
+    </div>
+    <div class="col-md-6">
+        <h1 id="group-manager-text">Group manager</h1>
         <div class="card groups">
             <div class="card-header">
                 Groups
@@ -91,6 +87,10 @@
     </div>
     <div class="col-md-6">
         <div class="sticky-top">
+            <div class="d-flex justify-content-end mb-3 pt-3 align-items-center div-show-search-groups d-none">
+                <button type="button" class="btn btn-primary create-button-new me-2" title="Create new group"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add group </button>
+                <button type="button" class="btn btn-primary import-groups-csv" title="Import groups from CSV"><i class="fa-solid fa-file-csv" aria-hidden="true"></i> Import groups</button>
+            </div>
             <!---  CREATE  -->
             <div class="card properties-create hidden">
                 <div class="card-header">Create new group</div>
@@ -195,7 +195,7 @@
                         </div>
                     </form>
                 </div>
-                </div>
+            </div>
 
             <!---  UPDATE  -->
             <div class="card properties-update">
@@ -337,11 +337,11 @@
                     <div class="input-group-sm float-start">
                         Change role:
 
-                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="reader" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Viewer rights"><i class="fa-solid fa-eye" aria-hidden="true"></i> Viewer</a>
-                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="normal" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Member rights"><i class="fa-solid fa-user" aria-hidden="true"></i> Member</a>
-                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="manager" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Manager rights"><i class="fa-solid fa-crown" aria-hidden="true"></i> Manager</a>
+                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="reader" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Viewer rights"><i class="fa-solid fa-eye" aria-hidden="true"></i> <span class="d-none d-xl-inline-block">Viewer</span></a>
+                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="normal" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Member rights"><i class="fa-solid fa-user" aria-hidden="true"></i> <span class="d-none d-xl-inline-block">Member</span></a>
+                        <a class="btn btn-sm btn-primary disabled update-button" data-target-role="manager" data-action="{{ url_for('group_manager_bp.user_update') }}" title="Manager rights"><i class="fa-solid fa-crown" aria-hidden="true"></i> <span class="d-none d-xl-inline-block">Manager</span></a>
 
-                        <a class="btn btn-sm btn-danger disabled delete-button ms-2" id="btn-remove-user-from-group" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group"><i class="fa-solid fa-trash" aria-hidden="true"></i> Remove member(s)</a>
+                        <a class="btn btn-sm btn-danger disabled delete-button ms-2" id="btn-remove-user-from-group" data-action="{{ url_for('group_manager_bp.user_delete') }}" data-bs-toggle="modal" data-bs-target="#modal-user-delete" title="Remove the selected member from this group"><i class="fa-solid fa-trash" aria-hidden="true"></i> <span class="d-none d-xxl-inline-block">Remove member(s)</span></a>
                     </div>
                 </div>
             </div>
@@ -398,22 +398,24 @@
                   </dl>
 
                   <p>
-                    The remainder of the columns should have a label that starts with a prefix which indicates the role of each group member.
+                    The file can optionally include the labels <b>schema_id</b> and <b>expiration_date</b>, each can be included up to one time.
+                    The remainder of the columns should have a label that indicates the role of each group member.
+                    Columns of these types may appear multiple times.
                     Columns may appear in any order and empty data cells are ignored: groups can differ in number of members.
                   </p>
                   <dl class="row">
-                    <dt class="col-sm-2">manager:</dt>
+                    <dt class="col-sm-2">manager</dt>
                     <dd class="col-sm-10">User that will be given the role of manager</dd>
-                    <dt class="col-sm-2">member:</dt>
+                    <dt class="col-sm-2">member</dt>
                     <dd class="col-sm-10">User that will be given the role of member with read/write</dd>
-                    <dt class="col-sm-2">viewer:</dt>
+                    <dt class="col-sm-2">viewer</dt>
                     <dd class="col-sm-10">User that will be given the role of viewer with read</dd>
                   </dl>
 
                   <h5>Example:</h5>
-<pre>category,subcategory,groupname,manager:manager,member:member1,member:member2
-departmentx,teama,groupteama,m.manager@example.com,m.member@example.com,n.member@example.com
-departmentx,teamb,groupteamb,m.manager@example.com,p.member@example.com,</pre>
+<pre>category,subcategory,groupname,manager,member,member,schema_id,expiration_date
+departmentx,teama,groupteama,m.manager@example.com,m.member@example.com,n.member@example.com,default-3,2026-01-01
+departmentx,teamb,groupteamb,m.manager@example.com,p.member@example.com,,,</pre>
                 </div>
               </div>
             </div>

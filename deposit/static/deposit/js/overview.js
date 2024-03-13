@@ -10,15 +10,14 @@ $(document).ajaxSend(function (e, request, settings) {
   }
 })
 
-let currentFolder
+let depositGroups = []
 
 $(function () {
-  // Canonicalize path somewhat, for convenience.
-  currentFolder = path.replace(/\/+/g, '/').replace(/\/$/, '')
-
   if ($('#file-browser').length) {
     startBrowsing()
   }
+
+  handleNewDepositModal()
 
   // FOLDER delete
   $('body').on('click', 'a.deposit-delete', function () {
@@ -35,6 +34,20 @@ $(function () {
   $('.btn-confirm-deposit-delete').on('click', function () {
     handleFolderDelete($(this).attr('data-collection'), $(this).attr('data-name'))
   })
+
+  // By default, this button should be a link
+  $('#deposit-create-start').on('click', function () {
+    handleNewDepositModal()
+    if (depositGroups.length > 1) {
+      $('#deposit-create').modal('show')
+    }
+  })
+
+  // Let user select which deposit group the deposit will be associated with
+  $('body').on('click', '.btn-confirm-deposit-create', function () {
+    const depositGroup = $('#deposit-create .modal-body input[type="radio"]:checked').val()
+    $('.btn-confirm-deposit-create').prop('href', 'data?group=' + Yoda.htmlEncode(depositGroup))
+  })
 })
 
 function fileMgmtDialogAlert (dlgName, alert) {
@@ -45,6 +58,46 @@ function fileMgmtDialogAlert (dlgName, alert) {
     $('#alert-panel-' + dlgName).show()
   } else {
     $('#alert-panel-' + dlgName).hide()
+  }
+}
+
+async function handleNewDepositModal () {
+  const result = await Yoda.call('group_data', {}, { rawResult: true })
+
+  if (result.status === 'ok') {
+    const data = result.data.group_hierarchy
+    const groups = []
+    // Select the groups that are deposit groups
+    for (const categoryName in data) {
+      for (const subcategoryName in data[categoryName]) {
+        for (const groupName in data[categoryName][subcategoryName]) {
+          if (groupName.startsWith('deposit-')) {
+            groups.push(groupName)
+          }
+        }
+      }
+    }
+
+    let modalHTML = ''
+    $.each(groups, function (index, group) {
+      if (index === 0) {
+        // First entry is by default checked
+        modalHTML += `<div class="form-check"><input class="form-check-input" type="radio" name="radio-deposit-groups" value="${group}" id="radio-${group}" checked> <label class="form-check-label" for="radio-${group}">${group}</label></div>`
+      } else {
+        modalHTML += `<div class="form-check"><input class="form-check-input" type="radio" name="radio-deposit-groups" value="${group}" id="radio-${group}"> <label class="form-check-label" for="radio-${group}">${group}</label></div>`
+      }
+    })
+    $('#radio-button-deposit-groups').html(modalHTML)
+    depositGroups = groups
+
+    if (groups.length === 1) {
+      // Set the button to create a group as a link if there is only one group
+      $('#deposit-create-start').prop('href', 'data?group=' + Yoda.htmlEncode(groups[0])).removeClass('disabled')
+    } else if (groups.length === 0) {
+      // Disable create button if no deposit groups
+      $('#deposit-create-start').removeAttr('href').addClass('disabled')
+      $('#deposit-create-start').prop('aria-disabled', 'true')
+    }
   }
 }
 
@@ -59,27 +112,11 @@ async function handleFolderDelete (collection, folderName) {
 
   if (result.status === 'ok') {
     Yoda.set_message('success', 'Successfully deleted deposit ' + folderName)
-    browse(collection, true)
+    buildFileBrowser()
     $('#deposit-delete').modal('hide')
   } else {
     fileMgmtDialogAlert('deposit-delete', result.status_info)
   }
-}
-
-function changeBrowserUrl (path) {
-  let url = window.location.pathname
-  if (typeof path !== 'undefined') {
-    url += '?dir=' + encodeURIComponent(path)
-  }
-
-  window.history.pushState({}, {}, url)
-}
-
-function browse (dir = '', changeHistory = false) {
-  currentFolder = dir
-  if (changeHistory) { changeBrowserUrl(dir) }
-
-  buildFileBrowser(dir)
 }
 
 function buildFileBrowser (dir) {
@@ -107,7 +144,6 @@ const getFolderContents = (() => {
   let total = false // Total subcollections / data objects.
   let cache = [] // Cached result rows (may be more than shown on one page).
   let cacheStart = null // Row number of the first cache entry.
-  let cacheFolder = null // Folder path of the cache.
   let cacheSortCol = null // Cached sort column nr.
   let cacheSortOrder = null // Cached sort order.
   let i = 0 // Keep simultaneous requests from interfering.
@@ -115,7 +151,6 @@ const getFolderContents = (() => {
   const get = async (args) => {
     // Check if we can use the cache.
     if (cache.length &&
-         currentFolder === cacheFolder &&
          args.order[0].dir === cacheSortOrder &&
          args.order[0].column === cacheSortCol &&
          args.start >= cacheStart &&
@@ -126,7 +161,6 @@ const getFolderContents = (() => {
       const j = ++i
       const result = await Yoda.call('deposit_overview',
         {
-          coll: Yoda.basePath + currentFolder,
           offset: args.start,
           limit: batchSize,
           sort_order: args.order[0].dir,
@@ -146,7 +180,6 @@ const getFolderContents = (() => {
       total = result.total
       cacheStart = args.start
       cache = result.items
-      cacheFolder = currentFolder
       cacheSortCol = args.order[0].column
       cacheSortOrder = args.order[0].dir
 
@@ -178,12 +211,10 @@ const getFolderContents = (() => {
 // Functions for rendering table cells, per column.
 const tableRenderer = {
   name: (name, _, row) => {
-    const tgt = `${currentFolder}/${name}`
-    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>`
+    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(row.path)}" data-path="${Yoda.htmlEncode(row.path)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>`
   },
   title: (name, _, row) => {
-    const tgt = `${currentFolder}/${name}`
-    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}">${Yoda.htmlEncode(row.deposit_title)}</a>`
+    return `<a class="coll browse" href="/deposit/data?dir=${encodeURIComponent(row.path)}" data-path="${Yoda.htmlEncode(row.path)}">${Yoda.htmlEncode(row.deposit_title)}</a>`
   },
   access: (name, _, row) => {
     return `${Yoda.htmlEncode(row.deposit_access)}`
@@ -209,14 +240,11 @@ const tableRenderer = {
   context: (_, __, row) => {
     const actions = $('<span>')
 
-    // no context menu for toplevel group-collections - these cannot be altered or deleted
-    if (currentFolder.length === 0) {
-      return ''
+    const pathSplit = row.path.split('/')
+    if (pathSplit.length > 1) {
+      actions.append(`<a href="#" class="deposit-delete" data-collection="${Yoda.htmlEncode('/' + pathSplit[1])}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this deposit"><i class="fa-solid fa-trash"></a>`)
+      return actions[0].innerHTML
     }
-
-    actions.append(`<a href="#" class="deposit-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this deposit"><i class="fa-solid fa-trash"></a>`)
-
-    return actions[0].innerHTML
   }
 }
 
@@ -249,5 +277,5 @@ function startBrowsing () {
   $('#file-browser').on('length.dt', function (e, settings, len) {
     Yoda.storage.session.set('pageLength', len)
   })
-  browse(currentFolder)
+  buildFileBrowser()
 }

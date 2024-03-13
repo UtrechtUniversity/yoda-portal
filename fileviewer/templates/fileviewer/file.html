@@ -1,0 +1,60 @@
+{% extends 'base-bare.html' %}
+
+{% block title %}{{ super() }} &dash; File Viewer{% endblock title %}
+
+{% block style %}
+<link id='pagestyle' rel="stylesheet" {% if g.settings and g.settings.color_mode and g.settings.color_mode == 'DARK' %}href="{{url_for('static', filename='lib/highlight-js-11.9.0/styles/dark.min.css')}}"{% else %}href="{{url_for('static', filename='lib/highlight-js-11.9.0/styles/default.min.css')}}"{% endif %}>
+{% endblock style %}
+
+{% block scripts %}
+<script>
+    var formLoaded = false;
+</script>
+<script src="{{ url_for('static', filename='lib/highlight-js-11.9.0/highlight.min.js') }}"></script>
+<script src="{{ url_for('fileviewer_bp.static', filename='js/file-display.js') }}" async></script>
+<script>
+    {% if g.settings %}
+        Yoda.settings = {{ g.settings | tojson}}
+        {# Set highlightjs theme #}
+        {% if g.settings.color_mode == 'AUTO' %}
+            const initialHref = document.getElementById('pagestyle').attributes.href.value
+
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.getElementById('pagestyle').setAttribute('href', initialHref.replace('default', 'dark'))
+            }
+        {% endif %}
+    {% endif %}
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<div id="file-errors" class="row hide">
+    <div class="col-md-12 p-2">
+        <div class="card">
+            <div class="card-header clearfix">
+                <h5 class="card-title float-start">
+                    File - {{ file | trim }}
+                </h5>
+            </div>
+            <div class="card-body" id="file-error-message">
+                <p>Loading file <i class="fa fa-spinner fa-spin fa-fw"></i></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="file-output" class="row hide">
+    <div class="col-md-12 p-2">
+        <div class="card">
+            <div class="card-header clearfix">
+                <h5 class="card-title float-start">
+                    File - {{ file | trim }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <pre><code id="file-contents"><code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

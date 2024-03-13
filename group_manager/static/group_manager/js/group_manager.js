@@ -154,44 +154,69 @@ function readCsvFile (e) {
     let contents = e.target.result
 
     // remove unwanted characters
-    contents = contents.replaceAll('"', '').replaceAll("'", '').replaceAll(' ', '')
+    contents = contents.replaceAll('"', '').replaceAll("'", '').replaceAll(' ', '').replaceAll('\r', '')
+
+    // remove extra newline at end of file
+    if (contents[contents.length - 1] === '\n') {
+      contents = contents.slice(0, contents.length - 1)
+    }
 
     // ensure correct seperator ','
     contents = contents.replaceAll(';', ',')
 
-    // required to be able to, in a simple manner, add header and data row to the tr's in the table to pass to the backend
-    const csvHeader = contents.slice(0, contents.indexOf('\n'))
+    // required to be able to, in a simple manner, add header and data row
+    // to the tr's in the table to pass to the backend
+    const csvHeader = contents.slice(0, contents.indexOf('\n')).trim()
     const csvRows = contents.slice(contents.indexOf('\n') + 1).split('\n')
     const csvRowsCorrected = []
 
     // parse the csv file data to be able to present in a table
     const result = csvToArray(contents)
 
-    // first row will contain fixed definion
-    const arKeys = result[0]
-
-    // For compressing all columns to  keys: category, subcategory, groupname and usercount
-    const presentationColumns = ['groupname', 'category', 'subcategory', 'users']
-    const allCsvColumns = ['groupname', 'category', 'subcategory', 'manager', 'member', 'viewer']
+    // For compressing all columns to keys: category, subcategory, groupname, schema, expiration, and usercount
+    const presentationColumns = ['groupname', 'category', 'subcategory', 'schema_id', 'expiration_date', 'users']
+    // Only the columns that directly display their values
+    const directlyPresentColumns = ['groupname', 'category', 'subcategory', 'schema_id', 'expiration_date']
+    const allCsvColumns = ['groupname', 'category', 'subcategory', 'manager', 'member', 'viewer', 'schema_id', 'expiration_date']
 
     // First validate the headers found values in csvHeader
     // 'groupname', 'category', 'subcategory' MUST be present
-    // 'manager', 'member', 'viewer' like for instance manager:manager,member:member1,member:member2
+    // 'manager', 'member', 'viewer', 'expiration_date', 'schema_id' like for instance manager,member,member
 
     // per csvHeader item check whether its valid
     let errorRows = ''
     csvHeader.split(',').forEach(function myFunction (item) {
-      if (!allCsvColumns.includes(item) && !allCsvColumns.includes(item.split(':')[0])) {
-        errorRows += '<tr><td> - ' + item + '</td></tr>'
+      if (! (allCsvColumns.includes(item) || /^(manager|member|viewer):/.test(item)) ){
+        errorRows += '<li>' + item + '</li>'
       }
     })
     if (errorRows) {
-      $('#result-import-groups-csv').html('</br>The uploaded CSV contains the following invalid header names:<br/><table>' + errorRows + '</table>')
+      $('#result-import-groups-csv').html('</br>The uploaded CSV contains the following invalid header names:<br/><ul>' + errorRows + '</ul>')
       return
     }
 
     const newResult = []
     let rowNr = 0
+
+    // Verify that CSV data does not have duplicate groups, since this can result in unexpected problems, such
+    // as trying to create the same group twice.
+    const groupsSeen = new Set()
+    const duplicateGroups = new Set()
+
+    result.forEach(function scanDuplicates (groupDef) {
+      const groupname = groupDef.groupname[0]
+
+      if (groupsSeen.has(groupname)) {
+        duplicateGroups.add(groupname)
+      } else {
+        groupsSeen.add(groupname)
+      }
+    })
+
+    if (duplicateGroups.size > 0) {
+      $('#result-import-groups-csv').html('<br>The uploaded CSV data contains one or more duplicate group names: ' + Array.from(duplicateGroups).join(','))
+      return
+    }
 
     result.forEach(function myFunction (groupDef) {
       // initialise all columns that must be present in the view
@@ -202,26 +227,22 @@ function readCsvFile (e) {
       })
 
       // now loop through the received rows and put them in the right presentation columns
-      for (const key of Object.keys(arKeys)) {
-        allCsvColumns.forEach(function myFunction (column) {
-          if (key === column) {
-            row[column] = groupDef[key]
-          } else if (key.startsWith(column)) {
-            if (groupDef[key] !== '\r') {
-              if (row.users === '') {
-                row.users = '1'
-              } else {
-                row.users = (parseInt(row.users) + 1).toString()
-              }
-            }
+      allCsvColumns.forEach(function myFunction (column) {
+        if (groupDef[column] !== undefined && directlyPresentColumns.includes(column)) {
+          row[column] = groupDef[column][0]
+        } else if (groupDef[column] !== undefined && groupDef[column] !== '\r') {
+          if (row.users === '') {
+            row.users = groupDef[column].length.toString()
+          } else {
+            row.users = (parseInt(row.users) + groupDef[column].length).toString()
           }
-        })
-      }
+        }
+      })
 
       // only show row when all required data is present.
       let rowError = false
       presentationColumns.forEach(function myFunction (column) {
-        if (!rowError && (row[column] === undefined || row[column] === '')) {
+        if (!rowError && (row[column] === undefined || row[column] === '') && column !== 'schema_id' && column !== 'expiration_date') {
           rowError = true
         }
       })
@@ -235,7 +256,7 @@ function readCsvFile (e) {
     // build the header row of the table
     let table = '<table class="table table-striped"><thead><tr><th></th>'
     presentationColumns.forEach(function myFunction (column) {
-      table += '<th>' + column + '</th>'
+      table += '<th>' + column.replace('_', ' ') + '</th>'
     })
     table += '<td></td></tr></thead><tbody>'
 
@@ -262,17 +283,36 @@ function readCsvFile (e) {
 }
 
 function csvToArray (str, delimiter = ',') {
-  const headers = str.slice(0, str.indexOf('\n')).split(delimiter)
+  var headers = str.slice(0, str.indexOf('\n')).split(delimiter)
   const rows = str.slice(str.indexOf('\n') + 1).split('\n')
+
+  // If we have headers with legacy suffixes, normalize them by removing each suffix
+  // e.g. "manager:manager1" becomes "manager".
+  headers.forEach(function(element, number, headers) {
+        const header_value = headers[number]
+        if ( /^(manager|member|viewer):/.test(header_value) ) {
+               headers[number] = header_value.substring(0, header_value.indexOf(':'))
+        }
+  });
 
   const arr = rows.map(function (row) {
     const values = row.split(delimiter)
     const el = headers.reduce(function (object, header, index) {
-      object[header] = values[index]
+      if (values[index] != null && values[index] !== '') {
+        if (!(header in object)) {
+          object[header] = []
+        }
+
+        object[header].push(values[index])
+      }
       return object
     }, {})
     return el
   })
+
+  if (arr.length > 0 && jQuery.isEmptyObject(arr[arr.length - 1])) {
+    return arr.slice(0, arr.length - 1)
+  }
 
   return arr
 }
@@ -911,14 +951,14 @@ $(function () {
       const categoryName = group.category
       const userCanManage = this.canManageGroup(groupName)
 
-      // TRee
+      // Tree
       const $groupList = $('#group-list')
       const $group = $groupList.find('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]')
       const $oldGroup = $groupList.find('.active')
 
       // group list handling row activation
       const listgroup = $('#tbl-list-groups tr[user-search-result-group="' + Yoda.escapeQuotes(groupName) + '"]')
-      listgroup.addClass('active').siblings().removeClass('active')
+      listgroup.addClass('table-active').siblings().removeClass('table-active')
 
       if ($group.is($oldGroup)) { return }
 
@@ -1570,7 +1610,8 @@ $(function () {
           placeholder: 'Click here to search...',
           allowClear: true,
           openOnEnter: false,
-          minimumInputLength: 3
+          minimumInputLength: 3,
+          width: 'element'
         }).on('select2:open', function () {
           $(this).val(null)
         }).on('change', function () {
@@ -1799,7 +1840,7 @@ $(function () {
          */
     onClickGroupDelete: function (el) {
       const groupName = $('#group-list .group.active').attr('data-name')
-      const nextGroupName = $('#result-user-search-groups .user-search-result-group.active').next().attr('user-search-result-group')
+      const nextGroupName = $('#result-user-search-groups .user-search-result-group.table-active').next().attr('user-search-result-group')
 
       $('#group-list .group.active')
         .addClass('delete-pending disabled')
@@ -2080,9 +2121,10 @@ $(function () {
 
       // Set initial state of group create button {{{
       if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
-        $('.create-button-new').removeClass('hidden')
+        $('.div-show-search-groups').removeClass('d-none')
       } else {
-        $('.create-button-new').addClass('hidden')
+        $('.div-show-search-groups').addClass('d-none')
+        $('#group-manager-text').appendTo('#group-manager-no-add')
       }
       // }}}
 
@@ -2260,11 +2302,6 @@ $(function () {
       if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
         const $groupPanel = $('.card.groups')
         $groupPanel.find('.create-button').removeClass('disabled')
-      }
-
-      if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
-        // show import button only for rodsadmin and members of priv-group-add
-        $('.import-groups-csv').removeClass('hidden')
       }
 
       let a = ''

@@ -16,22 +16,22 @@ $(document).ready(function () {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'file-move')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move')
       $('#dlg-file-browse-operations .card-title span.action').text('move')
-      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', "")
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', '')
     } else if ($(this).hasClass('folder-move')) {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-move')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move')
       $('#dlg-file-browse-operations .card-title span.action').text('move')
-      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', "")
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', '')
     } else if ($(this).hasClass('file-copy')) {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'file-copy')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy')
       $('#dlg-file-browse-operations .card-title span.action').text('copy')
-      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', "")
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', '')
     } else {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-copy')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy')
       $('#dlg-file-browse-operations .card-title span.action').text('copy')
-      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', "")
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', '')
     }
 
     // Set filename in modal & button attribute
@@ -185,33 +185,24 @@ $(document).on('click', '.multi-overwrite-button', function () {
   const name = $(this).attr('data-name')
   const currentPath = $(this).attr('data-collection') + '/' + name
   const index = $(this).closest('tr').attr('class').split('-').pop()
-  let newPath
-
-  newPath = dlgCurrentFolder + '/' + name
+  const newPath = dlgCurrentFolder + '/' + name
 
   if (type === 'data') {
-    if (action == 'copy') {
+    if (action === 'copy') {
       copyFile(currentPath, newPath, true, index, true)
-    }
-    else if (action == 'move') {
+    } else if (action === 'move') {
       moveFile(currentPath, newPath, true, index, true)
     }
   } else {
-    if (action == 'copy') {
+    if (action === 'copy') {
       copyFolder(currentPath, newPath, true, index, true)
-    }
-    else if (action == 'move') {
+    } else if (action === 'move') {
       moveFolder(currentPath, newPath, true, index, true)
     }
-    
   }
 })
 
 $(document).on('click', '.multi-cancel-button', function () {
-  const action = $(this).attr('data-action')
-  const type = $(this).attr('data-type')
-  const name = $(this).attr('data-name')
-  const currentPath = $(this).attr('data-collection') + '/' + name
   const index = $(this).closest('tr').attr('class').split('-').pop()
 
   $('.multi-select-table tr.row-' + index + ' td.item-progress').text('Overwrite cancelled')
@@ -661,7 +652,6 @@ const tableRenderer2 = {
 }
 
 function dlgBrowse (dir) {
-  dir = decodeURIComponent(dir)
   dlgCurrentFolder = dir
 
   dlgSelectAlertHide()
@@ -724,7 +714,7 @@ function dlgSelectAlertHide () {
   $('#dlg-select-alert-panel').addClass('hide')
 }
 
-function createOverwriteBtn(multipleIndex, path, type, action) {
+function createOverwriteBtn (multipleIndex, path, type, action) {
   fileName = $('.multi-select-table tr.row-' + multipleIndex).find('td:first').text().trim()
   filePath = path.substring(0, path.lastIndexOf('/'))
   overwriteBtn = '<button type="button" class="btn btn-primary ms-2 multi-overwrite-button" data-type="' + type + '" data-name="' +
@@ -734,17 +724,16 @@ function createOverwriteBtn(multipleIndex, path, type, action) {
   $('.multi-select-table tr.row-' + multipleIndex + ' td.item-progress').append(overwriteBtn + cancelOverwriteBtn)
 
   // Create Overwrite All button
-  $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">' + action.charAt(0).toUpperCase() + action.slice(1) 
-  + ' and overwrite all</span>')
+  $('#mutli-select-progress .dlg-multi-action-button').html('<span class="action">' + action.charAt(0).toUpperCase() + action.slice(1) +
+  ' and overwrite all</span>')
   $('#mutli-select-progress .dlg-multi-action-button').removeClass('hidden')
   $('#mutli-select-progress .dlg-multi-action-button').prop('disabled', false)
 }
 
-function changeActionBtn(action) {
+function changeActionBtn (action) {
   if ($('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite')) {
     $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">' + action + ' and overwrite</span>')
-  }
-  else {
+  } else {
     $('#dlg-file-browse-operations .dlg-action-button').html('<span class="action">' + action + '</span>')
   }
 }

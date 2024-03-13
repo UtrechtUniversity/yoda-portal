@@ -9,19 +9,20 @@
 
             <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 
-            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.4.0/css/fontawesome.min.css') }}">
-            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.4.0/css/all.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.5.1/css/fontawesome.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='lib/fontawesome-free-6.5.1/css/all.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/yoda-portal.css') }}">
             {% block style %}{% endblock style %}
 
-            <script src="{{ url_for('static', filename='lib/bootstrap-5.3.1/js/bootstrap.bundle.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='lib/bootstrap-5.3.3/js/bootstrap.bundle.min.js') }}"></script>
             <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
             {% if g.user %}
-            <script src="{{ url_for('static', filename='lib/jquery-3.7.0/jquery-3.7.0.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='lib/jquery-3.7.1/jquery-3.7.1.min.js') }}"></script>
             <script src="{{ url_for('static', filename='js/yoda-top-search.js') }}"></script>
             {% endif %}
             <script>
                 Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'};
+                Yoda.textFileExtensions = {{ config.get('TEXT_FILE_EXTENSIONS') | safe }}
                 {% if g.user %}
                 Yoda.basePath = '/{{ g.irods.zone }}/home';
                 Yoda.user = {

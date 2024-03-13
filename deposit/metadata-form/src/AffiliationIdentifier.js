@@ -141,11 +141,11 @@ class AffiliationIdentifier extends React.Component {
          * option/backgroundColor:active
          */
         primary50: '#2b3035',
-        primary75: '#2b3035',
-    };
+        primary75: '#2b3035'
+    }
 
     // Check what theme is set
-    const colorMode = document.documentElement.getAttribute('data-bs-theme');
+    const colorMode = document.documentElement.getAttribute('data-bs-theme')
 
     let parentContext = this.props.idSchema.$id
     parentContext = parentContext.replace(this.props.idPrefix + '_', '')

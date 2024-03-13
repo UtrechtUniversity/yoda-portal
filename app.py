@@ -14,6 +14,7 @@ from jinja2 import ChoiceLoader, FileSystemLoader
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
 from deposit.deposit import deposit_bp
+from fileviewer.fileviewer import fileviewer_bp
 from general.general import general_bp
 from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
@@ -86,6 +87,7 @@ Session(app)
 with app.app_context():
     app.register_blueprint(general_bp)
     app.register_blueprint(group_manager_bp, url_prefix='/group_manager')
+    app.register_blueprint(fileviewer_bp, url_prefix='/fileviewer')
     app.register_blueprint(research_bp, url_prefix='/research')
     app.register_blueprint(stats_bp, url_prefix='/stats')
     app.register_blueprint(user_bp, url_prefix='/user')

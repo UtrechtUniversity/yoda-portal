@@ -3,6 +3,7 @@
 .card-header .input-group-sm {
 	margin: -7px; /* Search box */
 }
+
 .card-footer .input-group-sm {
 	margin: -6px; /* Search box */
 }
@@ -145,4 +146,12 @@
 #result-import-groups-csv {
     max-height: 500px;
     overflow-y: auto;
+}
+
+#group-manager-text {
+	height: 50px;
+}
+
+.div-show-search-groups {
+	height: 42px;
 }

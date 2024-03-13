@@ -659,7 +659,7 @@ function loadForm() {
             formProperties = data;
 
             if (formProperties.data !== null) {
-                // These ary only present when there is a form to show (i.e. no
+                // These are only present when there is a form to show (i.e. no
                 // validation errors, and no transformation needed).
                 schema       = formProperties.data.schema;
                 uiSchema     = formProperties.data.uischema;

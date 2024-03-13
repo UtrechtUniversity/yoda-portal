@@ -1,6 +1,11 @@
 @import "font";
 @import "badge";
 
+/* Folder icons in group manager */
+.user-search-result-group.table-active .fa-folder {
+    color: var(--bs-black)
+}
+
 // Dark theme specific settings
 [data-bs-theme="dark"] {
     /* Breadcrumb */
@@ -14,7 +19,7 @@
     }
 
     /* File browser rows */
-    .browse, .deposit-delete, .page-link, .system-metadata-items, .name, .dlg-browse {
+    .browse, .deposit-delete, .page-link, .system-metadata-items, .name, .dlg-browse, #file-browser a {
         color: $white;
     }
 

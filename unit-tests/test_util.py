@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for portal utility functions."""
 
-__copyright__ = 'Copyright (c) 2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2023-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import sys
@@ -12,6 +12,7 @@ sys.path.append("..")
 
 from util import get_validated_static_path
 from util import is_email_in_domains
+from util import unicode_secure_filename
 
 
 class UtilTest(TestCase):
@@ -27,6 +28,36 @@ class UtilTest(TestCase):
         self.assertEqual(is_email_in_domains("peter@cs.uu.nl", ["*.uu.nl"]), True)
         self.assertEqual(is_email_in_domains("peter@ai.cs.uu.nl", ["*.cs.uu.nl"]), True)
         self.assertEqual(is_email_in_domains("peter@ai.hum.uu.nl", ["*.cs.uu.nl"]), False)
+
+    def test_unicode_secure_filename(self):
+        self.assertEqual(unicode_secure_filename('../../hi abc.txt'), '....hi abc.txt')
+        self.assertEqual(unicode_secure_filename('....//hi abc.txt'), '....hi abc.txt')
+        self.assertEqual(unicode_secure_filename('....\/hi abc.txt'), '....hi abc.txt')
+        self.assertEqual(unicode_secure_filename('..'), '')
+        self.assertEqual(unicode_secure_filename('.\\.'), '')
+        self.assertEqual(unicode_secure_filename('./.'), '')
+        self.assertEqual(unicode_secure_filename('.\\.'), '')
+        self.assertEqual(unicode_secure_filename('.\n.'), '')
+        self.assertEqual(unicode_secure_filename('.git'), '.git')
+        self.assertEqual(unicode_secure_filename('._Windows'), '._Windows')
+        self.assertEqual(unicode_secure_filename('__Windows__'), '__Windows__')
+        self.assertEqual(unicode_secure_filename('..hi abc.txt'), '..hi abc.txt')
+        self.assertEqual(unicode_secure_filename('ö.txt'), 'ö.txt')
+        self.assertEqual(unicode_secure_filename('我.txt'), '我.txt')
+        self.assertEqual(unicode_secure_filename('"Quote"\'Quote\'.txt'), '"Quote"\'Quote\'.txt')
+        self.assertEqual(unicode_secure_filename('\nnonsense\n.txt'), 'nonsense.txt')
+        self.assertEqual(unicode_secure_filename('nonsense\r\nfile'), 'nonsensefile')
+        self.assertEqual(unicode_secure_filename('non\t\a\fsense\r\nfile'), 'nonsensefile')
+        self.assertEqual(unicode_secure_filename('extra-file-extensions.png.jpg.pdf.zip'),
+                         'extra-file-extensions.png.jpg.pdf.zip')
+        self.assertEqual(unicode_secure_filename('/etc/passwd'), 'etcpasswd')
+        # Invalid name, nothing is left
+        self.assertEqual(unicode_secure_filename('\\/\r'), '')
+        # Some of the first non printable characters
+        self.assertEqual(unicode_secure_filename('\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0008\u0009'
+                                                 '\u000A\u000B\u000C\u000D\u000E\u000F'), '')
+        self.assertEqual(unicode_secure_filename('\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019'
+                                                 '\u001A\u001B\u001C\u001D\u001E\u001F\u007F'), '')
 
     def exists_return_value(self, pathname):
         """ Mock path.exists function. True if path does not contain "theme" and "uu" """
