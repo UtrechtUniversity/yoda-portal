@@ -689,14 +689,14 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
     html = '<li class="browse-select breadcrumb-item" data-path="">Research</li>'
     let path = ''
     $.each(parts, function (k, part) {
-      path += '/' + encodeURIComponent(part)
+      path += '/' + part
 
       // Active item
       const valueString = Yoda.htmlEncode(part).replace(/ /g, '&nbsp;')
       if (k === (totalParts - 1)) {
         html += '<li class="active breadcrumb-item">' + valueString + '</li>'
       } else {
-        html += '<li class="browse-select breadcrumb-item" data-path="' + path + '">' + valueString + '</li>'
+        html += '<li class="browse-select breadcrumb-item" data-path="' + Yoda.htmlEncode(path) + '">' + valueString + '</li>'
       }
     })
   }
