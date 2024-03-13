@@ -25,7 +25,7 @@ class KeywordSelector extends React.Component {
             ...props.formData
         };
 
-        const url = 'https://raw.githubusercontent.com/UtrechtUniversity/yoda-ruleset/epos-keyword-selector/vocabularies/epos-keywords.json';
+        const url = 'https://raw.githubusercontent.com/UtrechtUniversity/yoda-ruleset/epos-msl/vocabularies/epos-msl-keywords.json';
         const loadData = async () => {
             await axios.get(url).then((res) => {
                 this.json = res.data;
