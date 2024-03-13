@@ -79,6 +79,10 @@ class KeywordSelector extends React.Component {
             }
         })
         .on("check_node.jstree uncheck_node.jstree", function(e, data) {
+            data.node.parents.forEach((element) => {
+                $('#tree').jstree('check_node', element);
+            });
+
             if(e.type == "check_node") {
                 self.addItem(data.node);
             } else if (e.type == "uncheck_node") {
