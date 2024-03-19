@@ -323,7 +323,8 @@ $(function () {
 
       $.each(sortedFiles, function (key, file) {
         const secureFile = secureFilename(file.name)
-        logUpload(file.uniqueIdentifier, secureFile)
+        const fileName = file.relativePath.substring(0, file.relativePath.lastIndexOf("/") + 1) + secureFile
+        logUpload(file.uniqueIdentifier, fileName)
         const folderName = file.relativePath.substring(0, file.relativePath.indexOf("/"))
         let overwrite = false
 
