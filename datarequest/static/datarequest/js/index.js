@@ -65,7 +65,7 @@ let getFolderContents = (() => {
                                           'archived':    config.archived,
                                           'dacrequests': config.dacrequests,
                                           'sort_order':  args.order[0].dir,
-                                          'sort_on':     ['name', 'modified'][args.order[0].column]});
+                                          'sort_on':     ['name', 'id', 'title', 'modified', 'status'][args.order[0].column]});
 
             // If another requests has come while we were waiting, simply drop this one.
             if (i !== j) return null;
@@ -155,6 +155,7 @@ function startBrowsing()
         "processing": true,
         "serverSide": true,
         "iDeferLoading": 0,
+        order: [[3, 'desc']],
         "pageLength": parseInt(Yoda.settings['number_of_items'])
     });
 
