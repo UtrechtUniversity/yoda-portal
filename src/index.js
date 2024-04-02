@@ -1,9 +1,16 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
-import Form from "@rjsf/bootstrap-4";
+import Form from '@rjsf/bootstrap-4';
+import { customizeValidator } from '@rjsf/validator-ajv8';
+import Ajv2019 from 'ajv/dist/2019';
+import { getTemplate } from '@rjsf/utils';
 import Select from 'react-select';
 import Geolocation from "./Geolocation";
 import Vocabulary from "./Vocabulary";
+import AffiliationIdentifier from  "./AffiliationIdentifier";
+import PersonIdentifier from "./PersonIdentifier";
+import { withTheme } from "@rjsf/core";
+
 
 const path = $('#form').attr('data-path');
 
@@ -11,10 +18,15 @@ let schema       = {};
 let uiSchema     = {};
 let yodaFormData = {};
 
+let validator;
+let formProperties;
+
 let saving = false;
 
 let form = document.getElementById('form');
 
+const validatorAjvDraft7 = customizeValidator({ ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
+const validatorAjv2019 = customizeValidator({ AjvClass: Ajv2019, ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
 
 const enumWidget = (props) => {
     let enumArray = props['schema']['enum'];
@@ -26,18 +38,88 @@ const enumWidget = (props) => {
     let i = enumArray.indexOf(props['value']);
     let placeholder = enumNames[i] == null ? ' ' : enumNames[i];
 
-    let title = props.label || props.uiSchema["ui:title"]
-    let label = <label className="form-label">{title}</label>
     let customStyles = {
-        control: styles => ({
+        control: (styles) => ({
             ...styles,
-            border: '1px solid #ced4da',
+            border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
             boxShadow: 'none',
             '&:hover': {
-                border: '1px solid #ced4da',
+                border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
             }
         })
     };
+
+    const darkThemeColors = {
+        /* For theme color guidance: https://github.com/JedWatson/react-select/issues/3692#issuecomment-523425096 */
+        /*
+         * control/backgroundColor
+         * menu/backgroundColor
+         * option/color(selected)
+         */
+        neutral0: '#212529',
+
+        /*
+         * control/backgroundColor(disabled)
+         */
+        neutral5: '#212529',
+
+        /*
+         * control/borderColor(disabled)
+         * multiValue/backgroundColor
+         * indicators(separator)/backgroundColor(disabled)
+         */
+        neutral10: '#343a40',
+
+        /*
+         * control/borderColor
+         * option/color(disabled)
+         * indicators/color
+         * indicators(separator)/backgroundColor
+         * indicators(loading)/color
+         */
+        neutral20: '#343a40',
+
+        /*
+         * control/borderColor(focused)
+         * control/borderColor:hover
+         */
+        neutral30: '#343a40',
+
+        /*
+         * input/color
+         * multiValue(label)/color
+         * singleValue/color
+         * indicators/color(focused)
+         * indicators/color:hover(focused)
+         */
+        neutral80: 'var(--neutral-10)',
+        neutral90: 'var(--neutral-10)',
+
+         /*
+          * One of the few bootstrap variables we can use with themeing react-select!
+          * control/boxShadow(focused)
+          * control/borderColor(focused)
+          * control/borderColor:hover(focused)
+          * option/backgroundColor(selected)
+          * option/backgroundColor:active(selected)
+          */
+        primary: 'var(--bs-primary)',
+
+        /*
+         * option/backgroundColor(focused)
+         */
+        primary25: '#2b3035',
+
+        /*
+         * option/backgroundColor:active
+         */
+        primary50: '#2b3035',
+        primary75: '#2b3035',
+    };
+
+    // Check what theme is set
+    const colorMode = document.documentElement.getAttribute('data-bs-theme');
+
     let required = props.required
     let error = "should be equal to one of the allowed values";
 
@@ -58,7 +140,7 @@ const enumWidget = (props) => {
             name_hierarchy[level_counter] = level_name;
             level_counter++;
             level_name = '';
-         }
+        }
     });
 
     // If the final item was not numeric, it is not yet added to the name_hierarchy array
@@ -73,8 +155,13 @@ const enumWidget = (props) => {
         required = schema.required.includes(name_hierarchy[0]);
     }
 
+    // will hold classes (select-required, select-filled) as indications for totalization purposes.
+    // For that purpose element <selectTotals> will be added.
+    let selectCompletenessClasses = '';
+
     if((props.rawErrors !== undefined && props.rawErrors.indexOf(error) >= 0) || (required && props.value == null)) {
-        label = <label className="text-danger form-label select-required">{title}*</label>
+        // Indicate that this element is required and should be counted as total
+        selectCompletenessClasses = 'select-required';
         customStyles = {
             control: styles => ({
                 ...styles,
@@ -86,19 +173,25 @@ const enumWidget = (props) => {
             })
         };
     } else if (required) {
-        label = <label className="form-label select-required select-filled">{title}*</label>
+        // Indicate that this element is required and holds a value
+        selectCompletenessClasses = 'select-required select-filled';
     }
 
     return (
         <div>
-            {label}
+            <selectTotals class={selectCompletenessClasses}></selectTotals>
             <Select className={'select-box'}
                     placeholder={placeholder}
                     required={required}
                     isDisabled={props.readonly}
                     onChange={(event) => props.onChange(event.value)}
                     options={props['options']['enumOptions']}
-                    styles={customStyles} />
+                    styles={customStyles}
+                    theme={(theme) => ({
+                        ...theme,
+                        colors: (colorMode === 'dark') ? {...theme.colors, ...darkThemeColors} : {...theme.colors},
+                    })}
+            />
         </div>
     );
 };
@@ -109,7 +202,248 @@ const widgets = {
 
 const fields = {
     geo: Geolocation,
-    vocabulary: Vocabulary
+    vocabulary: Vocabulary,
+    affiliation_identifier: AffiliationIdentifier,
+    person_identifier: PersonIdentifier
+};
+
+const CustomArrayFieldTemplate = (props) => {
+    const { readonly, disabled } = props;
+
+    if (disabled) {
+        let output = props.items.map((element, i) => {
+            // Disabled view
+            if (disabled) {
+                return element.children;
+            }
+        });
+        return (<div className="hide">{output}</div>);
+    } else {
+        let buttonClass = "col-sm-2 offset-sm-10 array-item-add text-right";
+        if (props.uiSchema["ui:description"] || props.schema.description) {
+            buttonClass = "col-sm-2 array-item-add text-right";
+        }
+
+        return (
+            <fieldset className="yoda-array-field border rounded mb-4">
+                {(props.title) && (
+                    <legend>{props.title}</legend>
+                )}
+
+                <div className="d-flex">
+                    {(props.uiSchema["ui:description"] || props.schema.description) && (
+                        <small className="col-sm-10 text-muted form-text mb-2">
+                            {props.uiSchema["ui:description"] || props.schema.description}
+                        </small>
+                    )}
+
+                    {(!readonly && props.canAdd) && (
+                        <p className={buttonClass}>
+                            <button className="btn btn-outline-secondary btn-sm" onClick={props.onAddClick} type="button">
+                                <i className="fa-solid fa-plus" aria-hidden="true"></i>
+                            </button>
+                        </p>
+                    )}
+                </div>
+
+                {props.items &&
+                props.items.map(el => (
+                    <div key={el.key} className="d-flex">
+                        <div className="col-lg-10 col-10">
+                            {el.children}
+                        </div>
+                        {!readonly && (
+                            <div className="py-4 col-lg-2 col-2 mt-2">
+                                <div className="d-flex flex-row">
+                                    {el.hasMoveUp && (
+                                        <div className="m-0 p-0">
+                                            <button className="btn btn-outline-secondary btn-sm" type="button" tabindex="-1"
+                                                    onClick={el.onReorderClick(
+                                                        el.index,
+                                                        el.index - 1
+                                                    )}>
+                                                <i className="fa-solid fa-arrow-up" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {el.hasMoveDown && (
+                                        <div className="m-0 p-0">
+                                            <button className="btn btn-outline-secondary btn-sm" type="button" tabindex="-1"
+                                                    onClick={el.onReorderClick(
+                                                        el.index,
+                                                        el.index + 1
+                                                    )}>
+                                                <i className="fa-solid fa-arrow-down" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {el.hasRemove && props.items.length > 1 && (
+                                        <div className="m-0 p-0">
+                                            <button className="btn btn-outline-secondary btn-sm" type="button" tabindex="-1"
+                                                    onClick={el.onDropIndexClick(el.index)}>
+                                                <i className="fa-solid fa-trash" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    )}
+
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </fieldset>
+        );
+    }
+};
+
+const CustomFieldTemplate = (props) => {
+    const {id, classNames, style, label, help, hidden, required, description, errors,
+        rawErrors, children, displayLabel, formContext, readonly} = props;
+
+    let labelClass = '';
+    if (Array.isArray(rawErrors)) {
+        labelClass = 'text-danger';
+    }
+
+
+    if (hidden || !displayLabel) {
+        return children;
+    }
+
+    // Only show error messages after submit.
+    if (formContext.saving) {
+        return (
+            <div className={classNames + ' row'}>
+                <div className={'col-12 field-wrapper'}>
+                    <div className={'form-group mb-0'}>
+                        <div className={'mb-0 form-group'}>
+                            <label htmlFor={id} className={labelClass}>
+                                {label}
+                                {required ? '*' : null}
+                            </label>
+                            {children}
+                            {help && (
+                                <small className="text-muted form-text">{help}</small>
+                            )}
+                            {description}
+                        </div>
+                    </div>
+                    {errors}
+                </div>
+            </div>
+        );
+    } else {
+        return (
+            <div className={classNames+ ' row'}>
+                <div className={'col-12 field-wrapper'}>
+                    <div className={'form-group mb-0'}>
+                        <div className={'mb-0 form-group'}>
+                            <label htmlFor={id} className={labelClass}>
+                                {label}
+                                {required ? '*' : null}
+                            </label>
+                            {children}
+                            {help && (
+                                <small className="text-muted form-text">{help}</small>
+                            )}
+                            {description}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+};
+
+const CustomObjectFieldTemplate = (props) => {
+    const { registry, uiOptions } = props;
+    const TitleField = getTemplate("TitleFieldTemplate", registry, uiOptions);
+    let structureClass;
+    let structure;
+    if ('yoda:structure' in props.schema) {
+        structureClass = `yoda-structure ${props.schema['yoda:structure']}`;
+        structure = props.schema['yoda:structure'];
+    }
+
+    if (structure === 'compound') {
+        let output = props.properties.map((prop, i) => {
+            return (
+                <div key={i} className="col compound-field">
+                    {prop.content}
+                </div>
+            );
+        });
+
+        if(props.title) {
+            return (
+                <fieldset className="yoda-array-field border rounded mb-4">
+                    <legend>{props.title}</legend>
+                    <div className="d-flex">{output} </div>
+                </fieldset>
+            );
+        } else {
+            return (
+                <div className="d-flex">{output}</div>
+            );
+        }
+    }
+
+    return (
+        <fieldset className="mb-3">
+            {(props.uiSchema["ui:description"] || props.schema.description) && (
+                <small className="col-xs-12 text-muted form-text">
+                    {props.uiSchema["ui:description"] || props.schema.description}
+                </small>
+            )}
+            <div className="container-fluid p-0">
+                {props.properties.map(prop => (
+                    <div className="col-xs-12" key={prop.content.key}>
+                        {prop.content}
+                    </div>
+                ))}
+            </div>
+        </fieldset>
+    );
+};
+
+const CustomErrorListTemplate = (props) => {
+    let {errors, formContext} = props;
+    errors = errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies');
+
+    if (errors.length === 0) {
+        return(<div></div>);
+    } else {
+        // Show error list only on save.
+        if (formContext.saving) {
+            return (
+                <div className="mb-4 card border-danger">
+                    <div className="alert-danger card-header">Validation warnings</div>
+                    <div className="p-0 card-body">
+                        <div className="list-group">
+                            {errors.map((error, i) => {
+                                return (
+                                    <div key={i} className="border-0 list-group-item">
+                                        <span>{error.stack}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        } else {
+            return(<div></div>);
+        }
+    }
+};
+
+const templates = {
+    ArrayFieldTemplate: CustomArrayFieldTemplate,
+    ObjectFieldTemplate: CustomObjectFieldTemplate,
+    ErrorListTemplate: CustomErrorListTemplate,
+    FieldTemplate: CustomFieldTemplate
 };
 
 const onSubmit = ({formData}) => submitData(formData);
@@ -129,15 +463,6 @@ class YodaForm extends React.Component {
 
     onChange(form) {
         updateCompleteness();
-
-        // Turn save mode off.
-        saving = false;
-        const formContext = { saving: false };
-
-        this.setState({
-            formData: form.formData,
-            formContext: formContext
-        });
     }
 
     onError(form) {
@@ -154,37 +479,6 @@ class YodaForm extends React.Component {
         return errors;
     }
 
-    ErrorListTemplate(props) {
-        let {errors, formContext} = props;
-        errors = errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies');
-
-        if (errors.length === 0) {
-            return(<div></div>);
-        } else {
-            // Show error list only on save.
-            if (formContext.saving) {
-                return (
-                    <div className="mb-4 card border-danger">
-                        <div className="alert-danger card-header">Validation warnings</div>
-                        <div className="p-0 card-body">
-                            <div className="list-group">
-                                {errors.map((error, i) => {
-                                    return (
-                                        <div key={i} className="border-0 list-group-item">
-                                            <span>{error.stack}</span>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </div>
-                );
-            } else {
-                return(<div></div>);
-            }
-        }
-    }
-
     render () {
         return (
             <Form className="metadata-form"
@@ -194,19 +488,17 @@ class YodaForm extends React.Component {
                   fields={fields}
                   formData={this.state.formData}
                   formContext={this.state.formContext}
-                  ArrayFieldTemplate={ArrayFieldTemplate}
-                  ObjectFieldTemplate={ObjectFieldTemplate}
-                  FieldTemplate={CustomFieldTemplate}
                   liveValidate={true}
                   noValidate={false}
                   noHtml5Validate={true}
-                  showErrorList={true}
-                  ErrorList={this.ErrorListTemplate}
-                  onSubmit={onSubmit}
+                  showErrorList={"top"}
                   widgets={widgets}
+                  templates={templates}
+                  onSubmit={onSubmit}
                   onChange={this.onChange.bind(this)}
                   onError={this.onError.bind(this)}
-                  transformErrors={this.transformErrors}>
+                  transformErrors={this.transformErrors}
+                  validator={validator}>
                 <button ref={(btn) => {this.submitButton=btn;}} className="hidden" />
             </Form>
         );
@@ -252,7 +544,6 @@ class YodaButtons extends React.Component {
         );
     }
 }
-
 
 class Container extends React.Component {
     constructor(props) {
@@ -302,11 +593,18 @@ class Container extends React.Component {
 
 async function loadForm() {
     const [schemaResponse, uiSchemaResponse] = await Promise.all([
-      fetch('https://raw.githubusercontent.com/UtrechtUniversity/yoda-ruleset/development/schemas/default-2/metadata.json'),
-      fetch('https://raw.githubusercontent.com/UtrechtUniversity/yoda-ruleset/development/schemas/default-2/uischema.json')
+      fetch('https://raw.githubusercontent.com/UtrechtUniversity/yoda-ruleset/development/schemas/default-3/metadata.json'),
+      fetch('https://raw.githubusercontent.com/UtrechtUniversity/yoda-ruleset/development/schemas/default-3/uischema.json')
     ]);
     schema = await schemaResponse.json();
     uiSchema = await uiSchemaResponse.json();
+
+    // Select validator based on schema.
+    if (schema.$schema == "http://json-schema.org/draft-07/schema") {
+        validator = validatorAjvDraft7
+    } else {
+        validator = validatorAjv2019
+    }
 
     render(<Container/>, document.getElementById('form'));
     updateCompleteness();
@@ -351,200 +649,6 @@ async function submitData(data) {
 
     link.dispatchEvent(evt);
     link.remove()
-}
-
-function CustomFieldTemplate(props) {
-    const {id, classNames, label, help, hidden, required, description, errors,
-        rawErrors, children, displayLabel, formContext, readonly} = props;
-
-    if (hidden || !displayLabel) {
-        return children;
-    }
-
-    // Only show error messages after submit.
-    if (formContext.saving) {
-        return (
-            <div className={classNames + ' row'}>
-                <div className={'col-12 field-wrapper'}>
-                    <div className={'form-group mb-0'}>
-                        <div className={'mb-0 form-group'}>
-                            {children}
-                            {help && (
-                                <small className="text-muted form-text">{help}</small>
-                            )}
-                            {description}
-                        </div>
-                    </div>
-                    {errors}
-                </div>
-            </div>
-        );
-    } else {
-        return (
-            <div className={classNames+ ' row'}>
-                <div className={'col-12 field-wrapper'}>
-                    <div className={'form-group mb-0'}>
-                        <div className={'mb-0 form-group'}>
-                            {children}
-                            {help && (
-                                <small className="text-muted form-text">{help}</small>
-                            )}
-                            {description}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-}
-
-function ObjectFieldTemplate(props) {
-    const { TitleField, DescriptionField } = props;
-
-    let structureClass;
-    let structure;
-    if ('yoda:structure' in props.schema) {
-        structureClass = `yoda-structure ${props.schema['yoda:structure']}`;
-        structure = props.schema['yoda:structure'];
-    }
-
-    if (structure === 'compound') {
-        let output = props.properties.map((prop, i) => {
-            return (
-                <div key={i} className="col compound-field">
-                    {prop.content}
-                </div>
-            );
-        });
-
-        if(props.title) {
-            return (
-                <fieldset className="yoda-array-field border rounded mb-4">
-                    <legend>{props.title}</legend>
-                    <div className="d-flex">{output} </div>
-                </fieldset>
-            );
-        } else {
-            return (
-                <div className="d-flex">{output}</div>
-            );
-        }
-    }
-
-    return (
-        <fieldset className="mb-3">
-            {(props.uiSchema["ui:title"] || props.title) && (
-                <TitleField
-                    id={`${props.idSchema.$id}__title`}
-                    title={props.title || props.uiSchema["ui:title"]}
-                    required={props.required}
-                    formContext={props.formContext}
-                />
-            )}
-            {(props.uiSchema["ui:description"] || props.schema.description) && (
-                <small className="col-xs-12 text-muted form-text">
-                    {props.uiSchema["ui:description"] || props.schema.description}
-                </small>
-            )}
-            <div className="container-fluid p-0">
-                {props.properties.map(prop => (
-                    <div className="col-xs-12" key={prop.content.key}>
-                        {prop.content}
-                    </div>
-                ))}
-            </div>
-        </fieldset>
-    );
-}
-
-function ArrayFieldTemplate(props) {
-    const { DescriptionField, readonly, disabled } = props;
-
-    if (disabled) {
-        let output = props.items.map((element, i) => {
-            // Disabled view
-            if (disabled) {
-                return element.children;
-            }
-        });
-        return (<div className="hide">{output}</div>);
-    } else {
-        let buttonClass = "col-sm-2 offset-sm-10 array-item-add text-right";
-        if (props.uiSchema["ui:description"] || props.schema.description) {
-            buttonClass = "col-sm-2 array-item-add text-right";
-        }
-
-        return (
-            <fieldset className="yoda-array-field border rounded mb-4">
-                {(props.title) && (
-                    <legend>{props.title}</legend>
-                )}
-
-                <div className="d-flex">
-                    {(props.uiSchema["ui:description"] || props.schema.description) && (
-                        <small className="col-sm-10 text-muted form-text mb-2">
-                            {props.uiSchema["ui:description"] || props.schema.description}
-                        </small>
-                    )}
-
-                    {(!readonly && props.canAdd) && (
-                        <p className={buttonClass}>
-                            <button className="btn btn-outline-secondary btn-sm" onClick={props.onAddClick} type="button">
-                                +
-                            </button>
-                        </p>
-                    )}
-                </div>
-
-                {props.items &&
-                props.items.map(el => (
-                    <div key={el.key} className="d-flex">
-                        <div className="col-lg-10 col-10">
-                            {el.children}
-                        </div>
-                        {!readonly && (
-                            <div className="py-4 col-lg-2 col-2 mt-2">
-                                <div className="d-flex flex-row">
-                                    {el.hasMoveUp && (
-                                        <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
-                                                    onClick={el.onReorderClick(
-                                                        el.index,
-                                                        el.index - 1
-                                                    )}>
-                                                &uarr;
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {el.hasMoveDown && (
-                                        <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
-                                                    onClick={el.onReorderClick(
-                                                        el.index,
-                                                        el.index + 1
-                                                    )}>
-                                                &darr;
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {el.hasRemove && (
-                                        <div className="m-0 p-0">
-                                            <button className="btn btn-light btn-sm" type="button" tabindex="-1"
-                                                    onClick={el.onDropIndexClick(el.index)}>
-                                                -
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                ))}
-            </fieldset>
-        );
-    }
 }
 
 function updateCompleteness()
