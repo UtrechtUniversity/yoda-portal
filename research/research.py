@@ -159,9 +159,10 @@ def upload_get() -> Response:
     object_path = build_object_path(filepath, flow_relative_path, flow_filename)
 
     # Partial file name for chunked uploads.
-    if flow_total_chunks > 1:
+    if flow_total_chunks > 1 and app.config.get('UPLOAD_PART_FILES'):
         object_path = f"{object_path}.part"
-    else:
+
+    if flow_total_chunks == 1:
         # Ensuring single chunk files get to the overwrite stage as well
         response = make_response(jsonify({"message": "Chunk not found"}), 204)
         response.headers["Content-Type"] = "application/json"
@@ -207,7 +208,7 @@ def upload_post() -> Response:
     object_path = build_object_path(filepath, flow_relative_path, flow_filename)
 
     # Partial file name for chunked uploads.
-    if flow_total_chunks > 1:
+    if flow_total_chunks > 1 and app.config.get('UPLOAD_PART_FILES'):
         object_path = f"{object_path}.part"
 
     # Get the chunk data.
@@ -235,7 +236,7 @@ def upload_post() -> Response:
             return response
 
     # Rename partial file name when complete for chunked uploads.
-    if flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
+    if app.config.get('UPLOAD_PART_FILES') and flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
         final_object_path = build_object_path(filepath, flow_relative_path, flow_filename)
         try:
             # overwriting doesn't work using the move command, therefore unlink the previous file first
