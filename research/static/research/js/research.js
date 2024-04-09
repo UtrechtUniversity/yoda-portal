@@ -287,6 +287,7 @@ $(function () {
     chunkSize: 25 * 1024 * 1024,
     forceChunkSize: true,
     simultaneousUploads: 1,
+    testChunks: false,         // Disabled because of need to be able to overwrite files with different content
     query: { csrf_token: Yoda.csrf.tokenValue, filepath: '' }
   })
   // Flow.js isn't supported, fall back on a different method
