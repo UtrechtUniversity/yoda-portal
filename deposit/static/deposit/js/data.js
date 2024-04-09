@@ -195,6 +195,7 @@ $(function () {
     target: '/research/upload',
     chunkSize: 25 * 1024 * 1024,
     forceChunkSize: true,
+    testChunks: false,         // Disabled because of need to be able to overwrite files with different content
     simultaneousUploads: 1,
     query: { csrf_token: Yoda.csrf.tokenValue, filepath: '' }
   })
