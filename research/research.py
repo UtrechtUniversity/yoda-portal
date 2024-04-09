@@ -14,7 +14,7 @@ from flask import (
     render_template, request, Response, session, stream_with_context
 )
 from irods.data_object import iRODSDataObject
-from irods.exception import CAT_NO_ACCESS_PERMISSION
+from irods.exception import CAT_NO_ACCESS_PERMISSION, CAT_NO_ROWS_FOUND
 from irods.message import iRODSMessage
 
 import api
@@ -241,9 +241,16 @@ def upload_post() -> Response:
         try:
             # overwriting doesn't work using the move command, therefore unlink the previous file first
             g.irods.data_objects.unlink(final_object_path, force=True)
-        except Exception:
-            # Probably there was no file present which is no erroneous situation
+        except CAT_NO_ROWS_FOUND:
+            # No file was present, which is okay.
             pass
+        except Exception as e:
+            log_error("Error occurred on upload when unlinking existing object at {} ({}:{})".format(
+                      final_object_path, str(type(e)), str(e)))
+            response = make_response(jsonify({"message": "Upload failed when removing existing data object."}), 500)
+            response.headers["Content-Type"] = "application/json"
+            return response
+
         g.irods.data_objects.move(object_path, final_object_path)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
