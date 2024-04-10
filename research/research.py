@@ -241,7 +241,14 @@ def upload_post() -> Response:
     ))
 
     # check at the end, and after every Gb
-    if flow_total_chunks == flow_chunk_number or flow_chunk_number % 40 == 0:
+    if flow_total_chunks == flow_chunk_number:
+        need_to_check_flow = True
+    else:
+        flow_check_byte_interval = 2**30  # Check upload flow (at least) every 1 GB
+        flow_check_chunk_interval = int(flow_check_byte_interval / min(flow_chunk_size, flow_check_byte_interval))
+        need_to_check_flow = flow_chunk_number % flow_check_chunk_interval == 0
+
+    if need_to_check_flow:
         q.put(Chunk(None, None, 0, 0, None, None))
         q.join()
         if r.get():
