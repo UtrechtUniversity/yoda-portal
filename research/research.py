@@ -215,6 +215,21 @@ def upload_post() -> Response:
     chunk_data = request.files['file']
     encode_unicode_content = iRODSMessage.encode_unicode(chunk_data.stream.read())
 
+    # Truncate the existing data object, if present. This ensures that overwriting an
+    # existing data object with a smaller file works as expected.
+    if flow_chunk_number == 1:
+        try:
+            g.irods.data_objects.truncate(object_path, 0)
+        except CAT_NO_ROWS_FOUND:
+            # No file was present, which is okay.
+            pass
+        except Exception as e:
+            log_error("Error occurred when truncating existing object on upload at {} ({}:{})".format(
+                      object_path, str(type(e)), str(e)))
+            response = make_response(jsonify({"message": "Upload failed when truncating existing data object."}), 500)
+            response.headers["Content-Type"] = "application/json"
+            return response
+
     # Write chunk data.
     q.put(Chunk(
         g.irods.data_objects,
