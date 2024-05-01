@@ -401,7 +401,7 @@ async function processImportedRow (row) {
       let grpIdx = 1
       for (const category in groupdata.group_hierarchy) {
         html += `<div class="list-group-item category" id="category-${catIdx}" data-name="${category}">
-                                        <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-${catIdx}" href="#category-${catIdx}-ul">
+                                        <a class="name" data-bs-toggle="collapse" href="#category-${catIdx}-ul" aria-controls="category-${catIdx}-ul" aria-expanded="false" role="button">
                                             <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${category}
                                         </a>
                                         <div class="list-group collapse category-ul" id="category-${catIdx}-ul">`
@@ -410,10 +410,10 @@ async function processImportedRow (row) {
           html +=
 
                                 `<div class="list-group-item subcategory" data-name="${subcat}">
-                                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-${subcatIdx}" href="#subcategory-${subcatIdx}-ul">
+                                    <a class="name" data-bs-toggle="collapse" href="#subcategory-${catIdx}-${subcatIdx}-ul" aria-controls="subcategory-${catIdx}-${subcatIdx}-ul" aria-expanded="false" role="button">
                                         <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${subcat}
                                     </a>
-                                    <div class="list-group collapse subcategory-ul" id="subcategory-${subcatIdx}-ul">`
+                                    <div class="list-group collapse subcategory-ul" id="subcategory-${catIdx}-${subcatIdx}-ul">`
 
           grpIdx = 1
           for (const group in groupdata.group_hierarchy[category][subcat]) {
@@ -915,19 +915,18 @@ $(function () {
 
       const $group = $groupList.find('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]')
 
-      $group.parents('.category').children('a.name').removeClass('collapsed')
-      $group.parents('.category').children('.category-ul').removeClass('hidden')
-      $group.parents('.category').children('.category-ul').collapse('show')
+      const $catBody = $group.parents('.category').children('.category-ul')
+      new bootstrap.Collapse($catBody, {toggle: false}).show()
+      const numSubcats = $group.parents('.category').find('.subcategory').length
 
-      if ($group.parents('.category').find('.subcategory').length > 1) {
+      if (numSubcats > 1) {
         // Unfold subcategory.
         // Skip this if there is only one subcategory. In that case the
         // subcat will be automagically expanded by a
         // 'shown.bs.collapse' event handler.
         // (unfolding twice looks jittery)
-        $group.parents('.subcategory').children('a.name').removeClass('collapsed')
-        $group.parents('.subcategory').children('.subcategory-ul').removeClass('hidden')
-        $group.parents('.subcategory').children('.subcategory-ul').collapse('show')
+        const $subcatBody = $group.parents('.subcategory').children('.subcategory-ul')
+        new bootstrap.Collapse($subcatBody, {toggle: false}).show()
       }
     },
 
@@ -2156,13 +2155,12 @@ $(function () {
 
       $groupList.on('shown.bs.collapse', function (e) {
         // Once a category is fully opened, open its subcategory (if there is only one).
-        const subs = $(e.target).children('.subcategory')
-        subs.children('.subcategory-ul').collapse('hide')
-        if (subs.length === 1) {
+        const $subs = $(e.target).children('.subcategory')
+        
+        if ($subs.length === 1) {
           // Only one subcategory, expand it automatically.
-          subs.first().children('a.name').removeClass('collapsed')
-          subs.first().children('.subcategory-ul').removeClass('hidden')
-          subs.first().children('.subcategory-ul').collapse('show')
+          const $subcatBody = $subs.first().children('.subcategory-ul')
+          new bootstrap.Collapse($subcatBody, {toggle: false}).show()
         }
       })
 
