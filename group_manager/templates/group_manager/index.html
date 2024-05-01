@@ -51,17 +51,18 @@
 
                             {% for category, subcategories in group_hierarchy.items() %}
                             <div class="list-group-item category" id="category-{{ loop.index }}" data-name="{{ category }}">
-                                <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-{{ loop.index }}" href="#category-{{ loop.index }}-ul">
+                                <a class="name" data-bs-toggle="collapse" href="#category-{{ loop.index }}-ul" aria-controls="category-{{ loop.index }}-ul" aria-expanded="false" role="button">
                                     <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> {{ category }}
                                 </a>
                                 <div class="list-group collapse category-ul" id="category-{{ loop.index }}-ul">
 
+                                {% set outerindex = loop.index %}
                                 {% for subcategory, groups in subcategories.items() %}
                                 <div class="list-group-item subcategory" data-name="{{ subcategory }}">
-                                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-{{ loop.index }}" href="#subcategory-{{ loop.index }}-ul">
+                                    <a class="name" data-bs-toggle="collapse" href="#subcategory-{{ outerindex }}-{{ loop.index }}-ul" aria-controls="subcategory-{{ outerindex }}-{{ loop.index }}-ul" aria-expanded="false" role="button">
                                         <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> {{ subcategory }}
                                     </a>
-                                    <div class="list-group collapse subcategory-ul" id="subcategory-{{ loop.index }}-ul">
+                                    <div class="list-group collapse subcategory-ul" id="subcategory-{{ outerindex }}-{{ loop.index }}-ul">
                                     {% for group, properties in groups.items() %}
                                     <a class="list-group-item list-group-item-action group" id="group-{{ loop.index }}" data-name="{{ group }}">
                                         {{ group }}
