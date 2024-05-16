@@ -268,11 +268,6 @@ $(function () {
     handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'))
   })
 
-  // FILE stage
-  $('body').on('click', 'a.file-stage', function () {
-    handleFileStage($(this).attr('data-collection'), $(this).attr('data-name'))
-  })
-
   $('.upload-folder').on('click', function () {
     uploadFolder = true
   })
@@ -776,19 +771,6 @@ async function handleFileDelete (collection, fileName) {
   $('#file-delete .btn-confirm-file-delete').html('Delete file')
 }
 
-async function handleFileStage (collection, fileName) {
-  const result = await Yoda.call('tape_archive_stage',
-    { path: Yoda.basePath + collection + '/' + fileName },
-    { quiet: true, rawResult: true }
-  )
-
-  if (result.status === 'ok') {
-    Yoda.set_message('success', 'Successfully requested to bring file <' + fileName + '> online')
-  } else {
-    Yoda.set_message('error', 'Failed to request to bring file <' + fileName + '> online')
-  }
-}
-
 // Alerts regarding folder/file management
 function fileMgmtDialogAlert (dlgName, alert) {
   if (alert.length) {
@@ -1029,17 +1011,6 @@ const tableRenderer = {
     elem.attr('title', date.toString()) // (should include seconds and TZ info)
     return elem[0].outerHTML
   },
-  state: (_, __, row) => {
-    let state = $('<span>')
-    if (row.type === 'data' && row.state === 'OFL') {
-      state = $('<span class="badge bg-secondary" title="Stored offline on tape archive">Offline</span>')
-    } else if (row.type === 'data' && row.state === 'UNM') {
-      state = $('<span class="badge bg-secondary" title="Migrating from tape archive to disk">Bringing online</span>')
-    } else if (row.type === 'data' && row.state === 'MIG') {
-      state = $('<span class="badge bg-secondary" title="Migrating from disk to tape archive">Storing offline</span>')
-    }
-    return state[0].outerHTML
-  },
   context: (_, __, row) => {
     const actions = $('<div class="dropdown-menu">')
 
@@ -1053,19 +1024,11 @@ const tableRenderer = {
       actions.append(`<a href="#" class="dropdown-item folder-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this folder">Move</a>`)
       actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
     } else {
-      if (row.state === 'OFL') {
-        actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`)
-      } else if (row.state === 'MIG' || row.state === 'UNM') {
-        // no context menu for data objects migrating from or to tape archive
-        return ''
-      } else {
-        actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
-
-        actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this file">Rename</a>`)
-        actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this file">Copy</a>`)
-        actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this file">Move</a>`)
-        actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
-      }
+      actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this file">Rename</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this file">Copy</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this file">Move</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
     }
 
     const dropdown = $(`<div class="dropdown">
@@ -1096,7 +1059,6 @@ function startBrowsing () {
       // (enabling this as is may result in duplicated results for data objects)
       { render: tableRenderer.size, data: 'size' },
       { render: tableRenderer.date, orderable: false, data: 'modify_time' },
-      { render: tableRenderer.state, orderable: false },
       { render: tableRenderer.context, orderable: false }],
     ajax: getFolderContents,
     processing: true,
