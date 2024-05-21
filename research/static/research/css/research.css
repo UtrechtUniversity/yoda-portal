@@ -97,10 +97,6 @@ ol.breadcrumb li.active {
     max-width: 85px;
 }
 #file-browser tr > :nth-child(5) {
-    max-width: 40px;
-    text-align: right;
-}
-#file-browser tr > :nth-child(6) {
     max-width: 30px;
     text-align: right;
 }
