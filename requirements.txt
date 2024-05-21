@@ -4,7 +4,7 @@ flask-session==0.6.0
 Flask-WTF==1.2.1
 mod-wsgi==5.0.0
 pyjwt[crypto]==2.8.0
-requests==2.31.0
+requests==2.32.0
 opensearch-py==1.0.0
 irods-avu-json==2.2.0
 MarkupSafe==2.1.5
