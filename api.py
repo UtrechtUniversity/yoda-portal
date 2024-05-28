@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import base64
 import json
+import re
 import sys
 import zlib
 from timeit import default_timer as timer
@@ -13,7 +14,7 @@ from typing import Any, Dict, Optional
 from flask import Blueprint, current_app as app, g, jsonify, request, Response
 from irods import message, rule
 
-from errors import UnauthorizedAPIAccessError
+from errors import InvalidAPIError, UnauthorizedAPIAccessError
 from util import log_error
 
 api_bp = Blueprint('api_bp', __name__)
@@ -23,6 +24,9 @@ api_bp = Blueprint('api_bp', __name__)
 def _call(fn: str) -> Response:
     if not authenticated():
         raise UnauthorizedAPIAccessError
+
+    if not re.match("^([a-z_]+)$", fn):
+        raise InvalidAPIError
 
     data: Dict[str, Any] = {}
     if 'data' in request.form:
@@ -109,6 +113,10 @@ def api_error_handler(error: Exception) -> Response:
     status_info = "Something went wrong"
     data: Dict[str, Any] = {}
     code = 500
+
+    if type(error) == InvalidAPIError:
+        code = 400
+        status_info = "Bad API request"
 
     if type(error) == UnauthorizedAPIAccessError:
         code = 401
