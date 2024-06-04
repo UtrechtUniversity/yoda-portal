@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; <Admin-Test></Admin-Test>{% endblock title %}
+
+{% block style %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+{% endblock style %}
+
+{% block content %}
+
+    {% if g.user %}
+        {% include 'index_authenticated.html' %}
+    {% else %}
+        {% include 'index_not_authenticated.html' %}
+    {% endif %}
+
+{% endblock content %}
