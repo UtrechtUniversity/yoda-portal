@@ -25,6 +25,7 @@ from stats.stats import stats_bp
 from user.user import user_bp
 from util import get_validated_static_path
 from vault.vault import vault_bp
+from admin.admin import admin_bp
 
 
 app = Flask(__name__, static_folder='assets')
@@ -94,6 +95,7 @@ with app.app_context():
     app.register_blueprint(vault_bp, url_prefix='/vault')
     app.register_blueprint(search_bp, url_prefix='/search')
     app.register_blueprint(api_bp, url_prefix='/api/')
+    app.register_blueprint(admin_bp,url_prefix='/admin')
     if app.config.get('DEPOSIT_ENABLED'):
         app.register_blueprint(deposit_bp, url_prefix='/deposit')
     if app.config.get('OPEN_SEARCH_ENABLED'):
@@ -144,7 +146,8 @@ def protect_pages() -> Optional[Response]:
                                                     'user_bp.gate',
                                                     'user_bp.callback',
                                                     'api_bp._call',
-                                                    'static']:
+                                                    'static',
+                                                    ]:
         return None
     elif g.get('user', None) is not None:
         return None
