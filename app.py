@@ -146,8 +146,7 @@ def protect_pages() -> Optional[Response]:
                                                     'user_bp.gate',
                                                     'user_bp.callback',
                                                     'api_bp._call',
-                                                    'static',
-                                                    ]:
+                                                    'static']:
         return None
     elif g.get('user', None) is not None:
         return None
