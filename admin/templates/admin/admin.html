@@ -1,18 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; <Admin-Test></Admin-Test>{% endblock title %}
+{% block title %}{{ super() }} &dash; Administrtion{% endblock title %}
 
 {% block style %}
-{{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+    <link rel="stylesheet" href="{{ url_for('admin_bp.index', filename='css/stats.css') }}">
 {% endblock style %}
 
 {% block content %}
-
-    {% if g.user %}
-        {% include 'index_authenticated.html' %}
-    {% else %}
-        {% include 'index_not_authenticated.html' %}
-    {% endif %}
-
+    <p>This is a blank admin page, feature development is on the way ...</p>
 {% endblock content %}
