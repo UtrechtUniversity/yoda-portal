@@ -6,8 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 # Blueprint for modular structure of codes
 # redirect for directing users to various url
 # render_template is based on Jinja2
-from flask import Blueprint, redirect, render_template, Response, url_for
-from flask_wtf.csrf import CSRFError
+from flask import Blueprint, render_template, Response,
 
 admin_bp = Blueprint('admin_bp', __name__,
                        template_folder='templates/admin',
