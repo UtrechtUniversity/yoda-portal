@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} &dash; Data Transfer{% endblock %}
+
+{% block content %}
+<h1>Data Transfer</h1>
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-header">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#iCommands">iCommands</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#Gocommands">Gocommands</a>
+            </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <!-- Tab panes -->
+            <div class="tab-content">
+            <div id="iCommands" class="container tab-pane active"><br>
+                <p>
+                    Yoda is based on iRODS technology.
+                    The iCommands allows you to interact with the iRODS backend of Yoda directly.
+                    Therefore, it is possible to transfer data to and from Yoda using the iRODS communication protocol.
+                    You need to configure the iCommands to connect to this Yoda environment.
+                    Copy and paste this configuration into your ~/.irods/irods_environment.json configuration file.
+                  </p>
+            </div>
+            <div id="Gocommands" class="container tab-pane fade"><br>
+                <p>Gocommands can read configuration from an YAML file. Create config.yaml file using an editor and type in followings.</p>
+            </div>
+            </div>
+        </div>
+  </div>
+</div>
+{% endblock content %}
