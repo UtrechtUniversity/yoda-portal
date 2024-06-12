@@ -16,4 +16,25 @@ $(document).ready(function () {
 
         textArea.remove();
     })
+
+    $('.btn-download-file').on('click', function(event) {
+        if (this.id == 'download-button1') {
+            var codeBlockId = "code-block1"
+            var filename = 'conf.json'
+        } else {
+            var codeBlockId = "code-block2"
+            var filename = 'conf.yml'
+        }
+
+        const codeContent = document.getElementById(codeBlockId).textContent;
+
+        const link = document.createElement("a");
+        const file = new Blob([codeContent], { type: 'text/plain' });
+
+        link.href = URL.createObjectURL(file);
+        link.download = filename;
+        link.click();
+
+        URL.revokeObjectURL(link.href);
+    })
 })

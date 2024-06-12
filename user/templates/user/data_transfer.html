@@ -37,7 +37,7 @@
                                 <button id="button1" type="button" class="btn btn-secondary btn-copy-to-clipboard">
                                     <i class="fa fa-copy"></i> Copy
                                 </button>
-                                <a href="#" class="btn btn-outline-secondary download-configuration-as-json">Download as JSON</a>
+                                <button id="download-button1" type="button" class="btn btn-secondary btn-download-file"> Download as JSON </button>
                             </div>
                           <p class="card-text"><pre><code id="code-block1">{
     "irods_host": "{{ config.get('IRODS_ICAT_HOSTNAME') }}",
@@ -64,7 +64,7 @@
                                 <button id="button2" type="button" class="btn btn-secondary btn-copy-to-clipboard">
                                     <i class="fa fa-copy"></i> Copy
                                 </button>
-                                <a href="#" class="btn btn-outline-secondary download-configuration-as-yaml">Download as YAML</a>
+                                <button id="download-button2" type="button" class="btn btn-secondary btn-download-file"> Download as YAML </button>
                             </div>
                             <p class="card-text"><pre><code id="code-block2">irods_host: "{{ config.get('IRODS_ICAT_HOSTNAME') }}"
 irods_port: 1247
