@@ -11,6 +11,7 @@ from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 from jinja2 import ChoiceLoader, FileSystemLoader
 
+from admin.admin import admin_bp
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
 from deposit.deposit import deposit_bp
@@ -94,6 +95,7 @@ with app.app_context():
     app.register_blueprint(vault_bp, url_prefix='/vault')
     app.register_blueprint(search_bp, url_prefix='/search')
     app.register_blueprint(api_bp, url_prefix='/api/')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
     if app.config.get('DEPOSIT_ENABLED'):
         app.register_blueprint(deposit_bp, url_prefix='/deposit')
     if app.config.get('OPEN_SEARCH_ENABLED'):
