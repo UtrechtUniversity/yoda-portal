@@ -475,6 +475,10 @@ def prepare_user() -> None:
                 # Load saved settings
                 response = api.call('settings_load', data={})
                 g.settings = response['data']
+                # Check for Administration access #TODO: check if inside the notification block?
+                response = api.call("admin_has_access", data={})
+                g.administration = response["data"]
+                print(f"Admin access check from user.py: {g.administration}")
         except PAM_AUTH_PASSWORD_FAILED:
             # Password is not valid any more (probably OIDC access token).
             connman.clean(session.sid)
