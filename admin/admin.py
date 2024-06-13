@@ -18,14 +18,7 @@ admin_bp = Blueprint(
 
 @admin_bp.route("/")
 def index() -> Response:
-    """
-    Route to the admin page. It checks if the current user has admin
-    privileges and directs them accordingly.
-
-    :Returns:
-        Response: The Flask response object that renders the admin dashboard if
-        the user has admin access, or aborts with a 403 status code if they do not.
-    """
+    """Route to the admin page, if user has admin access"""
     has_admin_access = api.call("admin_has_access", data={})["data"]
     print(f"Admin access check from Portal: {has_admin_access}")
 
