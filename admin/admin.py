@@ -3,7 +3,7 @@
 __copyright__ = "Copyright (c) 2024, Utrecht University"
 __license__ = "GPLv3, see LICENSE"
 
-from flask import Blueprint, g, render_template, Response
+from flask import abort, Blueprint, render_template, Response
 
 import api
 
@@ -18,11 +18,17 @@ admin_bp = Blueprint(
 
 @admin_bp.route("/")
 def index() -> Response:
-    # Call api to check is user is admin
-    is_admin = api.call("admin_is_user_admin", {})
-    if (
-        is_admin
-    ):  # TODO redirect to the access-dinied html (available) for non-admin user
-        print("Test api_group_user_is_admin success, from Portal")
+    """
+    Route to the admin page. It checks if the current user has admin
+    privileges and directs them accordingly.
 
-    return render_template("admin.html")
+    Returns:
+        Rendered template or aborts the request (403) if access is denied.
+    """
+    has_admin_access = api.call("admin_has_access", data={})["data"]
+    print(f"Admin access check from Portal: {has_admin_access}")
+
+    if has_admin_access:
+        return render_template("admin.html")
+    else:
+        return abort(403)
