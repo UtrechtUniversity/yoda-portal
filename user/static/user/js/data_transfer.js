@@ -20,10 +20,10 @@ $(document).ready(function () {
     $('.btn-download-file').on('click', function(event) {
         if (this.id == 'download-button1') {
             var codeBlockId = "code-block1"
-            var filename = 'conf.json'
+            var filename = 'irods_environment.json'
         } else {
             var codeBlockId = "code-block2"
-            var filename = 'conf.yml'
+            var filename = 'config.yml'
         }
 
         const codeContent = document.getElementById(codeBlockId).textContent;

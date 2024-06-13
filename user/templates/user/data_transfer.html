@@ -25,12 +25,11 @@
             <div class="tab-content">
                 <div id="iCommands" class="container tab-pane active"><br>
                     <p>
-                        Yoda is based on iRODS technology.
-                        The iCommands allows you to interact with the iRODS backend of Yoda directly.
+                        Yoda is based on iRODS technology. The iCommands allows you to interact with the iRODS backend of Yoda directly.
                         Therefore, it is possible to transfer data to and from Yoda using the iRODS communication protocol.
                         You need to configure the iCommands to connect to this Yoda environment.
-                        Copy and paste this configuration into your ~/.irods/irods_environment.json configuration file.
                     </p>
+                    <p> Copy and paste the following configuraton into your ~/.irods/irods_environment.json configuration file. </p>
                     <div class="card">
                         <div class="card-body">
                             <div class="float-md-end"> 
@@ -39,25 +38,14 @@
                                 </button>
                                 <button id="download-button1" type="button" class="btn btn-secondary btn-download-file"> Download as JSON </button>
                             </div>
-                          <p class="card-text"><pre><code id="code-block1">{
-    "irods_host": "{{ config.get('IRODS_ICAT_HOSTNAME') }}",
-    "irods_port": 1247,
-    "irods_home": "/{{ config.get('IRODS_DEFAULT_ZONE') }}/home",
-    "irods_user_name": "{{ g.user }}",
-    "irods_zone_name": "{{ config.get('IRODS_DEFAULT_ZONE') }}",
-    "irods_authentication_scheme": "pam",
-    "irods_encryption_algorithm": "AES-256-CBC",
-    "irods_encryption_key_size": 32,
-    "irods_encryption_num_hash_rounds": 16,
-    "irods_encryption_salt_size": 8,
-    "irods_client_server_negotiation": "request_server_negotiation",
-    "irods_client_server_policy": "CS_NEG_REQUIRE"
-}</code></pre></p>
+                          <p class="card-text">
+                            <pre><code class="javascript" id="code-block1">{&#10;    "irods_host": "{{ config.get('IRODS_ICAT_HOSTNAME') }}",&#10;    "irods_port": 1247,&#10;    "irods_home": "/{{ config.get('IRODS_DEFAULT_ZONE') }}/home",&#10;    "irods_user_name": "{{ g.user }}",&#10;    "irods_zone_name": "{{ config.get('IRODS_DEFAULT_ZONE') }}",&#10;    "irods_authentication_scheme": "pam",&#10;    "irods_encryption_algorithm": "AES-256-CBC",&#10;    "irods_encryption_key_size": 32,&#10;    "irods_encryption_num_hash_rounds": 16,&#10;    "irods_encryption_salt_size": 8,&#10;    "irods_client_server_negotiation": "request_server_negotiation",&#10;    "irods_client_server_policy": "CS_NEG_REQUIRE"&#10;}</code></pre></p>
                         </div>
                       </div>
                 </div>
                 <div id="Gocommands" class="container tab-pane fade"><br>
-                    <p>Gocommands can read configuration from an YAML file. Create config.yaml file using an editor and type in followings.</p>
+                    <p>Gocommands can read configuration from a YAML file. </p>
+                    <p>Copy and paste the following configuration into your config.yml file.</p>
                     <div class="card">
                         <div class="card-body">
                             <div class="float-md-end"> 
@@ -66,12 +54,7 @@
                                 </button>
                                 <button id="download-button2" type="button" class="btn btn-secondary btn-download-file"> Download as YAML </button>
                             </div>
-                            <p class="card-text"><pre><code id="code-block2">irods_host: "{{ config.get('IRODS_ICAT_HOSTNAME') }}"
-irods_port: 1247
-irods_user_name: "{{ g.user }}"
-irods_zone_name: "iplant"
-irods_user_password: "your password"
-</code></pre></p>
+                            <p class="card-text"><pre><code id="code-block2">irods_host: "{{ config.get('IRODS_ICAT_HOSTNAME') }}"&#10;irods_port: 1247&#10;irods_user_name: "{{ g.user }}"&#10;irods_zone_name: "iplant"&#10;irods_user_password: "your password"</code></pre></p>
                         </div>
                       </div>
                 </div>
