@@ -22,7 +22,7 @@ def index() -> Response:
     Route to the admin page. It checks if the current user has admin
     privileges and directs them accordingly.
 
-    Returns:
+    :Returns:
         Response: The Flask response object that renders the admin dashboard if
         the user has admin access, or aborts with a 403 status code if they do not.
     """
