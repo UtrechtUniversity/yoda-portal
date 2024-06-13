@@ -21,9 +21,6 @@ def index() -> Response:
     """
     Route to the admin page. It checks if the current user has admin
     privileges and directs them accordingly.
-
-    Return:
-        Rendered template or aborts the request (403) if access is denied.
     """
     has_admin_access = api.call("admin_has_access", data={})["data"]
     print(f"Admin access check from Portal: {has_admin_access}")
