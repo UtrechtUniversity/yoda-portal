@@ -22,7 +22,7 @@ def index() -> Response:
     Route to the admin page. It checks if the current user has admin
     privileges and directs them accordingly.
 
-    Returns:
+    Return:
         Rendered template or aborts the request (403) if access is denied.
     """
     has_admin_access = api.call("admin_has_access", data={})["data"]
