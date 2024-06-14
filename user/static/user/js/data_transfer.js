@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    hljs.highlightAll();
+
     $('.btn-copy-to-clipboard').on('click', function(event) {
         if (this.id == 'button1')
             var codeBlockId = "code-block1"

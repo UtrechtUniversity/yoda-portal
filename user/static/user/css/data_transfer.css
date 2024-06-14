@@ -1,0 +1,20 @@
+.code-container {
+    position: relative;
+}
+
+.code-container.light-theme {
+    position: relative;
+    background-color: #f3f3f3;
+}
+
+.code-container.dark-theme {
+    position: relative;
+    background-color: #303030;
+}
+.buttons {
+    top: 5px;
+    right: 5px;
+}
+.buttons button {
+    margin-left: 5px;
+}

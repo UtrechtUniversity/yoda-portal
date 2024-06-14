@@ -4,7 +4,13 @@
 
 {% block scripts %}
     <script src="{{ url_for('user_bp.static', filename='js/data_transfer.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/highlight-js-11.9.0/highlight.min.js') }}"></script>
 {% endblock %}
+
+{% block style %}
+    <link id='pagestyle' rel="stylesheet" {% if g.settings and g.settings.color_mode and g.settings.color_mode == 'DARK' %}href="{{url_for('static', filename='lib/highlight-js-11.9.0/styles/dark.min.css')}}"{% else %}href="{{url_for('static', filename='lib/highlight-js-11.9.0/styles/default.min.css')}}"{% endif %}>
+    <link rel="stylesheet" href="{{ url_for('user_bp.static', filename='css/data_transfer.css') }}">
+{% endblock style %}
 
 {% block content %}
 <h1>Data Transfer</h1>
@@ -30,33 +36,28 @@
                         You need to configure the iCommands to connect to this Yoda environment.
                     </p>
                     <p> Copy and paste the following configuraton into your ~/.irods/irods_environment.json configuration file. </p>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="float-md-end"> 
-                                <button id="button1" type="button" class="btn btn-secondary btn-copy-to-clipboard">
-                                    <i class="fa fa-copy"></i> Copy
-                                </button>
-                                <button id="download-button1" type="button" class="btn btn-secondary btn-download-file"> Download as JSON </button>
-                            </div>
-                          <p class="card-text">
-                            <pre><code class="javascript" id="code-block1">{&#10;    "irods_host": "{{ config.get('IRODS_ICAT_HOSTNAME') }}",&#10;    "irods_port": 1247,&#10;    "irods_home": "/{{ config.get('IRODS_DEFAULT_ZONE') }}/home",&#10;    "irods_user_name": "{{ g.user }}",&#10;    "irods_zone_name": "{{ config.get('IRODS_DEFAULT_ZONE') }}",&#10;    "irods_authentication_scheme": "pam",&#10;    "irods_encryption_algorithm": "AES-256-CBC",&#10;    "irods_encryption_key_size": 32,&#10;    "irods_encryption_num_hash_rounds": 16,&#10;    "irods_encryption_salt_size": 8,&#10;    "irods_client_server_negotiation": "request_server_negotiation",&#10;    "irods_client_server_policy": "CS_NEG_REQUIRE"&#10;}</code></pre></p>
+                    <div {% if g.settings and g.settings.color_mode and g.settings.color_mode == 'DARK' %} class = "code-container dark-theme" {% else %} class = "code-container light-theme" {% endif %}>
+                        <div class="float-md-end">
+                            <button id="button1" type="button" class="btn btn-secondary btn-copy-to-clipboard">
+                                <i class="fa fa-copy"></i> Copy
+                            </button>
+                            <button id="download-button1" type="button" class="btn btn-secondary btn-download-file"> Download as JSON </button>
                         </div>
-                      </div>
+                        <pre><code id="code-block1">{&#10;    "irods_host": "{{ config.get('IRODS_ICAT_HOSTNAME') }}",&#10;    "irods_port": 1247,&#10;    "irods_home": "/{{ config.get('IRODS_DEFAULT_ZONE') }}/home",&#10;    "irods_user_name": "{{ g.user }}",&#10;    "irods_zone_name": "{{ config.get('IRODS_DEFAULT_ZONE') }}",&#10;    "irods_authentication_scheme": "pam",&#10;    "irods_encryption_algorithm": "AES-256-CBC",&#10;    "irods_encryption_key_size": 32,&#10;    "irods_encryption_num_hash_rounds": 16,&#10;    "irods_encryption_salt_size": 8,&#10;    "irods_client_server_negotiation": "request_server_negotiation",&#10;    "irods_client_server_policy": "CS_NEG_REQUIRE"&#10;}</code></pre>
+                    </div>
                 </div>
                 <div id="Gocommands" class="container tab-pane fade"><br>
                     <p>Gocommands can read configuration from a YAML file. </p>
                     <p>Copy and paste the following configuration into your config.yml file.</p>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="float-md-end"> 
-                                <button id="button2" type="button" class="btn btn-secondary btn-copy-to-clipboard">
-                                    <i class="fa fa-copy"></i> Copy
-                                </button>
-                                <button id="download-button2" type="button" class="btn btn-secondary btn-download-file"> Download as YAML </button>
-                            </div>
-                            <p class="card-text"><pre><code id="code-block2">irods_host: "{{ config.get('IRODS_ICAT_HOSTNAME') }}"&#10;irods_port: 1247&#10;irods_user_name: "{{ g.user }}"&#10;irods_zone_name: "iplant"&#10;irods_user_password: "your password"</code></pre></p>
+                    <div {% if g.settings and g.settings.color_mode and g.settings.color_mode == 'DARK' %} class = "code-container dark-theme" {% else %} class = "code-container light-theme" {% endif %}>
+                        <div class="float-md-end">
+                            <button id="button2" type="button" class="btn btn-secondary btn-copy-to-clipboard">
+                                <i class="fa fa-copy"></i> Copy
+                            </button>
+                            <button id="download-button2" type="button" class="btn btn-secondary btn-download-file"> Download as YAML </button>
                         </div>
-                      </div>
+                        <pre><code id="code-block2">irods_host: "{{ config.get('IRODS_ICAT_HOSTNAME') }}"&#10;irods_port: 1247&#10;irods_user_name: "{{ g.user }}"&#10;irods_zone_name: "iplant"&#10;irods_user_password: "your password"</code></pre>
+                    </div>
                 </div>
             </div>
         </div>
