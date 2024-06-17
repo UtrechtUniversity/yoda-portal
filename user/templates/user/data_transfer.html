@@ -5,6 +5,19 @@
 {% block scripts %}
     <script src="{{ url_for('user_bp.static', filename='js/data_transfer.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/highlight-js-11.9.0/highlight.min.js') }}"></script>
+    <script>
+        {% if g.settings %}
+            Yoda.settings = {{ g.settings | tojson}}
+            {# Set highlightjs theme #}
+            {% if g.settings.color_mode == 'AUTO' %}
+                const initialHref = document.getElementById('pagestyle').attributes.href.value
+    
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.getElementById('pagestyle').setAttribute('href', initialHref.replace('default', 'dark'))
+                }
+            {% endif %}
+        {% endif %}
+    </script>
 {% endblock %}
 
 {% block style %}
@@ -30,7 +43,7 @@
             <div class="tab-content">
                 <div id="iCommands" class="container tab-pane active"><br>
                     <p>
-                        Yoda is based on iRODS technology. The iCommands allows you to interact with the iRODS backend of Yoda directly.
+                        Yoda is based on iRODS technology. The <a href="https://docs.irods.org/4.2.12/icommands/user/">iCommands</a> allows you to interact with the iRODS backend of Yoda directly.
                         Therefore, it is possible to transfer data to and from Yoda using the iRODS communication protocol.
                         You need to configure the iCommands to connect to this Yoda environment.
                     </p>
@@ -41,9 +54,9 @@
                     </div>
                 </div>
                 <div id="Gocommands" class="container tab-pane fade"><br>
-                    <p>Gocommands can read configuration from a YAML file. </p>
+                    <p><a href="https://github.com/cyverse/gocommands/blob/main/README.md">Gocommands</a> can read configuration from a YAML file. </p>
                     <p>Copy and paste the following configuration into your config.yml file.</p>
-                    <pre><code id="code-block2">irods_host: "{{ config.get('IRODS_ICAT_HOSTNAME') }}"&#10;irods_port: 1247&#10;irods_user_name: "{{ g.user }}"&#10;irods_zone_name: "iplant"&#10;irods_user_password: "your password"</code></pre>
+                    <pre><code id="code-block2">irods_host: "{{ config.get('IRODS_ICAT_HOSTNAME') }}"&#10;irods_port: 1247&#10;irods_user_name: "{{ g.user }}"&#10;irods_zone_name: "{{ config.get('IRODS_DEFAULT_ZONE') }}"</code></pre>
                     <div class="float-md-end">
                         <button id="download-button2" type="button" class="btn btn-outline-secondary btn-download-file"> Download as YAML </button>
                     </div>
