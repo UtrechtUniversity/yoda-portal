@@ -53,7 +53,7 @@ def irods_writer() -> None:
                         obj_desc.write(chunk.data)
                 except Exception:
                     failure = True
-                    r.put((failure, chunk_name))
+                    r.put(failure)
                     failure = False
                     log_error("Chunk upload failed for {}".format(chunk.path))
                 finally:
