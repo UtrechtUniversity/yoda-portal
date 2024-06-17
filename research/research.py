@@ -53,16 +53,14 @@ def irods_writer() -> None:
                         obj_desc.write(chunk.data)
                 except Exception:
                     failure = True
+                    r.put((failure, chunk_name))
+                    failure = False
                     log_error("Chunk upload failed for {}".format(chunk.path))
                 finally:
                     try:
                         obj_desc.close()
                     except Exception:
                         pass
-        else:
-            # report back about failures
-            r.put(failure)
-            failure = False
         q.task_done()
 
 
@@ -251,11 +249,12 @@ def upload_post() -> Response:
     if need_to_check_flow:
         q.put(Chunk(None, None, 0, 0, None, None))
         q.join()
-        if r.get():
-            # failure in upload writer thread
-            response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
-            response.headers["Content-Type"] = "application/json"
-            return response
+    if not r.empty():
+        # failure in upload writer thread
+        r.get()
+        response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
+        response.headers["Content-Type"] = "application/json"
+        return response
 
     # Rename partial file name when complete for chunked uploads.
     if app.config.get('UPLOAD_PART_FILES') and flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
