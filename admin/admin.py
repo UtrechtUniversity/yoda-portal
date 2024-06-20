@@ -20,7 +20,7 @@ admin_bp = Blueprint(
 def index() -> Response:
     """Route to the admin page, if user has admin access"""
     has_admin_access = api.call("admin_has_access", data={})["data"]
-    print(f"Admin access check from Portal: {has_admin_access}")
+    print(f"Admin access check from Portal: {has_admin_access}")  # TODO: Remove
 
     if has_admin_access:
         return render_template("admin.html")
