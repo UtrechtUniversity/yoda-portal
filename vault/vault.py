@@ -4,6 +4,7 @@ __copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
+import urllib.parse
 from typing import Iterator
 from uuid import UUID
 
@@ -37,6 +38,7 @@ def index() -> Response:
 def download() -> Response:
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
+    quoted_filename = urllib.parse.quote(filename)
 
     def read_file_chunks(data_object: iRODSDataObject) -> Iterator[bytes]:
         READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
@@ -62,9 +64,9 @@ def download() -> Response:
         return Response(
             stream_with_context(read_file_chunks(data_object)),
             headers={
-                'Content-Disposition': f'attachment; filename={filename}',
+                'Content-Disposition': "attachment; filename*=UTF-8''" + quoted_filename,
                 'Content-Length': f'{size}',
-                'Content-Type': 'application/octet'
+                'Content-Type': 'application/octet-stream'
             }
         )
     else:
