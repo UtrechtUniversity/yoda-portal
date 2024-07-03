@@ -1,27 +1,27 @@
 {% if g.user %}
-<div class="dropdown">
-    <button type="button" class="btn btn-primary dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown"
-        aria-haspopup="true" aria-expanded="false">
+    <div class="dropdown">
+        <button type="button" class="btn btn-primary dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         {{ g.user }} {% if g.notifications %}<i class="fa-solid fa-bell" aria-hidden="true"></i>{% endif %}
-    </button>
-    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-        <a class="dropdown-item" href="{{ url_for('user_bp.notifications') }}">
-            Notifications {% if g.notifications %}<span class="badge bg-primary">{{ g.notifications }}</span>{% endif %}
-        </a>
-        <a class="dropdown-item" href="{{ url_for('user_bp.settings') }}">Settings</a>
-        {% if config.get('TOKENS_ENABLED') %}
-        <a class="dropdown-item" href="{{ url_for('user_bp.data_access') }}">Data Access Password</a>
-        {% endif %}
-        <div class="dropdown-divider"></div>
-        {% if g.administration %}
-        <a class="dropdown-item" href="{{ url_for('admin_bp.index') }}">Administration</a>
-        {% endif %}
-        <a class="dropdown-item" href="{{ url_for('group_manager_bp.index') }}">Group Manager</a>
-        <a class="dropdown-item" href="{{ url_for('stats_bp.index') }}">Statistics</a>
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="{{ url_for('user_bp.logout') }}">Log out</a>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <a class="dropdown-item" href="{{ url_for('user_bp.notifications') }}">
+                Notifications {% if g.notifications %}<span class="badge bg-primary">{{ g.notifications }}</span>{% endif %}
+            </a>
+            <a class="dropdown-item" href="{{ url_for('user_bp.settings') }}">Settings</a>
+            {% if config.get('TOKENS_ENABLED') %}
+            <a class="dropdown-item" href="{{ url_for('user_bp.data_access') }}">Data Access Password</a>
+            {% endif %}
+            <a class="dropdown-item" href="{{ url_for('user_bp.data_transfer') }}">Data Transfer</a>
+            <div class="dropdown-divider"></div>
+            {% if g.administration %}
+            <a class="dropdown-item" href="{{ url_for('admin_bp.index') }}">Administration</a>
+            {% endif %}
+            <a class="dropdown-item" href="{{ url_for('group_manager_bp.index') }}">Group Manager</a>
+            <a class="dropdown-item" href="{{ url_for('stats_bp.index') }}">Statistics</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{{ url_for('user_bp.logout') }}">Log out</a>
+        </div>
     </div>
-</div>
 {% else %}
-<a class="btn btn-primary" href="{{ url_for('user_bp.gate') }}" title="Go to sign in page">Sign in</a>
+    <a class="btn btn-primary" href="{{ url_for('user_bp.gate') }}" title="Go to sign in page">Sign in</a>
 {% endif %}

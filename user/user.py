@@ -195,6 +195,12 @@ def data_access() -> Response:
                            token_lifetime=token_lifetime)
 
 
+@user_bp.route('/data_transfer')
+def data_transfer() -> Response:
+    """Data Transfer page."""
+    return render_template('user/data_transfer.html')
+
+
 @user_bp.route('/callback')
 def callback() -> Response:
     """OpenID Connect callback."""

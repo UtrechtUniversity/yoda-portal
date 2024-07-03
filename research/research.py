@@ -7,6 +7,7 @@ import io
 import os
 import queue
 import threading
+import urllib.parse
 from typing import Iterator
 
 from flask import (
@@ -59,10 +60,10 @@ def irods_writer() -> None:
                         obj_desc.close()
                     except Exception:
                         pass
-        else:
-            # report back about failures
-            r.put(failure)
-            failure = False
+            else:
+                # Report back about failures.
+                r.put(failure)
+                failure = False
         q.task_done()
 
 
@@ -86,6 +87,7 @@ def index() -> Response:
 def download() -> Response:
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
+    quoted_filename = urllib.parse.quote(filename)
 
     def read_file_chunks(data_object: iRODSDataObject) -> Iterator[bytes]:
         READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
@@ -111,9 +113,9 @@ def download() -> Response:
         return Response(
             stream_with_context(read_file_chunks(data_object)),
             headers={
-                'Content-Disposition': f'attachment; filename={filename}',
+                'Content-Disposition': "attachment; filename*=UTF-8''" + quoted_filename,
                 'Content-Length': f'{size}',
-                'Content-Type': 'application/octet'
+                'Content-Type': 'application/octet-stream'
             }
         )
     else:
@@ -251,11 +253,13 @@ def upload_post() -> Response:
     if need_to_check_flow:
         q.put(Chunk(None, None, 0, 0, None, None))
         q.join()
-        if r.get():
-            # failure in upload writer thread
-            response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
-            response.headers["Content-Type"] = "application/json"
-            return response
+
+    if not r.empty():
+        # Failure in upload writer thread.
+        r.get()
+        response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
+        response.headers["Content-Type"] = "application/json"
+        return response
 
     # Rename partial file name when complete for chunked uploads.
     if app.config.get('UPLOAD_PART_FILES') and flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
