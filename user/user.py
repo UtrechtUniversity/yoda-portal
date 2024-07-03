@@ -473,14 +473,19 @@ def prepare_user() -> None:
         g.irods = irods
 
         try:
-            # Check for notifications.
             endpoints = ["static", "call", "upload_get", "upload_post"]
             if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
+                # Check for notifications.
                 response = api.call('notifications_load', data={})
                 g.notifications = len(response['data'])
+
                 # Load saved settings
                 response = api.call('settings_load', data={})
                 g.settings = response['data']
+
+                # Check for admin access.
+                response = api.call("admin_has_access", data={})
+                g.admin = response["data"]
         except PAM_AUTH_PASSWORD_FAILED:
             # Password is not valid any more (probably OIDC access token).
             connman.clean(session.sid)
