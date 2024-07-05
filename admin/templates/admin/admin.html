@@ -3,9 +3,34 @@
 {% block title %}{{ super() }} &dash; Administration{% endblock title %}
 
 {% block content %}
-<h1>Administration</h1>
-
-<div class="card">
-    <p>Set maintainance banner</p>
+<div class="container mt-4">
+    <header>
+        <h1>Administration</h1>
+    </header>
+    <main>
+        <section class="card my-3">
+            <div class="card-body">
+                <h2 class="card-title">Set maintenance banner</h2>
+                <div class="d-flex justify-content-start align-items-end" style="width: 100%;">
+                    <form action="{{ url_for('admin_bp.set_banner') }}" method="POST" class="flex-fill me-2 needs-validation" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="banner">Banner Details:</label>
+                            <textarea class="form-control" name="banner" id="banner" placeholder="Enter system maintenance details..." required></textarea>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="importance" name="importance">
+                            <label class="form-check-label" for="importance">Mark as Important</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Set Banner</button>
+                    </form>
+                    <form action="{{ url_for('admin_bp.remove_banner') }}" method="POST" class="flex-shrink-1">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-secondary">Remove Banner</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
 </div>
 {% endblock content %}
