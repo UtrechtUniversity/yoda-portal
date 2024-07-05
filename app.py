@@ -10,6 +10,7 @@ from flask import Flask, g, redirect, request, Response, send_from_directory, ur
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 from jinja2 import ChoiceLoader, FileSystemLoader
+import json
 
 from admin.admin import admin_bp
 from api import api_bp
@@ -73,6 +74,33 @@ app.config['modules'].append(
 app.config['modules'].append(
     {'name': 'Group Manager', 'function': 'group_manager_bp.index'},
 )
+
+#TODO: improve the .py file for organized codes
+
+app.config['APP_SHARED_FOLDER'] = '/tmp'
+
+def load_banner_config():
+    config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
+    default_config = {'BANNER_ENABLED': False}
+
+    try:
+        if not path.exists(config_file_path):
+            return default_config
+
+        with open(config_file_path, 'r') as file:
+            settings = json.load(file)
+            return {
+                'BANNER_ENABLED': settings.get('BANNER_ENABLED', False),
+                'banner_importance': settings.get('banner_importance', False),
+                'banner_message': settings.get('banner_message', '')
+            }
+    except json.JSONDecodeError:
+        return default_config
+    except Exception as e:
+        return default_config
+
+app.config.update(load_banner_config())
+
 
 app.config['modules_list'] = [module['name'] for module in app.config['modules']]
 
