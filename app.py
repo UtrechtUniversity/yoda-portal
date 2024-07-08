@@ -44,6 +44,7 @@ theme_loader = ChoiceLoader([
 ])
 app.jinja_loader = theme_loader
 
+
 # Load banner configurations
 def load_banner_config():
     '''Load or initialize banner configurations.'''

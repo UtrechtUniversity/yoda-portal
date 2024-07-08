@@ -44,7 +44,6 @@ def admin_required(f):
     return decorated_function
 
 
-
 @admin_bp.route('/set_banner', methods=['POST'])
 @admin_required
 def set_banner():
