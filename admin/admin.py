@@ -103,8 +103,8 @@ def save_settings(settings, flash_msg):
         with open(config_file_path, 'w') as file:
             json.dump(settings, file)
         flash(flash_msg, 'success')
-    except IOError as e:
-        flash(f"Failed to save settings: {str(e)}", "danger")
-        return f"Failed to save settings: {e}", 500
+    except IOError:
+        flash(f"Failed to save settings", "danger")
+        return f"Failed to save settings", 500
 
     return redirect(url_for('admin_bp.index'))
