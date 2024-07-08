@@ -3,6 +3,7 @@
 __copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import json
 from os import path
 from typing import Dict, Optional
 
@@ -10,7 +11,6 @@ from flask import Flask, g, redirect, request, Response, send_from_directory, ur
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 from jinja2 import ChoiceLoader, FileSystemLoader
-import json
 
 from admin.admin import admin_bp
 from api import api_bp
@@ -63,8 +63,9 @@ def load_banner_config():
             }
     except json.JSONDecodeError:
         return default_config
-    except Exception as e:
+    except Exception:
         return default_config
+
 
 app.config['APP_SHARED_FOLDER'] = '/tmp'
 app.config.update(load_banner_config())
@@ -99,11 +100,6 @@ app.config['modules'].append(
 app.config['modules'].append(
     {'name': 'Group Manager', 'function': 'group_manager_bp.index'},
 )
-
-
-
-
-
 
 app.config['modules_list'] = [module['name'] for module in app.config['modules']]
 

@@ -1,25 +1,26 @@
 #!/usr/bin/env python3
 
 __copyright__ = "Copyright (c) 2024, Utrecht University"
-__license__   = "GPLv3, see LICENSE"
+__license__ = "GPLv3, see LICENSE"
 
+from functools import wraps
 import json
 from os import path
-from functools import wraps
 
 from flask import (
-    abort, g, Blueprint, render_template, request, Response,
-    flash, current_app as app, redirect, url_for
+    abort, Blueprint, current_app as app, flash, g, redirect,
+    render_template, request, Response, url_for
 )
-from werkzeug.exceptions import BadRequest
 from markupsafe import escape
 
 import api
 
+# Blueprint configuration
 admin_bp = Blueprint("admin_bp", __name__,
                      template_folder="templates/admin",
                      static_folder="static/admin",
                      static_url_path="/assets")
+
 
 @admin_bp.route("/")
 def index() -> Response:
@@ -31,26 +32,22 @@ def index() -> Response:
     else:
         return abort(403)
 
-# TODO: Automation Test
-# TODO: Write API and UI tests
 
 def admin_required(f):
     """Decorator to check if the user has admin privileges."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        print("admin access Setbanner:",g.admin)
         if not getattr(g, 'admin', False):
             flash('You do not have permission to perform this action.', 'danger')
             return redirect(url_for('admin_bp.index'))
         return f(*args, **kwargs)
     return decorated_function
 
+
 @admin_bp.route('/set_banner', methods=['POST'])
 @admin_required
 def set_banner():
-    """set the banner message and persist it to configuration files"""
-
-    # Get the message input
+    """Set the banner message and persist it to configuration files."""
     banner_message = request.form.get('banner', '').strip()
     banner_message = escape_html(banner_message)  # Ensure safe text
 
@@ -69,12 +66,11 @@ def set_banner():
     flash_msg = 'Set banner message successfully'
     return save_settings(settings, flash_msg)
 
+
 @admin_bp.route('/remove_banner', methods=['POST'])
 @admin_required
 def remove_banner():
     """Remove banner message and save settings to web server's config files."""
-
-    # Update app config settings
     settings = {
         'banner_enabled': False,
         'banner_importance': False,
@@ -82,7 +78,6 @@ def remove_banner():
     }
     flash_msg = 'Banner removed successfully'
     return save_settings(settings, flash_msg)
-
 
 
 def length_check(banner_message):
@@ -94,9 +89,11 @@ def length_check(banner_message):
         return "Banner message too long.", False
     return None, True
 
+
 def escape_html(text):
     """Escape HTML special characters in text."""
     return escape(text)
+
 
 def save_settings(settings, flash_msg):
     """Apply and save the given settings to the configuration file."""
