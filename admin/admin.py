@@ -47,7 +47,7 @@ def admin_required(f):
 @admin_bp.route('/set_banner', methods=['POST'])
 @admin_required
 def set_banner():
-    """Set the banner message and persist it to configuration files."""
+    """Set the banner message and persist it to the configuration file."""
     banner_message = request.form.get('banner', '').strip()
     banner_message = escape_html(banner_message)  # Ensure safe text
 
@@ -70,7 +70,7 @@ def set_banner():
 @admin_bp.route('/remove_banner', methods=['POST'])
 @admin_required
 def remove_banner():
-    """Remove banner message and save settings to web server's config files."""
+    """Remove banner message and save settings to the configuration file."""
     settings = {
         'banner_enabled': False,
         'banner_importance': False,

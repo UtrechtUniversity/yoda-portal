@@ -12,18 +12,22 @@
             <div class="card-body">
                 <h2 class="card-title">Set maintenance banner</h2>
                 <div class="d-flex justify-content-start align-items-end" style="width: 100%;">
+                    <!-- Form to set a maintenance banner -->
                     <form action="{{ url_for('admin_bp.set_banner') }}" method="POST" class="flex-fill me-2 needs-validation" novalidate>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <!-- Text area for entering banner details -->
                         <div class="mb-3">
                             <label for="banner">Banner Details:</label>
                             <textarea class="form-control" name="banner" id="banner" placeholder="Enter system maintenance details..." required></textarea>
                         </div>
+                        <!-- Checkbox to mark the banner as important -->
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="importance" name="importance">
                             <label class="form-check-label" for="importance">Mark as Important</label>
                         </div>
                         <button type="submit" class="btn btn-primary">Set Banner</button>
                     </form>
+                    <!-- Form to remove the maintenance banner -->
                     <form action="{{ url_for('admin_bp.remove_banner') }}" method="POST" class="flex-shrink-1">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-secondary">Remove Banner</button>

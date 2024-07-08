@@ -47,7 +47,7 @@ app.jinja_loader = theme_loader
 
 # Load banner configurations
 def load_banner_config():
-    '''Load or initialize banner configurations.'''
+    """Load or initialize banner configurations."""
     config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
     default_config = {'banner_enabled': False}
 
