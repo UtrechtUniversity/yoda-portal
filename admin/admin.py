@@ -104,7 +104,7 @@ def save_settings(settings, flash_msg):
             json.dump(settings, file)
         flash(flash_msg, 'success')
     except IOError:
-        flash(f"Failed to save settings", "danger")
-        return f"Failed to save settings", 500
+        flash("Failed to save settings", "danger")
+        return "Failed to save settings", 500
 
     return redirect(url_for('admin_bp.index'))
