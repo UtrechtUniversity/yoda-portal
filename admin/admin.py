@@ -3,7 +3,7 @@
 __copyright__ = "Copyright (c) 2024, Utrecht University"
 __license__   = "GPLv3, see LICENSE"
 
-from flask import abort, Blueprint, render_template, request, Response
+from flask import abort, g, Blueprint, render_template, request, Response
 import json
 from flask import flash, current_app as app
 from werkzeug.exceptions import BadRequest
@@ -28,8 +28,9 @@ def index() -> Response:
     else:
         return abort(403)
 
-# TODO: Code reability
+# TODO: Code reability, simplify codes and update app.py for code snipts location (bottom?)
 # TODO: Automation Test
+# TODO: Write API and UI tests
 def validate_banner_message(banner_message):
     """Validate the length and content of the banner message."""
     max_length = 256
@@ -45,7 +46,13 @@ def escape_html(text):
 
 @admin_bp.route('/set_banner', methods=['POST'])
 def set_banner():
-    """Set up banner operations and save settings to web server's config files."""
+    """Set up banner and save settings to web server's config files."""
+    # Check if the user is not an administrator
+    if not getattr(g, 'admin', False):
+        flash('You do not have permission to perform this action.', 'danger')
+        return redirect(url_for('admin_bp.index'))
+    print("admin access Setbanner:",g.admin)
+
     banner_message = request.form.get('banner', '').strip()
     banner_message = escape_html(banner_message)  # Ensure safe text
     error_message, is_valid = validate_banner_message(banner_message)
@@ -56,7 +63,7 @@ def set_banner():
 
     is_important = 'importance' in request.form
     settings = {
-        'BANNER_ENABLED': True,
+        'banner_enabled': True,#TODO: improve the var naming
         'banner_importance': is_important,
         'banner_message': banner_message
     }
@@ -65,9 +72,9 @@ def set_banner():
 
 @admin_bp.route('/remove_banner', methods=['POST'])
 def remove_banner():
-    """Remove banner operations and save settings to web server's config files."""
+    """Remove banner message and save settings to web server's config files."""
     settings = {
-        'BANNER_ENABLED': False,
+        'banner_enabled': False,
         'banner_importance': False,
         'banner_message': ''
     }
