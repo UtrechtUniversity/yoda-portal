@@ -17,7 +17,6 @@ admin_bp = Blueprint("admin_bp", __name__,
                      static_folder="static/admin",
                      static_url_path="/assets")
 
-
 @admin_bp.route("/")
 def index() -> Response:
     """Route to the admin page, if user has admin access"""
@@ -31,6 +30,7 @@ def index() -> Response:
 # TODO: Code reability, simplify codes and update app.py for code snipts location (bottom?)
 # TODO: Automation Test
 # TODO: Write API and UI tests
+
 def admin_required(f):
     '''Decorator for admin access check'''
     @wraps(f)
@@ -42,7 +42,47 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-def validate_banner_message(banner_message):
+@admin_bp.route('/set_banner', methods=['POST'])
+@admin_required
+def set_banner():
+    """Set up banner and save settings to web server's config files."""
+
+    # Get the message input
+    banner_message = request.form.get('banner', '').strip()
+    banner_message = escape_html(banner_message)  # Ensure safe text
+
+    # Message length check
+    error_message, is_valid = length_check(banner_message)
+    if not is_valid:
+        flash(error_message, "danger")
+        return redirect(url_for('admin_bp.index'))
+
+    # Update app config settings
+    settings = {
+        'banner_enabled': True,
+        'banner_importance': 'importance' in request.form,
+        'banner_message': banner_message
+    }
+    flash_msg = 'Set banner message successfully'
+    return save_settings(settings, flash_msg)
+
+@admin_bp.route('/remove_banner', methods=['POST'])
+@admin_required
+def remove_banner():
+    """Remove banner message and save settings to web server's config files."""
+
+    # Update app config settings
+    settings = {
+        'banner_enabled': False,
+        'banner_importance': False,
+        'banner_message': ''
+    }
+    flash_msg = 'Banner removed successfully'
+    return save_settings(settings, flash_msg)
+
+
+
+def length_check(banner_message):
     """Validate the length and content of the banner message."""
     max_length = 256
     if not banner_message:
@@ -54,40 +94,6 @@ def validate_banner_message(banner_message):
 def escape_html(text):
     """Escape HTML special characters in text."""
     return escape(text)  # Assuming `escape` is from an imported module
-
-@admin_bp.route('/set_banner', methods=['POST'])
-@admin_required
-def set_banner():
-    """Set up banner and save settings to web server's config files."""
-
-    banner_message = request.form.get('banner', '').strip()
-    banner_message = escape_html(banner_message)  # Ensure safe text
-    error_message, is_valid = validate_banner_message(banner_message)
-
-    if not is_valid:
-        flash(error_message, "danger")
-        return redirect(url_for('admin_bp.index'))
-
-    is_important = 'importance' in request.form
-    settings = {
-        'banner_enabled': True,
-        'banner_importance': is_important,
-        'banner_message': banner_message
-    }
-    flash_msg = 'Set banner message successfully'
-    return save_settings(settings, flash_msg)
-
-@admin_bp.route('/remove_banner', methods=['POST'])
-@admin_required
-def remove_banner():
-    """Remove banner message and save settings to web server's config files."""
-    settings = {
-        'banner_enabled': False,
-        'banner_importance': False,
-        'banner_message': ''
-    }
-    flash_msg = 'Banner removed successfully'
-    return save_settings(settings, flash_msg)
 
 def save_settings(settings, flash_msg):
     """Save settings to the configuration file."""
