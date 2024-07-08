@@ -44,6 +44,31 @@ theme_loader = ChoiceLoader([
 ])
 app.jinja_loader = theme_loader
 
+# Load banner configurations
+def load_banner_config():
+    '''Load or initialize banner configurations.'''
+    config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
+    default_config = {'banner_enabled': False}
+
+    try:
+        if not path.exists(config_file_path):
+            return default_config
+
+        with open(config_file_path, 'r') as file:
+            settings = json.load(file)
+            return {
+                'banner_enabled': settings.get('banner_enabled', False),
+                'banner_importance': settings.get('banner_importance', False),
+                'banner_message': settings.get('banner_message', '')
+            }
+    except json.JSONDecodeError:
+        return default_config
+    except Exception as e:
+        return default_config
+
+app.config['APP_SHARED_FOLDER'] = '/tmp'
+app.config.update(load_banner_config())
+
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
 app.config['modules'] = []
@@ -75,31 +100,9 @@ app.config['modules'].append(
     {'name': 'Group Manager', 'function': 'group_manager_bp.index'},
 )
 
-#TODO: improve the .py file for organized codes
 
-app.config['APP_SHARED_FOLDER'] = '/tmp'
 
-def load_banner_config():
-    config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
-    default_config = {'BANNER_ENABLED': False}
 
-    try:
-        if not path.exists(config_file_path):
-            return default_config
-
-        with open(config_file_path, 'r') as file:
-            settings = json.load(file)
-            return {
-                'BANNER_ENABLED': settings.get('BANNER_ENABLED', False),
-                'banner_importance': settings.get('banner_importance', False),
-                'banner_message': settings.get('banner_message', '')
-            }
-    except json.JSONDecodeError:
-        return default_config
-    except Exception as e:
-        return default_config
-
-app.config.update(load_banner_config())
 
 
 app.config['modules_list'] = [module['name'] for module in app.config['modules']]

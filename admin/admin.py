@@ -3,15 +3,19 @@
 __copyright__ = "Copyright (c) 2024, Utrecht University"
 __license__   = "GPLv3, see LICENSE"
 
-from flask import abort, g, Blueprint, render_template, request, Response
 import json
-from flask import flash, current_app as app
-from werkzeug.exceptions import BadRequest
-import api
-from flask import redirect, url_for
 from os import path
-from markupsafe import escape
 from functools import wraps
+
+from flask import (
+    abort, g, Blueprint, render_template, request, Response,
+    flash, current_app as app, redirect, url_for
+)
+from werkzeug.exceptions import BadRequest
+from markupsafe import escape
+
+import api
+
 admin_bp = Blueprint("admin_bp", __name__,
                      template_folder="templates/admin",
                      static_folder="static/admin",
@@ -19,7 +23,7 @@ admin_bp = Blueprint("admin_bp", __name__,
 
 @admin_bp.route("/")
 def index() -> Response:
-    """Route to the admin page, if user has admin access"""
+    """Route to the admin page, if user has admin access."""
     has_admin_access = api.call("admin_has_access", data={})["data"]
 
     if has_admin_access:
@@ -27,12 +31,11 @@ def index() -> Response:
     else:
         return abort(403)
 
-# TODO: Code reability, simplify codes and update app.py for code snipts location (bottom?)
 # TODO: Automation Test
 # TODO: Write API and UI tests
 
 def admin_required(f):
-    '''Decorator for admin access check'''
+    """Decorator to check if the user has admin privileges."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         print("admin access Setbanner:",g.admin)
@@ -45,7 +48,7 @@ def admin_required(f):
 @admin_bp.route('/set_banner', methods=['POST'])
 @admin_required
 def set_banner():
-    """Set up banner and save settings to web server's config files."""
+    """set the banner message and persist it to configuration files"""
 
     # Get the message input
     banner_message = request.form.get('banner', '').strip()
@@ -57,7 +60,7 @@ def set_banner():
         flash(error_message, "danger")
         return redirect(url_for('admin_bp.index'))
 
-    # Update app config settings
+    # Update app config settings and save settings
     settings = {
         'banner_enabled': True,
         'banner_importance': 'importance' in request.form,
@@ -93,10 +96,10 @@ def length_check(banner_message):
 
 def escape_html(text):
     """Escape HTML special characters in text."""
-    return escape(text)  # Assuming `escape` is from an imported module
+    return escape(text)
 
 def save_settings(settings, flash_msg):
-    """Save settings to the configuration file."""
+    """Apply and save the given settings to the configuration file."""
     config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
     app.config.update(settings)
     try:
