@@ -1,0 +1,3 @@
+<div class="non-production sticky-top text-center fw-bold lh-1 p-1 {{ 'text-bg-danger' if config.banner_importance else 'text-bg-primary' }}" role="alert">
+    {{ config.get('banner_message', 'Default banner message if none provided.') }}
+</div>
