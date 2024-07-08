@@ -3,8 +3,8 @@
 __copyright__ = "Copyright (c) 2024, Utrecht University"
 __license__ = "GPLv3, see LICENSE"
 
-from functools import wraps
 import json
+from functools import wraps
 from os import path
 
 from flask import (
@@ -42,6 +42,7 @@ def admin_required(f):
             return redirect(url_for('admin_bp.index'))
         return f(*args, **kwargs)
     return decorated_function
+
 
 
 @admin_bp.route('/set_banner', methods=['POST'])
