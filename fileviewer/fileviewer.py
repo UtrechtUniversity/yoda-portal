@@ -51,7 +51,7 @@ def irods_writer() -> None:
                         obj_desc.write(chunk.data)
                 except Exception:
                     failure = True
-                    log_error("Chunk upload failed for {}".format(chunk.path))
+                    log_error(f"Chunk upload failed for {chunk.path}")
                 finally:
                     try:
                         obj_desc.close()

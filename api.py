@@ -58,7 +58,7 @@ def call(fn: str, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         return (N - 1) // m + 1
 
     def nrep_string_expr(s: str, m: int = 64) -> str:
-        return '++\n'.join('"{}"'.format(escape_quotes(s[i * m:i * m + m])) for i in range(break_strings(len(s), m) + 1))
+        return '++\n'.join(f'"{escape_quotes(s[i * m:i * m + m])}"' for i in range(break_strings(len(s), m) + 1))
 
     if app.config.get('LOG_API_CALL_DURATION', False):
         begintime = timer()
@@ -74,9 +74,9 @@ def call(fn: str, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     arg_str_expr = nrep_string_expr(base64_encoded_params.decode('utf-8'))
 
     # Set parameters as variable instead of parameter input to circumvent iRODS string limits.
-    rule_body = ''' *x={}
-                    api_{}(*x)
-                '''.format(arg_str_expr, fn)
+    rule_body = f''' *x={arg_str_expr}
+                    api_{fn}(*x)
+                '''
 
     x = rule.Rule(
         g.irods,
@@ -97,7 +97,7 @@ def call(fn: str, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     if app.config.get('LOG_API_CALL_DURATION', False):
         endtime = timer()
         callduration = round((endtime - begintime) * 1000)
-        print("DEBUG: {:4d}ms api_{} {}".format(callduration, fn, params), file=sys.stderr)
+        print(f"DEBUG: {callduration:4d}ms api_{fn} {params}", file=sys.stderr)
 
     return json.loads(result)
 

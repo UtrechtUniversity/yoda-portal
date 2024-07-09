@@ -54,7 +54,7 @@ def irods_writer() -> None:
                         obj_desc.write(chunk.data)
                 except Exception:
                     failure = True
-                    log_error("Chunk upload failed for {}".format(chunk.path))
+                    log_error(f"Chunk upload failed for {chunk.path}")
                 finally:
                     try:
                         obj_desc.close()
@@ -226,8 +226,7 @@ def upload_post() -> Response:
             # No file was present, which is okay.
             pass
         except Exception as e:
-            log_error("Error occurred when truncating existing object on upload at {} ({}:{})".format(
-                      object_path, str(type(e)), str(e)))
+            log_error(f"Error occurred when truncating existing object on upload at {object_path} ({str(type(e))}:{str(e)})")
             response = make_response(jsonify({"message": "Upload failed when truncating existing data object."}), 500)
             response.headers["Content-Type"] = "application/json"
             return response
@@ -271,8 +270,9 @@ def upload_post() -> Response:
             # No file was present, which is okay.
             pass
         except Exception as e:
-            log_error("Error occurred on upload when unlinking existing object at {} ({}:{})".format(
-                      final_object_path, str(type(e)), str(e)))
+            log_error(
+                f"Error occurred on upload when unlinking existing object at {final_object_path} ({str(type(e))}:{str(e)})"
+            )
             response = make_response(jsonify({"message": "Upload failed when removing existing data object."}), 500)
             response.headers["Content-Type"] = "application/json"
             return response
