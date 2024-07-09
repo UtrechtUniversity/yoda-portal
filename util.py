@@ -47,7 +47,7 @@ def is_email_in_domains(email: str, domain_list: List[str]) -> bool:
     return False
 
 
-def unicode_secure_filename(filename):
+def unicode_secure_filename(filename: str) -> str:
     """
     Secure filename handling
     Based on werkzeug secure_filename but allows unicode characters
@@ -89,7 +89,7 @@ def unicode_secure_filename(filename):
 
 
 def get_validated_static_path(
-    full_path, request_path, yoda_theme_path, yoda_theme
+    full_path: str, request_path: str, yoda_theme_path: str, yoda_theme: str
 ) -> Optional[Tuple[str, str]]:
     """
     Static files handling - recognisable through '/assets/'
@@ -112,13 +112,13 @@ def get_validated_static_path(
         _, asset_name = path.split(request_path)
         # Make sure asset_name is safe
         if asset_name != secure_filename(asset_name):
-            return
+            return None
 
         if parts[0] == "assets":
             # Main assets
             static_dir = safe_join(user_static_area + "/static", *parts[1:])
             if not static_dir:
-                return
+                return None
             user_static_filename = path.join(static_dir, asset_name)
             if not path.exists(user_static_filename):
                 static_dir = safe_join("/var/www/yoda/static", *parts[1:])
@@ -127,14 +127,14 @@ def get_validated_static_path(
             module = parts[0]
             # Make sure module name is safe
             if module != secure_filename(module):
-                return
+                return None
 
             module_static_area = path.join(module, "static", module)
             user_static_filename = safe_join(
                 path.join(user_static_area, module_static_area), *parts[2:], asset_name
             )
             if not user_static_filename:
-                return
+                return None
 
             if path.exists(user_static_filename):
                 static_dir = path.join(user_static_area, module_static_area, *parts[2:])

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import threading

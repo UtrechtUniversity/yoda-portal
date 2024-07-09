@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
@@ -29,7 +29,7 @@ research_bp = Blueprint('research_bp', __name__,
 
 
 class Chunk:
-    def __init__(self, data_objects, path, number, size, data, resource):
+    def __init__(self, data_objects, path: str, number: int, size: int, data, resource: str) -> None:
         self.data_objects = data_objects
         self.path = path
         self.number = number
@@ -38,8 +38,8 @@ class Chunk:
         self.resource = resource
 
 
-q = queue.Queue(4)
-r = queue.Queue(1)
+q: queue.Queue = queue.Queue(4)
+r: queue.Queue = queue.Queue(1)
 
 
 def irods_writer() -> None:

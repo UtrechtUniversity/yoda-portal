@@ -6,7 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 import sys
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 sys.path.append("..")
 
@@ -16,7 +16,7 @@ from util import unicode_secure_filename
 
 
 class UtilTest(TestCase):
-    def test_is_email_in_domains(self):
+    def test_is_email_in_domains(self) -> None:
         self.assertEqual(is_email_in_domains("peter", ["uu.nl"]), False)
         self.assertEqual(is_email_in_domains("peter@uu.nl", ["uu.nl"]), True)
         self.assertEqual(is_email_in_domains("peter@vu.nl", ["uu.nl"]), False)
@@ -29,7 +29,7 @@ class UtilTest(TestCase):
         self.assertEqual(is_email_in_domains("peter@ai.cs.uu.nl", ["*.cs.uu.nl"]), True)
         self.assertEqual(is_email_in_domains("peter@ai.hum.uu.nl", ["*.cs.uu.nl"]), False)
 
-    def test_unicode_secure_filename(self):
+    def test_unicode_secure_filename(self) -> None:
         self.assertEqual(unicode_secure_filename('../../hi abc.txt'), '....hi abc.txt')
         self.assertEqual(unicode_secure_filename('....//hi abc.txt'), '....hi abc.txt')
         self.assertEqual(unicode_secure_filename('....\/hi abc.txt'), '....hi abc.txt')
@@ -59,12 +59,12 @@ class UtilTest(TestCase):
         self.assertEqual(unicode_secure_filename('\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019'
                                                  '\u001A\u001B\u001C\u001D\u001E\u001F\u007F'), '')
 
-    def exists_return_value(self, pathname):
+    def exists_return_value(self, pathname: str) -> bool:
         """ Mock path.exists function. True if path does not contain "theme" and "uu" """
         return not ("theme" in pathname and "uu" in pathname)
 
     @patch("os.path.exists")
-    def test_static_loader_valid_path(self, mock_exists):
+    def test_static_loader_valid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # uu theme
         static_dir, asset_name = get_validated_static_path(
@@ -86,7 +86,7 @@ class UtilTest(TestCase):
         self.assertEqual(asset_name, "logo.svg")
 
     @patch("os.path.exists")
-    def test_static_loader_invalid_path(self, mock_exists):
+    def test_static_loader_invalid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # Too short
         self.assertIsNone(
@@ -140,7 +140,7 @@ class UtilTest(TestCase):
         )
 
     @patch("os.path.exists")
-    def test_static_loader_module_valid_path(self, mock_exists):
+    def test_static_loader_module_valid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # uu theme
         static_dir, asset_name = get_validated_static_path(
@@ -167,7 +167,7 @@ class UtilTest(TestCase):
         self.assertEqual(asset_name, "select2-bootstrap-5-theme.css")
 
     @patch("os.path.exists")
-    def test_static_loader_module_invalid_path(self, mock_exists):
+    def test_static_loader_module_invalid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # Invalid module name
         self.assertIsNone(
