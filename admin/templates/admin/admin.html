@@ -18,7 +18,8 @@
                         <!-- Text area for entering banner details -->
                         <div class="mb-3">
                             <label for="banner">Banner Details:</label>
-                            <textarea class="form-control" name="banner" id="banner" placeholder="Enter system maintenance details..." required></textarea>
+                            <textarea class="form-control" name="banner" id="banner" placeholder="Enter system maintenance details..." required> {{config.get('banner_message')}}
+                            </textarea>
                         </div>
                         <!-- Checkbox to mark the banner as important -->
                         <div class="mb-3 form-check">
