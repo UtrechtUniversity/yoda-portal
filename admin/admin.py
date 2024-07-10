@@ -65,11 +65,13 @@ def set_banner() -> Response:
     banner_message = request.form.get('banner', '').strip()
     banner_message = escape_html(banner_message)  # Ensure safe text
 
+    # Message length check
     error_message, is_valid = length_check(banner_message)
     if not is_valid:
         flash(error_message, "danger")
         return redirect(url_for('admin_bp.index'))
 
+    # Update app config settings and save settings
     settings = {
         'banner_enabled': True,
         'banner_importance': 'importance' in request.form,
@@ -98,7 +100,7 @@ def remove_banner() -> Response:
 
 def length_check(banner_message: str) -> Tuple[str, bool]:
     """
-    Check banner message length and content.
+    Check banner message length.
 
     :param banner_message: Message to validate.
     :returns: Error message and validity status.
