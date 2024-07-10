@@ -13,13 +13,15 @@
                 <h2 class="card-title">Set maintenance banner</h2>
                 <div class="d-flex justify-content-start align-items-end" style="width: 100%;">
                     <!-- Form to set a maintenance banner -->
-                    <form action="{{ url_for('admin_bp.set_banner') }}" method="POST" class="flex-fill me-2 needs-validation" novalidate>
+                    <form action="{{ url_for('admin_bp.set_banner') }}" method="POST"
+                        class="flex-fill me-2 needs-validation" novalidate>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <!-- Text area for entering banner details -->
                         <div class="mb-3">
                             <label for="banner">Banner Details:</label>
-                            <textarea class="form-control" name="banner" id="banner" placeholder="Enter system maintenance details..." required> {{config.get('banner_message')}}
-                            </textarea>
+                            <textarea class="form-control" name="banner" id="banner" rows="2"
+                                placeholder="Enter system maintenance details..."
+                                required>{{config.get('banner_message')}}</textarea>
                         </div>
                         <!-- Checkbox to mark the banner as important -->
                         <div class="mb-3 form-check">
