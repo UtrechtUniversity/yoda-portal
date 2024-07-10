@@ -16,6 +16,8 @@ from markupsafe import escape
 
 import api
 from util import length_check
+
+
 # Blueprint configuration
 admin_bp = Blueprint("admin_bp", __name__,
                      template_folder="templates/admin",
