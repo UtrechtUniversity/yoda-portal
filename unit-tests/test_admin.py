@@ -10,6 +10,7 @@ sys.path.append("..")
 
 from admin.admin import length_check
 
+
 class AdminTest(TestCase):
     def test_length_check_empty(self):
         """Test that an empty banner message is identified as invalid."""
