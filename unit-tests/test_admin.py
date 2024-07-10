@@ -5,7 +5,6 @@ __license__   = 'GPLv3, see LICENSE'
 
 import sys
 from unittest import TestCase
-from unittest.mock import patch
 
 sys.path.append("..")
 
