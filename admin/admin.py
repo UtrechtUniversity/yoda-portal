@@ -6,7 +6,7 @@ __license__ = "GPLv3, see LICENSE"
 import json
 from functools import wraps
 from os import path
-from typing import Any, Callable, Dict, Tuple
+from typing import Any, Callable, Dict
 
 from flask import (
     abort, Blueprint, current_app as app, flash, g, redirect,
@@ -15,7 +15,7 @@ from flask import (
 from markupsafe import escape
 
 import api
-
+from util import length_check
 # Blueprint configuration
 admin_bp = Blueprint("admin_bp", __name__,
                      template_folder="templates/admin",
@@ -96,21 +96,6 @@ def remove_banner() -> Response:
     }
     flash_msg = 'Banner removed successfully'
     return save_settings(settings, flash_msg)
-
-
-def length_check(banner_message: str) -> Tuple[str, bool]:
-    """
-    Check banner message length.
-
-    :param banner_message: Message to validate.
-    :returns: Error message and validity status.
-    """
-    max_length = 256
-    if not banner_message:
-        return "Empty banner message found.", False
-    elif len(banner_message) > max_length:
-        return "Banner message too long.", False
-    return None, True
 
 
 def escape_html(text: str) -> str:
