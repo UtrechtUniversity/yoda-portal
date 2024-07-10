@@ -6,6 +6,7 @@ __license__ = "GPLv3, see LICENSE"
 import json
 from functools import wraps
 from os import path
+from typing import Any, Callable, Dict, Tuple
 
 from flask import (
     abort, Blueprint, current_app as app, flash, g, redirect,
@@ -33,8 +34,8 @@ def index() -> Response:
         return abort(403)
 
 
-def admin_required(f):
-    """Decorator to check if the user has admin privileges."""
+def admin_required(f: Callable) -> Callable:
+    """Decorator to enforce that a user has admin privileges."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not getattr(g, 'admin', False):
@@ -46,7 +47,7 @@ def admin_required(f):
 
 @admin_bp.route('/set_banner', methods=['POST'])
 @admin_required
-def set_banner():
+def set_banner() -> Response:
     """Set the banner message and persist it to the configuration file."""
     banner_message = request.form.get('banner', '').strip()
     banner_message = escape_html(banner_message)  # Ensure safe text
@@ -69,7 +70,7 @@ def set_banner():
 
 @admin_bp.route('/remove_banner', methods=['POST'])
 @admin_required
-def remove_banner():
+def remove_banner() -> Response:
     """Remove banner message and save settings to the configuration file."""
     settings = {
         'banner_enabled': False,
@@ -80,7 +81,7 @@ def remove_banner():
     return save_settings(settings, flash_msg)
 
 
-def length_check(banner_message):
+def length_check(banner_message: str) -> Tuple[str, bool]:
     """Validate the length and content of the banner message."""
     max_length = 256
     if not banner_message:
@@ -90,12 +91,12 @@ def length_check(banner_message):
     return None, True
 
 
-def escape_html(text):
+def escape_html(text) -> str:
     """Escape HTML special characters in text."""
     return escape(text)
 
 
-def save_settings(settings, flash_msg):
+def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
     """Apply and save the given settings to the configuration file."""
     config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
     app.config.update(settings)
