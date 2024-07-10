@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __copyright__ = "Copyright (c) 2024, Utrecht University"
-__license__ = "GPLv3, see LICENSE"
+__license__   = "GPLv3, see LICENSE"
 
 import json
 from functools import wraps
@@ -27,10 +27,9 @@ admin_bp = Blueprint("admin_bp", __name__,
 
 @admin_bp.route("/")
 def index() -> Response:
-    """
-    Access the admin page if authorized.
+    """Access the admin page if authorized.
 
-    :returns: Rendered admin page or 403 access denied error.
+    :returns: Rendered admin page or 403 access denied error
     """
     has_admin_access = api.call("admin_has_access", data={})["data"]
 
@@ -41,11 +40,11 @@ def index() -> Response:
 
 
 def admin_required(f: Callable) -> Callable:
-    """
-    Decorator to check admin privileges.
+    """Decorator to check admin privileges.
 
-    :param f: Function to decorate.
-    :returns: Wrapped function with admin check.
+    :param f: Function to decorate
+
+    :returns: Wrapped function with admin check
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -59,10 +58,9 @@ def admin_required(f: Callable) -> Callable:
 @admin_bp.route('/set_banner', methods=['POST'])
 @admin_required
 def set_banner() -> Response:
-    """
-    Set and save the banner message.
+    """Set and save the banner message.
 
-    :returns: Redirect to admin page with status message.
+    :returns: Redirect to admin page with status message
     """
     banner_message = request.form.get('banner', '').strip()
     banner_message = escape_html(banner_message)  # Ensure safe text
@@ -86,10 +84,9 @@ def set_banner() -> Response:
 @admin_bp.route('/remove_banner', methods=['POST'])
 @admin_required
 def remove_banner() -> Response:
-    """
-    Remove and save the banner settings.
+    """Remove and save the banner settings.
 
-    :returns: Redirect to admin page with status message.
+    :returns: Redirect to admin page with status message
     """
     settings = {
         'banner_enabled': False,
@@ -101,22 +98,22 @@ def remove_banner() -> Response:
 
 
 def escape_html(text: str) -> str:
-    """
-    Escape HTML special characters in text.
+    """Escape HTML special characters in text.
 
-    :param text: Text to escape.
-    :returns: Escaped text.
+    :param text: Text to escape
+
+    :returns: Escaped text
     """
     return escape(text)
 
 
 def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
-    """
-    Apply and persist settings.
+    """Apply and persist settings.
 
-    :param settings: Settings dictionary.
-    :param flash_msg: Flash message on successful save.
-    :returns: Redirect with flash message.
+    :param settings:  Settings dictionary
+    :param flash_msg: Flash message on successful save
+
+    :returns: Redirect with flash message
     """
     config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
     app.config.update(settings)
