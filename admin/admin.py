@@ -63,7 +63,7 @@ def set_banner() -> Response:
     :returns: Redirect to admin page with status message
     """
     banner_message = request.form.get('banner', '').strip()
-    banner_message = escape_html(banner_message)  # Ensure safe text
+    banner_message = escape(banner_message)  # Ensure safe text
 
     # Message length check
     error_message, is_valid = length_check(banner_message)
@@ -97,16 +97,6 @@ def remove_banner() -> Response:
     return save_settings(settings, flash_msg)
 
 
-def escape_html(text: str) -> str:
-    """Escape HTML special characters in text.
-
-    :param text: Text to escape
-
-    :returns: Escaped text
-    """
-    return escape(text)
-
-
 def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
     """Apply and persist settings.
 
@@ -117,11 +107,12 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
     """
     config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
     app.config.update(settings)
+
     try:
         with open(config_file_path, 'w') as file:
             json.dump(settings, file)
         flash(flash_msg, 'success')
-    except IOError:
+    except Exception:
         flash("Failed to save settings", "danger")
         return "Failed to save settings", 500
 
