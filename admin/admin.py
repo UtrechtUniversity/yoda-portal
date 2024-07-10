@@ -25,7 +25,11 @@ admin_bp = Blueprint("admin_bp", __name__,
 
 @admin_bp.route("/")
 def index() -> Response:
-    """Route to the admin page, if user has admin access."""
+    """
+    Access the admin page if authorized.
+
+    :returns: Rendered admin page or 403 access denied error.
+    """
     has_admin_access = api.call("admin_has_access", data={})["data"]
 
     if has_admin_access:
@@ -35,7 +39,12 @@ def index() -> Response:
 
 
 def admin_required(f: Callable) -> Callable:
-    """Decorator to enforce that a user has admin privileges."""
+    """
+    Decorator to check admin privileges.
+
+    :param f: Function to decorate.
+    :returns: Wrapped function with admin check.
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not getattr(g, 'admin', False):
@@ -48,17 +57,19 @@ def admin_required(f: Callable) -> Callable:
 @admin_bp.route('/set_banner', methods=['POST'])
 @admin_required
 def set_banner() -> Response:
-    """Set the banner message and persist it to the configuration file."""
+    """
+    Set and save the banner message.
+
+    :returns: Redirect to admin page with status message.
+    """
     banner_message = request.form.get('banner', '').strip()
     banner_message = escape_html(banner_message)  # Ensure safe text
 
-    # Message length check
     error_message, is_valid = length_check(banner_message)
     if not is_valid:
         flash(error_message, "danger")
         return redirect(url_for('admin_bp.index'))
 
-    # Update app config settings and save settings
     settings = {
         'banner_enabled': True,
         'banner_importance': 'importance' in request.form,
@@ -71,7 +82,11 @@ def set_banner() -> Response:
 @admin_bp.route('/remove_banner', methods=['POST'])
 @admin_required
 def remove_banner() -> Response:
-    """Remove banner message and save settings to the configuration file."""
+    """
+    Remove and save the banner settings.
+
+    :returns: Redirect to admin page with status message.
+    """
     settings = {
         'banner_enabled': False,
         'banner_importance': False,
@@ -82,7 +97,12 @@ def remove_banner() -> Response:
 
 
 def length_check(banner_message: str) -> Tuple[str, bool]:
-    """Validate the length and content of the banner message."""
+    """
+    Check banner message length and content.
+
+    :param banner_message: Message to validate.
+    :returns: Error message and validity status.
+    """
     max_length = 256
     if not banner_message:
         return "Empty banner message found.", False
@@ -91,13 +111,24 @@ def length_check(banner_message: str) -> Tuple[str, bool]:
     return None, True
 
 
-def escape_html(text) -> str:
-    """Escape HTML special characters in text."""
+def escape_html(text: str) -> str:
+    """
+    Escape HTML special characters in text.
+
+    :param text: Text to escape.
+    :returns: Escaped text.
+    """
     return escape(text)
 
 
 def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
-    """Apply and save the given settings to the configuration file."""
+    """
+    Apply and persist settings.
+
+    :param settings: Settings dictionary.
+    :param flash_msg: Flash message on successful save.
+    :returns: Redirect with flash message.
+    """
     config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
     app.config.update(settings)
     try:
