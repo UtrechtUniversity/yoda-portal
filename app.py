@@ -3,6 +3,7 @@
 __copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import json
 from os import path
 from typing import Dict, Optional
 
@@ -42,6 +43,31 @@ theme_loader = ChoiceLoader([
     app.jinja_loader,
 ])
 app.jinja_loader = theme_loader
+
+
+# Load banner configurations
+def load_banner_config():
+    """Load or initialize banner configurations."""
+    config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
+    default_config = {'banner_enabled': False}
+
+    try:
+        if not path.exists(config_file_path):
+            return default_config
+
+        with open(config_file_path, 'r') as file:
+            settings = json.load(file)
+            return {
+                'banner_enabled': settings.get('banner_enabled', False),
+                'banner_importance': settings.get('banner_importance', False),
+                'banner_message': settings.get('banner_message', '')
+            }
+    except Exception:
+        return default_config
+
+
+app.config['APP_SHARED_FOLDER'] = '/tmp'
+app.config.update(load_banner_config())
 
 # Setup values for the navigation bar used in
 # general/templates/general/base.html

@@ -145,3 +145,18 @@ def get_validated_static_path(
         # Check that path is correct
         if path.exists(full_path):
             return static_dir, asset_name
+
+
+def length_check(banner_message: str) -> Tuple[str, bool]:
+    """
+    Check banner message length.
+
+    :param banner_message: Message to validate.
+    :returns: Error message and validity status.
+    """
+    max_length = 256
+    if not banner_message:
+        return "Empty banner message found.", False
+    elif len(banner_message) > max_length:
+        return "Banner message too long.", False
+    return None, True
