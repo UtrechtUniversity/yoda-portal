@@ -62,8 +62,11 @@ def load_banner_config():
                 'banner_importance': settings.get('banner_importance', False),
                 'banner_message': settings.get('banner_message', '')
             }
+<<<<<<< HEAD
     except json.JSONDecodeError:
         return default_config
+=======
+>>>>>>> development
     except Exception:
         return default_config
 

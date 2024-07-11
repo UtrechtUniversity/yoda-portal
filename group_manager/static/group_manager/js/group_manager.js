@@ -1,6 +1,8 @@
 /* global FileReader, jQuery, Option */
 'use strict'
 
+let enteredUsername = ''
+
 function flatListGroups () {
   // Create flat list of groups including filter handling on username and groupname.
   // Centralized handling of contents of fields in the frontend related to this functionality.
@@ -161,7 +163,7 @@ function readCsvFile (e) {
       contents = contents.slice(0, contents.length - 1)
     }
 
-    // ensure correct seperator ','
+    // ensure correct separator ','
     contents = contents.replaceAll(';', ',')
 
     // required to be able to, in a simple manner, add header and data row
@@ -186,7 +188,7 @@ function readCsvFile (e) {
     // per csvHeader item check whether its valid
     let errorRows = ''
     csvHeader.split(',').forEach(function myFunction (item) {
-      if (! (allCsvColumns.includes(item) || /^(manager|member|viewer):/.test(item)) ){
+      if (!(allCsvColumns.includes(item) || /^(manager|member|viewer):/.test(item))) {
         errorRows += '<li>' + item + '</li>'
       }
     })
@@ -283,17 +285,17 @@ function readCsvFile (e) {
 }
 
 function csvToArray (str, delimiter = ',') {
-  var headers = str.slice(0, str.indexOf('\n')).split(delimiter)
+  const headers = str.slice(0, str.indexOf('\n')).split(delimiter)
   const rows = str.slice(str.indexOf('\n') + 1).split('\n')
 
   // If we have headers with legacy suffixes, normalize them by removing each suffix
   // e.g. "manager:manager1" becomes "manager".
-  headers.forEach(function(element, number, headers) {
-        const header_value = headers[number]
-        if ( /^(manager|member|viewer):/.test(header_value) ) {
-               headers[number] = header_value.substring(0, header_value.indexOf(':'))
-        }
-  });
+  headers.forEach(function (element, number, headers) {
+    const headerValue = headers[number]
+    if (/^(manager|member|viewer):/.test(headerValue)) {
+      headers[number] = headerValue.substring(0, headerValue.indexOf(':'))
+    }
+  })
 
   const arr = rows.map(function (row) {
     const values = row.split(delimiter)
@@ -916,7 +918,7 @@ $(function () {
       const $group = $groupList.find('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]')
 
       const $catBody = $group.parents('.category').children('.category-ul')
-      new bootstrap.Collapse($catBody, {toggle: false}).show()
+      new bootstrap.Collapse($catBody, { toggle: false }).show()
       const numSubcats = $group.parents('.category').find('.subcategory').length
 
       if (numSubcats > 1) {
@@ -926,7 +928,7 @@ $(function () {
         // 'shown.bs.collapse' event handler.
         // (unfolding twice looks jittery)
         const $subcatBody = $group.parents('.subcategory').children('.subcategory-ul')
-        new bootstrap.Collapse($subcatBody, {toggle: false}).show()
+        new bootstrap.Collapse($subcatBody, { toggle: false }).show()
       }
     },
 
@@ -1244,7 +1246,7 @@ $(function () {
         $el.select2({
           placeholder,
           ajax: {
-            quietMillis: 200,
+            delay: 200,
             url: '/group_manager/get_categories',
             type: 'post',
             dataType: 'json',
@@ -1363,7 +1365,7 @@ $(function () {
         $el.select2({
           placeholder: 'Select a subcategory or enter a new name',
           ajax: {
-            quietMillis: 200,
+            delay: 200,
             url: '/group_manager/get_subcategories',
             type: 'post',
             dataType: 'json',
@@ -1438,7 +1440,7 @@ $(function () {
         $el.select2({
           ajax: {
             placeholder: 'Select a schema',
-            quietMillis: 200,
+            delay: 200,
             url: '/group_manager/get_schemas',
             type: 'post',
             dataType: 'json',
@@ -1503,10 +1505,10 @@ $(function () {
         $el.select2({
           allowClear: true,
           placeholder: 'Click here to add a user...',
-          openOnEnter: false,
           minimumInputLength: 3,
+          tags: true,
           ajax: {
-            quietMillis: 400,
+            delay: 400,
             url: '/group_manager/get_users',
             type: 'post',
             dataType: 'json',
@@ -1546,6 +1548,11 @@ $(function () {
                 })
               }
 
+              if (results.length == 1) {
+                enteredUsername = results[0].id
+                $("#select2-f-user-create-name-container").text(enteredUsername) 
+              }
+
               return { results }
             }
           },
@@ -1558,8 +1565,6 @@ $(function () {
                             ) +
                             '</span>')
           }
-        }).on('select2:open', function () {
-          $(this).val(null)
         })
       })
 
@@ -1746,7 +1751,7 @@ $(function () {
         }
       }
 
-      // Check if group decription is valid.
+      // Check if group description is valid.
       if (!newProperties.description.match(/^[a-zA-Z0-9,.()_ -]*$/)) {
         window.alert('The group description may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')
         resetSubmitButton()
@@ -1910,10 +1915,19 @@ $(function () {
       if ($(el).find('input[type="submit"]').hasClass('disabled')) { return }
 
       const groupName = $(el).find('#f-user-create-group').val()
-      const userName = $(el).find('#f-user-create-name').val().trim()
+      let userName = $(el).find('#f-user-create-name').find(':selected').val().trim()
+      if (enteredUsername.length > 0 && (enteredUsername.startsWith(userName) || userName.startsWith(enteredUsername))) {
+        userName = enteredUsername
+      }
 
       if (!userName.match(/^([a-z.]+|[a-z0-9_.-]+@[a-z0-9_.-]+)(#[a-zA-Z0-9_-]+)?$/)) {
         window.alert('Please enter either an e-mail address or a name consisting only of lowercase chars and dots.')
+        return
+      }
+
+      const onlyUserName = userName.indexOf("#") > -1 ? userName.split("#")[0] : userName
+      if (onlyUserName.length > 63) {
+        window.alert('Please enter a shorter username.')
         return
       }
 
@@ -1937,7 +1951,7 @@ $(function () {
             access: 'normal'
           }
 
-          $(el).find('#f-user-create-name').val('')
+          $(el).find('#f-user-create-name').val(null).trigger('change')
 
           that.deselectGroup()
           that.selectGroup(groupName)
@@ -2156,11 +2170,11 @@ $(function () {
       $groupList.on('shown.bs.collapse', function (e) {
         // Once a category is fully opened, open its subcategory (if there is only one).
         const $subs = $(e.target).children('.subcategory')
-        
+
         if ($subs.length === 1) {
           // Only one subcategory, expand it automatically.
           const $subcatBody = $subs.first().children('.subcategory-ul')
-          new bootstrap.Collapse($subcatBody, {toggle: false}).show()
+          new bootstrap.Collapse($subcatBody, { toggle: false }).show()
         }
       })
 
@@ -2268,7 +2282,7 @@ $(function () {
 
       $('#f-user-create-name').on('select2:close', function () {
         // Remove the new user name input on unfocus if nothing was entered.
-        if ($(this).select2('data')[0].id.length === 0) {
+        if ($(this).find(':selected').val().length === 0) {
           $(this).parents('.list-group-item').find('.user-create-text').removeAttr('hidden')
         }
       })
@@ -2276,6 +2290,13 @@ $(function () {
       // Adding users to groups.
       $('#f-user-create').on('submit', function (e) {
         that.onSubmitUserCreate(this, e)
+      })
+
+      $('#f-user-create').on('keydown', function (e) {
+        // Enter key.
+        if (e.which === 13) {
+          that.onSubmitUserCreate(this, e)
+        }
       })
 
       // User list search.

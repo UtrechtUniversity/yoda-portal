@@ -4,8 +4,6 @@ __copyright__ = 'Copyright (c) 2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
-import queue
-import threading
 import urllib.parse
 from typing import Iterator
 
@@ -17,54 +15,11 @@ from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 
 import connman
-from util import log_error
 
 fileviewer_bp = Blueprint('fileviewer_bp', __name__,
                           template_folder='templates',
                           static_folder='static/fileviewer',
                           static_url_path='/assets')
-
-
-class Chunk:
-    def __init__(self, data_objects, path, number, size, data, resource):
-        self.data_objects = data_objects
-        self.path = path
-        self.number = number
-        self.size = size
-        self.data = data
-        self.resource = resource
-
-
-q = queue.Queue(4)
-r = queue.Queue(1)
-
-
-def irods_writer() -> None:
-    failure = False
-    while True:
-        chunk = q.get()
-        if chunk.path:
-            if not failure:
-                try:
-                    with chunk.data_objects.open(chunk.path, 'a', chunk.resource) as obj_desc:
-                        obj_desc.seek(int(chunk.size * (chunk.number - 1)))
-                        obj_desc.write(chunk.data)
-                except Exception:
-                    failure = True
-                    log_error("Chunk upload failed for {}".format(chunk.path))
-                finally:
-                    try:
-                        obj_desc.close()
-                    except Exception:
-                        pass
-        else:
-            # report back about failures
-            r.put(failure)
-            failure = False
-        q.task_done()
-
-
-threading.Thread(target=irods_writer, name='irods-writer', daemon=True).start()
 
 
 @fileviewer_bp.route('/')

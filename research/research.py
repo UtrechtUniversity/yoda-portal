@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
@@ -29,7 +29,7 @@ research_bp = Blueprint('research_bp', __name__,
 
 
 class Chunk:
-    def __init__(self, data_objects, path, number, size, data, resource):
+    def __init__(self, data_objects, path: str, number: int, size: int, data, resource: str) -> None:
         self.data_objects = data_objects
         self.path = path
         self.number = number
@@ -38,8 +38,8 @@ class Chunk:
         self.resource = resource
 
 
-q = queue.Queue(4)
-r = queue.Queue(1)
+q: queue.Queue = queue.Queue(4)
+r: queue.Queue = queue.Queue(1)
 
 
 def irods_writer() -> None:
@@ -54,7 +54,7 @@ def irods_writer() -> None:
                         obj_desc.write(chunk.data)
                 except Exception:
                     failure = True
-                    log_error("Chunk upload failed for {}".format(chunk.path))
+                    log_error(f"Chunk upload failed for {chunk.path}")
                 finally:
                     try:
                         obj_desc.close()
@@ -226,8 +226,7 @@ def upload_post() -> Response:
             # No file was present, which is okay.
             pass
         except Exception as e:
-            log_error("Error occurred when truncating existing object on upload at {} ({}:{})".format(
-                      object_path, str(type(e)), str(e)))
+            log_error(f"Error occurred when truncating existing object on upload at {object_path} ({str(type(e))}:{str(e)})")
             response = make_response(jsonify({"message": "Upload failed when truncating existing data object."}), 500)
             response.headers["Content-Type"] = "application/json"
             return response
@@ -271,8 +270,9 @@ def upload_post() -> Response:
             # No file was present, which is okay.
             pass
         except Exception as e:
-            log_error("Error occurred on upload when unlinking existing object at {} ({}:{})".format(
-                      final_object_path, str(type(e)), str(e)))
+            log_error(
+                f"Error occurred on upload when unlinking existing object at {final_object_path} ({str(type(e))}:{str(e)})"
+            )
             response = make_response(jsonify({"message": "Upload failed when removing existing data object."}), 500)
             response.headers["Content-Type"] = "application/json"
             return response
