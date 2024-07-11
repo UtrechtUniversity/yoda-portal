@@ -138,7 +138,7 @@ csrf = CSRFProtect(app)
 
 
 @app.before_request
-def static_loader() -> Optional[Response]:
+def static_loader() -> Optional[Response]: #TODO:
     """
     Static files handling - recognisable through '/assets/'
     Override requested static file if present in user_static_area
@@ -158,8 +158,9 @@ def static_loader() -> Optional[Response]:
     result = get_validated_static_path(
         request.full_path,
         request.path,
-        app.config.get('YODA_THEME_PATH'),
-        app.config.get('YODA_THEME')
+        app.config.get('YODA_THEME_PATH'),#TODO: Use similar adding maintainance banner
+        app.config.get('YODA_THEME') #TODO: save to json together with the banner settings
+        #TODO: Use select dropdown and should automaticlally load all the theme options
     )
     if result is not None:
         static_dir, asset_name = result
