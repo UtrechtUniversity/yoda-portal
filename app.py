@@ -45,34 +45,42 @@ theme_loader = ChoiceLoader([
 app.jinja_loader = theme_loader
 
 
-# Load banner configurations
-def load_banner_config():
-    """Load or initialize banner configurations."""
-    config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
-    default_config = {'banner_enabled': False}
+def load_admin_config():
+    """Load or initialize admin configurations from config file, writing defaults if no config file exists."""
+    config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
+    default_config = {
+        'banner': {
+            'banner_enabled': False,
+            'banner_importance': False,
+            'banner_message': ''
+        }
+    }
 
     try:
+        # File doesn't exist, write the default configuration to a new file
         if not path.exists(config_file_path):
+            with open(config_file_path, 'w') as file:
+                json.dump(default_config, file)
             return default_config
 
+        # If the file exists, read and return the configuration
         with open(config_file_path, 'r') as file:
             settings = json.load(file)
+            banner_settings = settings.get('banner', default_config['banner'])  # Get banner settings or use default
             return {
-                'banner_enabled': settings.get('banner_enabled', False),
-                'banner_importance': settings.get('banner_importance', False),
-                'banner_message': settings.get('banner_message', '')
+                'banner': {
+                    'banner_enabled': banner_settings.get('banner_enabled', default_config['banner']['banner_enabled']),
+                    'banner_importance': banner_settings.get('banner_importance', default_config['banner']['banner_importance']),
+                    'banner_message': banner_settings.get('banner_message', default_config['banner']['banner_message'])
+                }
             }
-<<<<<<< HEAD
-    except json.JSONDecodeError:
-        return default_config
-=======
->>>>>>> development
-    except Exception:
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
         return default_config
 
 
 app.config['APP_SHARED_FOLDER'] = '/tmp'
-app.config.update(load_banner_config())
+app.config.update(load_admin_config())
 
 # Setup values for the navigation bar used in
 # general/templates/general/base.html

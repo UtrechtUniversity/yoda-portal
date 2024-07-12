@@ -27,16 +27,9 @@ admin_bp = Blueprint("admin_bp", __name__,
 
 @admin_bp.route("/")
 def index() -> Response:
-<<<<<<< HEAD
-    """
-    Access the admin page if authorized.
-
-    :returns: Rendered admin page or 403 access denied error.
-=======
     """Access the admin page if authorized.
 
     :returns: Rendered admin page or 403 access denied error
->>>>>>> development
     """
     has_admin_access = api.call("admin_has_access", data={})["data"]
 
@@ -47,19 +40,11 @@ def index() -> Response:
 
 
 def admin_required(f: Callable) -> Callable:
-<<<<<<< HEAD
-    """
-    Decorator to check admin privileges.
-
-    :param f: Function to decorate.
-    :returns: Wrapped function with admin check.
-=======
     """Decorator to check admin privileges.
 
     :param f: Function to decorate
 
     :returns: Wrapped function with admin check
->>>>>>> development
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -73,22 +58,12 @@ def admin_required(f: Callable) -> Callable:
 @admin_bp.route('/set_banner', methods=['POST'])
 @admin_required
 def set_banner() -> Response:
-<<<<<<< HEAD
-    """
-    Set and save the banner message.
-
-    :returns: Redirect to admin page with status message.
-    """
-    banner_message = request.form.get('banner', '').strip()
-    banner_message = escape_html(banner_message)  # Ensure safe text
-=======
     """Set and save the banner message.
 
     :returns: Redirect to admin page with status message
     """
     banner_message = request.form.get('banner', '').strip()
     banner_message = escape(banner_message)  # Ensure safe text
->>>>>>> development
 
     # Message length check
     error_message, is_valid = length_check(banner_message)
@@ -98,59 +73,35 @@ def set_banner() -> Response:
 
     # Update app config settings and save settings
     settings = {
-        'banner_enabled': True,
-        'banner_importance': 'importance' in request.form,
-        'banner_message': banner_message
+        'banner': {
+            'banner_enabled': True,
+            'banner_importance': 'importance' in request.form,
+            'banner_message': banner_message
+        }
     }
     flash_msg = 'Set banner message successfully'
+
     return save_settings(settings, flash_msg)
 
 
 @admin_bp.route('/remove_banner', methods=['POST'])
 @admin_required
 def remove_banner() -> Response:
-<<<<<<< HEAD
-    """
-    Remove and save the banner settings.
-
-    :returns: Redirect to admin page with status message.
-=======
     """Remove and save the banner settings.
 
     :returns: Redirect to admin page with status message
->>>>>>> development
     """
     settings = {
-        'banner_enabled': False,
-        'banner_importance': False,
-        'banner_message': ''
+        'banner': {
+            'banner_enabled': False,
+            'banner_importance': False,
+            'banner_message': '' #TODO: still need this? since banner setting was initialized?
+        }
     }
     flash_msg = 'Banner removed successfully'
     return save_settings(settings, flash_msg)
 
 
-<<<<<<< HEAD
-def escape_html(text: str) -> str:
-    """
-    Escape HTML special characters in text.
-
-    :param text: Text to escape.
-    :returns: Escaped text.
-    """
-    return escape(text)
-
-
-def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
-    """
-    Apply and persist settings.
-
-    :param settings: Settings dictionary.
-    :param flash_msg: Flash message on successful save.
-    :returns: Redirect with flash message.
-    """
-    config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
-    app.config.update(settings)
-=======
 def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
     """Apply and persist settings.
 
@@ -159,19 +110,14 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
 
     :returns: Redirect with flash message
     """
-    config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'banner_settings.json')
+    config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
     app.config.update(settings)
 
->>>>>>> development
     try:
         with open(config_file_path, 'w') as file:
             json.dump(settings, file)
         flash(flash_msg, 'success')
-<<<<<<< HEAD
-    except IOError:
-=======
     except Exception:
->>>>>>> development
         flash("Failed to save settings", "danger")
         return "Failed to save settings", 500
 
