@@ -4,7 +4,7 @@ __copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
-from os import path
+from os import listdir,path
 from typing import Dict, Optional
 
 from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
@@ -45,6 +45,20 @@ theme_loader = ChoiceLoader([
 app.jinja_loader = theme_loader
 
 
+@app.template_filter('get_directories')
+# TODO: Unit testing? for empty folders etc
+# TODO: Security concern? e.g, directory traversal?
+# TODO: Use caching to improve loading speed?
+def get_directories(theme_path):
+    """Jinja2 filter to retrieve directory names in the specified path, sorted alphabetically."""
+    try:
+        directories = [name for name in listdir(theme_path) if path.isdir(path.join(theme_path, name))]
+        directories.sort()
+        return directories
+    except Exception:
+        return []
+
+
 def load_admin_config():
     """Load or initialize admin configurations from config file, writing defaults if no config file exists."""
     config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
@@ -53,7 +67,8 @@ def load_admin_config():
             'banner_enabled': False,
             'banner_importance': False,
             'banner_message': ''
-        }
+        },
+        'YODA_THEME':app.config.get('YODA_THEME')
     }
 
     try:
@@ -72,10 +87,11 @@ def load_admin_config():
                     'banner_enabled': banner_settings.get('banner_enabled', default_config['banner']['banner_enabled']),
                     'banner_importance': banner_settings.get('banner_importance', default_config['banner']['banner_importance']),
                     'banner_message': banner_settings.get('banner_message', default_config['banner']['banner_message'])
-                }
+                },
+                'YODA_THEME':settings.get('YODA_THEME', default_config['YODA_THEME'])
             }
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+    except Exception:
+        print("An unexpected error occurred")
         return default_config
 
 

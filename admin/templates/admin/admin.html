@@ -8,9 +8,10 @@
         <h1>Administration</h1>
     </header>
     <main>
+        <!-- Set Maintenance Banner section-->
         <section class="card my-3">
             <div class="card-body">
-                <h2 class="card-title">Set maintenance banner</h2>
+                <h2 class="card-title">Set Maintenance Banner</h2>
                 <div class="d-flex justify-content-start align-items-end" style="width: 100%;">
                     <!-- Form to set a maintenance banner -->
                     <form action="{{ url_for('admin_bp.set_banner') }}" method="POST"
@@ -38,6 +39,26 @@
                 </div>
             </div>
         </section>
+        <!-- Theme Change section-->
+        <section class="card my-3">
+            <div class="card-body">
+                <h2 class="card-title">Change Portal Theme</h2>
+                <form action="{{ url_for('admin_bp.set_theme') }}" method="POST" class="needs-validation" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="theme">Select Theme:</label>
+                        <select class="form-control" id="theme" name="theme" required>
+                            <!-- Add default theme option -->
+                            {% set current_theme = config.get('YODA_THEME', 'default') %}
+                            {% for folder in config.get('YODA_THEME_PATH', '/var/www/yoda/themes') | get_directories %}
+                                <option value="{{ folder }}" {% if folder == current_theme %}selected{% endif %}>{{ folder }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Change Theme</button>
+                </form>
+            </div>
+        </section
     </main>
 </div>
 {% endblock content %}

@@ -80,7 +80,6 @@ def set_banner() -> Response:
         }
     }
     flash_msg = 'Set banner message successfully'
-
     return save_settings(settings, flash_msg)
 
 
@@ -94,12 +93,27 @@ def remove_banner() -> Response:
     settings = {
         'banner': {
             'banner_enabled': False,
-            'banner_importance': False,
-            'banner_message': '' #TODO: still need this? since banner setting was initialized?
         }
     }
     flash_msg = 'Banner removed successfully'
     return save_settings(settings, flash_msg)
+
+
+@admin_bp.route('/set_theme', methods=['POST'])
+@admin_required
+def set_theme() -> Response:
+    """Set and save the YODA theme.
+
+    :returns: Redirect to admin page with status message
+    """
+    # Load theme chocie
+    theme = request.form.get('theme')
+    print("YODA_THEME",theme)
+
+    # Save settings
+    flash_msg = f"Theme changed to {theme}."
+    theme_settings = {'YODA_THEME': theme}
+    return save_settings(theme_settings, flash_msg)
 
 
 def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
@@ -114,8 +128,14 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
     app.config.update(settings)
 
     try:
-        with open(config_file_path, 'w') as file:
-            json.dump(settings, file)
+        # Load existing settings and merge with new settings
+        with open(config_file_path, 'r+') as file:
+            file_settings = json.load(file)
+            file_settings.update(settings)
+            # Move to the beginning of the file to overwrite
+            file.seek(0)
+            json.dump(file_settings, file, indent=4)
+            file.truncate()
         flash(flash_msg, 'success')
     except Exception:
         flash("Failed to save settings", "danger")
