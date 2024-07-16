@@ -49,9 +49,9 @@
                         <label for="theme">Select Theme:</label>
                         <select class="form-control" id="theme" name="theme" required>
                             <!-- Add default theme option -->
-                            {% set current_theme = config.get('YODA_THEME', 'default') %}
-                            {% for folder in config.get('YODA_THEME_PATH', '/var/www/yoda/themes') | get_directories %}
-                                <option value="{{ folder }}" {% if folder == current_theme %}selected{% endif %}>{{ folder }}</option>
+                            {% set current_theme = config.get('YODA_THEME', 'uu') %}
+                            {% for folder in get_theme_directories() %}
+                                <option value="{{ folder }}" {% if folder == current_theme %}selected{% endif %}> {{ config.theme_mapping.get(folder, folder) }}</option>
                             {% endfor %}
                         </select>
                     </div>

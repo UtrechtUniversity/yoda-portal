@@ -45,18 +45,36 @@ theme_loader = ChoiceLoader([
 app.jinja_loader = theme_loader
 
 
-@app.template_filter('get_directories')
-# TODO: Unit testing? for empty folders etc
-# TODO: Security concern? e.g, directory traversal?
-# TODO: Use caching to improve loading speed?
-def get_directories(theme_path):
-    """Jinja2 filter to retrieve directory names in the specified path, sorted alphabetically."""
+theme_mapping = {
+    "uu": "Utrecht University - default",
+    "uu_its": "Utrecht University - ITS",
+    "uu_gw": "Utrecht University - Humanities",
+    "uu_youth": "Utrecht University - YOUth",
+    "uu_i-lab": "Utrecht University - i-lab",
+    "uu_science": "Utrecht University - Science",
+    "uu_fsw": "Utrecht University - Social science",
+    "uu_geo": "Utrecht University - GEO",
+    "uu_dgk": "Utrecht University - Veterinary Medicine",
+    "uu_dag": "Utrecht University - Data Archive for Geosciences (DAG)",
+    "vu": "Vrije University Amsterdam",
+    "wur": "Wageningen University & Research"
+}
+app.config["theme_mapping"]=theme_mapping
+# TODO: Unit testing? for empty folders etc # Exist, No exist,
+@app.template_global('get_theme_directories')
+def get_theme_directories():
+    """Jinja2 filter to retrieve theme directory names in the specified path, sorted alphabetically."""
     try:
-        directories = [name for name in listdir(theme_path) if path.isdir(path.join(theme_path, name))]
+        theme_path = app.config.get('YODA_THEME_PATH')
+        print("theme_path:",theme_path)
+        directories = [name for name in listdir(theme_path) if path.isdir(path.join(theme_path, name))] + ['uu']
         directories.sort()
+        print("dir:",directories)
         return directories
     except Exception:
         return []
+
+# TODO: UI test for which visual change?
 
 
 def load_admin_config():
