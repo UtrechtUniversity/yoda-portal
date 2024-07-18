@@ -155,7 +155,7 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
     :param app: The Flask application instance to configure.
     :param remove_cache: A boolean flag indicates whether to clear the template cache. Defaults to False.
 
-    :returns: None
+    :return: None
     """
     # Target theme path
     theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
