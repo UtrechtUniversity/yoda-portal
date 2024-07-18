@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
@@ -179,10 +179,9 @@ def settings() -> Response:
             flash('Saving settings failed!', 'danger')
 
     # Load user settings.
-    response = api.call('settings_load', data={})
-    settings = response['data']
+    session['settings'] = api.call('settings_load', data={})['data']
 
-    return render_template('user/settings.html', **settings)
+    return render_template('user/settings.html', **session['settings'])
 
 
 @user_bp.route('/data_access')
@@ -479,13 +478,18 @@ def prepare_user() -> None:
                 response = api.call('notifications_load', data={})
                 g.notifications = len(response['data'])
 
-                # Load saved settings
-                response = api.call('settings_load', data={})
-                g.settings = response['data']
+                # Load saved settings.
+                if session.get('settings', None) is None:
+                    response = api.call('settings_load', data={})
+                    session['settings'] = response['data']
+                g.settings = session.get('settings')
 
                 # Check for admin access.
-                response = api.call("admin_has_access", data={})
-                g.admin = response["data"]
+                if session.get('admin', None) is None:
+                    response = api.call("admin_has_access", data={})
+                    session['admin'] = response['data']
+                g.admin = session.get('admin')
+
         except PAM_AUTH_PASSWORD_FAILED:
             # Password is not valid any more (probably OIDC access token).
             connman.clean(session.sid)
