@@ -10,7 +10,7 @@ from typing import Any, Callable, Dict
 
 from flask import (
     abort, Blueprint, current_app as app, flash, g, redirect,
-    render_template, request, Response, url_for
+    render_template, request, Response, session, url_for
 )
 from markupsafe import escape
 
@@ -31,9 +31,9 @@ def index() -> Response:
 
     :returns: Rendered admin page or 403 access denied error
     """
-    has_admin_access = api.call("admin_has_access", data={})["data"]
+    session['admin'] = api.call("admin_has_access", data={})["data"]
 
-    if has_admin_access:
+    if session['admin']:
         return render_template("admin.html")
     else:
         return abort(403)
