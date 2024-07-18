@@ -4,7 +4,7 @@ __copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
-from os import listdir,path
+from os import path
 from typing import Dict, Optional
 
 from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
@@ -36,13 +36,7 @@ app.json.sort_keys = False
 with app.app_context():
     app.config.from_pyfile('flask.cfg')
 
-# Add theme loader.
-theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
-theme_loader = ChoiceLoader([
-    FileSystemLoader(theme_path),
-    app.jinja_loader,
-])
-app.jinja_loader = theme_loader
+
 
 
 theme_mapping = {
@@ -52,7 +46,7 @@ theme_mapping = {
     "uu_youth": "Utrecht University - YOUth",
     "uu_i-lab": "Utrecht University - i-lab",
     "uu_science": "Utrecht University - Science",
-    "uu_fsw": "Utrecht University - Social science",
+    "uu_fsw": "Utrecht University - Social Science",
     "uu_geo": "Utrecht University - GEO",
     "uu_dgk": "Utrecht University - Veterinary Medicine",
     "uu_dag": "Utrecht University - Data Archive for Geosciences (DAG)",
@@ -60,22 +54,6 @@ theme_mapping = {
     "wur": "Wageningen University & Research"
 }
 app.config["theme_mapping"]=theme_mapping
-# TODO: Unit testing? for empty folders etc # Exist, No exist,
-@app.template_global('get_theme_directories')
-def get_theme_directories():
-    """Jinja2 filter to retrieve theme directory names in the specified path, sorted alphabetically."""
-    try:
-        theme_path = app.config.get('YODA_THEME_PATH')
-        print("theme_path:",theme_path)
-        directories = [name for name in listdir(theme_path) if path.isdir(path.join(theme_path, name))] + ['uu']
-        directories.sort()
-        print("dir:",directories)
-        return directories
-    except Exception:
-        return []
-
-# TODO: UI test for which visual change?
-
 
 def load_admin_config():
     """Load or initialize admin configurations from config file, writing defaults if no config file exists."""
@@ -115,6 +93,13 @@ def load_admin_config():
 
 app.config['APP_SHARED_FOLDER'] = '/tmp'
 app.config.update(load_admin_config())
+
+theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
+theme_loader = ChoiceLoader([
+    FileSystemLoader(theme_path),
+    app.jinja_loader,
+])
+app.jinja_loader = theme_loader
 
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
@@ -183,7 +168,9 @@ csrf = CSRFProtect(app)
 
 
 @app.before_request
-def static_loader() -> Optional[Response]: #TODO:
+def static_loader() -> Optional[Response]:
+    # TODO: load the backgrounds and css statics, but themes/templates are loaded
+    # TODO: Cache issue that may result in logo unchagned (when changed from uu to the vu in another tab, but force reload can fix this (add force reload cmd))
     """
     Static files handling - recognisable through '/assets/'
     Override requested static file if present in user_static_area

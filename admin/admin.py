@@ -7,7 +7,6 @@ import json
 from functools import wraps
 from os import path
 from typing import Any, Callable, Dict
-
 from flask import (
     abort, Blueprint, current_app as app, flash, g, redirect,
     render_template, request, Response, url_for
@@ -15,7 +14,8 @@ from flask import (
 from markupsafe import escape
 
 import api
-from util import length_check
+from jinja2 import ChoiceLoader, FileSystemLoader
+from util import get_theme_directories, length_check
 
 
 # Blueprint configuration
@@ -34,7 +34,9 @@ def index() -> Response:
     has_admin_access = api.call("admin_has_access", data={})["data"]
 
     if has_admin_access:
-        return render_template("admin.html")
+        # reload theme options
+        theme_directories = get_theme_directories(app.config.get('YODA_THEME_PATH'))
+        return render_template("admin.html", theme_directories=theme_directories)
     else:
         return abort(403)
 
@@ -111,7 +113,7 @@ def set_theme() -> Response:
     print("YODA_THEME",theme)
 
     # Save settings
-    flash_msg = f"Theme changed to {theme}."
+    flash_msg = "Theme changed successfully."
     theme_settings = {'YODA_THEME': theme}
     return save_settings(theme_settings, flash_msg)
 
@@ -141,4 +143,14 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
         flash("Failed to save settings", "danger")
         return "Failed to save settings", 500
 
-    return redirect(url_for('admin_bp.index'))
+    if "YODA_THEME" in settings.keys():
+        # Reload the theme template if theme is changed
+        theme_path = path.join(app.config.get('YODA_THEME_PATH'), settings["YODA_THEME"])
+        theme_loader = ChoiceLoader([
+            FileSystemLoader(theme_path),
+            app.jinja_loader,
+        ])
+        app.jinja_loader = theme_loader
+        if hasattr(app.jinja_env, 'cache'):
+            app.jinja_env.cache = {}
+    return redirect(url_for("admin_bp.index"))
