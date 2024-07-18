@@ -37,24 +37,6 @@ with app.app_context():
     app.config.from_pyfile('flask.cfg')
 
 
-
-
-theme_mapping = {
-    "uu": "Utrecht University - default",
-    "uu_its": "Utrecht University - ITS",
-    "uu_gw": "Utrecht University - Humanities",
-    "uu_youth": "Utrecht University - YOUth",
-    "uu_i-lab": "Utrecht University - i-lab",
-    "uu_science": "Utrecht University - Science",
-    "uu_fsw": "Utrecht University - Social Science",
-    "uu_geo": "Utrecht University - GEO",
-    "uu_dgk": "Utrecht University - Veterinary Medicine",
-    "uu_dag": "Utrecht University - Data Archive for Geosciences (DAG)",
-    "vu": "Vrije University Amsterdam",
-    "wur": "Wageningen University & Research"
-}
-app.config["theme_mapping"]=theme_mapping
-
 def load_admin_config():
     """Load or initialize admin configurations from config file, writing defaults if no config file exists."""
     config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
@@ -90,10 +72,27 @@ def load_admin_config():
         print("An unexpected error occurred")
         return default_config
 
-
 app.config['APP_SHARED_FOLDER'] = '/tmp'
 app.config.update(load_admin_config())
 
+# Prepare theme settings
+theme_mapping = {
+    "uu": "Utrecht University - default",
+    "uu_its": "Utrecht University - ITS",
+    "uu_gw": "Utrecht University - Humanities",
+    "uu_youth": "Utrecht University - YOUth",
+    "uu_i-lab": "Utrecht University - i-lab",
+    "uu_science": "Utrecht University - Science",
+    "uu_fsw": "Utrecht University - Social Science",
+    "uu_geo": "Utrecht University - GEO",
+    "uu_dgk": "Utrecht University - Veterinary Medicine",
+    "uu_dag": "Utrecht University - Data Archive for Geosciences (DAG)",
+    "vu": "Vrije University Amsterdam",
+    "wur": "Wageningen University & Research"
+}
+app.config["theme_mapping"]=theme_mapping
+
+# Load theme templates
 theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
 theme_loader = ChoiceLoader([
     FileSystemLoader(theme_path),
