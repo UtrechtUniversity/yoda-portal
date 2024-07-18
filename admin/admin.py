@@ -3,19 +3,20 @@
 __copyright__ = "Copyright (c) 2024, Utrecht University"
 __license__ = "GPLv3, see LICENSE"
 
-import json
 from functools import wraps
+import json
+from markupsafe import escape
 from os import path
 from typing import Any, Callable, Dict
+
 from flask import (
     abort, Blueprint, current_app as app, flash, g, redirect,
     render_template, request, Response, url_for
 )
-from markupsafe import escape
-
-import api
 from jinja2 import ChoiceLoader, FileSystemLoader
 from util import get_theme_directories, length_check
+
+import api
 
 
 # Blueprint configuration

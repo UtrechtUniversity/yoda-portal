@@ -16,6 +16,7 @@ from util import is_email_in_domains
 from util import length_check
 from util import unicode_secure_filename
 
+
 class UtilTest(TestCase):
     def test_is_email_in_domains(self) -> None:
         self.assertEqual(is_email_in_domains("peter", ["uu.nl"]), False)
@@ -207,8 +208,8 @@ class UtilTest(TestCase):
     def test_get_theme_directories_specific_path(self):
         """Test that the specific theme path returns themes correctly"""
         with patch('util.listdir', return_value=['vu', 'wur']), \
-            patch('util.path.isdir', return_value=True):
-            expected_result = ['uu','vu', 'wur']
+                patch('util.path.isdir', return_value=True):
+            expected_result = ['uu', 'vu', 'wur']
             result = get_theme_directories('/var/www/yoda/themes')
             assert result == expected_result
 
@@ -221,7 +222,7 @@ class UtilTest(TestCase):
     def test_get_theme_directories_only_files(self):
         """Test that only files or no directory exists, returns the default uu theme"""
         with patch('util.listdir', return_value=['vu.txt', 'wur.doc']), \
-            patch('util.path.isdir', return_value=False):
+                patch('util.path.isdir', return_value=False):
             expected_result = ['uu']
             result = get_theme_directories('/test/path')
             assert result == expected_result
