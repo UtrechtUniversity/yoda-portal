@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
 
 __copyright__ = "Copyright (c) 2024, Utrecht University"
-__license__ = "GPLv3, see LICENSE"
+__license__  = "GPLv3, see LICENSE"
 
-# Standard library imports
 import json
 from functools import wraps
 from os import path
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional
 
-# Third-party imports
 from flask import (
-    abort, Blueprint, current_app as app, flash, g, redirect,
+    abort, Blueprint, current_app as app, flash, Flask, g, redirect,
     render_template, request, Response, url_for
 )
 from jinja2 import ChoiceLoader, FileSystemLoader
 from markupsafe import escape
 
-# Local application
 import api
 from util import get_theme_directories, length_check
 
@@ -111,7 +108,7 @@ def set_theme() -> Response:
 
     :returns: Redirect to admin page with status message
     """
-    # Load theme chocie
+    # Load the selected theme
     theme = request.form.get('theme')
 
     # Load theme and save settings
@@ -146,13 +143,25 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
         return "Failed to save settings", 500
 
     if "YODA_THEME" in settings.keys():
-        # Reload the theme template if theme is changed
-        theme_path = path.join(app.config.get('YODA_THEME_PATH'), settings["YODA_THEME"])
-        theme_loader = ChoiceLoader([
-            FileSystemLoader(theme_path),
-            app.jinja_loader,
-        ])
-        app.jinja_loader = theme_loader
-        if hasattr(app.jinja_env, 'cache'):
-            app.jinja_env.cache = {}
+        # Load the theme template if the current theme is changed
+        set_theme_loader(app, remove_cache = True)
     return redirect(url_for("admin_bp.index"))
+
+
+def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
+    """
+    Configures the template loader with the updated theme.
+
+    :param app: The Flask application instance to configure.
+    :param remove_app: A boolean flag indicates whether to clear the template cache. Defaults to False.
+    :returns: None
+    """
+    theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
+    theme_loader = ChoiceLoader([
+        FileSystemLoader(theme_path),
+        app.jinja_loader,
+    ])
+    app.jinja_loader = theme_loader
+    if remove_cache:
+        if hasattr(app.jinja_env, 'cache'): # Remove cache
+            app.jinja_env.cache = {}

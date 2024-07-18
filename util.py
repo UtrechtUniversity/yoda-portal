@@ -162,8 +162,13 @@ def length_check(banner_message: str) -> Tuple[str, bool]:
     return None, True
 
 
-def get_theme_directories(theme_path):
-    """Function to retrieve theme directory names in the specified path, sorted alphabetically."""
+def get_theme_directories(theme_path: str) -> List[str]:
+    """
+    Function to retrieve theme directory names in the specified path, sorted alphabetically.
+
+    :param theme_path: The path where theme directories are located.
+    :returns: A sorted list of directory names including 'uu', or an empty list in case of an error.
+    """
     try:
         directories = [name for name in listdir(theme_path) if path.isdir(path.join(theme_path, name))] + ['uu']
         directories.sort()

@@ -10,9 +10,8 @@ from typing import Dict, Optional
 from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
-from jinja2 import ChoiceLoader, FileSystemLoader
 
-from admin.admin import admin_bp
+from admin.admin import admin_bp, set_theme_loader
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
 from deposit.deposit import deposit_bp
@@ -40,7 +39,7 @@ with app.app_context():
 def load_admin_config():
     """Load or initialize admin configurations from config file, writing defaults if no config file exists."""
     config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
-    default_config = {
+    def_config = {
         'banner': {
             'banner_enabled': False,
             'banner_importance': False,
@@ -50,28 +49,27 @@ def load_admin_config():
     }
 
     try:
-        # File doesn't exist, write the default configuration to a new file
+        # If file doesn't exist, create and write the default configuration
         if not path.exists(config_file_path):
             with open(config_file_path, 'w') as file:
-                json.dump(default_config, file)
-            return default_config
+                json.dump(def_config, file)
+            return def_config
 
         # If the file exists, read and return the configuration
         with open(config_file_path, 'r') as file:
             settings = json.load(file)
-            banner_settings = settings.get('banner', default_config['banner'])  # Get banner settings or use default
+            banner_set = settings.get('banner', def_config['banner'])  # Get banner settings or use default
             return {
                 'banner': {
-                    'banner_enabled': banner_settings.get('banner_enabled'),
-                    'banner_importance': banner_settings.get('banner_importance'),
-                    'banner_message': banner_settings.get('banner_message')
+                    'banner_enabled': banner_set.get('banner_enabled',def_config['banner']['banner_enabled']),
+                    'banner_importance': banner_set.get('banner_importance',def_config['banner']['banner_importance']),
+                    'banner_message': banner_set.get('banner_message',def_config['banner']['banner_message'])
                 },
-                'YODA_THEME': settings.get('YODA_THEME', default_config['YODA_THEME'])
+                'YODA_THEME': settings.get('YODA_THEME', def_config['YODA_THEME'])
             }
     except Exception:
         print("An unexpected error occurred")
-        return default_config
-
+        return def_config
 
 app.config['APP_SHARED_FOLDER'] = '/tmp'
 app.config.update(load_admin_config())
@@ -85,7 +83,7 @@ theme_mapping = {
     "uu_i-lab": "Utrecht University - i-lab",
     "uu_science": "Utrecht University - Science",
     "uu_fsw": "Utrecht University - Social Science",
-    "uu_geo": "Utrecht University - GEO",
+    "uu_geo": "Utrecht University - Geo",
     "uu_dgk": "Utrecht University - Veterinary Medicine",
     "uu_dag": "Utrecht University - Data Archive for Geosciences (DAG)",
     "vu": "Vrije University Amsterdam",
@@ -94,12 +92,7 @@ theme_mapping = {
 app.config["theme_mapping"] = theme_mapping
 
 # Load theme templates
-theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
-theme_loader = ChoiceLoader([
-    FileSystemLoader(theme_path),
-    app.jinja_loader,
-])
-app.jinja_loader = theme_loader
+set_theme_loader(app)
 
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
