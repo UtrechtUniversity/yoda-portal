@@ -88,8 +88,7 @@ def unicode_secure_filename(filename: str) -> str:
     return filename
 
 
-def get_validated_static_path( x
-    full_path: str, request_path: str, yoda_theme_path: str, yoda_theme: str
+def get_validated_static_path(full_path: str, request_path: str, yoda_theme_path: str, yoda_theme: str
 ) -> Optional[Tuple[str, str]]:
     """
     Static files handling - recognisable through '/assets/'

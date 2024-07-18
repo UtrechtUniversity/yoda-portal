@@ -3,21 +3,23 @@
 __copyright__ = "Copyright (c) 2024, Utrecht University"
 __license__ = "GPLv3, see LICENSE"
 
+# Standard library imports
 import json
 from functools import wraps
 from os import path
 from typing import Any, Callable, Dict
 
+# Third-party imports
 from flask import (
     abort, Blueprint, current_app as app, flash, g, redirect,
     render_template, request, Response, url_for
 )
-from markupsafe import escape
-from util import get_theme_directories, length_check
-
-import api
 from jinja2 import ChoiceLoader, FileSystemLoader
+from markupsafe import escape
 
+# Local application
+import api
+from util import get_theme_directories, length_check
 
 # Blueprint configuration
 admin_bp = Blueprint("admin_bp", __name__,
