@@ -46,7 +46,7 @@ def load_admin_config():
             'banner_importance': False,
             'banner_message': ''
         },
-        'YODA_THEME':app.config.get('YODA_THEME')
+        'YODA_THEME': app.config.get('YODA_THEME')
     }
 
     try:
@@ -62,15 +62,16 @@ def load_admin_config():
             banner_settings = settings.get('banner', default_config['banner'])  # Get banner settings or use default
             return {
                 'banner': {
-                    'banner_enabled': banner_settings.get('banner_enabled', default_config['banner']['banner_enabled']),
-                    'banner_importance': banner_settings.get('banner_importance', default_config['banner']['banner_importance']),
-                    'banner_message': banner_settings.get('banner_message', default_config['banner']['banner_message'])
+                    'banner_enabled': banner_settings.get('banner_enabled'),
+                    'banner_importance': banner_settings.get('banner_importance'),
+                    'banner_message': banner_settings.get('banner_message')
                 },
-                'YODA_THEME':settings.get('YODA_THEME', default_config['YODA_THEME'])
+                'YODA_THEME': settings.get('YODA_THEME', default_config['YODA_THEME'])
             }
     except Exception:
         print("An unexpected error occurred")
         return default_config
+
 
 app.config['APP_SHARED_FOLDER'] = '/tmp'
 app.config.update(load_admin_config())
@@ -90,7 +91,7 @@ theme_mapping = {
     "vu": "Vrije University Amsterdam",
     "wur": "Wageningen University & Research"
 }
-app.config["theme_mapping"]=theme_mapping
+app.config["theme_mapping"] = theme_mapping
 
 # Load theme templates
 theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
@@ -168,8 +169,6 @@ csrf = CSRFProtect(app)
 
 @app.before_request
 def static_loader() -> Optional[Response]:
-    # TODO: load the backgrounds and css statics, but themes/templates are loaded
-    # TODO: Cache issue that may result in logo unchagned (when changed from uu to the vu in another tab, but force reload can fix this (add force reload cmd))
     """
     Static files handling - recognisable through '/assets/'
     Override requested static file if present in user_static_area
@@ -189,9 +188,8 @@ def static_loader() -> Optional[Response]:
     result = get_validated_static_path(
         request.full_path,
         request.path,
-        app.config.get('YODA_THEME_PATH'),#TODO: Use similar adding maintainance banner
-        app.config.get('YODA_THEME') #TODO: save to json together with the banner settings
-        #TODO: Use select dropdown and should automaticlally load all the theme options
+        app.config.get('YODA_THEME_PATH'),
+        app.config.get('YODA_THEME')
     )
     if result is not None:
         static_dir, asset_name = result

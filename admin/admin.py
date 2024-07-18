@@ -110,9 +110,8 @@ def set_theme() -> Response:
     """
     # Load theme chocie
     theme = request.form.get('theme')
-    print("YODA_THEME",theme)
 
-    # Save settings
+    # Load theme and save settings
     flash_msg = "Theme changed successfully."
     theme_settings = {'YODA_THEME': theme}
     return save_settings(theme_settings, flash_msg)
