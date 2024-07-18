@@ -144,9 +144,8 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
 
     if "YODA_THEME" in settings.keys():
         # Load the theme template if the current theme is changed
-        set_theme_loader(app, remove_cache = True)
+        set_theme_loader(app, remove_cache=True)
     return redirect(url_for("admin_bp.index"))
-
 
 
 def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
@@ -154,7 +153,8 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
     Configures the template loader with the updated theme.
 
     :param app: The Flask application instance to configure.
-    :param remove_app: A boolean flag indicates whether to clear the template cache. Defaults to False.
+    :param remove_cache: A boolean flag indicates whether to clear the template cache. Defaults to False.
+
     :returns: None
     """
     # Target theme path

@@ -61,9 +61,9 @@ def load_admin_config():
             banner_set = settings.get('banner', def_config['banner'])  # Get banner settings or use default
             return {
                 'banner': {
-                    'banner_enabled': banner_set.get('banner_enabled',def_config['banner']['banner_enabled']),
-                    'banner_importance': banner_set.get('banner_importance',def_config['banner']['banner_importance']),
-                    'banner_message': banner_set.get('banner_message',def_config['banner']['banner_message'])
+                    'banner_enabled': banner_set.get('banner_enabled', def_config['banner']['banner_enabled']),
+                    'banner_importance': banner_set.get('banner_importance', def_config['banner']['banner_importance']),
+                    'banner_message': banner_set.get('banner_message', def_config['banner']['banner_message'])
                 },
                 'YODA_THEME': settings.get('YODA_THEME', def_config['YODA_THEME'])
             }
