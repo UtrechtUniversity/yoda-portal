@@ -148,6 +148,7 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
     return redirect(url_for("admin_bp.index"))
 
 
+
 def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
     """
     Configures the template loader with the updated theme.
@@ -156,12 +157,21 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
     :param remove_app: A boolean flag indicates whether to clear the template cache. Defaults to False.
     :returns: None
     """
+    # Target theme path
     theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
+    # secondary theme path for scanning missing templates
+    default_theme_path = "/var/www/yoda/general/templates/general"
+    # Create theme path list to scan templates
+    theme_path_lst = [theme_path, default_theme_path]
+
+    # Load theme
     theme_loader = ChoiceLoader([
-        FileSystemLoader(theme_path),
+        FileSystemLoader(theme_path_lst),
         app.jinja_loader,
     ])
     app.jinja_loader = theme_loader
+
+    # Remove template cache
     if remove_cache:
-        if hasattr(app.jinja_env, 'cache'): # Remove cache
+        if hasattr(app.jinja_env, 'cache'):
             app.jinja_env.cache = {}

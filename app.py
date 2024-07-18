@@ -71,6 +71,7 @@ def load_admin_config():
         print("An unexpected error occurred")
         return def_config
 
+
 app.config['APP_SHARED_FOLDER'] = '/tmp'
 app.config.update(load_admin_config())
 
