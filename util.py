@@ -5,7 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 import sys
 import traceback
-from os import name, path
+from os import listdir, name, path
 from re import compile, fullmatch
 from typing import List, Optional, Tuple
 
@@ -88,7 +88,7 @@ def unicode_secure_filename(filename: str) -> str:
     return filename
 
 
-def get_validated_static_path(
+def get_validated_static_path( #TODO: What is this?
     full_path: str, request_path: str, yoda_theme_path: str, yoda_theme: str
 ) -> Optional[Tuple[str, str]]:
     """
@@ -160,3 +160,13 @@ def length_check(banner_message: str) -> Tuple[str, bool]:
     elif len(banner_message) > max_length:
         return "Banner message too long.", False
     return None, True
+
+
+def get_theme_directories(theme_path):
+    """Function to retrieve theme directory names in the specified path, sorted alphabetically."""
+    try:
+        directories = [name for name in listdir(theme_path) if path.isdir(path.join(theme_path, name))] + ['uu']
+        directories.sort()
+        return directories
+    except Exception:
+        return []
