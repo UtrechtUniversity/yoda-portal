@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __copyright__ = "Copyright (c) 2024, Utrecht University"
-__license__  = "GPLv3, see LICENSE"
+__license__   = 'GPLv3, see LICENSE'
 
 import json
 from functools import wraps
@@ -157,7 +157,7 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
     """
     # Target theme path
     theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
-    # secondary theme path for scanning missing templates
+    # Secondary theme path for scanning missing templates
     default_theme_path = "/var/www/yoda/general/templates/general"
     # Create theme path list to scan templates
     theme_path_lst = [theme_path, default_theme_path]
