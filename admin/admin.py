@@ -128,23 +128,33 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
     setting_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
     app.config.update(settings)
 
+    # Read existing settings
     try:
-        # Load existing settings and merge with new settings
-        with open(setting_file_path, 'r+') as file:
+        with open(setting_file_path, 'r') as file:
             file_settings = json.load(file)
             file_settings.update(settings)
-            # Move to the beginning of the file to overwrite
-            file.seek(0)
-            json.dump(file_settings, file, indent=4)
-            file.truncate()
-        flash(flash_msg, 'success')
+    except FileNotFoundError:
+        flash("Settings file not found, will create a new one.", 'info')
+    except json.JSONDecodeError:
+        flash("Corrupted settings file, will overwrite.", 'warning')
     except Exception:
-        flash("Failed to save settings", "danger")
+        flash(f"Unexpected error reading settings", 'danger')
+        return "Failed to read settings", 500
+
+    # Write the updated settings back to the file
+    try:
+        with open(setting_file_path, 'w') as file:
+            json.dump(file_settings, file, indent=4)
+    except Exception:
+        flash(f"Failed to save settings", 'danger')
         return "Failed to save settings", 500
 
     if "YODA_THEME" in settings.keys():
         # Load the theme template if the current theme is changed
         set_theme_loader(app, remove_cache=True)
+
+    flash(flash_msg, 'success')
+
     return redirect(url_for("admin_bp.index"))
 
 
