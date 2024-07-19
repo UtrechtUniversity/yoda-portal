@@ -39,7 +39,7 @@ with app.app_context():
 def load_admin_config():
     """Load or initialize admin configurations from config file, writing defaults if no config file exists."""
     config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
-    def_config = {
+    default_config = {
         'banner': {
             'banner_enabled': False,
             'banner_importance': False,
@@ -52,24 +52,24 @@ def load_admin_config():
         # If file doesn't exist, create and write the default configuration
         if not path.exists(config_file_path):
             with open(config_file_path, 'w') as file:
-                json.dump(def_config, file)
-            return def_config
+                json.dump(default_config, file)
+            return default_config
 
         # If the file exists, read and return the configuration
         with open(config_file_path, 'r') as file:
             settings = json.load(file)
-            banner_set = settings.get('banner', def_config['banner'])  # Get banner settings or use default
+            banner_set = settings.get('banner', default_config['banner'])  # Get banner settings or use default
             return {
                 'banner': {
-                    'banner_enabled': banner_set.get('banner_enabled', def_config['banner']['banner_enabled']),
-                    'banner_importance': banner_set.get('banner_importance', def_config['banner']['banner_importance']),
-                    'banner_message': banner_set.get('banner_message', def_config['banner']['banner_message'])
+                    'banner_enabled': banner_set.get('banner_enabled', default_config['banner']['banner_enabled']),
+                    'banner_importance': banner_set.get('banner_importance', default_config['banner']['banner_importance']),
+                    'banner_message': banner_set.get('banner_message', default_config['banner']['banner_message'])
                 },
-                'YODA_THEME': settings.get('YODA_THEME', def_config['YODA_THEME'])
+                'YODA_THEME': settings.get('YODA_THEME', default_config['YODA_THEME'])
             }
     except Exception:
         print("An unexpected error occurred")
-        return def_config
+        return default_config
 
 
 app.config['APP_SHARED_FOLDER'] = '/tmp'

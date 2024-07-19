@@ -125,12 +125,12 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
 
     :returns: Redirect with flash message
     """
-    config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
+    setting_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
     app.config.update(settings)
 
     try:
         # Load existing settings and merge with new settings
-        with open(config_file_path, 'r+') as file:
+        with open(setting_file_path, 'r+') as file:
             file_settings = json.load(file)
             file_settings.update(settings)
             # Move to the beginning of the file to overwrite
