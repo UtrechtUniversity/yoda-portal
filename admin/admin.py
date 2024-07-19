@@ -138,7 +138,7 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
     except json.JSONDecodeError:
         flash("Corrupted settings file, will overwrite.", 'warning')
     except Exception:
-        flash(f"Unexpected error reading settings", 'danger')
+        flash("Unexpected error reading settings", 'danger')
         return "Failed to read settings", 500
 
     # Write the updated settings back to the file
@@ -146,7 +146,7 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
         with open(setting_file_path, 'w') as file:
             json.dump(file_settings, file, indent=4)
     except Exception:
-        flash(f"Failed to save settings", 'danger')
+        flash("Failed to save settings", 'danger')
         return "Failed to save settings", 500
 
     if "YODA_THEME" in settings.keys():
