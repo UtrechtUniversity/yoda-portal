@@ -14,10 +14,14 @@ let currentFolder
 let filenames = []
 const hasReadRights = true
 let uploadFolder = false
+let folderCreateTooltip
+let uploadMenuTooltip
 
 $(function () {
   // Canonicalize path somewhat, for convenience.
   currentFolder = path.replace(/\/+/g, '/').replace(/\/$/, '')
+
+  createTooltips()
 
   if ($('#file-browser').length) {
     startBrowsing()
@@ -176,12 +180,12 @@ $(function () {
     })
   })
 
-  $('.upload-folder').on('click', function(){
+  $('.upload-folder').on('click', function () {
     uploadFolder = true
     console.log(uploadFolder)
   })
 
-  $('.upload').on('click', function(){
+  $('.upload-file').on('click', function () {
     uploadFolder = false
   })
 
@@ -195,7 +199,7 @@ $(function () {
     target: '/research/upload',
     chunkSize: 25 * 1024 * 1024,
     forceChunkSize: true,
-    testChunks: false,         // Disabled because of need to be able to overwrite files with different content
+    testChunks: false, // Disabled because of need to be able to overwrite files with different content
     simultaneousUploads: 1,
     query: { csrf_token: Yoda.csrf.tokenValue, filepath: '' }
   })
@@ -206,10 +210,10 @@ $(function () {
 
   // Assign upload places for dropping/selecting files
   r.assignDrop($('.upload-drop')[0])
-  r.assignBrowse($('.upload')[0])
+  r.assignBrowse($('.upload-file')[0])
   r.assignBrowse($('.upload-folder')[0], true)
 
-  // When chosing to close overview of upload overview then all incomplete file uploads will be canceled.
+  // When choosing to close overview of upload overview then all incomplete file uploads will be canceled.
   $('.btn-close-uploads-overview').on('click', function () {
     r.cancel()
     $('#files').html('')
@@ -233,9 +237,10 @@ $(function () {
 
       $.each(sortedFiles, function (key, file) {
         const secureFile = secureFilename(file.name)
-        const fileName = file.relativePath.substring(0, file.relativePath.lastIndexOf("/") + 1) + secureFile
+        const folders = file.relativePath.substring(0, file.relativePath.lastIndexOf('/'))
+        const fileName = file.relativePath.substring(0, file.relativePath.lastIndexOf('/') + 1) + secureFile
         logUpload(file.uniqueIdentifier, fileName)
-        const folderName = file.relativePath.substring(0, file.relativePath.indexOf("/"))
+        const folderName = file.relativePath.substring(0, file.relativePath.indexOf('/'))
         let overwrite = false
 
         const $self = $('#' + file.uniqueIdentifier)
@@ -270,13 +275,20 @@ $(function () {
           if (filenames.includes(folderName)) {
             overwrite = true
           }
-        }
-        else {
+        } else {
           if (filenames.includes(secureFile)) {
             overwrite = true
           }
         }
-        if (overwrite) {
+        // Check for apostrophe in folder name
+        if (folders.indexOf('\'') > -1) {
+          // It seems like you must first pause, then cancel
+          file.pause()
+          file.cancel()
+          $self.find('.msg').text('Upload cancelled: folder must not contain an apostrophe')
+          $self.find('.upload-pause').addClass('hidden')
+          $self.find('.upload-cancel').addClass('hidden')
+        } else if (overwrite) {
           file.pause()
           $self.find('.msg').text('Upload paused')
           $self.find('.overwrite-div').removeClass('hidden')
@@ -384,6 +396,17 @@ $(function () {
 
   dragElement(document.getElementById('uploads'))
 })
+
+function createTooltips () {
+  // Let user know why cannot upload files.
+  const folderCreate = $('.btn-group button.folder-create').parent()
+  folderCreateTooltip = new bootstrap.Tooltip(folderCreate)
+  folderCreateTooltip.disable()
+
+  const uploadMenu = $('button#uploadMenu').parent()
+  uploadMenuTooltip = new bootstrap.Tooltip(uploadMenu)
+  uploadMenuTooltip.disable()
+}
 
 function secureFilename (file) {
   // mirrors behaviour of unicode_secure_filename in util.py
@@ -636,8 +659,35 @@ function browse (dir = '', changeHistory = false) {
 
   buildFileBrowser(dir)
   $('button.upload').attr('data-path', dir)
-  $('button.upload-folder').attr('data-path', dir)
   $('button.folder-create').attr('data-path', dir)
+
+  apostropheFolderHints(dir)
+}
+
+function apostropheFolderHints (dir) {
+  // Apostrophe in the name, so disable upload/creation
+  if (dir.indexOf('\'') > -1) {
+    if (folderCreateTooltip) {
+      folderCreateTooltip.enable()
+    }
+    if (uploadMenuTooltip) {
+      uploadMenuTooltip.enable()
+    }
+    $('.btn-group button.folder-create').addClass('disabled')
+    $('.btn-group button.upload').attr('data-path', '')
+    $('.btn-group button.upload').prop('disabled', true)
+  } else {
+    if (folderCreateTooltip) {
+      folderCreateTooltip.disable()
+    }
+    if (uploadMenuTooltip) {
+      uploadMenuTooltip.disable()
+    }
+    $('.btn-group button.folder-create').removeClass('disabled')
+    // Enable uploads.
+    $('.btn-group button.upload').attr('data-path', dir)
+    $('.btn-group button.upload').prop('disabled', false)
+  }
 }
 
 function makeBreadcrumb (dir) {
