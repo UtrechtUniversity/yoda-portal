@@ -96,7 +96,7 @@ const enumWidget = (props) => {
         neutral90: 'var(--neutral-10)',
 
          /*
-          * One of the few bootstrap variables we can use with themeing react-select!
+          * One of the few bootstrap variables we can use with theming react-select!
           * control/boxShadow(focused)
           * control/borderColor(focused)
           * control/borderColor:hover(focused)
@@ -144,7 +144,7 @@ const enumWidget = (props) => {
     });
 
     // If the final item was not numeric, it is not yet added to the name_hierarchy array
-    // Therefore, do it now explicitely
+    // Therefore, do it now explicitly
     if (!last_was_numeric) {
         name_hierarchy[level_counter] = level_name;
     }
