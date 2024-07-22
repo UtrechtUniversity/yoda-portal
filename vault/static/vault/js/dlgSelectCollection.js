@@ -67,7 +67,7 @@ async function copyVaultPackageToDynamic (urlEncodedOrigin, urlEncodedTarget) {
     )
 
     if (result.status === 'ok') {
-      let html = 'Datapackage succesfully registered for copying to research area. Actual copying will start soon'
+      let html = 'Datapackage successfully registered for copying to research area. Actual copying will start soon'
       html += ' <a href="/research/?dir=' + dlgCurrentFolder + '">Go to research area</a>'
       dlgSelectAlertShow(html)
     } else { // non api error
