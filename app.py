@@ -75,23 +75,6 @@ def load_admin_config():
 app.config['APP_SHARED_FOLDER'] = '/tmp'
 app.config.update(load_admin_config())
 
-# Prepare theme settings
-theme_mapping = {
-    "uu": "Utrecht University - default",
-    "uu_its": "Utrecht University - ITS",
-    "uu_gw": "Utrecht University - Humanities",
-    "uu_youth": "Utrecht University - YOUth",
-    "uu_i-lab": "Utrecht University - i-lab",
-    "uu_science": "Utrecht University - Science",
-    "uu_fsw": "Utrecht University - Social Science",
-    "uu_geo": "Utrecht University - Geo",
-    "uu_dgk": "Utrecht University - Veterinary Medicine",
-    "uu_dag": "Utrecht University - Data Archive for Geosciences (DAG)",
-    "vu": "Vrije University Amsterdam",
-    "wur": "Wageningen University & Research"
-}
-app.config["theme_mapping"] = theme_mapping
-
 # Load theme templates
 set_theme_loader(app)
 
