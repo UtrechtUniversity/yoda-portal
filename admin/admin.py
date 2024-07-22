@@ -111,6 +111,12 @@ def set_theme() -> Response:
     # Load the selected theme
     theme = request.form.get('theme')
 
+    # Input validation
+    valid_themes = get_theme_directories(app.config.get('YODA_THEME_PATH'))
+    if theme not in valid_themes:
+        flash('Invalid theme selected.', 'error')
+        return redirect(url_for('admin_bp.index'))
+
     # Load theme and save settings
     flash_msg = "Theme changed successfully."
     theme_settings = {'YODA_THEME': theme}
