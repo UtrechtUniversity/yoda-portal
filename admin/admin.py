@@ -10,7 +10,7 @@ from typing import Any, Callable, Dict, Optional
 
 from flask import (
     abort, Blueprint, current_app as app, flash, Flask, g, redirect,
-    render_template, request, Response, url_for
+    render_template, request, Response, session, url_for
 )
 from jinja2 import ChoiceLoader, FileSystemLoader
 from markupsafe import escape
@@ -31,9 +31,9 @@ def index() -> Response:
 
     :returns: Rendered admin page or 403 access denied error
     """
-    has_admin_access = api.call("admin_has_access", data={})["data"]
+    session['admin'] = api.call("admin_has_access", data={})["data"]
 
-    if has_admin_access:
+    if session['admin']:
         # reload theme options
         theme_directories = get_theme_directories(app.config.get('YODA_THEME_PATH'))
         return render_template("admin.html", theme_directories=theme_directories)
