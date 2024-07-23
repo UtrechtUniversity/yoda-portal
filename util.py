@@ -5,7 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 import sys
 import traceback
-from os import name, path
+from os import listdir, name, path
 from re import compile, fullmatch
 from typing import List, Optional, Tuple
 
@@ -160,3 +160,18 @@ def length_check(banner_message: str) -> Tuple[str, bool]:
     elif len(banner_message) > max_length:
         return "Banner message too long.", False
     return None, True
+
+
+def get_theme_directories(theme_path: str) -> List[str]:
+    """
+    Function to retrieve theme directory names in the specified path, sorted alphabetically.
+
+    :param theme_path: The path where theme directories are located.
+    :returns: A sorted list of directory names including 'uu', or an empty list in case of an error.
+    """
+    try:
+        directories = [name for name in listdir(theme_path) if path.isdir(path.join(theme_path, name))] + ['uu']
+        directories.sort()
+        return directories
+    except Exception:
+        return []

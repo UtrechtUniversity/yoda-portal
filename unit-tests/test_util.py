@@ -10,6 +10,7 @@ from unittest.mock import Mock, patch
 
 sys.path.append("..")
 
+from util import get_theme_directories
 from util import get_validated_static_path
 from util import is_email_in_domains
 from util import length_check
@@ -203,3 +204,25 @@ class UtilTest(TestCase):
         """Test that a valid banner message is accepted."""
         _, is_valid = length_check("Maintenance scheduled from 1 July 7:00 to 2 July 9:00.")
         self.assertTrue(is_valid)
+
+    def test_get_theme_directories_specific_path(self):
+        """Test that the specific theme path returns themes correctly"""
+        with patch('util.listdir', return_value=['vu', 'wur']), \
+                patch('util.path.isdir', return_value=True):
+            expected_result = ['uu', 'vu', 'wur']
+            result = get_theme_directories('/var/www/yoda/themes')
+            assert result == expected_result
+
+    def test_get_theme_directories_path_not_exist(self):
+        """Test that non-existent path returns an empty list"""
+        with patch('util.listdir', side_effect=Exception):
+            result = get_theme_directories('/non/existent/path')
+            assert result == []
+
+    def test_get_theme_directories_only_files(self):
+        """Test that only files or no directory exists, returns the default uu theme"""
+        with patch('util.listdir', return_value=['vu.txt', 'wur.doc']), \
+                patch('util.path.isdir', return_value=False):
+            expected_result = ['uu']
+            result = get_theme_directories('/test/path')
+            assert result == expected_result

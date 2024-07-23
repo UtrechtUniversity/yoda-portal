@@ -8,9 +8,10 @@
         <h1>Administration</h1>
     </header>
     <main>
+        <!-- Set Maintenance Banner section-->
         <section class="card my-3">
             <div class="card-body">
-                <h2 class="card-title">Set maintenance banner</h2>
+                <h2 class="card-title">Set Maintenance Banner</h2>
                 <div class="d-flex justify-content-start align-items-end" style="width: 100%;">
                     <!-- Form to set a maintenance banner -->
                     <form action="{{ url_for('admin_bp.set_banner') }}" method="POST"
@@ -21,11 +22,11 @@
                             <label for="banner">Banner Details:</label>
                             <textarea class="form-control" name="banner" id="banner" rows="2"
                                 placeholder="Enter system maintenance details..."
-                                required>{{config.get('banner_message')}}</textarea>
+                                required>{{config.get('banner').banner_message}}</textarea>
                         </div>
                         <!-- Checkbox to mark the banner as important -->
                         <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="importance" name="importance">
+                            <input type="checkbox" class="form-check-input" id="importance" name="importance" {{ 'checked' if config.get('banner', {}).get('banner_importance', False) else '' }}>
                             <label class="form-check-label" for="importance">Mark as Important</label>
                         </div>
                         <button type="submit" class="btn btn-primary" name="Set Banner">Set Banner</button>
@@ -36,6 +37,26 @@
                         <button type="submit" class="btn btn-secondary" name="Remove Banner">Remove Banner</button>
                     </form>
                 </div>
+            </div>
+        </section>
+        <!-- Theme Change section-->
+        <section class="card my-3">
+            <div class="card-body">
+                <h2 class="card-title">Change Portal Theme</h2>
+                <form action="{{ url_for('admin_bp.set_theme') }}" method="POST" class="needs-validation" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="theme">Select Theme:</label>
+                        <select class="form-control" id="theme" name="theme" required>
+                            <!-- Add default theme option -->
+                            {% set current_theme = config.get('YODA_THEME', 'uu') %}
+                            {% for folder in theme_directories %}
+                                <option value="{{ folder }}" {% if folder == current_theme %}selected{% endif %}> {{ config.YODA_THEME_MAPPING.get(folder, folder) }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" name="Change Theme">Change Theme</button>
+                </form>
             </div>
         </section>
     </main>
