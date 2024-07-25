@@ -131,7 +131,7 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
 
     :returns: Redirect with flash message
     """
-    setting_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
+    setting_file_path = path.join(app.config['APP_CONFIG_FOLDER'], 'admin_settings.json')
     app.config.update(settings)
 
     # Read existing settings
