@@ -35,22 +35,6 @@ app.json.sort_keys = False
 with app.app_context():
     app.config.from_pyfile('flask.cfg')
 
-import os
-
-# Function to list contents of a directory
-def list_directory_contents(path):
-    try:
-        contents = os.listdir(path)
-        print(f"Contents of {path}:")
-        for item in contents:
-            print(item)
-    except PermissionError:
-        print(f"Permission denied: Unable to access the contents of {path}")
-    except FileNotFoundError:
-        print(f"Directory not found: {path}")
-    except Exception as e:
-        print(f"Unexpected error occurred while accessing {path}: {e}")
-
 
 def load_admin_setting():
     """Load or initialize admin settings from a JSON file.
@@ -59,70 +43,43 @@ def load_admin_setting():
 
     If a setting file exists, it reads and returns the updated settings.
     """
-    print("Initializing admin settings")
-    setting_folder_path = app.config['APP_CONFIG_FOLDER']
-    setting_file_path = path.join(setting_folder_path, 'admin_settings.json')
-    default_setting = {
+    config_folder = app.config['CONFIG_FOLDER_PATH']
+    settings_file_path = path.join(config_folder, 'admin_settings.json')
+    default_settings = {
         'banner': {
-            'banner_enabled': False,
-            'banner_importance': False,
-            'banner_message': ''
+            'enabled': False,
+            'importance': False,
+            'message': ''
         },
         'YODA_THEME': app.config.get('YODA_THEME')
     }
 
     try:
-        # Ensure the directory exists or create it
-        os.makedirs(setting_folder_path, exist_ok=True)
-        #os.makedirs(os.path.dirname(setting_folder_path), exist_ok=True)
-        print("Directory created or already exists.")
-
-        # Check if the directory actually exists
-        if not os.path.exists(os.path.dirname(setting_folder_path)):
-            print("Directory was not created.")
-        else:
-            # If the directory exists, list its contents
-            list_directory_contents(os.path.dirname(setting_folder_path))
-    except PermissionError:
-        print("Permission denied: Unable to create the directory.")
-    except Exception as e:
-        print(f"Unexpected error occurred: {e}")
-
-    # Print the current working directory
-    current_path = os.getcwd()
-    print(f"Current working directory: {current_path}")
-
-    # List everything in the specified setting folder path
-    list_directory_contents(setting_folder_path)
-
-    # List everything in /var/www/yoda
-    list_directory_contents('/var/www/yoda')
-    try:
-        # If file doesn't exist, create and write the default configuration
-        if not path.exists(setting_file_path):
-            print("creating default admin confg settings")
-            with open(setting_file_path, 'w') as file:
-                json.dump(default_setting, file)
-            return default_setting
+         # If file doesn't exist, create and write the default configuration
+        if not path.exists(settings_file_path):
+            makedirs(config_folder, exist_ok=True)
+            with open(settings_file_path, 'w') as file:
+                json.dump(default_settings, file)
+            return default_settings
 
         # If the file exists, read and return the setting
-        with open(setting_file_path, 'r') as file:
+        with open(settings_file_path, 'r') as file:
             settings = json.load(file)
-            banner_set = settings.get('banner', default_setting['banner'])  # Get banner settings or use default
+            banner_set = settings.get('banner', default_settings['banner'])  # Get banner settings or use default
             return {
                 'banner': {
-                    'banner_enabled': banner_set.get('banner_enabled', default_setting['banner']['banner_enabled']),
-                    'banner_importance': banner_set.get('banner_importance', default_setting['banner']['banner_importance']),
-                    'banner_message': banner_set.get('banner_message', default_setting['banner']['banner_message'])
+                    'enabled': banner_set.get('enabled', default_settings['banner']['enabled']),
+                    'importance': banner_set.get('importance', default_settings['banner']['importance']),
+                    'message': banner_set.get('message', default_settings['banner']['message'])
                 },
-                'YODA_THEME': settings.get('YODA_THEME', default_setting['YODA_THEME'])
+                'YODA_THEME': settings.get('YODA_THEME', default_settings['YODA_THEME'])
             }
     except Exception as e:
         print(f"Unexpected error occurred: {e}")
-        return default_setting  # Return default settings or handle error as needed
+        return default_settings
 
 
-app.config['APP_CONFIG_FOLDER'] = '/var/www/yoda/config'
+app.config['CONFIG_FOLDER_PATH'] = '/var/www/yoda/config'
 app.config.update(load_admin_setting())
 
 # Load theme templates

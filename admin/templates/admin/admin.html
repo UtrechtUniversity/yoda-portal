@@ -22,11 +22,11 @@
                             <label for="banner">Banner Details:</label>
                             <textarea class="form-control" name="banner" id="banner" rows="2"
                                 placeholder="Enter system maintenance details..."
-                                required>{{config.get('banner').banner_message}}</textarea>
+                                required>{{config.get('banner').message}}</textarea>
                         </div>
                         <!-- Checkbox to mark the banner as important -->
                         <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="importance" name="importance" {{ 'checked' if config.get('banner', {}).get('banner_importance', False) else '' }}>
+                            <input type="checkbox" class="form-check-input" id="importance" name="importance" {{ 'checked' if config.get('banner', {}).get('importance', False) else '' }}>
                             <label class="form-check-label" for="importance">Mark as Important</label>
                         </div>
                         <button type="submit" class="btn btn-primary" name="Set Banner">Set Banner</button>
