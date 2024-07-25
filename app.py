@@ -37,12 +37,14 @@ with app.app_context():
 
 
 def load_admin_setting():
-    """Load or initialize admin settings from a JSON file.
+    """Load or initialize admin loaded_settings from a JSON file.
 
-    If no setting file exists, it writes default settings and returns them.
+    If no setting file exists, it writes default loaded_settings and returns them.
 
-    If a setting file exists, it reads and returns the updated settings.
+    If a setting file exists, it reads and returns the updated loaded_settings.
     """
+
+    # configure default loaded_settings
     config_folder = app.config['CONFIG_FOLDER_PATH']
     settings_file_path = path.join(config_folder, 'admin_settings.json')
     default_settings = {
@@ -64,22 +66,21 @@ def load_admin_setting():
 
         # If the file exists, read and return the setting
         with open(settings_file_path, 'r') as file:
-            settings = json.load(file)
-            banner_set = settings.get('banner', default_settings['banner'])  # Get banner settings or use default
-            return {
-                'banner': {
-                    'enabled': banner_set.get('enabled', default_settings['banner']['enabled']),
-                    'importance': banner_set.get('importance', default_settings['banner']['importance']),
-                    'message': banner_set.get('message', default_settings['banner']['message'])
-                },
-                'YODA_THEME': settings.get('YODA_THEME', default_settings['YODA_THEME'])
-            }
+            loaded_settings = json.load(file)
+            merged_settings = {
+            'banner': {
+                **default_settings['banner'],
+                **loaded_settings.get('banner', {})
+            },
+            'YODA_THEME': loaded_settings.get('YODA_THEME', default_settings['YODA_THEME'])
+        }
+            return merged_settings
     except Exception as e:
         print(f"Unexpected error occurred: {e}")
         return default_settings
 
 
-app.config['CONFIG_FOLDER_PATH'] = '/var/www/yoda/config'
+#app.config['CONFIG_FOLDER_PATH'] = '/var/www/yoda/config'
 app.config.update(load_admin_setting())
 
 # Load theme templates
