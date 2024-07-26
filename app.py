@@ -46,7 +46,7 @@ def load_admin_setting():
     :returns: admin settings from file or default settings
     """
 
-    # configure default loaded_settings
+    # configure default admin settings
     config_folder = app.config['CONFIG_FOLDER_PATH']
     settings_file_path = path.join(config_folder, 'admin_settings.json')
     default_settings = {
