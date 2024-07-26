@@ -5,7 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 import json
 from os import makedirs, path
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
 from flask_session import Session
@@ -36,7 +36,7 @@ with app.app_context():
     app.config.from_pyfile('flask.cfg')
 
 
-def load_admin_setting():
+def load_admin_setting() -> Dict[str, Any]:
     """Load or initialize admin settings from a JSON file.
 
     If no setting file exists, it writes default loaded_settings and returns them.
@@ -77,9 +77,15 @@ def load_admin_setting():
                 'YODA_THEME': loaded_settings.get('YODA_THEME', default_settings['YODA_THEME'])
             }
             return merged_settings
-    except Exception as e:
-        print(f"Unexpected error occurred: {e}")
-        return default_settings
+    except PermissionError:
+        print("Permission denied while accessing settings file.")
+    except FileNotFoundError:
+        print("Settings file not found.")
+    except json.JSONDecodeError:
+        print("Error decoding JSON from the settings file.")
+    except Exception:
+        print("Unexpected error occurred.")
+    return default_settings
 
 
 # Load admin settings
