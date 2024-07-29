@@ -24,7 +24,7 @@ from research.research import research_bp
 from search.search import search_bp
 from stats.stats import stats_bp
 from user.user import user_bp
-from util import get_validated_static_path
+from util import get_validated_static_path, log_error
 from vault.vault import vault_bp
 
 
@@ -78,13 +78,13 @@ def load_admin_setting() -> Dict[str, Any]:
             }
             return merged_settings
     except PermissionError:
-        print("Permission denied while accessing settings file.")
+        log_error("Permission denied while accessing settings file.",True)
     except FileNotFoundError:
-        print("Settings file not found.")
+        log_error("Settings file not found.",True)
     except json.JSONDecodeError:
-        print("Error decoding JSON from the settings file.")
+        log_error("Error decoding JSON from the settings file.",True)
     except Exception:
-        print("Unexpected error occurred.")
+        log_error("Unexpected error occurred.",True)
     return default_settings
 
 
