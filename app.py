@@ -78,13 +78,13 @@ def load_admin_setting() -> Dict[str, Any]:
             }
             return merged_settings
     except PermissionError:
-        log_error("Permission denied while accessing settings file.",True)
+        log_error("Permission denied while accessing settings file.", True)
     except FileNotFoundError:
-        log_error("Settings file not found.",True)
+        log_error("Settings file not found.", True)
     except json.JSONDecodeError:
-        log_error("Error decoding JSON from the settings file.",True)
+        log_error("Error decoding JSON from the settings file.", True)
     except Exception:
-        log_error("Unexpected error occurred.",True)
+        log_error("Unexpected error occurred.", True)
     return default_settings
 
 
