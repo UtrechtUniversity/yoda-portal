@@ -22,7 +22,7 @@
                             <label for="banner">Banner Details:</label>
                             <textarea class="form-control" name="banner" id="banner" rows="2"
                                 placeholder="Enter system maintenance details..."
-                                required>{{config.get('banner').message}}</textarea>
+                                required>{{config.get('banner').get('message')}}</textarea>
                         </div>
                         <!-- Checkbox to mark the banner as important -->
                         <div class="mb-3 form-check">
@@ -51,7 +51,7 @@
                             <!-- Add default theme option -->
                             {% set current_theme = config.get('YODA_THEME', 'uu') %}
                             {% for folder in theme_directories %}
-                                <option value="{{ folder }}" {% if folder == current_theme %}selected{% endif %}> {{ config.YODA_THEME_MAPPING.get(folder, folder) }}</option>
+                                <option value="{{ folder }}" {% if folder == current_theme %}selected{% endif %}> {{ config.get('YODA_THEME_MAPPING').get(folder, folder) }}</option>
                             {% endfor %}
                         </select>
                     </div>
