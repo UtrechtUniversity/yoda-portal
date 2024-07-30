@@ -19,6 +19,7 @@ from fileviewer.fileviewer import fileviewer_bp
 from general.general import general_bp
 from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
+from monitor import Monitor
 from open_search.open_search import open_search_bp
 from research.research import research_bp
 from search.search import search_bp
@@ -126,6 +127,13 @@ app.config['search-items-per-page'] = 10
 
 # Start Flask-Session
 Session(app)
+
+# Start monitoring thread for extracting tech support information
+with app.app_context():
+    # Monitor signal file can be set to empty to completely disable monitor thread.
+    if app.config.get("MONITOR_SIGNAL_FILE", "/var/www/yoda/show-tech.sig") != "":
+        monitor_thread = Monitor(app.config)
+        monitor_thread.start()
 
 # Register blueprints
 with app.app_context():

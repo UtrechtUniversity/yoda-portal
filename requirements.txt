@@ -10,3 +10,5 @@ irods-avu-json==2.2.0
 MarkupSafe==2.1.5
 python-magic==0.4.27
 Werkzeug==3.0.3
+psutil==6.0.0
+humanize==4.10.0
