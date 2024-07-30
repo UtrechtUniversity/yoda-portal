@@ -14,6 +14,7 @@ let preservableFormatsLists = null
 let currentFolder
 let dataPackage = null
 let hasReadRights = true
+let researchGroupAccess = true
 
 $(function () {
   // Extract current location from query string (default to '').
@@ -228,12 +229,25 @@ $(function () {
     e.preventDefault()
   })
 
-  $('body').on('click', 'a.action-grant-vault-access', function () {
-    vaultAccess('grant', $(this).attr('data-folder'))
+  $('body').on('click', 'a.action-change-vault-access', function () {
+    // Show more detailed information on changing read permissions
+    if (researchGroupAccess) {
+      $('.action-confirm-revoke-read-permissions').attr('data-folder', $(this).attr('data-folder'))
+      $('#confirmRevokeReadPermissions').modal('show')
+    } else {
+      $('.action-confirm-grant-read-permissions').attr('data-folder', $(this).attr('data-folder'))
+      $('#confirmGrantReadPermissions').modal('show')
+    }
   })
 
-  $('body').on('click', 'a.action-revoke-vault-access', function () {
+  $('#confirmRevokeReadPermissions').on('click', '.action-confirm-revoke-read-permissions', function () {
+    $('#confirmRevokeReadPermissions').modal('hide')
     vaultAccess('revoke', $(this).attr('data-folder'))
+  })
+
+  $('#confirmGrantReadPermissions').on('click', '.action-confirm-grant-read-permissions', function () {
+    $('#confirmGrantReadPermissions').modal('hide')
+    vaultAccess('grant', $(this).attr('data-folder'))
   })
 
   $('body').on('click', 'a.action-depublish-publication', function () {
@@ -656,10 +670,10 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
       const userType = data.member_type
       const hasDatamanager = data.has_datamanager
       const isDatamanager = data.is_datamanager
-      const researchGroupAccess = data.research_group_access
       const actions = []
       const downloadable = data.downloadable
       const archive = data.archive
+      researchGroupAccess = data.research_group_access
 
       $('.btn-group button.metadata-form').hide()
       $('.top-information').hide()
@@ -771,11 +785,7 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
         // Datamanager sees access buttons in vault.
         $('.top-info-buttons').show()
         if (isDatamanager) {
-          if (researchGroupAccess) {
-            actions['revoke-vault-access'] = 'Revoke read access to research group'
-          } else {
-            actions['grant-vault-access'] = 'Grant read access to research group'
-          }
+          actions['change-vault-access'] = 'Change who has read access'
         }
       }
 
@@ -828,7 +838,7 @@ function handleActionsList (actions, folder) {
     'republish-publication', 'vault-download', 'vault-archival',
     'vault-unarchive']
 
-  const possibleVaultActions = ['grant-vault-access', 'revoke-vault-access',
+  const possibleVaultActions = ['change-vault-access',
     'copy-vault-package-to-research',
     'check-for-unpreservable-files',
     'show-checksum-report']

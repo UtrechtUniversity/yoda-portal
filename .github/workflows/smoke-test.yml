@@ -1,0 +1,121 @@
+name: Run smoke test
+
+on:
+  push:
+    branches:
+    - development
+    - "**-str"
+    # We can force a smoke test run without opening a PR by pushing to a branch name that ends with "-str"
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    if: |
+      ${{ ! contains(github.event.head_commit.message, '#nosmoketest') &&
+            ( github.event_name == 'push' ||
+              github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name
+            )
+       }}
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.8
+
+    - name: Extract branch name
+      shell: bash
+      run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+      id: extract_branch
+
+    # We currently always use the development branch for the main Yoda repo. This can
+    # be customized later.
+    - name: Determine Yoda repository branch
+      run: |
+        echo "branch=development" >> $GITHUB_OUTPUT
+      id: yoda_repo_branch
+
+    - name: Clone Yoda repo for Docker Setup
+      run: |
+        git clone -b "${{ steps.yoda_repo_branch.outputs.branch }}" --single-branch https://github.com/UtrechtUniversity/yoda.git
+
+    - name: Clone Yoda ruleset for tests
+      run: |
+        git clone -b "${{ steps.yoda_repo_branch.outputs.branch }}" https://github.com/UtrechtUniversity/yoda-ruleset.git
+
+    - name: Install test dependencies
+      run: |
+        pip3 install --user -r yoda-ruleset/tests/requirements.txt
+        sudo apt install -y docker-compose
+
+    - name: Prepare hosts file for API tests
+      run: |
+        sudo echo "127.0.0.1 portal.yoda eus.yoda data.yoda public.yoda" | sudo tee -a /etc/hosts
+
+    - name: Start Dockerized Yoda
+      run: |
+        cd yoda/docker/compose
+        docker-compose pull
+        ../up.sh -d
+
+    - name: Wait until Dockerized setup is ready or the maximum wait time has been reached
+      shell: bash
+      run: |
+        MAX_WAIT_TIME=120
+        WAIT_INTERVAL=1
+        WAIT_TIME=0
+        while [ "$WAIT_TIME" -lt "$MAX_WAIT_TIME" ]; do if curl -k --output /dev/null --silent --head --fail https://portal.yoda:8443 ; then echo "Portal is up."; break; else echo "Waiting for portal to start ($WAIT_TIME/$MAX_WAIT_TIME)"; fi; WAIT_TIME=$((WAIT_TIME + WAIT_INTERVAL)) ; sleep "$WAIT_TIME"; done
+        docker exec provider.yoda sh -c 'while ! pgrep irodsServer > /dev/null  ; do echo Waiting for iRODS to start ...  ; sleep 1; done'
+
+    - name: Pull and install latest version of ruleset
+      shell: bash
+      run: |
+        cd yoda/docker/compose
+        docker exec provider.yoda sh -c 'set -x ; cd /etc/irods/yoda-ruleset && sudo chown irods:irods -R /etc/irods/yoda-ruleset && sudo -u irods git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*" && sudo -u irods git pull && sudo -u irods git status'
+        docker exec provider.yoda sh -c "set -x ; cd /etc/irods/yoda-ruleset && ( sudo -u irods git checkout ${{ steps.extract_branch.outputs.branch }} || sudo -u irods git checkout development) && sudo -u irods python -m pip --no-cache-dir install --user -r /etc/irods/yoda-ruleset/requirements.txt && sudo -u irods make && sudo -u irods make install" 
+        docker exec provider.yoda sh -c "set -x ; sudo -u irods /var/lib/irods/irodsctl restart"
+
+    - name: Pull and install branch version of the portal
+      shell: bash
+      run: |
+        cd yoda/docker/compose
+        docker exec portal.yoda sh -c 'set -x ; cd /var/www/yoda && git config remote.origin.fetch  "+refs/heads/*:refs/remotes/origin/*" && git pull'
+        docker exec portal.yoda sh -c 'set -x ; cd /var/www/yoda && git checkout ${{ steps.extract_branch.outputs.branch }}'
+        docker exec portal.yoda sh -c 'set -x ; cd /var/www/yoda && git status'
+        docker exec portal.yoda sh -c 'set -x ; touch /var/www/yoda/*.wsgi'
+
+    - name: Check if portal is answering at all
+      shell: bash
+      run: |
+        curl -k --fail --output /dev/stdout https://portal.yoda:8443
+
+    - name: Run smoke tests
+      shell: bash
+      run: |
+        cd yoda-ruleset/tests
+        nohup bash -c 'while true ; do sleep 5 ;  ../../yoda/docker/run-cronjob.sh copytovault >> ../../copytovault.log 2>&1 ; ../../yoda/docker/run-cronjob.sh publication >> ../../publication.log 2>&1 ; done' &
+        test -d mycache || mkdir -p mycache
+        python3 -m pytest --skip-ui --skip-api --no-env-csrf --smoke -o cache_dir=mycache --environment environments/docker_smoke.json
+        cat ../../copytovault.log
+        cat ../../publication.log
+
+    - name: Output logs and portal response text in case of failure or cancellation
+      if: failure() || cancelled()
+      run: |
+        set -x
+        curl -k https://portal.yoda:8443
+        docker logs portal.yoda
+        docker logs provider.yoda
+        docker exec portal.yoda sh -c 'set -x; cat /var/log/apache2/error.log || echo "Apache error log file not found."'
+        docker exec provider.yoda sh -c 'set -x ; cat /var/lib/irods/log/rodsLog*' || echo "rodsLog not found."'
+
+# Uncomment section below when needed for debugging.
+#
+#    - name: Setup tmate session for debugging
+#      uses: mxschmitt/action-tmate@v3
+#      if: ${{ failure() }}
+#      with:
+#        limit-access-to-actor: true
