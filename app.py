@@ -4,7 +4,7 @@ __copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
-from os import makedirs, path
+from os import path
 from typing import Any, Dict, Optional
 
 from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
@@ -76,12 +76,6 @@ def load_admin_setting() -> Dict[str, Any]:
                 'YODA_THEME': loaded_settings.get('YODA_THEME', default_settings['YODA_THEME'])
             }
             return merged_settings
-    except PermissionError:
-        log_error("Permission denied while accessing settings file.", True)
-    except FileNotFoundError:
-        log_error("Settings file not found.", True)
-    except json.JSONDecodeError:
-        log_error("Error decoding JSON from the settings file.", True)
     except Exception:
         log_error("Unexpected error occurred.", True)
     return default_settings
