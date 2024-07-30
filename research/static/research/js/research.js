@@ -1311,7 +1311,7 @@ function topInformation (dir, showAlert) {
         if (uploadMenuTooltip) {
           uploadMenuTooltip.enable()
         }
-      } else if (hasWriteRights && (status === '' || status === 'REJECTED' || status === 'SECURED')) {
+      } else if (hasWriteRights && (status === '' || status === 'REJECTED' || status === 'SECURED' || status === 'FOLDER')) {
         // Check if folder is writable.
         // Enable uploads.
         $('.btn-group button.upload').attr('data-path', dir)
