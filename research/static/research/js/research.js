@@ -1246,7 +1246,7 @@ function topInformation (dir, showAlert) {
 
       // Set folder status badge and actions.
       if (typeof status !== 'undefined') {
-        if (status === '') {
+        if (status === '' || status === 'SECURED' || status === 'FOLDER') {
           statusText = ''
           actions.lock = 'Lock'
           actions.submit = 'Submit'
@@ -1260,11 +1260,6 @@ function topInformation (dir, showAlert) {
           actions.unsubmit = 'Unsubmit'
         } else if (status === 'ACCEPTED') {
           statusText = 'Accepted'
-        } else if (status === 'SECURED') {
-          statusText = 'Secured'
-          actions.lock = 'Lock'
-          actions.submit = 'Submit'
-          actions.cleanup = 'Clean up temporary files'
         } else if (status === 'REJECTED') {
           statusText = 'Rejected'
           actions.lock = 'Lock'
@@ -1316,7 +1311,7 @@ function topInformation (dir, showAlert) {
         if (uploadMenuTooltip) {
           uploadMenuTooltip.enable()
         }
-      } else if (hasWriteRights && (status === '' || status === 'REJECTED' || status === 'SECURED')) {
+      } else if (hasWriteRights && (status === '' || status === 'REJECTED' || status === 'SECURED' || status === 'FOLDER')) {
         // Check if folder is writable.
         // Enable uploads.
         $('.btn-group button.upload').attr('data-path', dir)
