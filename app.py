@@ -61,7 +61,6 @@ def load_admin_setting() -> Dict[str, Any]:
     try:
         # If file doesn't exist, create and write the default configuration
         if not path.exists(settings_file_path):
-            makedirs(config_folder, exist_ok=True)
             with open(settings_file_path, 'w') as file:
                 json.dump(default_settings, file)
             return default_settings
