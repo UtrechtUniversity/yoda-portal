@@ -131,7 +131,7 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
 
     :returns: Redirect with flash message
     """
-    setting_file_path = path.join(app.config['CONFIG_FOLDER_PATH'], 'admin_settings.json')
+    setting_file_path = path.join(app.config['YODA_CONFIG_PATH'], 'admin_settings.json')
     app.config.update(settings)
 
     # Read existing settings
@@ -174,7 +174,7 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
     # Target theme path
     theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
     # Secondary theme path for scanning missing templates
-    default_theme_path = path.join(app.config.get('YODA_MAIN_PATH'), 'general/templates/general')
+    default_theme_path = path.join(app.config.get('YODA_PORTAL_PATH'), 'general/templates/general')
     # Create theme path list to scan templates
     theme_path_lst = [theme_path, default_theme_path]
 

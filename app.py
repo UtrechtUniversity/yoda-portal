@@ -47,7 +47,7 @@ def load_admin_setting() -> Dict[str, Any]:
     """
 
     # configure default admin settings
-    config_folder = app.config['CONFIG_FOLDER_PATH']
+    config_folder = app.config['YODA_CONFIG_PATH']
     settings_file_path = path.join(config_folder, 'admin_settings.json')
     default_settings = {
         'banner': {
