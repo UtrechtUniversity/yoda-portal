@@ -64,11 +64,11 @@ def set_banner() -> Response:
 
     :returns: Redirect to admin page with status message
     """
-    banner_message = request.form.get('banner', '').strip()
-    banner_message = escape(banner_message)  # Ensure safe text
+    message = request.form.get('banner', '').strip()
+    message = escape(message)  # Ensure safe text
 
     # Message length check
-    error_message, is_valid = length_check(banner_message)
+    error_message, is_valid = length_check(message)
     if not is_valid:
         flash(error_message, "danger")
         return redirect(url_for('admin_bp.index'))
@@ -76,9 +76,9 @@ def set_banner() -> Response:
     # Update app config settings and save settings
     settings = {
         'banner': {
-            'banner_enabled': True,
-            'banner_importance': 'importance' in request.form,
-            'banner_message': banner_message
+            'enabled': True,
+            'importance': 'importance' in request.form,
+            'message': message
         }
     }
     flash_msg = 'Set banner message successfully'
@@ -94,7 +94,7 @@ def remove_banner() -> Response:
     """
     settings = {
         'banner': {
-            'banner_enabled': False,
+            'enabled': False,
         }
     }
     flash_msg = 'Banner removed successfully'
@@ -131,7 +131,7 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
 
     :returns: Redirect with flash message
     """
-    setting_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
+    setting_file_path = path.join(app.config['YODA_CONFIG_PATH'], 'admin_settings.json')
     app.config.update(settings)
 
     # Read existing settings
@@ -174,7 +174,7 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
     # Target theme path
     theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
     # Secondary theme path for scanning missing templates
-    default_theme_path = path.join(app.config.get('YODA_MAIN_PATH'), 'general/templates/general')
+    default_theme_path = path.join(app.config.get('YODA_PORTAL_PATH'), 'general/templates/general')
     # Create theme path list to scan templates
     theme_path_lst = [theme_path, default_theme_path]
 

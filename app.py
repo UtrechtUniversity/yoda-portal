@@ -5,7 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 import json
 from os import path
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
 from flask_session import Session
@@ -24,7 +24,7 @@ from research.research import research_bp
 from search.search import search_bp
 from stats.stats import stats_bp
 from user.user import user_bp
-from util import get_validated_static_path
+from util import get_validated_static_path, log_error
 from vault.vault import vault_bp
 
 
@@ -36,45 +36,53 @@ with app.app_context():
     app.config.from_pyfile('flask.cfg')
 
 
-def load_admin_config():
-    """Load or initialize admin configurations from config file, writing defaults if no config file exists."""
-    config_file_path = path.join(app.config['APP_SHARED_FOLDER'], 'admin_settings.json')
-    default_config = {
+def load_admin_setting() -> Dict[str, Any]:
+    """Load or initialize admin settings from a JSON file.
+
+    If no setting file exists, it writes default loaded_settings and returns them.
+
+    If a setting file exists, it reads and returns the updated loaded_settings.
+
+    :returns: admin settings from file or default settings
+    """
+
+    # configure default admin settings
+    config_folder = app.config['YODA_CONFIG_PATH']
+    settings_file_path = path.join(config_folder, 'admin_settings.json')
+    default_settings = {
         'banner': {
-            'banner_enabled': False,
-            'banner_importance': False,
-            'banner_message': ''
+            'enabled': False,
+            'importance': False,
+            'message': ''
         },
         'YODA_THEME': app.config.get('YODA_THEME')
     }
 
     try:
         # If file doesn't exist, create and write the default configuration
-        if not path.exists(config_file_path):
-            with open(config_file_path, 'w') as file:
-                json.dump(default_config, file)
-            return default_config
+        if not path.exists(settings_file_path):
+            with open(settings_file_path, 'w') as file:
+                json.dump(default_settings, file)
+            return default_settings
 
-        # If the file exists, read and return the configuration
-        with open(config_file_path, 'r') as file:
-            settings = json.load(file)
-            banner_set = settings.get('banner', default_config['banner'])  # Get banner settings or use default
-            return {
+        # If the file exists, read and return the setting
+        with open(settings_file_path, 'r') as file:
+            loaded_settings = json.load(file)
+            merged_settings = {
                 'banner': {
-                    'banner_enabled': banner_set.get('banner_enabled', default_config['banner']['banner_enabled']),
-                    'banner_importance': banner_set.get('banner_importance', default_config['banner']['banner_importance']),
-                    'banner_message': banner_set.get('banner_message', default_config['banner']['banner_message'])
+                    **default_settings['banner'],
+                    **loaded_settings.get('banner', {})
                 },
-                'YODA_THEME': settings.get('YODA_THEME', default_config['YODA_THEME'])
+                'YODA_THEME': loaded_settings.get('YODA_THEME', default_settings['YODA_THEME'])
             }
+            return merged_settings
     except Exception:
-        print("An unexpected error occurred")
-        return default_config
+        log_error("Unexpected error occurred.", True)
+    return default_settings
 
 
-app.config['APP_SHARED_FOLDER'] = '/tmp'
-app.config.update(load_admin_config())
-
+# Load admin settings
+app.config.update(load_admin_setting())
 # Load theme templates
 set_theme_loader(app)
 
