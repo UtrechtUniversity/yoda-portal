@@ -107,10 +107,11 @@ def view(request_id: str) -> Response:
     if not is_project_manager and not is_datamanager and not is_dac_member and not is_request_owner:
         abort(403)
 
-    request_info         = api.call('datarequest_get', {'request_id': request_id})['data']
-    request_status       = request_info['requestStatus']
-    if request_status == 'forbidden':
+    request_info = api.call('datarequest_get', {'request_id': request_id})['data']
+    if not request_info:
         abort(403)
+        
+    request_status       = request_info['requestStatus']
     human_request_status = human_readable_status[request_status].value
     available_documents  = request_info['requestAvailableDocuments']
     request_type         = request_info['requestType']
