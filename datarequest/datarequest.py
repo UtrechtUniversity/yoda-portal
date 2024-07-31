@@ -110,7 +110,7 @@ def view(request_id: str) -> Response:
     request_info = api.call('datarequest_get', {'request_id': request_id})['data']
     if not request_info:
         abort(403)
-        
+
     request_status       = request_info['requestStatus']
     human_request_status = human_readable_status[request_status].value
     available_documents  = request_info['requestAvailableDocuments']
