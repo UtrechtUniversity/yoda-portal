@@ -22,7 +22,8 @@
             {% endif %}
             <script>
                 Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'};
-                Yoda.textFileExtensions = {{ config.get('TEXT_FILE_EXTENSIONS') | safe }}
+                Yoda.textFileExtensions = {{ config.get('TEXT_FILE_EXTENSIONS') | safe }};
+                Yoda.version = '{{ config.get('YODA_VERSION') }}';
                 {% if g.user %}
                 Yoda.basePath = '/{{ g.irods.zone }}/home';
                 Yoda.user = {
