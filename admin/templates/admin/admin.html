@@ -22,7 +22,7 @@
                             <label for="banner">Banner Details:</label>
                             <textarea class="form-control" name="banner" id="banner" rows="2"
                                 placeholder="Enter system maintenance details..."
-                                required>{{config.get('banner').get('message')}}</textarea>
+                                required>{{config.get('banner').get('message','')}}</textarea>
                         </div>
                         <!-- Checkbox to mark the banner as important -->
                         <div class="mb-3 form-check">
