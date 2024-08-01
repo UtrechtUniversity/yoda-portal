@@ -26,7 +26,8 @@
                         </div>
                         <!-- Checkbox to mark the banner as important -->
                         <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="importance" name="importance" {{ 'checked' if config.get('banner', {}).get('importance', False) else '' }}>
+                            <input type="checkbox" class="form-check-input" id="importance" name="importance"
+                                {{ 'checked' if config.get('banner', {}).get('importance', False) else '' }}>
                             <label class="form-check-label" for="importance">Mark as Important</label>
                         </div>
                         <button type="submit" class="btn btn-primary" name="Set Banner">Set Banner</button>
@@ -51,11 +52,27 @@
                             <!-- Add default theme option -->
                             {% set current_theme = config.get('YODA_THEME', 'uu') %}
                             {% for folder in theme_directories %}
-                                <option value="{{ folder }}" {% if folder == current_theme %}selected{% endif %}> {{ config.get('YODA_THEME_MAPPING').get(folder, folder) }}</option>
+                            <option value="{{ folder }}" {% if folder==current_theme %}selected{% endif %}> {{
+                                config.get('YODA_THEME_MAPPING').get(folder, folder) }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary" name="Change Theme">Change Theme</button>
+                </form>
+            </div>
+        </section>
+        <!-- New Section: Update Publication Terms -->
+        <section class="card my-3">
+            <div class="card-body">
+                <h2 class="card-title">Update Publication Terms</h2>
+                <form method="POST" action="{{ url_for('admin_bp.set_publication_terms') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="publicationTerms">Publication Terms:</label>
+                        <textarea class="form-control" id="publicationTerms" name="publicationTerms" rows="4"
+                            required>This is the default publication terms</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Set Terms</button>
                 </form>
             </div>
         </section>

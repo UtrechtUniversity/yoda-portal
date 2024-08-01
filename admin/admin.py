@@ -189,3 +189,10 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
     if remove_cache:
         if hasattr(app.jinja_env, 'cache'):
             app.jinja_env.cache = {}
+
+
+@admin_bp.route('/set_publication_terms', methods=['POST'])
+@admin_required
+def set_publication_terms() -> Response:
+    pass
+    
