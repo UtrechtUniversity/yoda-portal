@@ -13,6 +13,7 @@ from flask import (
     abort, Blueprint, current_app as app, flash, Flask, g, redirect,
     render_template, request, Response, session, url_for
 )
+from flask import jsonify
 from jinja2 import ChoiceLoader, FileSystemLoader
 from markupsafe import escape
 
@@ -38,28 +39,43 @@ def index() -> Response:
     if session['admin']:
         # reload theme options
         theme_directories = get_theme_directories(app.config.get('YODA_THEME_PATH'))
-        publication_terms_path = path.join(app.config['YODA_CONFIG_PATH'], 'publication_terms.html')
-        if path.exists(publication_terms_path):
-            try:
-                with open(publication_terms_path, 'r') as file:
-                    publication_terms_html = file.read()
-                    publication_terms_text = html.unescape(publication_terms_html)
-            except Exception as e:
-                flash(f"Failed to load publication terms from file: {str(e)}", "error")
-                publication_terms_text = "Default publication terms"
-        else:
-            try:
-                # Fetch publication terms from iRODS API if file does not exist
-                response = api.call('vault_get_publication_terms', {})
-                publication_terms_text = response["data"]
-            except Exception as e:
-                flash(f"Failed to load publication terms from API: {str(e)}", "error")
-                publication_terms_text = "Default publication terms"
-
+        publication_terms_text = get_publication_terms()
         return render_template("admin.html", theme_directories=theme_directories, publication_terms=publication_terms_text)
 
     else:
         return abort(403)
+
+
+@admin_bp.route("/api/publication-terms")
+def publication_terms():
+    terms = get_publication_terms()
+    return jsonify({'terms': terms})
+
+def get_publication_terms():
+    """Retrieve publication terms from a local file or from an iRODS API fallback.
+
+    :return: A string containing the html-like publication terms.
+    """
+    publication_terms_path = path.join(app.config['YODA_CONFIG_PATH'], 'publication_terms.html')
+
+    # Attempt to read from local file
+    if path.exists(publication_terms_path):
+        try:
+            with open(publication_terms_path, 'r') as file:
+                publication_terms_html = file.read()
+                return html.unescape(publication_terms_html)
+        except Exception as e:
+            flash(f"Failed to load publication terms from file: {str(e)}", "error")
+
+    # Fallback to API if the file does not exist or an error occurred
+    try:
+        response = api.call('vault_get_publication_terms', {})
+        return response["data"]
+    except Exception as e:
+        flash(f"Failed to load publication terms from API: {str(e)}", "error")
+
+    # Return default terms if all else fails
+    return "Failed to read default publication terms"
 
 
 def admin_required(f: Callable) -> Callable:
