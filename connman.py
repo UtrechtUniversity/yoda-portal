@@ -14,20 +14,20 @@ IRODS_TTL = 60  # Time to live (TTL) for iRODS sessions.
 
 
 class Session(object):
-    def __init__(self, sid: int, irods: iRODSSession) -> None:
+    def __init__(self, sid: str, irods: iRODSSession) -> None:
         """Session object storing the iRODS session object.
 
         :param sid:   Flask session identifier
         :param irods: iRODS session
         """
-        self.sid: int             = sid               # Flask session identifier
+        self.sid: str             = sid               # Flask session identifier
         self.time: float          = time.time()       # Flask session start time
         self.irods: iRODSSession  = irods             # iRODS session
         self.irods_time: float    = time.time()       # iRODS session start time
         self.lock: threading.Lock = threading.Lock()
 
 
-sessions: Dict[int, Session] = dict()  # Custom session dict instead of Flask session (cannot pickle iRODS session)
+sessions: Dict[str, Session] = dict()  # Custom session dict instead of Flask session (cannot pickle iRODS session)
 lock: threading.Lock = threading.Lock()
 
 
@@ -54,7 +54,7 @@ gc_thread = threading.Thread(target=gc, name='irods-session-gc', daemon=True)
 gc_thread.start()
 
 
-def get(sid: int) -> Optional[iRODSSession]:
+def get(sid: str) -> Optional[iRODSSession]:
     """Retrieve iRODS session object from session."""
     if sid in sessions:
         s: Session = sessions[sid]
@@ -65,7 +65,7 @@ def get(sid: int) -> Optional[iRODSSession]:
     return s.irods
 
 
-def add(sid: int, irods: iRODSSession) -> None:
+def add(sid: str, irods: iRODSSession) -> None:
     """Add Flask sid and iRODS session to our custom session dict.
 
     :param sid:   Flask session identifier
@@ -80,7 +80,7 @@ def add(sid: int, irods: iRODSSession) -> None:
     print(f"[login]: Successfully connected to iRODS for session {sid}'")
 
 
-def release(sid: int) -> None:
+def release(sid: str) -> None:
     """Release a session.
 
     :param sid: Flask session identifier
@@ -93,7 +93,7 @@ def release(sid: int) -> None:
         s.lock.release()
 
 
-def clean(sid: int) -> None:
+def clean(sid: str) -> None:
     """Clean a session.
 
     :param sid: Flask session identifier
@@ -106,7 +106,7 @@ def clean(sid: int) -> None:
         print(f"[logout]: Cleanup session {sid}")
 
 
-def extend(sid: int) -> None:
+def extend(sid: str) -> None:
     """Extend session TTLs.
 
     :param sid: Flask session identifier
