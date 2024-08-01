@@ -26,6 +26,7 @@ admin_bp = Blueprint("admin_bp", __name__,
                      static_url_path="/assets")
 
 
+# TODO: if having such publication_terms vari, render directly
 @admin_bp.route("/")
 def index() -> Response:
     """Access the admin page if authorized.
@@ -37,16 +38,23 @@ def index() -> Response:
     if session['admin']:
         # reload theme options
         theme_directories = get_theme_directories(app.config.get('YODA_THEME_PATH'))
-
         publication_terms_path = path.join(app.config['YODA_CONFIG_PATH'], 'publication_terms.html')
-        try:
-            with open(publication_terms_path, 'r') as file:
-                publication_terms_html = file.read()
-                # Convert HTML to a safer text format for the textarea
-                publication_terms_text = html.unescape(publication_terms_html)
-        except Exception as e: #TODO:
-            flash(f"Failed to load publication terms: {str(e)}", "error")
-            publication_terms_text = "Default publication terms"
+        if path.exists(publication_terms_path):
+            try:
+                with open(publication_terms_path, 'r') as file:
+                    publication_terms_html = file.read()
+                    publication_terms_text = html.unescape(publication_terms_html)
+            except Exception as e:
+                flash(f"Failed to load publication terms from file: {str(e)}", "error")
+                publication_terms_text = "Default publication terms"
+        else:
+            try:
+                # Fetch publication terms from iRODS API if file does not exist
+                response = api.call('vault_get_publication_terms', {})
+                publication_terms_text = response["data"]
+            except Exception as e:
+                flash(f"Failed to load publication terms from API: {str(e)}", "error")
+                publication_terms_text = "Default publication terms"
 
         return render_template("admin.html", theme_directories=theme_directories, publication_terms=publication_terms_text)
 
@@ -221,10 +229,13 @@ def update_publication_terms():
         return redirect(url_for("admin_bp.index"))
     except Exception as e:
         flash(f"Failed to update publication terms: {str(e)}", "error")
+
+
     return render_template('admin.html', publication_terms=sanitized_terms)
 
     # Yoda.call('vault_get_publication_terms', {}).then((data) => {
     response = api.call('vault_get_publication_terms', {})
+    terms = response["data"]
     for key, value in response.items():
         print(f"{key}: {value}")
     return response
