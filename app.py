@@ -3,6 +3,7 @@
 __copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+
 import json
 from os import path
 from typing import Any, Dict, Optional
@@ -87,6 +88,10 @@ app.config.update(load_admin_setting())
 # Load theme templates
 set_theme_loader(app)
 
+import api
+
+
+
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
 app.config['modules'] = []
@@ -135,6 +140,26 @@ with app.app_context():
         monitor_thread = Monitor(app.config)
         monitor_thread.start()
 
+def retrive_publication_terms_from_irods():
+    publication_terms_path = path.join(app.config['YODA_CONFIG_PATH'], 'publication_terms.html')
+
+    # Check if the publication terms file already exists
+    if not path.exists(publication_terms_path):
+        # If the file does not exist, fetch the terms from iRODS
+        try:
+            response = api.call('vault_get_publication_terms', {})
+            publication_terms_html = response['data']
+
+            # Save the terms to portal config directory
+            with open(publication_terms_path, 'w') as file:
+                file.write(publication_terms_html)
+            print("Publication terms loaded from iRODS and saved locally.")
+        except Exception as e:
+            print(f"Failed to load publication terms from iRODS: {str(e)}")
+    else:
+        print("Publication terms file already exists.")
+
+
 # Register blueprints
 with app.app_context():
     app.register_blueprint(general_bp)
@@ -155,6 +180,7 @@ with app.app_context():
         app.register_blueprint(intake_bp, url_prefix='/intake')
     if app.config.get('DATAREQUEST_ENABLED'):
         app.register_blueprint(datarequest_bp, url_prefix='/datarequest/')
+    #retrive_publication_terms_from_irods()
 
 # CSRF protection.
 csrf = CSRFProtect(app)

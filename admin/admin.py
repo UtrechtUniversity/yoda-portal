@@ -70,7 +70,16 @@ def get_publication_terms():
     # Fallback to API if the file does not exist or an error occurred
     try:
         response = api.call('vault_get_publication_terms', {})
-        return response["data"]
+        publication_terms_html = response["data"]
+
+        # Save the data to a local file if it was fetched from the API
+        try:
+            with open(publication_terms_path, 'w') as file:
+                file.write(html.escape(publication_terms_html))  # Optionally escape HTML to preserve integrity
+        except Exception as e:
+            flash(f"Failed to save publication terms to file: {str(e)}", "error")
+
+        return publication_terms_html
     except Exception as e:
         flash(f"Failed to load publication terms from API: {str(e)}", "error")
 
