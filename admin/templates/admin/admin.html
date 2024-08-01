@@ -61,21 +61,41 @@
                 </form>
             </div>
         </section>
-        <!-- New Section: Update Publication Terms -->
-        <section class="card my-3">
-            <div class="card-body">
-                <h2 class="card-title">Update Publication Terms</h2>
-                <form method="POST" action="{{ url_for('admin_bp.set_publication_terms') }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="mb-3">
-                        <label for="publicationTerms">Publication Terms:</label>
-                        <textarea class="form-control" id="publicationTerms" name="publicationTerms" rows="4"
-                            required>This is the default publication terms</textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Set Terms</button>
-                </form>
+<!-- Update Publication Terms -->
+<section class="card my-3">
+    <div class="card-body">
+        <h2 class="card-title">Update Publication Terms</h2>
+        <form method="POST" action="{{ url_for('admin_bp.update_publication_terms') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+                <label for="publicationTerms">Current Publication Terms:</label>
+                <textarea class="form-control" id="publicationTerms" name="publicationTerms" rows="10" required>{{ publication_terms|safe }}</textarea>
             </div>
-        </section>
+            <button type="button" class="btn btn-secondary" onclick="togglePreview()">Preview</button>
+            <button type="submit" class="btn btn-primary">Update Terms</button>
+        </form>
+        <div class="mt-3" id="previewContainer" style="display: none;">
+            <h4>Preview:</h4>
+            <div id="previewArea" class="border p-3">
+                <!-- This is where the HTML content will be rendered for preview -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function togglePreview() {
+        const publicationText = document.getElementById('publicationTerms').value;
+        const previewContainer = document.getElementById('previewContainer');
+
+        if (previewContainer.style.display === 'none') {
+            previewContainer.style.display = 'block';
+            document.getElementById('previewArea').innerHTML = publicationText;
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    }
+</script>
     </main>
 </div>
 {% endblock content %}

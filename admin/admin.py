@@ -5,6 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 import json
 from functools import wraps
+import html
 from os import path
 from typing import Any, Callable, Dict, Optional
 
@@ -36,7 +37,19 @@ def index() -> Response:
     if session['admin']:
         # reload theme options
         theme_directories = get_theme_directories(app.config.get('YODA_THEME_PATH'))
-        return render_template("admin.html", theme_directories=theme_directories)
+
+        publication_terms_path = path.join(app.config['YODA_CONFIG_PATH'], 'publication_terms.html')
+        try:
+            with open(publication_terms_path, 'r') as file:
+                publication_terms_html = file.read()
+                # Convert HTML to a safer text format for the textarea
+                publication_terms_text = html.unescape(publication_terms_html)
+        except Exception as e: #TODO:
+            flash(f"Failed to load publication terms: {str(e)}", "error")
+            publication_terms_text = "Default publication terms"
+
+        return render_template("admin.html", theme_directories=theme_directories, publication_terms=publication_terms_text)
+
     else:
         return abort(403)
 
@@ -191,8 +204,27 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
             app.jinja_env.cache = {}
 
 
-@admin_bp.route('/set_publication_terms', methods=['POST'])
+@admin_bp.route('/update_publication_terms', methods=['POST'])
 @admin_required
-def set_publication_terms() -> Response:
-    pass
-    
+def update_publication_terms():
+    publication_terms_path = path.join(app.config['YODA_CONFIG_PATH'], 'publication_terms.html')
+
+    # Handling POST request: Update the terms
+    new_terms = request.form['publicationTerms']
+    # Sanitize and prepare for saving (basic HTML escaping)
+    sanitized_terms = html.escape(new_terms)
+    try:
+        with open(publication_terms_path, 'w') as file:
+            file.write(sanitized_terms)
+        flash("Publication terms updated successfully.", "success")
+        # Redirect to the same endpoint to refresh the page and show updated terms
+        return redirect(url_for("admin_bp.index"))
+    except Exception as e:
+        flash(f"Failed to update publication terms: {str(e)}", "error")
+    return render_template('admin.html', publication_terms=sanitized_terms)
+
+    # Yoda.call('vault_get_publication_terms', {}).then((data) => {
+    response = api.call('vault_get_publication_terms', {})
+    for key, value in response.items():
+        print(f"{key}: {value}")
+    return response
