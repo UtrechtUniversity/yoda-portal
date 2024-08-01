@@ -1,4 +1,4 @@
-/* global Flow, path */
+/* global bootstrap, Flow, path */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
@@ -411,7 +411,7 @@ function createTooltips () {
 function secureFilename (file) {
   // mirrors behaviour of unicode_secure_filename in util.py
   let result = ''
-  result = file.replace(/[\u{0000}-\u{001F}\u{007F}\\\/]/gu, '')
+  result = file.replace(/[\u{0000}-\u{001F}\u{007F}\\\/]/gu, '') // eslint-disable-line no-control-regex, no-useless-escape
 
   if (result === '..') {
     return ''

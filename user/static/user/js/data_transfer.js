@@ -1,51 +1,53 @@
+/* global hljs */
+'use strict'
+
 $(document).ready(function () {
-    hljs.highlightAll();
+  hljs.highlightAll()
 
-    var snippets = document.getElementsByTagName('pre');
-    for (var i = 0; i < snippets.length; i++) {
-        code = snippets[i].getElementsByTagName('code')[0].innerText;
+  const snippets = document.getElementsByTagName('pre')
+  for (let i = 0; i < snippets.length; i++) {
+    snippets[i].classList.add('hljs') // append copy button to pre tag
+    snippets[i].innerHTML = '<button id="button' + (i + 1) + '" class="hljs-copy btn btn-secondary btn-copy-to-clipboard mt-2 me-2 float-end"><i class="fa fa-copy"></i> Copy</button>' + snippets[i].innerHTML
+  }
 
-        snippets[i].classList.add('hljs'); // append copy button to pre tag
-        snippets[i].innerHTML = '<button id="button' + (i+1) + '" class="hljs-copy btn btn-secondary btn-copy-to-clipboard mt-2 me-2 float-end"><i class="fa fa-copy"></i> Copy</button>' + snippets[i].innerHTML;
+  $('.btn-copy-to-clipboard').on('click', function (event) {
+    let codeBlockId
+    if (this.id === 'button1') {
+      codeBlockId = 'code-block1'
+    } else {
+      codeBlockId = 'code-block2'
     }
 
-    $('.btn-copy-to-clipboard').on('click', function(event) {
-        if (this.id == 'button1')
-            var codeBlockId = "code-block1"
-        else
-            var codeBlockId = "code-block2"
+    const codeContent = document.getElementById(codeBlockId).textContent
+    const textArea = document.createElement('textarea')
+    textArea.textContent = codeContent
+    document.body.append(textArea)
 
-        console.log(this.id + ' ' + codeBlockId)
-        const codeContent = document.getElementById(codeBlockId).textContent;
+    textArea.select()
+    document.execCommand('copy')
 
-        var textArea = document.createElement('textarea');
-        textArea.textContent = codeContent;
-        document.body.append(textArea)
+    textArea.remove()
+  })
 
-        textArea.select();
-        document.execCommand('copy');
+  $('.btn-download-file').on('click', function (event) {
+    let codeBlockId
+    let filename
+    if (this.id === 'download-button1') {
+      codeBlockId = 'code-block1'
+      filename = 'irods_environment.json'
+    } else {
+      codeBlockId = 'code-block2'
+      filename = 'config.yml'
+    }
 
-        textArea.remove();
-    })
+    const codeContent = document.getElementById(codeBlockId).textContent
+    const link = document.createElement('a')
+    const file = new Blob([codeContent], { type: 'text/plain' })
 
-    $('.btn-download-file').on('click', function(event) {
-        if (this.id == 'download-button1') {
-            var codeBlockId = "code-block1"
-            var filename = 'irods_environment.json'
-        } else {
-            var codeBlockId = "code-block2"
-            var filename = 'config.yml'
-        }
+    link.href = URL.createObjectURL(file)
+    link.download = filename
+    link.click()
 
-        const codeContent = document.getElementById(codeBlockId).textContent;
-
-        const link = document.createElement("a");
-        const file = new Blob([codeContent], { type: 'text/plain' });
-
-        link.href = URL.createObjectURL(file);
-        link.download = filename;
-        link.click();
-
-        URL.revokeObjectURL(link.href);
-    })
+    URL.revokeObjectURL(link.href)
+  })
 })

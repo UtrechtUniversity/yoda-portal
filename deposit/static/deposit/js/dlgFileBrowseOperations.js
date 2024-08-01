@@ -262,7 +262,7 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null, 
           dlgSelectAlertShow(result.status_info + '. Do you want to overwrite?')
           $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', true)
         } else {
-        dlgSelectAlertShow(result.status_info)
+          dlgSelectAlertShow(result.status_info)
         }
       }
     }
@@ -318,7 +318,7 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null, 
           dlgSelectAlertShow(result.status_info + '. Do you want to overwrite?')
           $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', true)
         } else {
-        dlgSelectAlertShow(result.status_info)
+          dlgSelectAlertShow(result.status_info)
         }
       }
     }
