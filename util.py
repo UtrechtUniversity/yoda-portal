@@ -8,7 +8,7 @@ import traceback
 import urllib
 from os import name, path
 from re import compile, fullmatch
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 from werkzeug.security import safe_join
 from werkzeug.utils import secure_filename
@@ -90,8 +90,8 @@ def unicode_secure_filename(filename):
 
 
 def get_validated_static_path(
-    full_path, request_path, yoda_theme_path, yoda_theme
-) -> Optional[Tuple[str, str]]:
+    full_path: str, request_path: str, yoda_theme_path: str, yoda_theme: str
+) -> Tuple[str, str]:
     """
     Static files handling - recognisable through '/assets/'
     Confirms that input path is valid and return corresponding static path
@@ -113,13 +113,13 @@ def get_validated_static_path(
         _, asset_name = path.split(request_path)
         # Make sure asset_name is safe
         if asset_name != secure_filename(asset_name):
-            return
+            return "", ""
 
         if parts[0] == "assets":
             # Main assets
             static_dir = safe_join(user_static_area + "/static", *parts[1:])
             if not static_dir:
-                return
+                return "", ""
             user_static_filename = path.join(static_dir, asset_name)
             if not path.exists(user_static_filename):
                 static_dir = safe_join("/var/www/yoda/static", *parts[1:])
@@ -128,7 +128,7 @@ def get_validated_static_path(
             module = parts[0]
             # Make sure module name is safe
             if module != secure_filename(module):
-                return
+                return "", ""
 
             module_static_area = path.join(module, "static", module)
             user_module_static_filename = safe_join(
@@ -146,9 +146,12 @@ def get_validated_static_path(
             return "", ""
 
         full_path = path.join(static_dir, asset_name)
+
         # Check that path is correct
         if path.exists(full_path):
             return static_dir, asset_name
+
+    return "", ""
 
 
 def is_relative_url(url: str) -> bool:
