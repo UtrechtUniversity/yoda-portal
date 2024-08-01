@@ -91,54 +91,61 @@ class UtilTest(TestCase):
     def test_static_loader_invalid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # Too short
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/?sawerw", "/", "/var/www/yoda/themes", "uu"
-            )
+            ),
+            ("", "")
         )
         # Path traversal attack
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/assets/../../../../etc/passwd?werwrwr",
                 "/assets/../../../../etc/passwd",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
         # non-printable characters
         full_path = "/assets/" + chr(13) + "img/logo.svg?werwer"
         path = "/assets/" + chr(13) + "img/logo.svg"
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "uu"
-            )
+            ),
+            ("", "")
         )
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "wur"
-            )
+            ),
+            ("", "")
         )
         # non-printable characters in asset name
         full_path = "/assets/img/l" + chr(13) + "ogo.svg?werwer"
         path = "/assets/img/l" + chr(13) + "ogo.svg"
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "uu"
-            )
+            ),
+            ("", "")
         )
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "wur"
-            )
+            ),
+            ("", "")
         )
         # .. in file name
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/assets/img/lo..go.svg?sklaerw",
                 "/assets/img/lo..go.svg?sklaerw",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
 
     @patch("os.path.exists")
@@ -172,22 +179,24 @@ class UtilTest(TestCase):
     def test_static_loader_module_invalid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # Invalid module name
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/../assets/../research/static/research/css/research.css?sklwrawe",
                 "/../assets/../research/static/research/css/research.css",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
         # Path traversal attack
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/group_manager/assets/../../../../../../etc/passwd?werwrwr",
                 "/group_manager/assets/../../../../../../etc/passwd",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
 
     def test_length_check_empty(self):

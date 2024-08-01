@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 
 __copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
@@ -8,7 +9,7 @@ import os
 import queue
 import threading
 import urllib.parse
-from typing import Iterator
+from typing import Iterator, Optional
 
 from flask import (
     abort, Blueprint, current_app as app, g, jsonify, make_response,
@@ -16,6 +17,7 @@ from flask import (
 )
 from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION, CAT_NO_ROWS_FOUND
+from irods.manager.data_object_manager import DataObjectManager
 from irods.message import iRODSMessage
 
 import api
@@ -29,24 +31,30 @@ research_bp = Blueprint('research_bp', __name__,
 
 
 class Chunk:
-    def __init__(self, data_objects, path: str, number: int, size: int, data, resource: str) -> None:
-        self.data_objects = data_objects
-        self.path = path
-        self.number = number
-        self.size = size
-        self.data = data
-        self.resource = resource
+    def __init__(self,
+                 data_objects: Optional[DataObjectManager],
+                 path: Optional[str],
+                 number: int,
+                 size: int,
+                 data: Optional[str],
+                 resource: Optional[str]) -> None:
+        self.data_objects: Optional[DataObjectManager] = data_objects
+        self.path: Optional[str] = path
+        self.number: int = number
+        self.size: int = size
+        self.data: Optional[str] = data
+        self.resource: Optional[str] = resource
 
 
-q: queue.Queue = queue.Queue(4)
-r: queue.Queue = queue.Queue(1)
+q: queue.Queue[Chunk] = queue.Queue(4)
+r: queue.Queue[bool] = queue.Queue(1)
 
 
 def irods_writer() -> None:
     failure = False
     while True:
         chunk = q.get()
-        if chunk.path:
+        if chunk.path and chunk.data_objects is not None:
             if not failure:
                 try:
                     with chunk.data_objects.open(chunk.path, 'a', chunk.resource) as obj_desc:
