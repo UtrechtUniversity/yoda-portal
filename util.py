@@ -130,16 +130,19 @@ def get_validated_static_path(
                 return "", ""
 
             module_static_area = path.join(module, "static", module)
-            user_static_filename = safe_join(
+            user_module_static_filename = safe_join(
                 path.join(user_static_area, module_static_area), *parts[2:], asset_name
             )
-            if not user_static_filename:
+            if not user_module_static_filename:
                 return "", ""
 
-            if path.exists(user_static_filename):
+            if path.exists(user_module_static_filename):
                 static_dir = path.join(user_static_area, module_static_area, *parts[2:])
             else:
                 static_dir = path.join("/var/www/yoda/", module_static_area, *parts[2:])
+
+        if not static_dir:
+            return "", ""
 
         full_path = path.join(static_dir, asset_name)
 
