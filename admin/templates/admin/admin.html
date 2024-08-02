@@ -21,7 +21,7 @@
                         <div class="mb-3">
                             <label for="banner">Banner Details:</label>
                             <textarea class="form-control" name="banner" id="banner" rows="2"
-                                placeholder="Enter system maintenance details..."
+                                placeholder="Enter system maintenance details..." style="width: 110%;"
                                 required>{{config.get('banner').get('message','')}}</textarea>
                         </div>
                         <!-- Checkbox to mark the banner as important -->
@@ -67,17 +67,27 @@
         <section class="card my-3">
             <div class="card-body">
                 <h2 class="card-title">Update Publication Terms</h2>
-                <form method="POST" action="{{ url_for('admin_bp.update_publication_terms') }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="mb-3">
-                        <label for="publicationTerms">Current Publication Terms:</label>
-                        <textarea class="form-control" id="publicationTerms" name="publicationTerms" rows="10"
-                            required>{{ publication_terms|safe }}</textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Update Terms</button>
-                    <button type="button" class="btn btn-secondary" class="flex-shrink-1"
-                        onclick="togglePreview()">Preview Updated Terms</button>
-                </form>
+                <div class="d-flex justify-content-start align-items-end" style="width: 100%;">
+
+                    <!-- Form to update publication terms -->
+                    <form action="{{ url_for('admin_bp.update_publication_terms') }}" method="POST"
+                        class="flex-fill me-2 needs-validation" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="publicationTerms">Current Publication Terms:</label>
+                            <textarea class="form-control" id="publicationTerms" name="publicationTerms" rows="10"
+                                style="width: 120%;" required>{{ publication_terms|safe }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Terms</button>
+                    </form>
+
+                    <!-- Separate form for previewing updated terms -->
+                    <form action="javascript:void(0);" method="POST" class="flex-shrink-1">
+                        <button type="button" class="btn btn-secondary" onclick="togglePreview()">Preview Updated
+                            Terms</button>
+                    </form>
+
+                </div>
             </div>
         </section>
 
