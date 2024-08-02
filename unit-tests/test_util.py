@@ -201,22 +201,22 @@ class UtilTest(TestCase):
             ("", "")
         )
 
-    def test_length_check_empty(self):
+    def test_length_check_empty(self) -> None:
         """Test that an empty banner message is identified as invalid."""
         _, is_valid = length_check("")
         self.assertFalse(is_valid)
 
-    def test_length_check_too_long(self):
+    def test_length_check_too_long(self) -> None:
         """Test that a too-long banner message is identified as invalid."""
         _, is_valid = length_check("a" * 257)  # 257 characters long
         self.assertFalse(is_valid)
 
-    def test_length_check_valid(self):
+    def test_length_check_valid(self) -> None:
         """Test that a valid banner message is accepted."""
         _, is_valid = length_check("Maintenance scheduled from 1 July 7:00 to 2 July 9:00.")
         self.assertTrue(is_valid)
 
-    def test_get_theme_directories_specific_path(self):
+    def test_get_theme_directories_specific_path(self) -> None:
         """Test that the specific theme path returns themes correctly"""
         with patch('util.listdir', return_value=['vu', 'wur']), \
                 patch('util.path.isdir', return_value=True):
@@ -224,13 +224,13 @@ class UtilTest(TestCase):
             result = get_theme_directories('/var/www/yoda/themes')
             assert result == expected_result
 
-    def test_get_theme_directories_path_not_exist(self):
+    def test_get_theme_directories_path_not_exist(self) -> None:
         """Test that non-existent path returns an empty list"""
         with patch('util.listdir', side_effect=Exception):
             result = get_theme_directories('/non/existent/path')
             assert result == []
 
-    def test_get_theme_directories_only_files(self):
+    def test_get_theme_directories_only_files(self) -> None:
         """Test that only files or no directory exists, returns the default uu theme"""
         with patch('util.listdir', return_value=['vu.txt', 'wur.doc']), \
                 patch('util.path.isdir', return_value=False):

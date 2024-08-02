@@ -59,7 +59,7 @@ def admin_required(f: Callable) -> Callable:
     :returns: Wrapped function with admin check
     """
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function(*args: str, **kwargs: int) -> Callable:
         if not getattr(g, 'admin', False):
             flash('You do not have permission to perform this action.', 'danger')
             return redirect(url_for('admin_bp.index'))
