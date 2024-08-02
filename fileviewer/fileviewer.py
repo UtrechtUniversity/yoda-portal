@@ -8,8 +8,14 @@ import urllib.parse
 from typing import Iterator
 
 from flask import (
-    abort, Blueprint, g,
-    render_template, request, Response, session, stream_with_context
+    abort,
+    Blueprint,
+    g,
+    render_template,
+    request,
+    Response,
+    session,
+    stream_with_context,
 )
 from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION

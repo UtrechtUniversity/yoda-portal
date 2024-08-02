@@ -12,7 +12,6 @@ import jwt
 import requests
 from flask import (
     Blueprint,
-    current_app as app,
     flash,
     g,
     redirect,
@@ -20,9 +19,15 @@ from flask import (
     request,
     Response,
     session,
-    url_for
+    url_for,
 )
-from irods.exception import CAT_INVALID_AUTHENTICATION, CAT_INVALID_USER, iRODSException, PAM_AUTH_PASSWORD_FAILED
+from flask import current_app as app
+from irods.exception import (
+    CAT_INVALID_AUTHENTICATION,
+    CAT_INVALID_USER,
+    iRODSException,
+    PAM_AUTH_PASSWORD_FAILED,
+)
 from irods.session import iRODSSession
 
 import api
@@ -388,7 +393,7 @@ def callback() -> Response:
 
         # Redirect to gate when exception has occurred.
         if exception_occurred:
-            return redirect(url_for('user_bp.gate'))
+            return redirect(url_for('user_bp.gate'))  # noqa: B012
 
     return redirect(original_destination())
 

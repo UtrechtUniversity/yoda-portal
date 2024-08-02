@@ -9,12 +9,22 @@ import os
 import queue
 import threading
 import urllib.parse
+from contextlib import suppress
 from typing import Iterator, Optional
 
 from flask import (
-    abort, Blueprint, current_app as app, g, jsonify, make_response,
-    render_template, request, Response, session, stream_with_context
+    abort,
+    Blueprint,
+    g,
+    jsonify,
+    make_response,
+    render_template,
+    request,
+    Response,
+    session,
+    stream_with_context,
 )
+from flask import current_app as app
 from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION, CAT_NO_ROWS_FOUND
 from irods.manager.data_object_manager import DataObjectManager
@@ -64,10 +74,8 @@ def irods_writer() -> None:
                     failure = True
                     log_error(f"Chunk upload failed for {chunk.path}")
                 finally:
-                    try:
+                    with suppress(Exception):
                         obj_desc.close()
-                    except Exception:
-                        pass
             else:
                 # Report back about failures.
                 r.put(failure)

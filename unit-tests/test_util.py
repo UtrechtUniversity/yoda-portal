@@ -10,11 +10,13 @@ from unittest.mock import Mock, patch
 
 sys.path.append("..")
 
-from util import get_theme_directories
-from util import get_validated_static_path
-from util import is_email_in_domains
-from util import length_check
-from util import unicode_secure_filename
+from util import (
+    get_theme_directories,
+    get_validated_static_path,
+    is_email_in_domains,
+    length_check,
+    unicode_secure_filename,
+)
 
 
 class UtilTest(TestCase):

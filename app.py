@@ -28,7 +28,6 @@ from user.user import user_bp
 from util import get_validated_static_path, log_error
 from vault.vault import vault_bp
 
-
 app = Flask(__name__, static_folder='assets')
 app.json.sort_keys = False
 
@@ -198,9 +197,7 @@ def protect_pages() -> Optional[Response]:
                                                     'user_bp.gate',
                                                     'user_bp.callback',
                                                     'api_bp._call',
-                                                    'static']:
-        return None
-    elif g.get('user', None) is not None:
+                                                    'static'] or g.get('user', None) is not None:
         return None
     else:
         return redirect(url_for('user_bp.gate', redirect_target=request.full_path))
