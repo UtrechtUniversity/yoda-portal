@@ -74,26 +74,50 @@
             <button type="button" class="btn btn-secondary" onclick="togglePreview()">Preview</button>
             <button type="submit" class="btn btn-primary">Update Terms</button>
         </form>
-        <div class="mt-3" id="previewContainer" style="display: none;">
-            <h4>Preview:</h4>
-            <div id="previewArea" class="border p-3">
-                <!-- This is where the HTML content will be rendered for preview -->
+    </div>
+</section>
+
+<!-- Confirmation Agreement Conditions Modal -->
+<div class="modal" tabindex="-1" role="dialog" id="confirmAgreementConditions">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <!-- Updated content will be displayed here -->
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <fieldset>
+                            <input type="checkbox" class="confirm-conditions" id="checkbox-confirm-conditions">
+                            <label for="checkbox-confirm-conditions">Please confirm that you agree with the above</label>
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary ms-2 action-confirm-submit-for-publication">Confirm agreement</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <script>
     function togglePreview() {
         const publicationText = document.getElementById('publicationTerms').value;
-        const previewContainer = document.getElementById('previewContainer');
+        const modalBody = document.querySelector('#confirmAgreementConditions .modal-body');
 
-        if (previewContainer.style.display === 'none') {
-            previewContainer.style.display = 'block';
-            document.getElementById('previewArea').innerHTML = publicationText;
-        } else {
-            previewContainer.style.display = 'none';
-        }
+        // Clear previous content
+        modalBody.innerHTML = '';
+
+        // Insert new content and show the modal
+        modalBody.innerHTML = publicationText;
+
+        // Assuming Bootstrap is used for modal management
+        const modalElement = new bootstrap.Modal(document.getElementById('confirmAgreementConditions'));
+        modalElement.show();
     }
 </script>
     </main>
