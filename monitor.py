@@ -36,7 +36,7 @@ class Monitor(Timer):
         return "{} ({})".format(self.config.get("YODA_VERSION", "N/A"),
                                 self.config.get("YODA_COMMIT", "N/A"))
 
-    def record_info_if_needed(self):
+    def record_info_if_needed(self) -> None:
         while not self.finished.wait(self.interval):
             try:
                 if os.path.isfile(self.get_signal_file()):

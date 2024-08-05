@@ -48,13 +48,21 @@ def _faceted_query() -> Response:
     sort = data.get('sort', None)
     reverse = data.get('reverse', False)
 
-    res = faceted_query(value, facets, ranges, filters, start=start, size=size, sort=sort, reverse=reverse)
+    res = faceted_query(
+        value,
+        facets,
+        ranges,
+        filters,
+        start=start,
+        size=size,
+        sort=sort,
+        reverse=reverse)  # type: ignore[no-untyped-call]
     response = jsonify(res)
     response.status_code = res['status']
     return response
 
 
-def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, reverse=False):
+def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, reverse=False):  # type: ignore[no-untyped-def]
     result = {
         'query': {
             'facets': facets,
@@ -384,7 +392,7 @@ def _metadata() -> Response:
         metadata_json = jsonavu.avu2json(avus['attributes'], 'usr')
 
     # Query data package on UUID.
-    res = faceted_query('Data_Package_Reference', uuid, [], [], size=1)
+    res = faceted_query('Data_Package_Reference', uuid, [], [], size=1)  # type: ignore[no-untyped-call]
 
     # Transform search result into data package metadata.
     deposit_date = ""

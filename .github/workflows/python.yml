@@ -27,7 +27,7 @@ jobs:
 
       - name: Check static typing
         run: |
-          mypy . --explicit-package-bases || true
+          mypy . --explicit-package-bases
 
       - name: Run unit and integration tests
         run: |
