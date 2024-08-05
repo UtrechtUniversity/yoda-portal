@@ -3,7 +3,6 @@
 __copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-
 import json
 from os import path
 from typing import Any, Dict, Optional
@@ -135,7 +134,6 @@ with app.app_context():
     if app.config.get("MONITOR_SIGNAL_FILE", "/var/www/yoda/show-tech.sig") != "":
         monitor_thread = Monitor(app.config)
         monitor_thread.start()
-
 
 # Register blueprints
 with app.app_context():

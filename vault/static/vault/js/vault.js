@@ -177,28 +177,28 @@ $(function () {
   })
 
   $('body').on('click', 'button.action-confirm-data-package-select', function () {
-    var dataPackage = $('#submitPublication .modal-body input[type="radio"]:checked').val();
-    $('#submitPublication').modal('hide');
+    dataPackage = $('#submitPublication .modal-body input[type="radio"]:checked').val()
+    $('#submitPublication').modal('hide')
 
-    $('#confirmAgreementConditions .modal-body').text(''); // Clear it first
+    $('#confirmAgreementConditions .modal-body').text('') // clear it first
 
     // Fetch publication terms from the Flask endpoint
     $.ajax({
         url: '/admin/api/publication-terms',
         type: 'GET',
         success: function(response) {
-            $('#confirmAgreementConditions .modal-body').html(response.terms);
+            $('#confirmAgreementConditions .modal-body').html(response.terms)
 
             // Set default status and show dialog.
-            $('.action-confirm-submit-for-publication').prop('disabled', true);
-            $('#confirmAgreementConditions .confirm-conditions').prop('checked', false);
+            $('.action-confirm-submit-for-publication').prop('disabled', true)
+            $('#confirmAgreementConditions .confirm-conditions').prop('checked', false)
 
-            $('#confirmAgreementConditions').modal('show');
+            $('#confirmAgreementConditions').modal('show')
         },
         error: function() {
-            console.error("Failed to load publication terms.");
+            console.error("Failed to load publication terms.")
             // Handle error case
-            $('#confirmAgreementConditions .modal-body').html("Failed to load publication terms.");
+            $('#confirmAgreementConditions .modal-body').html("Failed to load publication terms.")
         }
     });
 });

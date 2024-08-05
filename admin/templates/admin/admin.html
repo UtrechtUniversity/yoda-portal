@@ -37,7 +37,7 @@
                         <button type="submit" class="btn btn-primary" name="Set Banner">Set Banner</button>
                     </form>
                     <!-- Form to remove the maintenance banner -->
-                    <form action="{{ url_for('admin_bp.remove_banner') }}" method="POST">
+                    <form action="{{ url_for('admin_bp.remove_banner') }}" method="POST" class="flex-shrink-1">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-secondary" name="Remove Banner">Remove Banner</button>
                     </form>
@@ -57,8 +57,7 @@
                             <!-- Add default theme option -->
                             {% set current_theme = config.get('YODA_THEME', 'uu') %}
                             {% for folder in theme_directories %}
-                            <option value="{{ folder }}" {% if folder==current_theme %}selected{% endif %}> {{
-                                config.get('YODA_THEME_MAPPING').get(folder, folder) }}</option>
+                                <option value="{{ folder }}" {% if folder==current_theme %}selected{% endif %}>{{config.get('YODA_THEME_MAPPING').get(folder, folder) }}</option>
                             {% endfor %}
                         </select>
                     </div>
