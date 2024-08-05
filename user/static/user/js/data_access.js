@@ -71,5 +71,5 @@ $(document).ready(function () {
     const date = now.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })
     const time = now.toTimeString().split(' ')[0]
     $('#f-token-label').val(`${date} ${time}`)
-  });
+  })
 })
