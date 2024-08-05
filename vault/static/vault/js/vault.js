@@ -184,7 +184,7 @@ $(function () {
 
     // Fetch publication terms from the Flask endpoint
     $.ajax({
-        url: '/admin/api/publication-terms',
+        url: '/admin/get_publication_terms',
         type: 'GET',
         success: function(response) {
             $('#confirmAgreementConditions .modal-body').html(response.terms)
