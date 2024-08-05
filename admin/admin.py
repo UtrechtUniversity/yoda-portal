@@ -168,8 +168,7 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
 
 
 def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
-    """
-    Configures the template loader with the updated theme.
+    """Configures the template loader with the updated theme.
 
     :param app: The Flask application instance to configure.
     :param remove_cache: A boolean flag indicates whether to clear the template cache. Defaults to False.
@@ -196,8 +195,11 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
 
 @admin_bp.route('/set_publication_terms', methods=['POST'])
 @admin_required
-def set_publication_terms():
+def set_publication_terms() -> Response:
+    """Receives new publication terms from a POST request, sanitizes, and saves them.
 
+    :return: A redirection response to the admin index page.
+    """
     # Retrives new terms from the POST request
     new_terms = request.form['publicationTerms']
     sanitized_terms = html.escape(new_terms)
@@ -216,11 +218,16 @@ def set_publication_terms():
 
 
 @admin_bp.route("/get_publication_terms")
-def publication_terms():
+def publication_terms() -> Response:
+    """Retrieve and return the current publication terms as JSON.
+
+    :return: JSON object containing the current publication terms.
+    """
     terms = get_publication_terms()
     return jsonify({'terms': terms})
 
-def get_publication_terms():
+
+def get_publication_terms()  -> Optional[str]:
     """Retrieve publication terms from a local file or from an iRODS API fallback.
 
     :return: A string containing the html-like publication terms.
