@@ -168,7 +168,8 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
 
 
 def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
-    """Configures the template loader with the updated theme.
+    """
+    Configures the template loader with the updated theme.
 
     :param app: The Flask application instance to configure.
     :param remove_cache: A boolean flag indicates whether to clear the template cache. Defaults to False.
