@@ -67,9 +67,9 @@ $(document).ready(function () {
   })
 
   $('.btn-generate-dap').on('click', function (event) {
-    const now = new Date();
-    const date = now.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
-    const time = now.toTimeString().split(' ')[0];
-    $('#f-token-label').val(`${date} ${time}`);
+    const now = new Date()
+    const date = now.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })
+    const time = now.toTimeString().split(' ')[0]
+    $('#f-token-label').val(`${date} ${time}`)
   });
 })
