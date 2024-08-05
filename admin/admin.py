@@ -63,7 +63,7 @@ def get_publication_terms():
         try:
             with open(publication_terms_path, 'r') as file:
                 publication_terms_html = file.read()
-                return html.unescape(publication_terms_html)
+                return html.unescape(publication_terms_html) # Convert escaped terms back to html
         except Exception as e:
             flash(f"Failed to load publication terms from file: {str(e)}", "error")
 
@@ -237,9 +237,10 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
             app.jinja_env.cache = {}
 
 
-@admin_bp.route('/update_publication_terms', methods=['POST'])
+@admin_bp.route('/set_publication_terms', methods=['POST'])
 @admin_required
-def update_publication_terms():
+def set_publication_terms():
+
     publication_terms_path = path.join(app.config['YODA_CONFIG_PATH'], 'publication_terms.html')
 
     # Handling POST request: Update the terms
