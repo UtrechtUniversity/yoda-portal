@@ -4,6 +4,7 @@
 
 {% block scripts %}
 <script src="{{ url_for('admin_bp.static', filename='js/create_preview.js') }}"></script>
+<script src="{{ url_for('static', filename='js/purify.min.js') }}"></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -25,7 +26,7 @@
                         <div class="mb-3">
                             <label for="banner">Banner Details:</label>
                             <textarea class="form-control" name="banner" id="banner" rows="2"
-                                placeholder="Enter system maintenance details..." style="width: 110%;"
+                                placeholder="Enter system maintenance details..."
                                 required>{{config.get('banner').get('message','')}}</textarea>
                         </div>
                         <!-- Checkbox to mark the banner as important -->
