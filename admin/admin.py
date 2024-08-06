@@ -10,9 +10,20 @@ from os import path
 from typing import Any, Callable, Dict, Optional
 
 from flask import (
-    abort, Blueprint, current_app as app, flash, Flask, g, jsonify, redirect,
-    render_template, request, Response, session, url_for
+    abort,
+    Blueprint,
+    flash,
+    Flask,
+    g,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    Response,
+    session,
+    url_for,
 )
+from flask import current_app as app
 from jinja2 import ChoiceLoader, FileSystemLoader
 from markupsafe import escape
 
@@ -52,7 +63,7 @@ def admin_required(f: Callable) -> Callable:
     :returns: Wrapped function with admin check
     """
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function(*args: str, **kwargs: int) -> Callable:
         if not getattr(g, 'admin', False):
             flash('You do not have permission to perform this action.', 'danger')
             return redirect(url_for('admin_bp.index'))
@@ -158,7 +169,7 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
         flash("Failed to save settings", 'danger')
         return "Failed to save settings", 500
 
-    if "YODA_THEME" in settings.keys():
+    if "YODA_THEME" in settings:
         # Load the theme template if the current theme is changed
         set_theme_loader(app, remove_cache=True)
 
@@ -171,8 +182,8 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
     """
     Configures the template loader with the updated theme.
 
-    :param app: The Flask application instance to configure.
-    :param remove_cache: A boolean flag indicates whether to clear the template cache. Defaults to False.
+    :param app:          Flask application instance
+    :param remove_cache: Boolean flag indicating whether to clear the template cache. Defaults to False
     """
     # Target theme path
     theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
@@ -189,9 +200,8 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
     app.jinja_loader = theme_loader
 
     # Remove template cache
-    if remove_cache:
-        if hasattr(app.jinja_env, 'cache'):
-            app.jinja_env.cache = {}
+    if remove_cache and hasattr(app.jinja_env, 'cache'):
+        app.jinja_env.cache = {}
 
 
 @admin_bp.route('/set_publication_terms', methods=['POST'])

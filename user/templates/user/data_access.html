@@ -27,7 +27,7 @@
         Data Access Passwords
     </div>
     <div class="card-body">
-        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#dataAccessPassword">
+        <button type="button" class="btn btn-primary mb-3 btn-generate-dap" data-bs-toggle="modal" data-bs-target="#dataAccessPassword">
           Generate new data access password
         </button>
         <div class="list-group">
@@ -57,6 +57,9 @@
       <div class="modal-body">
           <form method="post" class="form-horizontal">
               <div class="form-group row mb-3">
+                  <p>Label is used to identify a data access password.
+                    The default label is set the current date and time and is editable.
+                  </p>
                   <label id="label-input" class="col-sm-3 col-form-label" for="f-token-label">Label</label>
                   <div class="col-sm-9">
                       <input

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 from flask import Blueprint, make_response, render_template, request, Response
@@ -98,9 +98,9 @@ def get_users() -> Response:
 
 @group_manager_bp.route('/group_create', methods=['POST'])
 def group_create() -> Response:
-    schema_id = request.form['group_schema_id'] if 'group_schema_id' in request.form else ''
-    data_classification = request.form['group_data_classification'] if 'group_data_classification' in request.form else ''
-    expiration_date = request.form['group_expiration_date'] if 'group_expiration_date' in request.form else ''
+    schema_id = request.form.get('group_schema_id', '')
+    data_classification = request.form.get('group_data_classification', '')
+    expiration_date = request.form.get('group_expiration_date', '')
 
     response = api.call('group_create', data={'group_name': request.form['group_name'],
                                               'category': request.form['group_category'],

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
@@ -8,7 +8,16 @@ import urllib.parse
 from typing import Iterator
 from uuid import UUID
 
-from flask import abort, Blueprint, g, render_template, request, Response, session, stream_with_context
+from flask import (
+    abort,
+    Blueprint,
+    g,
+    render_template,
+    request,
+    Response,
+    session,
+    stream_with_context,
+)
 from irods.data_object import iRODSDataObject
 from irods.exception import CAT_NO_ACCESS_PERMISSION
 

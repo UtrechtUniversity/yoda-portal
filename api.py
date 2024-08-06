@@ -11,7 +11,8 @@ import zlib
 from timeit import default_timer as timer
 from typing import Any, Dict, Optional
 
-from flask import Blueprint, current_app as app, g, jsonify, request, Response
+from flask import Blueprint, g, jsonify, request, Response
+from flask import current_app as app
 from irods import message, rule
 
 from errors import InvalidAPIError, UnauthorizedAPIAccessError

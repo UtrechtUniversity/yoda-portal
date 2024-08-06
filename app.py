@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
@@ -27,7 +27,6 @@ from stats.stats import stats_bp
 from user.user import user_bp
 from util import get_validated_static_path, log_error
 from vault.vault import vault_bp
-
 
 app = Flask(__name__, static_folder='assets')
 app.json.sort_keys = False
@@ -178,15 +177,16 @@ def static_loader() -> Optional[Response]:
 
     :returns: Static file
     """
-    result = get_validated_static_path(
+    static_dir, asset_name = get_validated_static_path(
         request.full_path,
         request.path,
         app.config.get('YODA_THEME_PATH'),
         app.config.get('YODA_THEME')
     )
-    if result is not None:
-        static_dir, asset_name = result
+    if static_dir and asset_name:
         return send_from_directory(static_dir, asset_name)
+    else:
+        return None
 
 
 @app.before_request
@@ -197,9 +197,7 @@ def protect_pages() -> Optional[Response]:
                                                     'user_bp.gate',
                                                     'user_bp.callback',
                                                     'api_bp._call',
-                                                    'static']:
-        return None
-    elif g.get('user', None) is not None:
+                                                    'static'] or g.get('user', None) is not None:
         return None
     else:
         return redirect(url_for('user_bp.gate', redirect_target=request.full_path))

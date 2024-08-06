@@ -10,11 +10,13 @@ from unittest.mock import Mock, patch
 
 sys.path.append("..")
 
-from util import get_theme_directories
-from util import get_validated_static_path
-from util import is_email_in_domains
-from util import length_check
-from util import unicode_secure_filename
+from util import (
+    get_theme_directories,
+    get_validated_static_path,
+    is_email_in_domains,
+    length_check,
+    unicode_secure_filename,
+)
 
 
 class UtilTest(TestCase):
@@ -91,54 +93,61 @@ class UtilTest(TestCase):
     def test_static_loader_invalid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # Too short
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/?sawerw", "/", "/var/www/yoda/themes", "uu"
-            )
+            ),
+            ("", "")
         )
         # Path traversal attack
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/assets/../../../../etc/passwd?werwrwr",
                 "/assets/../../../../etc/passwd",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
         # non-printable characters
         full_path = "/assets/" + chr(13) + "img/logo.svg?werwer"
         path = "/assets/" + chr(13) + "img/logo.svg"
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "uu"
-            )
+            ),
+            ("", "")
         )
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "wur"
-            )
+            ),
+            ("", "")
         )
         # non-printable characters in asset name
         full_path = "/assets/img/l" + chr(13) + "ogo.svg?werwer"
         path = "/assets/img/l" + chr(13) + "ogo.svg"
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "uu"
-            )
+            ),
+            ("", "")
         )
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "wur"
-            )
+            ),
+            ("", "")
         )
         # .. in file name
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/assets/img/lo..go.svg?sklaerw",
                 "/assets/img/lo..go.svg?sklaerw",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
 
     @patch("os.path.exists")
@@ -172,40 +181,42 @@ class UtilTest(TestCase):
     def test_static_loader_module_invalid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # Invalid module name
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/../assets/../research/static/research/css/research.css?sklwrawe",
                 "/../assets/../research/static/research/css/research.css",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
         # Path traversal attack
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/group_manager/assets/../../../../../../etc/passwd?werwrwr",
                 "/group_manager/assets/../../../../../../etc/passwd",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
 
-    def test_length_check_empty(self):
+    def test_length_check_empty(self) -> None:
         """Test that an empty banner message is identified as invalid."""
         _, is_valid = length_check("")
         self.assertFalse(is_valid)
 
-    def test_length_check_too_long(self):
+    def test_length_check_too_long(self) -> None:
         """Test that a too-long banner message is identified as invalid."""
         _, is_valid = length_check("a" * 257)  # 257 characters long
         self.assertFalse(is_valid)
 
-    def test_length_check_valid(self):
+    def test_length_check_valid(self) -> None:
         """Test that a valid banner message is accepted."""
         _, is_valid = length_check("Maintenance scheduled from 1 July 7:00 to 2 July 9:00.")
         self.assertTrue(is_valid)
 
-    def test_get_theme_directories_specific_path(self):
+    def test_get_theme_directories_specific_path(self) -> None:
         """Test that the specific theme path returns themes correctly"""
         with patch('util.listdir', return_value=['vu', 'wur']), \
                 patch('util.path.isdir', return_value=True):
@@ -213,13 +224,13 @@ class UtilTest(TestCase):
             result = get_theme_directories('/var/www/yoda/themes')
             assert result == expected_result
 
-    def test_get_theme_directories_path_not_exist(self):
+    def test_get_theme_directories_path_not_exist(self) -> None:
         """Test that non-existent path returns an empty list"""
         with patch('util.listdir', side_effect=Exception):
             result = get_theme_directories('/non/existent/path')
             assert result == []
 
-    def test_get_theme_directories_only_files(self):
+    def test_get_theme_directories_only_files(self) -> None:
         """Test that only files or no directory exists, returns the default uu theme"""
         with patch('util.listdir', return_value=['vu.txt', 'wur.doc']), \
                 patch('util.path.isdir', return_value=False):

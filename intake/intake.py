@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
-
 
 import time
 from typing import Any, Dict
 
-from flask import Blueprint, g, make_response, render_template, request, Response, session
+from flask import (
+    Blueprint,
+    g,
+    make_response,
+    render_template,
+    request,
+    Response,
+    session,
+)
 
 import api
 

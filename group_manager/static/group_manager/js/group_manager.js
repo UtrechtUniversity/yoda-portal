@@ -1,4 +1,4 @@
-/* global FileReader, jQuery, Option */
+/* global bootstrap, FileReader, jQuery, Option */
 'use strict'
 
 let enteredUsername = ''
@@ -1548,9 +1548,9 @@ $(function () {
                 })
               }
 
-              if (results.length == 1) {
+              if (results.length === 1) {
                 enteredUsername = results[0].id
-                $("#select2-f-user-create-name-container").text(enteredUsername) 
+                $('#select2-f-user-create-name-container').text(enteredUsername)
               }
 
               return { results }
@@ -1925,7 +1925,7 @@ $(function () {
         return
       }
 
-      const onlyUserName = userName.indexOf("#") > -1 ? userName.split("#")[0] : userName
+      const onlyUserName = userName.indexOf('#') > -1 ? userName.split('#')[0] : userName
       if (onlyUserName.length > 63) {
         window.alert('Please enter a shorter username.')
         return

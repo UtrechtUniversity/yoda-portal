@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2022, Utrecht University'
+__copyright__ = 'Copyright (c) 2022-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
@@ -35,10 +35,7 @@ def index() -> Response:
 @open_search_bp.route('/faceted_query', methods=['POST'])
 def _faceted_query() -> Response:
     data = json.loads(request.form['data'])
-    if 'value' in data:
-        value = data['value']
-    else:
-        value = None
+    value = data.get('value', None)
     facets = data['facets']
     ranges = data['ranges']
     filters = data['filters']
@@ -48,22 +45,24 @@ def _faceted_query() -> Response:
     else:
         start = 0
         size = 500
-    if 'sort' in data:
-        sort = data['sort']
-    else:
-        sort = None
-    if 'reverse' in data:
-        reverse = data['reverse']
-    else:
-        reverse = False
+    sort = data.get('sort', None)
+    reverse = data.get('reverse', False)
 
-    res = faceted_query(value, facets, ranges, filters, start=start, size=size, sort=sort, reverse=reverse)
+    res = faceted_query(
+        value,
+        facets,
+        ranges,
+        filters,
+        start=start,
+        size=size,
+        sort=sort,
+        reverse=reverse)  # type: ignore[no-untyped-call]
     response = jsonify(res)
     response.status_code = res['status']
     return response
 
 
-def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, reverse=False):
+def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, reverse=False):  # type: ignore[no-untyped-def]
     result = {
         'query': {
             'facets': facets,
@@ -327,10 +326,7 @@ def faceted_query(value, facets, ranges, filters, start=0, size=500, sort=None, 
     }
 
     if sort is not None:
-        if reverse:
-            order = 'desc'
-        else:
-            order = 'asc'
+        order = 'desc' if reverse else 'asc'
         query['sort'] = [
             {
                 'metadataEntries.value.raw': {
@@ -396,7 +392,7 @@ def _metadata() -> Response:
         metadata_json = jsonavu.avu2json(avus['attributes'], 'usr')
 
     # Query data package on UUID.
-    res = faceted_query('Data_Package_Reference', uuid, [], [], size=1)
+    res = faceted_query('Data_Package_Reference', uuid, [], [], size=1)  # type: ignore[no-untyped-call]
 
     # Transform search result into data package metadata.
     deposit_date = ""
