@@ -3,7 +3,7 @@
 
 $(document).ready(function () {
   // Preview publication terms in a modal.
-  $('.btn-create-preview').on('click', function () {
+  $('#create-preview').on('click', function () {
     // Get the content of the textarea and sanitize it.
     const termsText = document.getElementById('publicationTerms').value
     const sanitizedContent = DOMPurify.sanitize(termsText)
