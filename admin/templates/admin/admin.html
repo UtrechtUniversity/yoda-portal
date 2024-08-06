@@ -3,8 +3,8 @@
 {% block title %}{{ super() }} &dash; Administration{% endblock title %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='lib/purify-3.1.6/js/purify.min.js') }}"></script>
 <script src="{{ url_for('admin_bp.static', filename='js/create_preview.js') }}"></script>
-<script src="{{ url_for('static', filename='js/purify.min.js') }}"></script>
 {% endblock scripts %}
 
 {% block content %}
