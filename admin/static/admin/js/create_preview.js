@@ -1,6 +1,7 @@
-/* global createPreview, bootstrap, DOMPurify */
+/* global bootstrap, DOMPurify */
 'use strict'
 
+/* eslint-disable no-unused-vars */
 // Function to preview publication terms in a specific modal
 function createPreview () {
   // Get the content of the textarea and sanitize it
@@ -15,3 +16,4 @@ function createPreview () {
   const myModal = new bootstrap.Modal(document.getElementById('confirmAgreementConditions'))
   myModal.show()
 }
+/* eslint-enable no-unused-vars */
