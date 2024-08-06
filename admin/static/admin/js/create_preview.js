@@ -1,22 +1,13 @@
 // Function to preview publication terms in a specific modal
 function createPreview() {
-    $.ajax({
-        url: '/admin/get_publication_terms',  // Endpoint to fetch publication terms
-        type: 'GET',
-        success: function (response) {
-            const modalBody = document.querySelector('#confirmAgreementConditions .modal-body');
-            modalBody.innerHTML = response.terms; // Display terms in modal body
+    // Get the content of the textarea
+    var termsText = document.getElementById('publicationTerms').value;
 
-            const modalElement = new bootstrap.Modal(document.getElementById('confirmAgreementConditions'));
-            modalElement.show();
-        },
-        error: function () {
-            console.error("Error: Failed to load publication terms.");
-            const modalBody = document.querySelector('#confirmAgreementConditions .modal-body');
-            modalBody.innerHTML = "Failed to load publication terms.";  // Display error message in modal body
+    // Set the content in the modal body for preview
+    const modalBody = document.querySelector('#confirmAgreementConditions .modal-body');
+    modalBody.innerHTML = termsText;
 
-            const modalElement = new bootstrap.Modal(document.getElementById('confirmAgreementConditions'));
-            modalElement.show();
-        }
-    });
+    // Show the modal
+    var myModal = new bootstrap.Modal(document.getElementById('confirmAgreementConditions'));
+    myModal.show();
 }

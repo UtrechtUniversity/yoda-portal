@@ -78,14 +78,13 @@
                         <div class="mb-3">
                             <label for="publicationTerms">Current Publication Terms:</label>
                             <textarea class="form-control" id="publicationTerms" name="publicationTerms" rows="10"
-                                style="width: 120%;" required>{{ publication_terms|safe }}</textarea>
+                                style="width: 110%;" required>{{ publication_terms|safe }}</textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Update Terms</button>
                     </form>
                     <!-- Form to preview updated terms -->
                     <form action="javascript:void(0);" method="POST" class="flex-shrink-1">
-                        <button type="button" class="btn btn-secondary" onclick="createPreview()">Preview Updated
-                            Terms</button>
+                        <button type="button" class="btn btn-secondary" onclick="createPreview()">Preview Terms</button>
                     </form>
                 </div>
             </div>
