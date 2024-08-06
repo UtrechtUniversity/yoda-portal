@@ -1,4 +1,4 @@
-/* global bootstrap, DOMPurify */
+/* global createPreview, bootstrap, DOMPurify */
 'use strict'
 
 // Function to preview publication terms in a specific modal
