@@ -3,6 +3,7 @@
 __copyright__ = 'Copyright (c) 2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import html
 import json
 from functools import wraps
 from os import path
@@ -14,6 +15,7 @@ from flask import (
     flash,
     Flask,
     g,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -46,7 +48,9 @@ def index() -> Response:
     if session['admin']:
         # reload theme options
         theme_directories = get_theme_directories(app.config.get('YODA_THEME_PATH'))
-        return render_template("admin.html", theme_directories=theme_directories)
+        publication_terms_text = get_publication_terms()
+        return render_template("admin.html", theme_directories=theme_directories, publication_terms=publication_terms_text)
+
     else:
         return abort(403)
 
@@ -198,3 +202,72 @@ def set_theme_loader(app: Flask, remove_cache: Optional[bool] = False) -> None:
     # Remove template cache
     if remove_cache and hasattr(app.jinja_env, 'cache'):
         app.jinja_env.cache = {}
+
+
+@admin_bp.route('/set_publication_terms', methods=['POST'])
+@admin_required
+def set_publication_terms() -> Response:
+    """Receives new publication terms from a POST request, sanitizes, and saves them.
+
+    :return: A redirection response to the admin index page.
+    """
+    # Retrives new terms from the POST request
+    new_terms = request.form['publicationTerms']
+    sanitized_terms = html.escape(new_terms)
+
+    # Save new terms to local file
+    try:
+        publication_terms_path = path.join(app.config['YODA_CONFIG_PATH'], 'publication_terms.html')
+        with open(publication_terms_path, 'w') as file:
+            file.write(sanitized_terms)
+        flash("Publication terms updated successfully.", "success")
+        return redirect(url_for("admin_bp.index"))
+    except Exception:
+        flash("Failed to update publication terms", "error")
+
+    return redirect(url_for("admin_bp.index"))
+
+
+@admin_bp.route("/get_publication_terms")
+def publication_terms() -> Response:
+    """Retrieve and return the current publication terms as JSON.
+
+    :return: JSON object containing the current publication terms.
+    """
+    terms = get_publication_terms()
+    return jsonify({'terms': terms})
+
+
+def get_publication_terms()  -> Optional[str]:
+    """Retrieve publication terms from a local file or from an iRODS API fallback.
+
+    :return: A string containing the html-like publication terms.
+    """
+    publication_terms_path = path.join(app.config['YODA_CONFIG_PATH'], 'publication_terms.html')
+
+    # Attempt to read from local file
+    if path.exists(publication_terms_path):
+        try:
+            with open(publication_terms_path, 'r') as file:
+                publication_terms_html = file.read()
+                return html.unescape(publication_terms_html)  # Convert escaped terms to html
+        except Exception:
+            flash("Failed to load publication terms from file.", "error")
+
+    # Fallback to API if the file does not exist or an error occurred
+    try:
+        response = api.call('vault_get_publication_terms', {})
+        publication_terms_html = response["data"]
+
+        # Save the data to a local file if it was fetched from the API
+        try:
+            with open(publication_terms_path, 'w') as file:
+                file.write(html.escape(publication_terms_html))
+        except Exception:
+            flash("Failed to save publication terms to file", "error")
+
+        return publication_terms_html
+    except Exception:
+        flash("Failed to load publication terms from API", "error")
+
+    return "Error: failed to read publication terms"
