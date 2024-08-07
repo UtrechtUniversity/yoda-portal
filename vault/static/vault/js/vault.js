@@ -793,7 +793,8 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
           $('.alert.is-processing').show()
         } else {
           metadataInfo(dir)
-          if (vaultStatus === 'PUBLISHED') {
+          if (vaultStatus === 'PUBLISHED' || vaultStatus === 'PENDING_DEPUBLICATION' || 
+               vaultStatus === 'PENDING_REPUBLICATION' || vaultStatus === 'DEPUBLISHED') {
             $('.metadata-form-size').addClass('col-lg-8')
             $('.meta-title-size').removeClass('col-lg-2').addClass('col-lg-3')
             $('.meta-content-size').removeClass('col-lg-10').addClass('col-lg-9')

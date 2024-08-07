@@ -119,10 +119,6 @@ table.dataTable > tbody > tr > td {
     padding-left:3px;
 }
 
-.meta-content-size {
-    text-align: justify;
-}
-
 /* Version */
 .version tbody {
     font-size: 14px;
