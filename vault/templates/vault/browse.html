@@ -329,38 +329,56 @@
 <section class="metadata-info container hide">
     <h3 class="metadata-title"></h3>
     <h5 class="metadata-creator mt-3"></h5>
-    <div class="row">
-        <div class="col-lg-2">
-            <strong>Description <i class="fa-solid fa-question-circle" aria-hidden="true" title="Description of this data package"></i></strong>
+    <div class="row pb-4 mb-3">
+        <div class="metadata-form-size">
+            <div class="row">
+                <div class="meta-title-size col-lg-2">
+                    <strong data-toggle="tooltip" data-placement="bottom" title="Description of this data package">Description</strong>
+                </div>
+                <div class="meta-content-size col-lg-10">
+                    <div class="metadata-description"></div>
+                    <button type="button" class="btn read-more-button hide">Read full description...</button>
+                    <button type="button" class="btn read-less-button hide">Collapse description...</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="meta-title-size col-lg-2">
+                    <strong data-toggle="tooltip" data-placement="bottom" title="Classification of data package with regard to information security policy">Data classification</strong>
+                </div>
+                <div class="meta-content-size col-lg-10">
+                    <span class="metadata-data-classification"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="meta-title-size col-lg-2">
+                    <strong data-toggle="tooltip" data-placement="bottom" title="Data package accessibility to third parties">Data package access</strong>
+                </div>
+                <div class="meta-content-size col-lg-10">
+                    <span class="metadata-access"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="meta-title-size col-lg-2">
+                    <strong data-toggle="tooltip" data-placement="bottom" title="The license under which this data package is available for use by third parties">License</strong>
+                </div>
+                <div class="meta-content-size col-lg-10">
+                    <span class="metadata-license"></span>
+                </div>
+            </div>
         </div>
-        <div class="col-lg-10">
-            <div class="metadata-description"></div>
-            <button type="button" class="btn read-more-button hide">Read full description...</button>
-            <button type="button" class="btn read-less-button hide">Collapse description...</button>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-2">
-            <strong>Data classification <i class="fa-solid fa-question-circle" aria-hidden="true" title="Classification of data package with regard to information security policy"></i></strong>
-        </div>
-        <div class="col-lg-10">
-            <span class="metadata-data-classification"></span>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-2">
-            <strong>Data package access <i class="fa-solid fa-question-circle" aria-hidden="true" title="Data package accessibility to third parties"></i></strong>
-        </div>
-        <div class="col-lg-10">
-            <span class="metadata-access"></span>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-2">
-            <strong>License <i class="fa-solid fa-question-circle" aria-hidden="true" title="The license under which this data package is available for use by third parties"></i></strong>
-        </div>
-        <div class="col-lg-10">
-            <span class="metadata-license"></span>
+        <div class="version col-lg-4 hide">
+            <div>
+                <h6 class="ml-1"><b>Versions</b></h6>
+                <table class="table table-sm">
+                    <tbody>
+                    </tbody>
+                </table>
+                <small class="base_doi hide">
+                    <b>Base DOI: </b>
+                    <span></span>
+                    This DOI represents all versions of this publication and will resolve to the latest publication.
+                </small>
+            </div>
         </div>
     </div>
 </section>
