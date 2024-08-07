@@ -16,7 +16,7 @@
         <!-- Set Maintenance Banner section-->
         <section class="card my-3">
             <div class="card-body">
-                <h2 class="card-title">Set Maintenance Banner</h2>
+                <h2 class="card-title">Maintenance Banner</h2>
                 <div class="d-flex justify-content-start align-items-end" style="width: 100%;">
                     <!-- Form to set a maintenance banner -->
                     <form action="{{ url_for('admin_bp.set_banner') }}" method="POST"
@@ -49,7 +49,7 @@
         <!-- Theme Change section-->
         <section class="card my-3">
             <div class="card-body">
-                <h2 class="card-title">Change Portal Theme</h2>
+                <h2 class="card-title">Portal Theme</h2>
                 <form action="{{ url_for('admin_bp.set_theme') }}" method="POST" class="needs-validation" novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
@@ -62,7 +62,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary" name="Change Theme">Change Theme</button>
+                    <button type="submit" class="btn btn-primary" name="Change Theme">Set Theme</button>
                 </form>
             </div>
         </section>
@@ -70,7 +70,7 @@
         <!-- Update Publication Terms -->
         <section class="card my-3">
             <div class="card-body">
-                <h2 class="card-title">Update Publication Terms</h2>
+                <h2 class="card-title">Publication Terms</h2>
                 <div class="d-flex justify-content-start align-items-end" style="width: 100%;">
                     <!-- Form to update publication terms -->
                     <form action="{{ url_for('admin_bp.set_publication_terms') }}" method="POST"
@@ -81,7 +81,7 @@
                             <textarea class="form-control" id="publicationTerms" name="publicationTerms" rows="10"
                                 style="width: 110%;" required>{{ publication_terms|safe }}</textarea>
                         </div>
-                        <button type="submit" id="update-terms" class="btn btn-primary">Update Terms</button>
+                        <button type="submit" id="update-terms" class="btn btn-primary">Set Terms</button>
                     </form>
                     <!-- Form to preview updated terms -->
                     <button type="button" id="create-preview" class="btn btn-secondary">Preview Terms</button>
