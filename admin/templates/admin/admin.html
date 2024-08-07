@@ -2,6 +2,11 @@
 
 {% block title %}{{ super() }} &dash; Administration{% endblock title %}
 
+{% block scripts %}
+<script src="{{ url_for('static', filename='lib/purify-3.1.6/js/purify.min.js') }}"></script>
+<script src="{{ url_for('admin_bp.static', filename='js/create_preview.js') }}"></script>
+{% endblock scripts %}
+
 {% block content %}
 <div class="container mt-4">
     <header>
@@ -26,7 +31,8 @@
                         </div>
                         <!-- Checkbox to mark the banner as important -->
                         <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="importance" name="importance" {{ 'checked' if config.get('banner', {}).get('importance', False) else '' }}>
+                            <input type="checkbox" class="form-check-input" id="importance" name="importance"
+                                {{ 'checked' if config.get('banner', {}).get('importance', False) else '' }}>
                             <label class="form-check-label" for="importance">Mark as Important</label>
                         </div>
                         <button type="submit" class="btn btn-primary" name="Set Banner">Set Banner</button>
@@ -39,6 +45,7 @@
                 </div>
             </div>
         </section>
+
         <!-- Theme Change section-->
         <section class="card my-3">
             <div class="card-body">
@@ -51,7 +58,7 @@
                             <!-- Add default theme option -->
                             {% set current_theme = config.get('YODA_THEME', 'uu') %}
                             {% for folder in theme_directories %}
-                                <option value="{{ folder }}" {% if folder == current_theme %}selected{% endif %}> {{ config.get('YODA_THEME_MAPPING').get(folder, folder) }}</option>
+                            <option value="{{ folder }}" {% if folder == current_theme %}selected{% endif %}> {{ config.get('YODA_THEME_MAPPING').get(folder, folder) }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -59,6 +66,56 @@
                 </form>
             </div>
         </section>
+
+        <!-- Update Publication Terms -->
+        <section class="card my-3">
+            <div class="card-body">
+                <h2 class="card-title">Update Publication Terms</h2>
+                <div class="d-flex justify-content-start align-items-end" style="width: 100%;">
+                    <!-- Form to update publication terms -->
+                    <form action="{{ url_for('admin_bp.set_publication_terms') }}" method="POST"
+                        class="flex-fill me-2 needs-validation" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="publicationTerms">Current Publication Terms:</label>
+                            <textarea class="form-control" id="publicationTerms" name="publicationTerms" rows="10"
+                                style="width: 110%;" required>{{ publication_terms|safe }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Terms</button>
+                    </form>
+                    <!-- Form to preview updated terms -->
+                    <button type="button" id="create-preview" class="btn btn-secondary">Preview Terms</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Confirmation Agreement Conditions Modal, copied from vault/browse.html -->
+        <div class="modal" tabindex="-1" role="dialog" id="confirmAgreementConditions">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <!-- Updated content will be displayed here -->
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <fieldset>
+                                    <input type="checkbox" class="confirm-conditions" id="checkbox-confirm-conditions">
+                                    <label for="checkbox-confirm-conditions">Please confirm that you agree with the
+                                        above</label>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary ms-2" data-bs-dismiss="modal">Confirm agreement</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </div>
 {% endblock content %}
