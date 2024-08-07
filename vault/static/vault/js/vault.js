@@ -684,9 +684,9 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
       const downloadable = data.downloadable
       const archive = data.archive
       researchGroupAccess = data.research_group_access
-      const all_versions = data.all_versions
-      const base_doi = data.base_doi
-      const package_doi = data.package_doi
+      const allVersions = data.all_versions
+      const baseDOI = data.base_doi
+      const packageDOI = data.package_doi
 
       $('.btn-group button.metadata-form').hide()
       $('.top-information').hide()
@@ -793,44 +793,40 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
           $('.alert.is-processing').show()
         } else {
           metadataInfo(dir)
-          if (vaultStatus === 'PUBLISHED'){
+          if (vaultStatus === 'PUBLISHED') {
             $('.metadata-form-size').addClass('col-lg-8')
             $('.meta-title-size').removeClass('col-lg-2').addClass('col-lg-3')
             $('.meta-content-size').removeClass('col-lg-10').addClass('col-lg-9')
 
             // List DOIs
-            const list_dois = $('.version tbody')
-            const base_doi_span = $('.base_doi span')
+            const listDOIs = $('.version tbody')
+            const baseDOISpan = $('.base_doi span')
             let ld = ''
             let highlight = ''
             let bdoi = ''
-            for(var i = 0; i < all_versions.length; i++) {
-              if (package_doi === all_versions[i][1] && all_versions.length > 1) {
+            for (let i = 0; i < allVersions.length; i++) {
+              if (packageDOI === allVersions[i][1] && allVersions.length > 1) {
                 highlight = ' class="highlight"'
-              }
-              else {
+              } else {
                 highlight = ''
               }
 
-              ld += '<tr' + highlight + '><td>'
-              + '<a href="https://doi.org/' + all_versions[i][1] + '">https://doi.org/' + all_versions[i][1] + '</a>'
-              + '</td>'
-              + '<td>'
-              + '<small title="' + all_versions[i][2] + '">' + all_versions[i][0] + '</small>'
-              + '</td></tr>'
+              ld += '<tr' + highlight + '><td>' +
+              '<a href="https://doi.org/' + allVersions[i][1] + '">https://doi.org/' + allVersions[i][1] + '</a>' +
+              '</td><td>' +
+              '<small title="' + allVersions[i][2] + '">' + allVersions[i][0] + '</small>' +
+              '</td></tr>'
             }
-            list_dois.html(ld)
-            if (base_doi != null){
-              bdoi += '<a href="https://doi.org/' + base_doi + '">https://doi.org/' + base_doi + '</a><br>'
-              base_doi_span.html(bdoi)
+            listDOIs.html(ld)
+            if (baseDOI != null) {
+              bdoi += '<a href="https://doi.org/' + baseDOI + '">https://doi.org/' + baseDOI + '</a><br>'
+              baseDOISpan.html(bdoi)
               $('.base_doi').show()
-            }
-            else {
+            } else {
               $('.base_doi').hide()
             }
             $('.version').show()
-          }
-          else{
+          } else {
             $('.metadata-form-size').removeClass('col-lg-8')
             $('.meta-title-size').removeClass('col-lg-3').addClass('col-lg-2')
             $('.meta-content-size').removeClass('col-lg-9').addClass('col-lg-10')
