@@ -700,7 +700,8 @@ $(function () {
     accessIcons: {
       reader: 'fa-eye',
       normal: 'fa-user',
-      manager: 'fa-crown'
+      manager: 'fa-crown',
+      invited: 'fa-user-clock'
     },
 
     /// Human-readable descriptions of access levels.
@@ -1100,16 +1101,24 @@ $(function () {
           // Loop through the sorted user list and generate the #userList element.
           const user = users[userName]
 
-          const $user = $('<a class="list-group-item list-group-item-action user">')
-          $user.attr('id', 'user-' + i)
-          $user.addClass('user-access-' + user.access)
-          $user.attr('data-name', userName)
+          const $user = $('<span>')
+
+          // Check if user is current user.
+          let me = false
           if (userName === that.userNameFull) {
-            $user.addClass('self')
+            me = true
             if (!that.isRodsAdmin) {
-              $user.addClass('disabled')
-                .attr('title', 'You cannot change your own role or remove yourself from this group.')
+              $user.attr('data-bs-toggle', 'tooltip')
+              $user.attr('data-bs-title', 'You cannot change your own role or remove yourself from this group')
             }
+          }
+
+          // Open SRAM invitation.
+          let invited = false
+          if (typeof user.sram !== 'undefined') {
+            invited = true
+            $user.attr('data-bs-toggle', 'tooltip')
+            $user.attr('data-bs-title', 'This user has not accepted the SRAM invitation')
           }
 
           let displayName = userName
@@ -1118,14 +1127,15 @@ $(function () {
           // from the client's zone.
           if (nameAndZone[1] === that.zone) { displayName = nameAndZone[0] }
 
-          // that.canManageGroup(groupName))
-          $user.html('<input class="form-check-input" type="checkbox" value=""> <i class="fa-solid ' +
-                               that.accessIcons[user.access] +
-                               '" aria-hidden="true" title="' +
-                               that.accessNames[user.access] +
-                               '"></i> ' +
-                               Yoda.htmlEncode(displayName))
-
+          $user.html('<a id="user-' + i + '" class="list-group-item list-group-item-action user user-access-' +
+                     user.access + ((invited || me) ? ' disabled' : '') + (me ? ' self' : '') + '" data-name="' + userName + '">' +
+                     '<input class="form-check-input" type="checkbox" value=""> <i class="fa-solid ' +
+                     (invited ? that.accessIcons.invited : that.accessIcons[user.access]) +
+                     '" aria-hidden="true" title="' +
+                     that.accessNames[user.access] +
+                     '"></i> ' +
+                     Yoda.htmlEncode(displayName) +
+                     '</a>')
           $userList.append($user)
         })
 
@@ -1148,6 +1158,10 @@ $(function () {
 
         $userPanel.find('.create-button').removeClass('disabled')
         $userPanel.find('.update-button, .delete-button').addClass('disabled')
+
+        // Trigger tooltips.
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl)) // eslint-disable-line no-unused-vars
       })()
 
       // }}}
