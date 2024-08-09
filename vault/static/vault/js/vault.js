@@ -1,4 +1,4 @@
-/* global Option */
+/* global bootstrap, Option */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
@@ -872,6 +872,10 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
       if (typeof vaultStatus !== 'undefined') {
         $('.top-information').show()
         $('.top-info-buttons').show()
+
+        // Trigger tooltips.
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl)) // eslint-disable-line no-unused-vars
       }
       if (rebuildFileBrowser) {
         buildFileBrowser(dir)
