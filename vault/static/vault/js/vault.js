@@ -1,4 +1,4 @@
-/* global Option */
+/* global bootstrap, Option */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
@@ -684,6 +684,9 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
       const downloadable = data.downloadable
       const archive = data.archive
       researchGroupAccess = data.research_group_access
+      const allVersions = data.all_versions
+      const baseDOI = data.base_doi
+      const packageDOI = data.package_doi
 
       $('.btn-group button.metadata-form').hide()
       $('.top-information').hide()
@@ -790,6 +793,45 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
           $('.alert.is-processing').show()
         } else {
           metadataInfo(dir)
+          if (vaultStatus === 'PUBLISHED' || vaultStatus === 'PENDING_DEPUBLICATION' || vaultStatus === 'PENDING_REPUBLICATION' || vaultStatus === 'DEPUBLISHED') {
+            $('.metadata-form-size').addClass('col-lg-8')
+            $('.meta-title-size').removeClass('col-lg-2').addClass('col-lg-3')
+            $('.meta-content-size').removeClass('col-lg-10').addClass('col-lg-9')
+
+            // List DOIs
+            const listDOIs = $('.version tbody')
+            const baseDOISpan = $('.base_doi span')
+            let ld = ''
+            let highlight = ''
+            let bdoi = ''
+            for (let i = 0; i < allVersions.length; i++) {
+              if (packageDOI === allVersions[i][1] && allVersions.length > 1) {
+                highlight = ' class="highlight"'
+              } else {
+                highlight = ''
+              }
+
+              ld += '<tr' + highlight + '><td>' +
+              '<a href="https://doi.org/' + allVersions[i][1] + '">https://doi.org/' + allVersions[i][1] + '</a>' +
+              '</td><td>' +
+              '<small title="' + allVersions[i][2] + '">' + allVersions[i][0] + '</small>' +
+              '</td></tr>'
+            }
+            listDOIs.html(ld)
+            if (baseDOI != null) {
+              bdoi += '<a href="https://doi.org/' + baseDOI + '">https://doi.org/' + baseDOI + '</a><br>'
+              baseDOISpan.html(bdoi)
+              $('.base_doi').show()
+            } else {
+              $('.base_doi').hide()
+            }
+            $('.version').show()
+          } else {
+            $('.metadata-form-size').removeClass('col-lg-8')
+            $('.meta-title-size').removeClass('col-lg-3').addClass('col-lg-2')
+            $('.meta-content-size').removeClass('col-lg-9').addClass('col-lg-10')
+            $('.version').hide()
+          }
         }
 
         // Datamanager sees access buttons in vault.
@@ -830,6 +872,10 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
       if (typeof vaultStatus !== 'undefined') {
         $('.top-information').show()
         $('.top-info-buttons').show()
+
+        // Trigger tooltips.
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl)) // eslint-disable-line no-unused-vars
       }
       if (rebuildFileBrowser) {
         buildFileBrowser(dir)

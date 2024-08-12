@@ -14,6 +14,7 @@ from util import (
     get_theme_directories,
     get_validated_static_path,
     is_email_in_domains,
+    is_relative_url,
     length_check,
     unicode_secure_filename,
 )
@@ -237,3 +238,11 @@ class UtilTest(TestCase):
             expected_result = ['uu']
             result = get_theme_directories('/test/path')
             assert result == expected_result
+
+    def test_is_relative_url(self) -> None:
+        self.assertEqual(is_relative_url("http://www.uu.nl"), False)
+        self.assertEqual(is_relative_url("https://www.uu.nl"), False)
+        self.assertEqual(is_relative_url("http://username:password@www.uu.nl"), False)
+        self.assertEqual(is_relative_url("https://username:password@www.uu.nl"), False)
+        self.assertEqual(is_relative_url("/foo/bar/bat"), True)
+        self.assertEqual(is_relative_url("foo/bar/bat"), True)
