@@ -12,6 +12,7 @@ sys.path.append("..")
 
 from util import get_validated_static_path
 from util import is_email_in_domains
+from util import is_relative_url
 from util import unicode_secure_filename
 
 
@@ -187,3 +188,11 @@ class UtilTest(TestCase):
                 "uu",
             )
         )
+
+    def test_is_relative_url(self) -> None:
+        self.assertEqual(is_relative_url("http://www.uu.nl"), False)
+        self.assertEqual(is_relative_url("https://www.uu.nl"), False)
+        self.assertEqual(is_relative_url("http://username:password@www.uu.nl"), False)
+        self.assertEqual(is_relative_url("https://username:password@www.uu.nl"), False)
+        self.assertEqual(is_relative_url("/foo/bar/bat"), True)
+        self.assertEqual(is_relative_url("foo/bar/bat"), True)
