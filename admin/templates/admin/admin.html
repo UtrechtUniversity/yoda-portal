@@ -13,7 +13,7 @@
         <h1>Administration</h1>
     </header>
     <main>
-        <!-- A card for all features -->
+        <!-- A card for all admin features -->
         <section class="card my-3">
             <div class="card-body">
                 <!-- Maintenance Banner Section -->
@@ -24,19 +24,20 @@
                             class="flex-fill me-2 needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="mb-3">
-                                <label for="banner">Banner Details:</label>
-                                <textarea class="form-control" name="banner" id="banner" rows="2"
+                                <label for="admin-banner-message">Banner Details:</label>
+                                <textarea class="form-control" name="banner" id="admin-banner-message" rows="2"
                                     placeholder="Enter system maintenance details..."
                                     required>{{config.get('banner').get('message','')}}</textarea>
                             </div>
                             <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="importance" name="importance"
-                                    {{ 'checked' if config.get('banner', {}).get('importance', False) else '' }}>
-                                <label class="form-check-label" for="importance">Mark as Important</label>
+                                <input type="checkbox" class="form-check-input" id="admin-banner-importance"
+                                    name="importance" {{ 'checked' if config.get('banner', {}).get('importance', False)
+                                    else '' }}>
+                                <label class="form-check-label" for="admin-banner-importance">Mark as Important</label>
                             </div>
-                            <button type="submit" class="btn btn-primary">Set Banner</button>
+                            <button type="submit" id="set-banner" class="btn btn-primary">Set Banner</button>
                             <button type="submit" formaction="{{ url_for('admin_bp.remove_banner') }}"
-                                class="btn btn-secondary ms-2">Remove Banner</button>
+                                id="remove-banner" class="btn btn-secondary ms-2">Remove Banner</button>
                         </form>
                     </div>
                 </div>
@@ -48,8 +49,8 @@
                         novalidate>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="mb-3">
-                            <label for="theme">Select Theme:</label>
-                            <select class="form-control" id="theme" name="theme" required>
+                            <label for="admin-theme-selection">Select Theme:</label>
+                            <select class="form-control" id="admin-theme-selection" name="theme" required>
                                 {% set current_theme = config.get('YODA_THEME', 'uu') %}
                                 {% for folder in theme_directories %}
                                 <option value="{{ folder }}" {% if folder==current_theme %}selected{% endif %}>{{
@@ -57,7 +58,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Set Theme</button>
+                        <button type="submit" id="set-theme" class="btn btn-primary">Set Theme</button>
                     </form>
                 </div>
 
@@ -69,11 +70,11 @@
                             class="flex-fill me-2 needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="mb-3">
-                                <label for="publicationTerms">Current Publication Terms:</label>
-                                <textarea class="form-control" id="publicationTerms" name="publicationTerms" rows="10"
-                                    required>{{ publication_terms|safe }}</textarea>
+                                <label for="admin-publication-terms">Current Publication Terms:</label>
+                                <textarea class="form-control" id="admin-publication-terms" name="publicationTerms"
+                                    rows="10" required>{{ publication_terms|safe }}</textarea>
                             </div>
-                            <button type="submit" id="update-terms" class="btn btn-primary">Set Terms</button>
+                            <button type="submit" id="set-terms" class="btn btn-primary">Set Terms</button>
                             <button type="button" id="create-preview" class="btn btn-secondary ms-2">Preview
                                 Terms</button>
                         </form>
