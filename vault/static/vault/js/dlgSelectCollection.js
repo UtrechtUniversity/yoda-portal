@@ -1,3 +1,4 @@
+/* global DOMPurify */
 'use strict'
 
 let urlEncodedPath = ''
@@ -100,7 +101,7 @@ function dlgShowFolderSelectDialog (orgPath) {
 /// alert handling
 function dlgSelectAlertShow (errorMessage) {
   $('#dlg-select-alert-panel').removeClass('hide')
-  $('#dlg-select-alert-panel span').html(errorMessage)
+  $('#dlg-select-alert-panel span').html(DOMPurify.sanitize(errorMessage))
 }
 
 function dlgSelectAlertHide () {
