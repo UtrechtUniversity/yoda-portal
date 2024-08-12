@@ -35,9 +35,9 @@
                                     else '' }}>
                                 <label class="form-check-label" for="admin-banner-importance">Mark as Important</label>
                             </div>
-                            <button type="submit" id="set-banner" class="btn btn-primary">Set Banner</button>
+                            <button type="submit" id="admin-set-banner" class="btn btn-primary">Set Banner</button>
                             <button type="submit" formaction="{{ url_for('admin_bp.remove_banner') }}"
-                                id="remove-banner" class="btn btn-secondary ms-2">Remove Banner</button>
+                                id="admin-remove-banner" class="btn btn-secondary ms-2">Remove Banner</button>
                         </form>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <button type="submit" id="set-theme" class="btn btn-primary">Set Theme</button>
+                        <button type="submit" id="admin-set-theme" class="btn btn-primary">Set Theme</button>
                     </form>
                 </div>
 
@@ -74,8 +74,8 @@
                                 <textarea class="form-control" id="admin-publication-terms" name="publicationTerms"
                                     rows="10" required>{{ publication_terms|safe }}</textarea>
                             </div>
-                            <button type="submit" id="set-terms" class="btn btn-primary">Set Terms</button>
-                            <button type="button" id="create-preview" class="btn btn-secondary ms-2">Preview
+                            <button type="submit" id="admin-set-terms" class="btn btn-primary">Set Terms</button>
+                            <button type="button" id="admin-create-preview" class="btn btn-secondary ms-2">Preview
                                 Terms</button>
                         </form>
                     </div>
