@@ -32,7 +32,7 @@ from irods.session import iRODSSession
 
 import api
 import connman
-from util import is_email_in_domains, log_error
+from util import is_email_in_domains, is_relative_url, log_error
 
 # Blueprint creation
 user_bp = Blueprint('user_bp', __name__,
@@ -60,7 +60,7 @@ def gate() -> Response:
         session['login_username'] = username
 
         redirect_target = request.args.get('redirect_target')
-        if redirect_target is not None:
+        if redirect_target is not None and is_relative_url(redirect_target):
             session['redirect_target'] = redirect_target
 
         # If the username matches the domain set for OIDC
@@ -454,7 +454,7 @@ def authenticated() -> bool:
 
 def original_destination() -> str:
     target = session.get('redirect_target')
-    if target is not None:
+    if target is not None and is_relative_url(target):
         session['redirect_target'] = None
         return target
     else:
