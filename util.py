@@ -5,6 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 import sys
 import traceback
+import urllib
 from os import listdir, name, path
 from re import compile, fullmatch
 from typing import List, Tuple
@@ -183,3 +184,15 @@ def get_theme_directories(theme_path: str) -> List[str]:
         return directories
     except Exception:
         return []
+
+
+def is_relative_url(url: str) -> bool:
+    """
+    Function to check whether whether a URL is relative
+
+    :param url: The URL to check
+
+    :returns: boolean value that indicated whether the URL is relative or not.
+    """
+    parsed_url = urllib.parse.urlparse(url)
+    return parsed_url.scheme == "" and parsed_url.netloc == ""
