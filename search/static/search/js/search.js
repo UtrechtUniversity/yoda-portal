@@ -1,3 +1,4 @@
+/* global DOMPurify */
 'use strict'
 
 let currentSearchString
@@ -30,7 +31,8 @@ $(document).ready(function () {
   }
 
   $('#search-panel a').on('click', function () {
-    $('#search_concept').html($(this).text())
+    const sanitizedSearchConcept = DOMPurify.sanitize($(this).text())
+    $('#search_concept').html(sanitizedSearchConcept)
     $('#search_concept').attr('data-type', $(this).attr('data-type'))
 
     if ($(this).attr('data-type') === 'status') {

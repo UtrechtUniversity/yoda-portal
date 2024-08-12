@@ -1,3 +1,4 @@
+/* global DOMPurify */
 'use strict'
 
 // Handles content of two tables
@@ -412,7 +413,8 @@ $(document).ready(function () {
     $('#newFileName').val($('#org_folder_select_filename').val()) // Is in dialog where to enter a new name when duplicate
 
     // For error reporting
-    $('.mode-dlg-exists .alert-warning').html('The file name <b>' + $('#org_folder_select_filename').val() + '</b> (location: ' + $('#org_folder_select_path').val() + ') already exists')
+    const errorReport = DOMPurify.sanitize('The file name <b>' + $('#org_folder_select_filename').val() + '</b> (location: ' + $('#org_folder_select_path').val() + ') already exists')
+    $('.mode-dlg-exists .alert-warning').html(errorReport)
 
     restoreRevision('restore_no_overwrite')
   })
@@ -453,7 +455,7 @@ $(document).ready(function () {
 
 // select-folder
 function dlgAlertShow (alertMessage) {
-  $('.alert-folder-select').html(alertMessage)
+  $('.alert-folder-select').html(DOMPurify.sanitize(alertMessage))
 }
 
 // dlg-select-folder
@@ -593,7 +595,7 @@ async function restoreRevision (overwriteFlag) {
 
 // Alerts to user in dialog when file already exists
 function dlgAlreadyExistsAlert (message) {
-  $('.alert-dlg-already-exists').html(message)
+  $('.alert-dlg-already-exists').html(DOMPurify.sanitize(message))
 }
 
 /// ////////////////////////////////////////////////////////////////////////////////////////////////////////
