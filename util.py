@@ -5,6 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 import sys
 import traceback
+import urllib
 from os import name, path
 from re import compile, fullmatch
 from typing import List, Optional, Tuple
@@ -145,3 +146,15 @@ def get_validated_static_path(
         # Check that path is correct
         if path.exists(full_path):
             return static_dir, asset_name
+
+
+def is_relative_url(url: str) -> bool:
+    """
+    Function to check whether whether a URL is relative
+
+    :param url: The URL to check
+
+    :returns: boolean value that indicated whether the URL is relative or not.
+    """
+    parsed_url = urllib.parse.urlparse(url)
+    return parsed_url.scheme == "" and parsed_url.netloc == ""
