@@ -1,4 +1,4 @@
-/* global bootstrap, FileReader, jQuery, Option */
+/* global bootstrap, DOMPurify, FileReader, jQuery, Option */
 'use strict'
 
 let enteredUsername = ''
@@ -973,7 +973,8 @@ $(function () {
       $('.properties-update').removeClass('hidden')
       $('.users').removeClass('hidden')
 
-      $('#group-properties-group-name').html('<strong>[' + groupName + ']</strong>')
+      const sanitizedGroupName = DOMPurify.sanitize('<strong>[' + groupName + ']</strong>')
+      $('#group-properties-group-name').html(sanitizedGroupName)
 
       $oldGroup.removeClass('active')
       $group.addClass('active')
@@ -1346,7 +1347,8 @@ $(function () {
           // $(this).val(null).trigger('change')
         }).on('change', function () {
           // Reset the subcategory value
-          $($(this).attr('data-subcategory')).val(null).trigger('change')
+          const sanitizedSubCategory = DOMPurify.sanitize($(this).attr('data-subcategory'))
+          $(sanitizedSubCategory).val(null).trigger('change')
 
           // bring over the category value to the schema-id if exists.
           if (that.schemaIDs.includes($(this).select2('data')[0].id)) {
@@ -1376,6 +1378,8 @@ $(function () {
       $(sel).filter('.selectify-subcategory').each(function () {
         const $el = $(this)
 
+        const sanitizedCategory = DOMPurify.sanitize($el.attr('data-category'))
+
         $el.select2({
           placeholder: 'Select a subcategory or enter a new name',
           ajax: {
@@ -1386,7 +1390,7 @@ $(function () {
             data: function (params) {
               const request = {
                 query: '',
-                category: $($el.attr('data-category')).val()
+                category: $(sanitizedCategory).val()
               }
               if (params.term) {
                 request.query = params.term
@@ -1544,7 +1548,8 @@ $(function () {
 
               users.forEach(function (userName) {
                 // Exclude users already in the group.
-                if (!(userName in that.groups[$($el.attr('data-group')).val()].members)) {
+                const sanitizedGroup = DOMPurify.sanitize($el.attr('data-group'))
+                if (!(userName in that.groups[$(sanitizedGroup).val()].members)) {
                   const nameAndZone = userName.split('#')
                   results.push({
                     id: userName,
@@ -2209,12 +2214,10 @@ $(function () {
       })
 
       // Group creation {{{
-
       $('#f-group-create-prefix-div a').on('click', function (e) {
         // Select new group prefix.
-        const newPrefix = $(this).attr('data-value')
+        const newPrefix = DOMPurify.sanitize($(this).attr('data-value'))
         const oldPrefix = $('#f-group-create-name').attr('data-prefix')
-
         $('#f-group-create-prefix-div button .text').html(newPrefix + '&nbsp;')
         $('#f-group-create-name').attr('data-prefix', newPrefix)
 

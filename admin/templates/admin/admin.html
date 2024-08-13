@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Administration{% endblock title %}
+{% block title %}{{ super() }} - Administration{% endblock title %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='lib/purify-3.1.6/js/purify.min.js') }}"></script>
@@ -19,7 +19,7 @@
                 <h2 class="card-title">Set Maintenance Banner</h2>
                 <div class="d-flex justify-content-start align-items-end" style="width: 100%;">
                     <!-- Form to set a maintenance banner -->
-                    <form action="{{ url_for('admin_bp.set_banner') }}" method="POST"
+                    <form action="{{ url_for('admin_bp.set_banner') }}" method="post"
                         class="flex-fill me-2 needs-validation" novalidate>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <!-- Text area for entering banner details -->
@@ -38,7 +38,7 @@
                         <button type="submit" class="btn btn-primary" name="Set Banner">Set Banner</button>
                     </form>
                     <!-- Form to remove the maintenance banner -->
-                    <form action="{{ url_for('admin_bp.remove_banner') }}" method="POST" class="flex-shrink-1">
+                    <form action="{{ url_for('admin_bp.remove_banner') }}" method="post" class="flex-shrink-1">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-secondary" name="Remove Banner">Remove Banner</button>
                     </form>
@@ -50,7 +50,7 @@
         <section class="card my-3">
             <div class="card-body">
                 <h2 class="card-title">Change Portal Theme</h2>
-                <form action="{{ url_for('admin_bp.set_theme') }}" method="POST" class="needs-validation" novalidate>
+                <form action="{{ url_for('admin_bp.set_theme') }}" method="post" class="needs-validation" novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="theme">Select Theme:</label>
@@ -73,7 +73,7 @@
                 <h2 class="card-title">Update Publication Terms</h2>
                 <div class="d-flex justify-content-start align-items-end" style="width: 100%;">
                     <!-- Form to update publication terms -->
-                    <form action="{{ url_for('admin_bp.set_publication_terms') }}" method="POST"
+                    <form action="{{ url_for('admin_bp.set_publication_terms') }}" method="post"
                         class="flex-fill me-2 needs-validation" novalidate>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="mb-3">

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Vault{% endblock title %}
+{% block title %}{{ super() }} - Vault{% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/vault.css') }}">
@@ -8,6 +8,7 @@
 {% endblock style %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='lib/purify-3.1.6/js/purify.min.js') }}"></script>
 <script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
@@ -252,7 +253,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-primary action-confirm-vault-download'>Confirm download</button>
+                <button class="btn btn-primary action-confirm-vault-download">Confirm download</button>
             </div>
         </div>
     </div>
@@ -270,7 +271,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-primary action-confirm-vault-archival'>Confirm archive</button>
+                <button class="btn btn-primary action-confirm-vault-archival">Confirm archive</button>
             </div>
         </div>
     </div>
@@ -288,7 +289,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class='btn btn-primary action-confirm-vault-unarchive'>Confirm unarchive</button>
+                <button class="btn btn-primary action-confirm-vault-unarchive">Confirm unarchive</button>
             </div>
         </div>
     </div>
