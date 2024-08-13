@@ -97,7 +97,7 @@
             <div class="card properties-create hidden">
                 <div class="card-header">Create new group</div>
                 <div class="card-body" id="group-properties-create">
-                    <form class="form-horizontal" id="f-group-create" action="{{ url_for('group_manager_bp.group_create') }}" method="POST">
+                    <form class="form-horizontal" id="f-group-create" action="{{ url_for('group_manager_bp.group_create') }}" method="post">
                         <div class="mb-3 row">
                             <label class="col-sm-4 form-label" for="f-group-create-name">Group name
                                 <i class="fa-solid fa-question-circle" aria-hidden="true" title="Name and type for this group, this cannot be changed after group creation (may only contain lowercase letters (a-z) and hyphens (-))"></i>
@@ -211,7 +211,7 @@
                     <p class="placeholder-text">
                         Please select a group.
                     </p>
-                    <form action="{{ url_for('group_manager_bp.group_update') }}" method="POST" id="f-group-update" class="hidden">
+                    <form action="{{ url_for('group_manager_bp.group_update') }}" method="post" id="f-group-update" class="hidden">
 
                         <div class="mb-3 row">
                             <label class="col-sm-4 form-label" for="f-group-update-name">Group name
@@ -323,7 +323,7 @@
                 </div>
                 <div class="list-group overflow-auto" id="user-list" style="max-height: 243px"></div>
                 <div class="list-group-item item-user-create" id="user-list-add-user" hidden>
-                    <form action="{{ url_for('group_manager_bp.user_create') }}" method="POST" class="form-inline" id="f-user-create">
+                    <form action="{{ url_for('group_manager_bp.user_create') }}" method="post" class="form-inline" id="f-user-create">
                         <input name="group_name" id="f-user-create-group" type="hidden" />
                         <div class="input-group">
                             <select name="user_name" id="f-user-create-name" class="form-control form-control-sm selectify-user-name" required data-group="#f-user-create-group" >
