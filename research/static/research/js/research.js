@@ -184,8 +184,8 @@ $(function () {
 
     $('#showChecksumReport .collection').text(folder)
     $('#showChecksumReport .modal-body #checksumReport').html('')
-    $('#showChecksumReport .modal-footer .download-report-text').addClass('d-none');
-    $('#showChecksumReport .modal-footer .download-report-csv').addClass('d-none');
+    $('#showChecksumReport .modal-footer .download-report-text').addClass('d-none')
+    $('#showChecksumReport .modal-footer .download-report-csv').addClass('d-none')
     $('#showChecksumReport .modal-footer .download-report-text').attr('href', downloadUrl + '&format=text')
     $('#showChecksumReport .modal-footer .download-report-csv').attr('href', downloadUrl + '&format=csv')
 
@@ -201,8 +201,8 @@ $(function () {
                       <td>${obj.size}</td>
                       <td>${obj.checksum}</td>
                   </tr>`
-          $('#showChecksumReport .modal-footer .download-report-text').removeClass('d-none');
-          $('#showChecksumReport .modal-footer .download-report-csv').removeClass('d-none');
+          $('#showChecksumReport .modal-footer .download-report-text').removeClass('d-none')
+          $('#showChecksumReport .modal-footer .download-report-csv').removeClass('d-none')
         }
       })
       table += '</tbody></table>'
