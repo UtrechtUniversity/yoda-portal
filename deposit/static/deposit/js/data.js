@@ -158,6 +158,8 @@ $(function () {
 
     $('#showChecksumReport .collection').text(folder)
     $('#showChecksumReport .modal-body #checksumReport').html('')
+    $('#showChecksumReport .modal-footer .download-report-text').addClass('d-none')
+    $('#showChecksumReport .modal-footer .download-report-csv').addClass('d-none')
     $('#showChecksumReport .modal-footer .download-report-text').attr('href', downloadUrl + '&format=text')
     $('#showChecksumReport .modal-footer .download-report-csv').attr('href', downloadUrl + '&format=csv')
 
@@ -167,11 +169,15 @@ $(function () {
 
       table += '<thead><tr><th>Filename</th><th>Size</th><th>Checksum</th></tr></thead>'
       $.each(data, function (index, obj) {
-        table += `<tr>
-                     <td>${obj.name}</td>
-                     <td>${obj.size}</td>
-                     <td>${obj.checksum}</td>
+        if (data.length > 0) {
+          table += `<tr>
+                    <td>${obj.name}</td>
+                    <td>${obj.size}</td>
+                    <td>${obj.checksum}</td>
                 </tr>`
+          $('#showChecksumReport .modal-footer .download-report-text').removeClass('d-none')
+          $('#showChecksumReport .modal-footer .download-report-csv').removeClass('d-none')
+        }
       })
       table += '</tbody></table>'
 
