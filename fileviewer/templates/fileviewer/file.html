@@ -3,7 +3,7 @@
 {% block title %}{{ super() }} - File Viewer{% endblock title %}
 
 {% block style %}
-<link id='pagestyle' rel="stylesheet" {% if g.settings and g.settings.color_mode and g.settings.color_mode == 'DARK' %}href="{{url_for('static', filename='lib/highlight-js-11.9.0/styles/dark.min.css')}}"{% else %}href="{{url_for('static', filename='lib/highlight-js-11.9.0/styles/default.min.css')}}"{% endif %}>
+<link id="pagestyle" rel="stylesheet" {% if g.settings and g.settings.color_mode and g.settings.color_mode == 'DARK' %}href="{{url_for('static', filename='lib/highlight-js-11.9.0/styles/dark.min.css')}}"{% else %}href="{{url_for('static', filename='lib/highlight-js-11.9.0/styles/default.min.css')}}"{% endif %}>
 {% endblock style %}
 
 {% block scripts %}
