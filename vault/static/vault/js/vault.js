@@ -10,6 +10,8 @@ $(document).ajaxSend(function (e, request, settings) {
   }
 })
 
+let downloadChecksumReportTextTooltip
+let downloadChecksumReportCSVTooltip
 let preservableFormatsLists = null
 let currentFolder
 let dataPackage = null
@@ -23,6 +25,8 @@ $(function () {
 
   // Canonicalize path somewhat, for convenience.
   currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '')
+
+  createTooltips()
 
   if ($('#file-browser').length) {
     // startBrowsing(browsePageItems);
@@ -49,8 +53,6 @@ $(function () {
 
     $('#showChecksumReport .collection').text(folder)
     $('#showChecksumReport .modal-body #checksumReport').html('')
-    $('#showChecksumReport .modal-footer .download-report-text').addClass('d-none')
-    $('#showChecksumReport .modal-footer .download-report-csv').addClass('d-none')
     $('#showChecksumReport .modal-footer .download-report-text').attr('href', downloadUrl + '&format=text')
     $('#showChecksumReport .modal-footer .download-report-csv').attr('href', downloadUrl + '&format=csv')
 
@@ -59,23 +61,35 @@ $(function () {
       let table = '<table class="table table-striped"><tbody>'
 
       table += '<thead><tr><th>Filename</th><th>Size</th><th>Checksum</th></tr></thead>'
-      $.each(data, function (index, obj) {
-        if (data.length > 0) {
+      if (data.length > 0) {
+        $.each(data, function (index, obj) {
           table += `<tr>
-                    <td>${obj.name}</td>
-                    <td>${obj.size}</td>
-                    <td>${obj.checksum}</td>
-                </tr>`
-          $('#showChecksumReport .modal-footer .download-report-text').removeClass('d-none')
-          $('#showChecksumReport .modal-footer .download-report-csv').removeClass('d-none')
+                      <td>${obj.name}</td>
+                      <td>${obj.size}</td>
+                      <td>${obj.checksum}</td>
+                  </tr>`
+        })
+        if (downloadChecksumReportTextTooltip) {
+          downloadChecksumReportTextTooltip.disable()
         }
-      })
+        if (downloadChecksumReportCSVTooltip) {
+          downloadChecksumReportCSVTooltip.disable()
+        }
+      } else {
+        $('#showChecksumReport .modal-footer .download-report-text').removeAttr('href')
+        $('#showChecksumReport .modal-footer .download-report-csv').removeAttr('href')
+        if (downloadChecksumReportTextTooltip) {
+          downloadChecksumReportTextTooltip.enable()
+        }
+        if (downloadChecksumReportCSVTooltip) {
+          downloadChecksumReportCSVTooltip.enable()
+        }
+      }
       table += '</tbody></table>'
 
       $('#showChecksumReport .modal-body #checksumReport').html(table)
       $('#showChecksumReport').modal('show')
     })
-  })
 
   $('body').on('click', 'a.action-check-for-unpreservable-files', function () {
     // Check for unpreservable file formats.
@@ -305,6 +319,16 @@ $(function () {
     vaultUnarchive($(this).attr('data-folder'))
   })
 })
+
+function createTooltips () {
+  const downloadChecksumReportText = $('.download-report-text').parent()
+  downloadChecksumReportTextTooltip = new bootstrap.Tooltip(downloadChecksumReportText)
+  downloadChecksumReportTextTooltip.disable()
+
+  const downloadChecksumReportCSV = $('.download-report-csv').parent()
+  downloadChecksumReportCSVTooltip = new bootstrap.Tooltip(downloadChecksumReportCSV)
+  downloadChecksumReportCSVTooltip.disable()
+}
 
 function changeBrowserUrl (path) {
   let url = window.location.pathname
