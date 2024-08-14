@@ -19,6 +19,6 @@ $(document).ready(function () {
 
   // Click the Confirm button to dismiss
   $('#confirmAgreementConditions').on('click', '.action-confirm-submit-for-publication', function () {
-    $('#confirmAgreementConditions').modal('hide');
-  });
-});
+    $('#confirmAgreementConditions').modal('hide')
+  })
+})
