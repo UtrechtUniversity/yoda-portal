@@ -16,4 +16,9 @@ $(document).ready(function () {
     const myModal = new bootstrap.Modal(document.getElementById('confirmAgreementConditions'))
     myModal.show()
   })
-})
+
+  // Click the Confirm button to dismiss
+  $('#confirmAgreementConditions').on('click', '.action-confirm-submit-for-publication', function () {
+    $('#confirmAgreementConditions').modal('hide');
+  });
+});
