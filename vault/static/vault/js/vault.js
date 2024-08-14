@@ -91,7 +91,7 @@ $(function () {
       $('#showChecksumReport').modal('show')
     })
   })
-  
+
   $('body').on('click', 'a.action-check-for-unpreservable-files', function () {
     // Check for unpreservable file formats.
     // If present, show extensions to user.
