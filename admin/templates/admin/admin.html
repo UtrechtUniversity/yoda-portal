@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Administration{% endblock title %}
+{% block title %}{{ super() }} - Administration{% endblock title %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='lib/purify-3.1.6/js/purify.min.js') }}"></script>
@@ -20,7 +20,7 @@
                 <div class="mb-4">
                     <h2 class="card-title">Maintenance Banner</h2>
                     <div class="d-flex justify-content-start align-items-end">
-                        <form action="{{ url_for('admin_bp.set_banner') }}" method="POST"
+                        <form action="{{ url_for('admin_bp.set_banner') }}" method="post"
                             class="flex-fill me-2 needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="mb-3">
@@ -45,7 +45,7 @@
                 <!-- Theme Change Section -->
                 <div class="mb-4">
                     <h2 class="card-title">Portal Theme</h2>
-                    <form action="{{ url_for('admin_bp.set_theme') }}" method="POST" class="needs-validation"
+                    <form action="{{ url_for('admin_bp.set_theme') }}" method="post" class="needs-validation"
                         novalidate>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="mb-3">
@@ -66,7 +66,7 @@
                 <div>
                     <h2 class="card-title">Publication Terms</h2>
                     <div class="d-flex justify-content-start align-items-end">
-                        <form action="{{ url_for('admin_bp.set_publication_terms') }}" method="POST"
+                        <form action="{{ url_for('admin_bp.set_publication_terms') }}" method="post"
                             class="flex-fill me-2 needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="mb-3">

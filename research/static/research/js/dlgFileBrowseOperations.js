@@ -1,4 +1,4 @@
-/* global browse */
+/* global browse, DOMPurify */
 'use strict'
 
 let folderSelectBrowser = null
@@ -126,7 +126,7 @@ $(document).ready(function () {
                     <td class="item-progress">-</td>
                 </tr>
                 `
-        $('.multi-select-table tbody').append(row)
+        $('.multi-select-table tbody').append(DOMPurify.sanitize(row))
       })
 
       if (action === 'multiple-delete') {
@@ -707,7 +707,7 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
 /// alert handling
 function dlgSelectAlertShow (errorMessage) {
   $('#dlg-select-alert-panel').removeClass('hide')
-  $('#dlg-select-alert-panel span').html(errorMessage)
+  $('#dlg-select-alert-panel span').html(DOMPurify.sanitize(errorMessage))
 }
 
 function dlgSelectAlertHide () {

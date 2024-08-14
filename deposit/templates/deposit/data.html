@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit &dash; Add data{% endblock title %}
+{% block title %}{{ super() }} - Deposit - Add data{% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.css') }}">
@@ -13,6 +13,7 @@
     var path = {{ path|tojson|safe }};
     var view = 'browse';
 </script>
+<script src="{{ url_for('static', filename='lib/purify-3.1.6/js/purify.min.js') }}"></script>
 <script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
