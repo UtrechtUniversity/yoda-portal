@@ -15,8 +15,12 @@ let currentFolder
 let dataPackage = null
 let hasReadRights = true
 let researchGroupAccess = true
+let downloadChecksumReportTextTooltip
+let downloadChecksumReportCSVTooltip
 
 $(function () {
+  createTooltips()
+
   // Extract current location from query string (default to '').
   currentFolder = decodeURIComponent((/(?:\?|&)dir=([^&]*)/
     .exec(window.location.search) || [0, ''])[1])
@@ -42,7 +46,6 @@ $(function () {
     showMetadataForm($(this).attr('data-path'))
   })
 
-  // Show checksum report
   $('body').on('click', 'a.action-show-checksum-report', function () {
     const folder = $(this).attr('data-folder')
     const downloadUrl = 'browse/download_checksum_report?path=' + encodeURIComponent(folder)
@@ -57,13 +60,30 @@ $(function () {
       let table = '<table class="table table-striped"><tbody>'
 
       table += '<thead><tr><th>Filename</th><th>Size</th><th>Checksum</th></tr></thead>'
-      $.each(data, function (index, obj) {
-        table += `<tr>
-                     <td>${obj.name}</td>
-                     <td>${obj.size}</td>
-                     <td>${obj.checksum}</td>
-                </tr>`
-      })
+      if (data.length > 0) {
+        $.each(data, function (index, obj) {
+          table += `<tr>
+                      <td>${obj.name}</td>
+                      <td>${obj.size}</td>
+                      <td>${obj.checksum}</td>
+                  </tr>`
+        })
+        if (downloadChecksumReportTextTooltip) {
+          downloadChecksumReportTextTooltip.disable()
+        }
+        if (downloadChecksumReportCSVTooltip) {
+          downloadChecksumReportCSVTooltip.disable()
+        }
+      } else {
+        $('#showChecksumReport .modal-footer .download-report-text').removeAttr('href')
+        $('#showChecksumReport .modal-footer .download-report-csv').removeAttr('href')
+        if (downloadChecksumReportTextTooltip) {
+          downloadChecksumReportTextTooltip.enable()
+        }
+        if (downloadChecksumReportCSVTooltip) {
+          downloadChecksumReportCSVTooltip.enable()
+        }
+      }
       table += '</tbody></table>'
 
       $('#showChecksumReport .modal-body #checksumReport').html(table)
@@ -299,6 +319,16 @@ $(function () {
     vaultUnarchive($(this).attr('data-folder'))
   })
 })
+
+function createTooltips () {
+  const downloadChecksumReportText = $('.download-report-text').parent()
+  downloadChecksumReportTextTooltip = new bootstrap.Tooltip(downloadChecksumReportText)
+  downloadChecksumReportTextTooltip.disable()
+
+  const downloadChecksumReportCSV = $('.download-report-csv').parent()
+  downloadChecksumReportCSVTooltip = new bootstrap.Tooltip(downloadChecksumReportCSV)
+  downloadChecksumReportCSVTooltip.disable()
+}
 
 function changeBrowserUrl (path) {
   let url = window.location.pathname
@@ -874,7 +904,7 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
         $('.top-info-buttons').show()
 
         // Trigger tooltips.
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]:not(.download-report-text):not(.download-report-csv)')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl)) // eslint-disable-line no-unused-vars
       }
       if (rebuildFileBrowser) {
