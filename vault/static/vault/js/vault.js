@@ -59,9 +59,9 @@ $(function () {
       table += '<thead><tr><th>Filename</th><th>Size</th><th>Checksum</th></tr></thead>'
       $.each(data, function (index, obj) {
         table += `<tr>
-                    <td>${obj.name}</td>
-                    <td>${obj.size}</td>
-                    <td>${obj.checksum}</td>
+                     <td>${obj.name}</td>
+                     <td>${obj.size}</td>
+                     <td>${obj.checksum}</td>
                 </tr>`
       })
       table += '</tbody></table>'
