@@ -189,8 +189,12 @@
                 <div id="checksumReport"></div>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn btn-outline-secondary download-report-text">Download as text</a>
-                <a href="#" class="btn btn-outline-secondary download-report-csv">Download as CSV</a>
+                <span class="d-inline-block download-report-text" tabindex="0" data-bs-toggle="tooltip" title="No checksum report because folder is empty.">
+                    <a href="#" class="btn btn-outline-secondary download-report-text">Download as text</a>
+                </span>
+                <span class="d-inline-block download-report-csv" tabindex="0" data-bs-toggle="tooltip" title="No checksum report because folder is empty.">
+                    <a href="#" class="btn btn-outline-secondary download-report-csv">Download as CSV</a>
+                </span>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
