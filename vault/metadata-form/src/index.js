@@ -463,6 +463,16 @@ class YodaForm extends React.Component {
     }
 
     onChange(form) {
+        // Turn save mode off.
+        saving = false;
+        const formContext = { saving: false };
+
+        this.setState({
+            formData: form.formData,
+            formContext: formContext
+        });
+
+        // Update form completeness bar
         updateCompleteness();
     }
 
