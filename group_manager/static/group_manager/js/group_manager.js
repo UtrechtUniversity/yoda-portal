@@ -2,6 +2,48 @@
 'use strict'
 
 let enteredUsername = ''
+let didScroll
+let lastScrollTop = 0
+
+setInterval(function () {
+  if (didScroll) {
+    collapseUncollapseOnScroll()
+    didScroll = false
+  }
+}, 400)
+
+function collapseUncollapseOnScroll () {
+  // Collapse or uncollapse group properties on scroll, if the right pane is too long
+  const buffer = 20
+  const delta = 10
+  const collapseDelta = 400
+  const topOfScreenPoint = 60
+  const collapsePoint = 300
+  const st = Math.floor(window.scrollY)
+  let collapseEl = bootstrap.Collapse.getInstance('#group-properties')
+  if (!collapseEl) {
+    collapseEl = new bootstrap.Collapse('#group-properties', {
+      toggle: false
+    })
+  }
+
+  if (Math.abs(lastScrollTop - st) <= delta) {
+    return
+  }
+
+  if (st <= lastScrollTop && st <= topOfScreenPoint) {
+    // Near the top of the screen
+    bootstrap.Collapse.getInstance('#group-properties').show()
+  } else if (st > lastScrollTop &&
+    st > collapsePoint &&
+    Math.abs(lastScrollTop - st) <= collapseDelta &&
+    $('#group-overview').outerHeight() + buffer > $(window).height()) {
+    // Have scrolled down at least a little
+    bootstrap.Collapse.getInstance('#group-properties').hide()
+  }
+
+  lastScrollTop = st
+}
 
 function flatListGroups () {
   // Create flat list of groups including filter handling on username and groupname.
@@ -2175,6 +2217,11 @@ $(function () {
           .removeClass('fa-caret-right')
           .addClass('fa-caret-down')
         Yoda.storage.session.set('is-collapsed', 'false')
+      })
+
+      // For the auto-collapsing of group properties
+      $(window).scroll(function (event) {
+        didScroll = true
       })
       // }}}
 
