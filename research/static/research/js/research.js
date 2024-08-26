@@ -428,7 +428,19 @@ $(function () {
     browse(path)
   })
   r.on('fileSuccess', function (file, message) {
-    $('#' + file.uniqueIdentifier + ' .msg').html("<span class='text-success'>Upload complete</span>")
+    try {
+      decodeURIComponent(escape(file.name));
+    } catch (e) {
+      $('#' + file.uniqueIdentifier).prepend(`
+          <div class="container">
+            <div class="alert alert-primary">
+              Uploaded file will be renamed because not all non UTF-8 characters are supported.
+            </div>
+          </div>
+      `);
+    }
+    
+    $('#' + file.uniqueIdentifier + ' .msg').html("<span class='text-success'>Upload complete</span>");
     const $self = $('#' + file.uniqueIdentifier)
     $self.find('.upload-btns').hide()
     const path = $('.upload').attr('data-path')
