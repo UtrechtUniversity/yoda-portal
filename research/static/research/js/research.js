@@ -430,7 +430,7 @@ $(function () {
   })
   r.on('fileSuccess', function (file, message) {
     try {
-      decodeURIComponent(escape(file.name));
+      decodeURIComponent(escape(file.name))
     } catch (e) {
       if ($('#nonUTF-8FilenameWarning').hasClass('hidden')) {
         $('#nonUTF-8FilenameWarning').removeClass('hidden')
