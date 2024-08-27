@@ -415,7 +415,7 @@ $(function () {
               $('#nonUTF-8FilenameWarning').removeClass('hidden')
             }
           }
-          
+
           // No Overwrite btn
           $self.find('.upload-no-overwrite').on('click', function () {
             file.cancel()
@@ -437,7 +437,6 @@ $(function () {
     browse(path)
   })
   r.on('fileSuccess', function (file, message) {
-
     $('#' + file.uniqueIdentifier + ' .msg').html("<span class='text-success'>Upload complete</span>")
     const $self = $('#' + file.uniqueIdentifier)
     $self.find('.upload-btns').hide()
