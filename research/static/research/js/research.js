@@ -322,6 +322,7 @@ $(function () {
     r.cancel()
     $('#files').html('')
     $('#uploads').addClass('hidden')
+    $('#nonUTF-8FilenameWarning').addClass('hidden')
     // clear information present for next time dialog is presented
     $('.uploads-progress-information').html('')
     $('.uploads-total-progress-bar').css('width', '0%')
@@ -431,15 +432,11 @@ $(function () {
     try {
       decodeURIComponent(escape(file.name));
     } catch (e) {
-      $('#' + file.uniqueIdentifier).prepend(`
-          <div class="container">
-            <div class="alert alert-primary">
-              Uploaded file will be renamed because not all non UTF-8 characters are supported.
-            </div>
-          </div>
-      `);
+      if ($('#nonUTF-8FilenameWarning').hasClass('hidden')) {
+        $('#nonUTF-8FilenameWarning').removeClass('hidden')
+      }
     }
-    
+
     $('#' + file.uniqueIdentifier + ' .msg').html("<span class='text-success'>Upload complete</span>");
     const $self = $('#' + file.uniqueIdentifier)
     $self.find('.upload-btns').hide()

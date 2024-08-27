@@ -321,6 +321,9 @@
                 <button type="button" class="btn-close btn-close-uploads-overview" data-bs-dismiss="modal" aria-label="Close" title="Close"></button>
             </div>
             <div class="modal-body">
+                <div id="nonUTF-8FilenameWarning" class="hidden alert alert-primary">
+                    Uploaded file(s) containing non UTF-8 characters will be renamed because not all non UTF-8 characters are supported.
+                </div>
                 <div id="files"></div>
             </div>
             <div class="modal-footer">
