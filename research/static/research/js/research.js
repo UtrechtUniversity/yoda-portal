@@ -437,7 +437,7 @@ $(function () {
       }
     }
 
-    $('#' + file.uniqueIdentifier + ' .msg').html("<span class='text-success'>Upload complete</span>");
+    $('#' + file.uniqueIdentifier + ' .msg').html("<span class='text-success'>Upload complete</span>")
     const $self = $('#' + file.uniqueIdentifier)
     $self.find('.upload-btns').hide()
     const path = $('.upload').attr('data-path')
