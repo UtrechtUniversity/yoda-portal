@@ -408,6 +408,14 @@ $(function () {
             $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
           })
 
+          try {
+            decodeURIComponent(escape(file.name))
+          } catch (e) {
+            if ($('#nonUTF-8FilenameWarning').hasClass('hidden')) {
+              $('#nonUTF-8FilenameWarning').removeClass('hidden')
+            }
+          }
+          
           // No Overwrite btn
           $self.find('.upload-no-overwrite').on('click', function () {
             file.cancel()
@@ -429,13 +437,6 @@ $(function () {
     browse(path)
   })
   r.on('fileSuccess', function (file, message) {
-    try {
-      decodeURIComponent(escape(file.name))
-    } catch (e) {
-      if ($('#nonUTF-8FilenameWarning').hasClass('hidden')) {
-        $('#nonUTF-8FilenameWarning').removeClass('hidden')
-      }
-    }
 
     $('#' + file.uniqueIdentifier + ' .msg').html("<span class='text-success'>Upload complete</span>")
     const $self = $('#' + file.uniqueIdentifier)
