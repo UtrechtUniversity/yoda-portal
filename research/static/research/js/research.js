@@ -348,6 +348,14 @@ $(function () {
         const folderName = file.relativePath.substring(0, file.relativePath.indexOf('/'))
         let overwrite = false
 
+        try {
+          decodeURIComponent(escape(file.name))
+        } catch (e) {
+          if ($('#nonUTF-8FilenameWarning').hasClass('hidden')) {
+            $('#nonUTF-8FilenameWarning').removeClass('hidden')
+          }
+        }
+        
         const $self = $('#' + file.uniqueIdentifier)
         // Pause btn
         $self.find('.upload-pause').on('click', function () {
@@ -385,6 +393,7 @@ $(function () {
             overwrite = true
           }
         }
+
         // Check for apostrophe in folder name
         if (folders.indexOf('\'') > -1) {
           // It seems like you must first pause, then cancel
@@ -407,14 +416,6 @@ $(function () {
             $self.find('.upload-cancel').show()
             $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
           })
-
-          try {
-            decodeURIComponent(escape(file.name))
-          } catch (e) {
-            if ($('#nonUTF-8FilenameWarning').hasClass('hidden')) {
-              $('#nonUTF-8FilenameWarning').removeClass('hidden')
-            }
-          }
 
           // No Overwrite btn
           $self.find('.upload-no-overwrite').on('click', function () {
