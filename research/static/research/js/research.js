@@ -393,7 +393,6 @@ $(function () {
             overwrite = true
           }
         }
-
         // Check for apostrophe in folder name
         if (folders.indexOf('\'') > -1) {
           // It seems like you must first pause, then cancel
