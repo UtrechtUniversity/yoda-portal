@@ -355,7 +355,7 @@ $(function () {
             $('#nonUTF-8FilenameWarning').removeClass('hidden')
           }
         }
-        
+
         const $self = $('#' + file.uniqueIdentifier)
         // Pause btn
         $self.find('.upload-pause').on('click', function () {
