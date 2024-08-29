@@ -349,11 +349,7 @@ $(function () {
         let overwrite = false
 
         const diamondQuestionMarkPattern = /\uFFFD/
-        console.log(diamondQuestionMarkPattern)
-        console.log(file.uniqueIdentifier)
-        console.log(file.name)
         if (diamondQuestionMarkPattern.test(file.name)) {
-          console.log('aAAAAAA')
           $('#unsupportedCharsWarning').removeClass('hidden')
         }
 
