@@ -322,6 +322,7 @@ $(function () {
     r.cancel()
     $('#files').html('')
     $('#uploads').addClass('hidden')
+    $('#unsupportedCharsWarning').addClass('hidden')
     // clear information present for next time dialog is presented
     $('.uploads-progress-information').html('')
     $('.uploads-total-progress-bar').css('width', '0%')
@@ -346,6 +347,11 @@ $(function () {
         logUpload(file.uniqueIdentifier, fileName)
         const folderName = file.relativePath.substring(0, file.relativePath.indexOf('/'))
         let overwrite = false
+
+        const diamondQuestionMarkPattern = /\uFFFD/
+        if (diamondQuestionMarkPattern.test(file.name)) {
+          $('#unsupportedCharsWarning').removeClass('hidden')
+        }
 
         const $self = $('#' + file.uniqueIdentifier)
         // Pause btn
