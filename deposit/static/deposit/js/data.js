@@ -20,6 +20,10 @@ let downloadChecksumReportTextTooltip
 let downloadChecksumReportCSVTooltip
 
 $(function () {
+  // Extract current location from query string (default to '').
+  currentFolder = decodeURIComponent((/(?:\?|&)dir=([^&]*)/
+    .exec(window.location.search) || [0, ''])[1])
+
   // Canonicalize path somewhat, for convenience.
   currentFolder = path.replace(/\/+/g, '/').replace(/\/$/, '')
 
@@ -201,7 +205,6 @@ $(function () {
 
   $('.upload-folder').on('click', function () {
     uploadFolder = true
-    console.log(uploadFolder)
   })
 
   $('.upload-file').on('click', function () {
@@ -802,7 +805,7 @@ const getFolderContents = (() => {
           limit: batchSize,
           sort_order: args.order[0].dir,
           sort_on: ['name', 'size', 'modified'][args.order[0].column - 1],
-          space: 'Space.RESEARCH'
+          space: 'Space.DEPOSIT'
         })
 
       // If another requests has come while we were waiting, simply drop this one.
@@ -946,7 +949,7 @@ function startBrowsing () {
   $('#file-browser').on('length.dt', function (e, settings, len) {
     Yoda.storage.session.set('pageLength', len)
   })
-  browse(currentFolder)
+  browse(currentFolder, true)
 }
 
 window.addEventListener('popstate', function (e) {

@@ -560,7 +560,7 @@ const getFolderContents2 = (() => {
           limit: batchSize,
           sort_order: args.order[0].dir,
           sort_on: ['name', 'modified'][args.order[0].column],
-          space: 'Space.RESEARCH'
+          space: 'Space.DEPOSIT'
         })
 
       // If another requests has come while we were waiting, simply drop this one.
