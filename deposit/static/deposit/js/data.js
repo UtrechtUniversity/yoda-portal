@@ -20,10 +20,9 @@ let downloadChecksumReportTextTooltip
 let downloadChecksumReportCSVTooltip
 
 $(function () {
-
   // Extract current location from query string (default to '').
   currentFolder = decodeURIComponent((/(?:\?|&)dir=([^&]*)/
-  .exec(window.location.search) || [0, ''])[1])
+    .exec(window.location.search) || [0, ''])[1])
 
   // Canonicalize path somewhat, for convenience.
   currentFolder = path.replace(/\/+/g, '/').replace(/\/$/, '')
