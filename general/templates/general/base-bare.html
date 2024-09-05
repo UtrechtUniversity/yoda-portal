@@ -45,7 +45,7 @@
 
     <body class="d-flex flex-column min-vh-100">
         {% if config.get('YODA_ENVIRONMENT') != "production" %}{% include 'environment.html' %}{% endif %}
-
+        {% if config.get('banner').get('enabled') %}{% include 'banner.html' %}{% endif %}
         {% block container %}
         <div class="page p-3">
             <div class="container">

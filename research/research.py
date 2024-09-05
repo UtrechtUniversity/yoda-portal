@@ -1,20 +1,33 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import io
 import os
 import queue
 import threading
-from typing import Iterator
+import urllib.parse
+from contextlib import suppress
+from typing import Iterator, Optional
 
 from flask import (
-    abort, Blueprint, current_app as app, g, jsonify, make_response,
-    render_template, request, Response, session, stream_with_context
+    abort,
+    Blueprint,
+    g,
+    jsonify,
+    make_response,
+    render_template,
+    request,
+    Response,
+    session,
+    stream_with_context,
 )
+from flask import current_app as app
 from irods.data_object import iRODSDataObject
-from irods.exception import CAT_NO_ACCESS_PERMISSION
+from irods.exception import CAT_NO_ACCESS_PERMISSION, CAT_NO_ROWS_FOUND
+from irods.manager.data_object_manager import DataObjectManager
 from irods.message import iRODSMessage
 
 import api
@@ -28,24 +41,30 @@ research_bp = Blueprint('research_bp', __name__,
 
 
 class Chunk:
-    def __init__(self, data_objects, path, number, size, data, resource):
-        self.data_objects = data_objects
-        self.path = path
-        self.number = number
-        self.size = size
-        self.data = data
-        self.resource = resource
+    def __init__(self,
+                 data_objects: Optional[DataObjectManager],
+                 path: Optional[str],
+                 number: int,
+                 size: int,
+                 data: Optional[str],
+                 resource: Optional[str]) -> None:
+        self.data_objects: Optional[DataObjectManager] = data_objects
+        self.path: Optional[str] = path
+        self.number: int = number
+        self.size: int = size
+        self.data: Optional[str] = data
+        self.resource: Optional[str] = resource
 
 
-q = queue.Queue(4)
-r = queue.Queue(1)
+q: queue.Queue[Chunk] = queue.Queue(4)
+r: queue.Queue[bool] = queue.Queue(1)
 
 
 def irods_writer() -> None:
     failure = False
     while True:
         chunk = q.get()
-        if chunk.path:
+        if chunk.path and chunk.data_objects is not None:
             if not failure:
                 try:
                     with chunk.data_objects.open(chunk.path, 'a', chunk.resource) as obj_desc:
@@ -53,16 +72,14 @@ def irods_writer() -> None:
                         obj_desc.write(chunk.data)
                 except Exception:
                     failure = True
-                    log_error("Chunk upload failed for {}".format(chunk.path))
+                    log_error(f"Chunk upload failed for {chunk.path}")
                 finally:
-                    try:
+                    with suppress(Exception):
                         obj_desc.close()
-                    except Exception:
-                        pass
-        else:
-            # report back about failures
-            r.put(failure)
-            failure = False
+            else:
+                # Report back about failures.
+                r.put(failure)
+                failure = False
         q.task_done()
 
 
@@ -86,6 +103,7 @@ def index() -> Response:
 def download() -> Response:
     path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
     filename = path.rsplit('/', 1)[1]
+    quoted_filename = urllib.parse.quote(filename)
 
     def read_file_chunks(data_object: iRODSDataObject) -> Iterator[bytes]:
         READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
@@ -111,9 +129,9 @@ def download() -> Response:
         return Response(
             stream_with_context(read_file_chunks(data_object)),
             headers={
-                'Content-Disposition': f'attachment; filename={filename}',
+                'Content-Disposition': "attachment; filename*=UTF-8''" + quoted_filename,
                 'Content-Length': f'{size}',
-                'Content-Type': 'application/octet'
+                'Content-Type': 'application/octet-stream'
             }
         )
     else:
@@ -159,9 +177,10 @@ def upload_get() -> Response:
     object_path = build_object_path(filepath, flow_relative_path, flow_filename)
 
     # Partial file name for chunked uploads.
-    if flow_total_chunks > 1:
+    if flow_total_chunks > 1 and app.config.get('UPLOAD_PART_FILES'):
         object_path = f"{object_path}.part"
-    else:
+
+    if flow_total_chunks == 1:
         # Ensuring single chunk files get to the overwrite stage as well
         response = make_response(jsonify({"message": "Chunk not found"}), 204)
         response.headers["Content-Type"] = "application/json"
@@ -207,12 +226,26 @@ def upload_post() -> Response:
     object_path = build_object_path(filepath, flow_relative_path, flow_filename)
 
     # Partial file name for chunked uploads.
-    if flow_total_chunks > 1:
+    if flow_total_chunks > 1 and app.config.get('UPLOAD_PART_FILES'):
         object_path = f"{object_path}.part"
 
     # Get the chunk data.
     chunk_data = request.files['file']
     encode_unicode_content = iRODSMessage.encode_unicode(chunk_data.stream.read())
+
+    # Truncate the existing data object, if present. This ensures that overwriting an
+    # existing data object with a smaller file works as expected.
+    if flow_chunk_number == 1:
+        try:
+            g.irods.data_objects.truncate(object_path, 0)
+        except CAT_NO_ROWS_FOUND:
+            # No file was present, which is okay.
+            pass
+        except Exception as e:
+            log_error(f"Error occurred when truncating existing object on upload at {object_path} ({str(type(e))}:{str(e)})")
+            response = make_response(jsonify({"message": "Upload failed when truncating existing data object."}), 500)
+            response.headers["Content-Type"] = "application/json"
+            return response
 
     # Write chunk data.
     q.put(Chunk(
@@ -225,24 +258,41 @@ def upload_post() -> Response:
     ))
 
     # check at the end, and after every Gb
-    if flow_total_chunks == flow_chunk_number or flow_chunk_number % 40 == 0:
+    if flow_total_chunks == flow_chunk_number:
+        need_to_check_flow = True
+    else:
+        flow_check_byte_interval = 2**30  # Check upload flow (at least) every 1 GB
+        flow_check_chunk_interval = int(flow_check_byte_interval / min(flow_chunk_size, flow_check_byte_interval))
+        need_to_check_flow = flow_chunk_number % flow_check_chunk_interval == 0
+
+    if need_to_check_flow:
         q.put(Chunk(None, None, 0, 0, None, None))
         q.join()
-        if r.get():
-            # failure in upload writer thread
-            response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
-            response.headers["Content-Type"] = "application/json"
-            return response
+
+    if not r.empty():
+        # Failure in upload writer thread.
+        r.get()
+        response = make_response(jsonify({"message": "Chunk upload failed"}), 500)
+        response.headers["Content-Type"] = "application/json"
+        return response
 
     # Rename partial file name when complete for chunked uploads.
-    if flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
+    if app.config.get('UPLOAD_PART_FILES') and flow_total_chunks > 1 and flow_total_chunks == flow_chunk_number:
         final_object_path = build_object_path(filepath, flow_relative_path, flow_filename)
         try:
             # overwriting doesn't work using the move command, therefore unlink the previous file first
             g.irods.data_objects.unlink(final_object_path, force=True)
-        except Exception:
-            # Probably there was no file present which is no erroneous situation
+        except CAT_NO_ROWS_FOUND:
+            # No file was present, which is okay.
             pass
+        except Exception as e:
+            log_error(
+                f"Error occurred on upload when unlinking existing object at {final_object_path} ({str(type(e))}:{str(e)})"
+            )
+            response = make_response(jsonify({"message": "Upload failed when removing existing data object."}), 500)
+            response.headers["Content-Type"] = "application/json"
+            return response
+
         g.irods.data_objects.move(object_path, final_object_path)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)

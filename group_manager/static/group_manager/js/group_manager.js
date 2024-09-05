@@ -1,5 +1,49 @@
-/* global FileReader, jQuery, Option */
+/* global bootstrap, DOMPurify, FileReader, jQuery, Option */
 'use strict'
+
+let enteredUsername = ''
+let didScroll
+let lastScrollTop = 0
+
+setInterval(function () {
+  if (didScroll) {
+    collapseUncollapseOnScroll()
+    didScroll = false
+  }
+}, 400)
+
+function collapseUncollapseOnScroll () {
+  // Collapse or uncollapse group properties on scroll, if the right pane is too long
+  const buffer = 20
+  const delta = 10
+  const collapseDelta = 400
+  const topOfScreenPoint = 60
+  const collapsePoint = 300
+  const st = Math.floor(window.scrollY)
+  let collapseEl = bootstrap.Collapse.getInstance('#group-properties')
+  if (!collapseEl) {
+    collapseEl = new bootstrap.Collapse('#group-properties', {
+      toggle: false
+    })
+  }
+
+  if (Math.abs(lastScrollTop - st) <= delta) {
+    return
+  }
+
+  if (st <= lastScrollTop && st <= topOfScreenPoint) {
+    // Near the top of the screen
+    bootstrap.Collapse.getInstance('#group-properties').show()
+  } else if (st > lastScrollTop &&
+    st > collapsePoint &&
+    Math.abs(lastScrollTop - st) <= collapseDelta &&
+    $('#group-overview').outerHeight() + buffer > $(window).height()) {
+    // Have scrolled down at least a little
+    bootstrap.Collapse.getInstance('#group-properties').hide()
+  }
+
+  lastScrollTop = st
+}
 
 function flatListGroups () {
   // Create flat list of groups including filter handling on username and groupname.
@@ -161,7 +205,7 @@ function readCsvFile (e) {
       contents = contents.slice(0, contents.length - 1)
     }
 
-    // ensure correct seperator ','
+    // ensure correct separator ','
     contents = contents.replaceAll(';', ',')
 
     // required to be able to, in a simple manner, add header and data row
@@ -186,7 +230,7 @@ function readCsvFile (e) {
     // per csvHeader item check whether its valid
     let errorRows = ''
     csvHeader.split(',').forEach(function myFunction (item) {
-      if (! (allCsvColumns.includes(item) || /^(manager|member|viewer):/.test(item)) ){
+      if (!(allCsvColumns.includes(item) || /^(manager|member|viewer):/.test(item))) {
         errorRows += '<li>' + item + '</li>'
       }
     })
@@ -283,17 +327,17 @@ function readCsvFile (e) {
 }
 
 function csvToArray (str, delimiter = ',') {
-  var headers = str.slice(0, str.indexOf('\n')).split(delimiter)
+  const headers = str.slice(0, str.indexOf('\n')).split(delimiter)
   const rows = str.slice(str.indexOf('\n') + 1).split('\n')
 
   // If we have headers with legacy suffixes, normalize them by removing each suffix
   // e.g. "manager:manager1" becomes "manager".
-  headers.forEach(function(element, number, headers) {
-        const header_value = headers[number]
-        if ( /^(manager|member|viewer):/.test(header_value) ) {
-               headers[number] = header_value.substring(0, header_value.indexOf(':'))
-        }
-  });
+  headers.forEach(function (element, number, headers) {
+    const headerValue = headers[number]
+    if (/^(manager|member|viewer):/.test(headerValue)) {
+      headers[number] = headerValue.substring(0, headerValue.indexOf(':'))
+    }
+  })
 
   const arr = rows.map(function (row) {
     const values = row.split(delimiter)
@@ -401,7 +445,7 @@ async function processImportedRow (row) {
       let grpIdx = 1
       for (const category in groupdata.group_hierarchy) {
         html += `<div class="list-group-item category" id="category-${catIdx}" data-name="${category}">
-                                        <a class="name collapsed" data-bs-toggle="collapse" data-parent="#category-${catIdx}" href="#category-${catIdx}-ul">
+                                        <a class="name" data-bs-toggle="collapse" href="#category-${catIdx}-ul" aria-controls="category-${catIdx}-ul" aria-expanded="false" role="button">
                                             <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${category}
                                         </a>
                                         <div class="list-group collapse category-ul" id="category-${catIdx}-ul">`
@@ -410,10 +454,10 @@ async function processImportedRow (row) {
           html +=
 
                                 `<div class="list-group-item subcategory" data-name="${subcat}">
-                                    <a class="name collapsed" data-bs-toggle="collapse" data-parent="#subcategory-${subcatIdx}" href="#subcategory-${subcatIdx}-ul">
+                                    <a class="name" data-bs-toggle="collapse" href="#subcategory-${catIdx}-${subcatIdx}-ul" aria-controls="subcategory-${catIdx}-${subcatIdx}-ul" aria-expanded="false" role="button">
                                         <i class="fa-solid fa-caret-right triangle" aria-hidden="true"></i> ${subcat}
                                     </a>
-                                    <div class="list-group collapse subcategory-ul" id="subcategory-${subcatIdx}-ul">`
+                                    <div class="list-group collapse subcategory-ul" id="subcategory-${catIdx}-${subcatIdx}-ul">`
 
           grpIdx = 1
           for (const group in groupdata.group_hierarchy[category][subcat]) {
@@ -698,7 +742,8 @@ $(function () {
     accessIcons: {
       reader: 'fa-eye',
       normal: 'fa-user',
-      manager: 'fa-crown'
+      manager: 'fa-crown',
+      invited: 'fa-user-clock'
     },
 
     /// Human-readable descriptions of access levels.
@@ -915,19 +960,18 @@ $(function () {
 
       const $group = $groupList.find('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]')
 
-      $group.parents('.category').children('a.name').removeClass('collapsed')
-      $group.parents('.category').children('.category-ul').removeClass('hidden')
-      $group.parents('.category').children('.category-ul').collapse('show')
+      const $catBody = $group.parents('.category').children('.category-ul')
+      new bootstrap.Collapse($catBody, { toggle: false }).show()
+      const numSubcats = $group.parents('.category').find('.subcategory').length
 
-      if ($group.parents('.category').find('.subcategory').length > 1) {
+      if (numSubcats > 1) {
         // Unfold subcategory.
         // Skip this if there is only one subcategory. In that case the
         // subcat will be automagically expanded by a
         // 'shown.bs.collapse' event handler.
         // (unfolding twice looks jittery)
-        $group.parents('.subcategory').children('a.name').removeClass('collapsed')
-        $group.parents('.subcategory').children('.subcategory-ul').removeClass('hidden')
-        $group.parents('.subcategory').children('.subcategory-ul').collapse('show')
+        const $subcatBody = $group.parents('.subcategory').children('.subcategory-ul')
+        new bootstrap.Collapse($subcatBody, { toggle: false }).show()
       }
     },
 
@@ -971,7 +1015,8 @@ $(function () {
       $('.properties-update').removeClass('hidden')
       $('.users').removeClass('hidden')
 
-      $('#group-properties-group-name').html('<strong>[' + groupName + ']</strong>')
+      const sanitizedGroupName = DOMPurify.sanitize('<strong>[' + groupName + ']</strong>')
+      $('#group-properties-group-name').html(sanitizedGroupName)
 
       $oldGroup.removeClass('active')
       $group.addClass('active')
@@ -1099,16 +1144,24 @@ $(function () {
           // Loop through the sorted user list and generate the #userList element.
           const user = users[userName]
 
-          const $user = $('<a class="list-group-item list-group-item-action user">')
-          $user.attr('id', 'user-' + i)
-          $user.addClass('user-access-' + user.access)
-          $user.attr('data-name', userName)
+          const $user = $('<span>')
+
+          // Check if user is current user.
+          let me = false
           if (userName === that.userNameFull) {
-            $user.addClass('self')
+            me = true
             if (!that.isRodsAdmin) {
-              $user.addClass('disabled')
-                .attr('title', 'You cannot change your own role or remove yourself from this group.')
+              $user.attr('data-bs-toggle', 'tooltip')
+              $user.attr('data-bs-title', 'You cannot change your own role or remove yourself from this group')
             }
+          }
+
+          // Open SRAM invitation.
+          let invited = false
+          if (typeof user.sram !== 'undefined') {
+            invited = true
+            $user.attr('data-bs-toggle', 'tooltip')
+            $user.attr('data-bs-title', 'This user has not accepted the SRAM invitation')
           }
 
           let displayName = userName
@@ -1117,14 +1170,15 @@ $(function () {
           // from the client's zone.
           if (nameAndZone[1] === that.zone) { displayName = nameAndZone[0] }
 
-          // that.canManageGroup(groupName))
-          $user.html('<input class="form-check-input" type="checkbox" value=""> <i class="fa-solid ' +
-                               that.accessIcons[user.access] +
-                               '" aria-hidden="true" title="' +
-                               that.accessNames[user.access] +
-                               '"></i> ' +
-                               Yoda.htmlEncode(displayName))
-
+          $user.html('<a id="user-' + i + '" class="list-group-item list-group-item-action user user-access-' +
+                     user.access + ((invited || me) ? ' disabled' : '') + (me ? ' self' : '') + '" data-name="' + userName + '">' +
+                     '<input class="form-check-input" type="checkbox" value=""> <i class="fa-solid ' +
+                     (invited ? that.accessIcons.invited : that.accessIcons[user.access]) +
+                     '" aria-hidden="true" title="' +
+                     that.accessNames[user.access] +
+                     '"></i> ' +
+                     Yoda.htmlEncode(displayName) +
+                     '</a>')
           $userList.append($user)
         })
 
@@ -1147,6 +1201,10 @@ $(function () {
 
         $userPanel.find('.create-button').removeClass('disabled')
         $userPanel.find('.update-button, .delete-button').addClass('disabled')
+
+        // Trigger tooltips.
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl)) // eslint-disable-line no-unused-vars
       })()
 
       // }}}
@@ -1245,7 +1303,7 @@ $(function () {
         $el.select2({
           placeholder,
           ajax: {
-            quietMillis: 200,
+            delay: 200,
             url: '/group_manager/get_categories',
             type: 'post',
             dataType: 'json',
@@ -1331,7 +1389,8 @@ $(function () {
           // $(this).val(null).trigger('change')
         }).on('change', function () {
           // Reset the subcategory value
-          $($(this).attr('data-subcategory')).val(null).trigger('change')
+          const sanitizedSubCategory = DOMPurify.sanitize($(this).attr('data-subcategory'))
+          $(sanitizedSubCategory).val(null).trigger('change')
 
           // bring over the category value to the schema-id if exists.
           if (that.schemaIDs.includes($(this).select2('data')[0].id)) {
@@ -1361,17 +1420,19 @@ $(function () {
       $(sel).filter('.selectify-subcategory').each(function () {
         const $el = $(this)
 
+        const sanitizedCategory = DOMPurify.sanitize($el.attr('data-category'))
+
         $el.select2({
           placeholder: 'Select a subcategory or enter a new name',
           ajax: {
-            quietMillis: 200,
+            delay: 200,
             url: '/group_manager/get_subcategories',
             type: 'post',
             dataType: 'json',
             data: function (params) {
               const request = {
                 query: '',
-                category: $($el.attr('data-category')).val()
+                category: $(sanitizedCategory).val()
               }
               if (params.term) {
                 request.query = params.term
@@ -1439,7 +1500,7 @@ $(function () {
         $el.select2({
           ajax: {
             placeholder: 'Select a schema',
-            quietMillis: 200,
+            delay: 200,
             url: '/group_manager/get_schemas',
             type: 'post',
             dataType: 'json',
@@ -1504,10 +1565,10 @@ $(function () {
         $el.select2({
           allowClear: true,
           placeholder: 'Click here to add a user...',
-          openOnEnter: false,
           minimumInputLength: 3,
+          tags: true,
           ajax: {
-            quietMillis: 400,
+            delay: 400,
             url: '/group_manager/get_users',
             type: 'post',
             dataType: 'json',
@@ -1529,7 +1590,8 @@ $(function () {
 
               users.forEach(function (userName) {
                 // Exclude users already in the group.
-                if (!(userName in that.groups[$($el.attr('data-group')).val()].members)) {
+                const sanitizedGroup = DOMPurify.sanitize($el.attr('data-group'))
+                if (!(userName in that.groups[$(sanitizedGroup).val()].members)) {
                   const nameAndZone = userName.split('#')
                   results.push({
                     id: userName,
@@ -1547,6 +1609,11 @@ $(function () {
                 })
               }
 
+              if (results.length === 1) {
+                enteredUsername = results[0].id
+                $('#select2-f-user-create-name-container').text(enteredUsername)
+              }
+
               return { results }
             }
           },
@@ -1559,8 +1626,6 @@ $(function () {
                             ) +
                             '</span>')
           }
-        }).on('select2:open', function () {
-          $(this).val(null)
         })
       })
 
@@ -1747,7 +1812,7 @@ $(function () {
         }
       }
 
-      // Check if group decription is valid.
+      // Check if group description is valid.
       if (!newProperties.description.match(/^[a-zA-Z0-9,.()_ -]*$/)) {
         window.alert('The group description may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')
         resetSubmitButton()
@@ -1911,10 +1976,19 @@ $(function () {
       if ($(el).find('input[type="submit"]').hasClass('disabled')) { return }
 
       const groupName = $(el).find('#f-user-create-group').val()
-      const userName = $(el).find('#f-user-create-name').val().trim()
+      let userName = $(el).find('#f-user-create-name').find(':selected').val().trim()
+      if (enteredUsername.length > 0 && (enteredUsername.startsWith(userName) || userName.startsWith(enteredUsername))) {
+        userName = enteredUsername
+      }
 
       if (!userName.match(/^([a-z.]+|[a-z0-9_.-]+@[a-z0-9_.-]+)(#[a-zA-Z0-9_-]+)?$/)) {
         window.alert('Please enter either an e-mail address or a name consisting only of lowercase chars and dots.')
+        return
+      }
+
+      const onlyUserName = userName.indexOf('#') > -1 ? userName.split('#')[0] : userName
+      if (onlyUserName.length > 63) {
+        window.alert('Please enter a shorter username.')
         return
       }
 
@@ -1938,7 +2012,7 @@ $(function () {
             access: 'normal'
           }
 
-          $(el).find('#f-user-create-name').val('')
+          $(el).find('#f-user-create-name').val(null).trigger('change')
 
           that.deselectGroup()
           that.selectGroup(groupName)
@@ -2144,6 +2218,11 @@ $(function () {
           .addClass('fa-caret-down')
         Yoda.storage.session.set('is-collapsed', 'false')
       })
+
+      // For the auto-collapsing of group properties
+      $(window).scroll(function (event) {
+        didScroll = true
+      })
       // }}}
 
       // Group list {{{
@@ -2156,13 +2235,12 @@ $(function () {
 
       $groupList.on('shown.bs.collapse', function (e) {
         // Once a category is fully opened, open its subcategory (if there is only one).
-        const subs = $(e.target).children('.subcategory')
-        subs.children('.subcategory-ul').collapse('hide')
-        if (subs.length === 1) {
+        const $subs = $(e.target).children('.subcategory')
+
+        if ($subs.length === 1) {
           // Only one subcategory, expand it automatically.
-          subs.first().children('a.name').removeClass('collapsed')
-          subs.first().children('.subcategory-ul').removeClass('hidden')
-          subs.first().children('.subcategory-ul').collapse('show')
+          const $subcatBody = $subs.first().children('.subcategory-ul')
+          new bootstrap.Collapse($subcatBody, { toggle: false }).show()
         }
       })
 
@@ -2183,12 +2261,10 @@ $(function () {
       })
 
       // Group creation {{{
-
       $('#f-group-create-prefix-div a').on('click', function (e) {
         // Select new group prefix.
-        const newPrefix = $(this).attr('data-value')
+        const newPrefix = DOMPurify.sanitize($(this).attr('data-value'))
         const oldPrefix = $('#f-group-create-name').attr('data-prefix')
-
         $('#f-group-create-prefix-div button .text').html(newPrefix + '&nbsp;')
         $('#f-group-create-name').attr('data-prefix', newPrefix)
 
@@ -2270,7 +2346,7 @@ $(function () {
 
       $('#f-user-create-name').on('select2:close', function () {
         // Remove the new user name input on unfocus if nothing was entered.
-        if ($(this).select2('data')[0].id.length === 0) {
+        if ($(this).find(':selected').val().length === 0) {
           $(this).parents('.list-group-item').find('.user-create-text').removeAttr('hidden')
         }
       })
@@ -2278,6 +2354,13 @@ $(function () {
       // Adding users to groups.
       $('#f-user-create').on('submit', function (e) {
         that.onSubmitUserCreate(this, e)
+      })
+
+      $('#f-user-create').on('keydown', function (e) {
+        // Enter key.
+        if (e.which === 13) {
+          that.onSubmitUserCreate(this, e)
+        }
       })
 
       // User list search.

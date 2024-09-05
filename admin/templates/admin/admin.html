@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} - Administration{% endblock title %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='lib/purify-3.1.6/js/purify.min.js') }}"></script>
+<script src="{{ url_for('admin_bp.static', filename='js/create_preview.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+<div class="container mt-4">
+    <header>
+        <h1>Administration</h1>
+    </header>
+    <main>
+        <!-- A card for all admin features -->
+        <section class="card my-3">
+            <div class="card-body">
+                <!-- Maintenance Banner Section -->
+                <div class="mb-4">
+                    <h2 class="card-title">Maintenance Banner</h2>
+                    <div class="d-flex justify-content-start align-items-end">
+                        <form action="{{ url_for('admin_bp.set_banner') }}" method="post"
+                            class="flex-fill me-2 needs-validation" novalidate>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-3">
+                                <label for="admin-banner-message">Banner Details:</label>
+                                <textarea class="form-control" name="banner" id="admin-banner-message" rows="2"
+                                    placeholder="Enter system maintenance details..."
+                                    required>{{config.get('banner').get('message','')}}</textarea>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="admin-banner-importance"
+                                    name="importance" {{ 'checked' if config.get('banner', {}).get('importance', False)
+                                    else '' }}>
+                                <label class="form-check-label" for="admin-banner-importance">Mark as Important</label>
+                            </div>
+                            <button type="submit" id="admin-set-banner" class="btn btn-primary">Set Banner</button>
+                            <button type="submit" formaction="{{ url_for('admin_bp.remove_banner') }}"
+                                id="admin-remove-banner" class="btn btn-secondary ms-2">Remove Banner</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Theme Change Section -->
+                <div class="mb-4">
+                    <h2 class="card-title">Portal Theme</h2>
+                    <form action="{{ url_for('admin_bp.set_theme') }}" method="post" class="needs-validation"
+                        novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="admin-theme-selection">Select Theme:</label>
+                            <select class="form-control" id="admin-theme-selection" name="theme" required>
+                                {% set current_theme = config.get('YODA_THEME', 'uu') %}
+                                {% for folder in theme_directories %}
+                                <option value="{{ folder }}" {% if folder==current_theme %}selected{% endif %}>{{
+                                    config.get('YODA_THEME_MAPPING').get(folder, folder) }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" id="admin-set-theme" class="btn btn-primary">Set Theme</button>
+                    </form>
+                </div>
+
+                <!-- Publication Terms Section -->
+                <div>
+                    <h2 class="card-title">Publication Terms</h2>
+                    <div class="d-flex justify-content-start align-items-end">
+                        <form action="{{ url_for('admin_bp.set_publication_terms') }}" method="post"
+                            class="flex-fill me-2 needs-validation" novalidate>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-3">
+                                <label for="admin-publication-terms">Current Publication Terms:</label>
+                                <textarea class="form-control" id="admin-publication-terms" name="publicationTerms"
+                                    rows="10" required>{{ publication_terms|safe }}</textarea>
+                            </div>
+                            <button type="submit" id="admin-set-terms" class="btn btn-primary">Set Terms</button>
+                            <button type="button" id="admin-create-preview" class="btn btn-secondary ms-2">Preview
+                                Terms</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Confirmation Agreement Conditions Modal -->
+{% include 'vault/confirmation_modal.html' %}
+
+{% endblock content %}

@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Research{% endblock title %}
+{% block title %}{{ super() }} - Research{% endblock title %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='lib/purify-3.1.6/js/purify.min.js') }}"></script>
 <script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='js/research.js') }}"></script>
@@ -67,8 +68,12 @@
                 <div id="checksumReport"></div>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn btn-outline-secondary download-report-text">Download as text</a>
-                <a href="#" class="btn btn-outline-secondary download-report-csv">Download as CSV</a>
+                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="No checksum report because folder is empty.">
+                    <a href="#" class="btn btn-outline-secondary download-report-text">Download as text</a>
+                </span>
+                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="No checksum report because folder is empty.">
+                    <a href="#" class="btn btn-outline-secondary download-report-csv">Download as CSV</a>
+                </span>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
@@ -347,11 +352,11 @@
                         <div class="btn-group me-2" role="group">
                             <button type="button" class="btn btn-outline-secondary metadata-form" data-path="" title="Open metadata form">Metadata</button>
                         </div>
-                        <div class="btn-group me-2" role="group">
+                        <div class="btn-group me-2" role="group" title="Cannot create files in folder with apostrophe in name" data-toggle="tooltip" tabindex="0">
                             <button type="button" class="btn btn-outline-secondary folder-create" data-path="" title="Create a new folder"><i class="fa-solid fa-folder" aria-hidden="true"></i> Create Folder</button>
                         </div>
                         <div class="btn-group me-2" role="group">
-                            <div class="dropdown">
+                            <div class="dropdown" title="Cannot upload files in folder with apostrophe in name" data-toggle="tooltip" tabindex="0">
                                 <button type="button" class="btn btn-outline-secondary dropdown-toggle upload" data-path="" title="Upload files &amp; folders" id="uploadMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fa-solid fa-upload" aria-hidden="true"></i> Upload
                                 </button>
@@ -407,7 +412,6 @@
                     <th scope="col">Name</th>
                     <th scope="col">Size</th>
                     <th scope="col">Modified date</th>
-                    <th scope="col"></th>
                     <th scope="col"></th>
                 </tr>
                 </thead>

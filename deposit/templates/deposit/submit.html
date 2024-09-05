@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Deposit &dash; Submit data{% endblock title %}
+{% block title %}{{ super() }} - Deposit - Submit data{% endblock title %}
 
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('deposit_bp.static', filename='lib/stepper/bs-stepper.custom.css') }}">
@@ -36,7 +36,7 @@
             <p class="mt-4">
             You understand that:
                 <ul>
-                    <li>You are about to deposit a data package to the DAG</li>
+                    <li>You are about to deposit a data package into the vault.</li>
                     <li>The data package will be managed by data management staff within the faculty</li>
                     <li>The data package will be findable by all faculty members via the entered metadata</li>
                     <li>When the data access type 'open' has been chosen, the data can be accessed by all faculty members</li>

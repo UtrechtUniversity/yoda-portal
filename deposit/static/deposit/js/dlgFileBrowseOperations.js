@@ -1,4 +1,4 @@
-/* global browse, path */
+/* global browse, DOMPurify, path */
 'use strict'
 
 let folderSelectBrowser = null
@@ -133,7 +133,7 @@ $(document).ready(function () {
                     <td class="item-progress">-</td>
                 </tr>
                 `
-        $('.multi-select-table tbody').append(row)
+        $('.multi-select-table tbody').append(DOMPurify.sanitize(row))
       })
 
       if (action === 'multiple-delete') {
@@ -262,7 +262,7 @@ async function copyFile (filepath, newFilepath, multiple, multipleIndex = null, 
           dlgSelectAlertShow(result.status_info + '. Do you want to overwrite?')
           $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', true)
         } else {
-        dlgSelectAlertShow(result.status_info)
+          dlgSelectAlertShow(result.status_info)
         }
       }
     }
@@ -318,7 +318,7 @@ async function moveFile (filepath, newFilepath, multiple, multipleIndex = null, 
           dlgSelectAlertShow(result.status_info + '. Do you want to overwrite?')
           $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', true)
         } else {
-        dlgSelectAlertShow(result.status_info)
+          dlgSelectAlertShow(result.status_info)
         }
       }
     }
@@ -638,11 +638,6 @@ const tableRendererColl = {
 }
 
 function dlgBrowse (dir) {
-  // Only decode if the directory has 'deposit-' prefix
-  if ((dir.substring(dir.lastIndexOf('/') + 1)).includes('deposit-')) {
-    dir = decodeURIComponent(dir)
-  }
-
   dlgCurrentFolder = dir
 
   dlgSelectAlertHide()
@@ -681,14 +676,14 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
     html = '<li class="browse-select breadcrumb-item" data-path="">Deposit</li>'
     let path = ''
     $.each(parts, function (k, part) {
-      path += '/' + encodeURIComponent(part)
+      path += '/' + part
 
       // Active item
       const valueString = Yoda.htmlEncode(part).replace(/ /g, '&nbsp;')
       if (k === (totalParts - 1)) {
         html += '<li class="active breadcrumb-item">' + valueString + '</li>'
       } else {
-        html += '<li class="browse-select breadcrumb-item" data-path="' + path + '">' + valueString + '</li>'
+        html += '<li class="browse-select breadcrumb-item" data-path="' + Yoda.htmlEncode(path) + '">' + valueString + '</li>'
       }
     })
   }
@@ -699,7 +694,7 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
 /// alert handling
 function dlgSelectAlertShow (errorMessage) {
   $('#dlg-select-alert-panel').removeClass('hide')
-  $('#dlg-select-alert-panel span').html(errorMessage)
+  $('#dlg-select-alert-panel span').html(DOMPurify.sanitize(errorMessage))
 }
 
 function dlgSelectAlertHide () {

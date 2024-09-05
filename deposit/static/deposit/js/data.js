@@ -1,4 +1,4 @@
-/* global Flow, path */
+/* global bootstrap, Flow, path */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
@@ -14,10 +14,16 @@ let currentFolder
 let filenames = []
 const hasReadRights = true
 let uploadFolder = false
+let folderCreateTooltip
+let uploadMenuTooltip
+let downloadChecksumReportTextTooltip
+let downloadChecksumReportCSVTooltip
 
 $(function () {
   // Canonicalize path somewhat, for convenience.
   currentFolder = path.replace(/\/+/g, '/').replace(/\/$/, '')
+
+  createTooltips()
 
   if ($('#file-browser').length) {
     startBrowsing()
@@ -162,13 +168,30 @@ $(function () {
       let table = '<table class="table table-striped"><tbody>'
 
       table += '<thead><tr><th>Filename</th><th>Size</th><th>Checksum</th></tr></thead>'
-      $.each(data, function (index, obj) {
-        table += `<tr>
-                     <td>${obj.name}</td>
-                     <td>${obj.size}</td>
-                     <td>${obj.checksum}</td>
-                </tr>`
-      })
+      if (data.length > 0) {
+        $.each(data, function (index, obj) {
+          table += `<tr>
+                      <td>${obj.name}</td>
+                      <td>${obj.size}</td>
+                      <td>${obj.checksum}</td>
+                  </tr>`
+        })
+        if (downloadChecksumReportTextTooltip) {
+          downloadChecksumReportTextTooltip.disable()
+        }
+        if (downloadChecksumReportCSVTooltip) {
+          downloadChecksumReportCSVTooltip.disable()
+        }
+      } else {
+        $('#showChecksumReport .modal-footer .download-report-text').removeAttr('href')
+        $('#showChecksumReport .modal-footer .download-report-csv').removeAttr('href')
+        if (downloadChecksumReportTextTooltip) {
+          downloadChecksumReportTextTooltip.enable()
+        }
+        if (downloadChecksumReportCSVTooltip) {
+          downloadChecksumReportCSVTooltip.enable()
+        }
+      }
       table += '</tbody></table>'
 
       $('#showChecksumReport .modal-body #checksumReport').html(table)
@@ -176,12 +199,12 @@ $(function () {
     })
   })
 
-  $('.upload-folder').on('click', function(){
+  $('.upload-folder').on('click', function () {
     uploadFolder = true
     console.log(uploadFolder)
   })
 
-  $('.upload').on('click', function(){
+  $('.upload-file').on('click', function () {
     uploadFolder = false
   })
 
@@ -195,6 +218,7 @@ $(function () {
     target: '/research/upload',
     chunkSize: 25 * 1024 * 1024,
     forceChunkSize: true,
+    testChunks: false, // Disabled because of need to be able to overwrite files with different content
     simultaneousUploads: 1,
     query: { csrf_token: Yoda.csrf.tokenValue, filepath: '' }
   })
@@ -205,10 +229,10 @@ $(function () {
 
   // Assign upload places for dropping/selecting files
   r.assignDrop($('.upload-drop')[0])
-  r.assignBrowse($('.upload')[0])
+  r.assignBrowse($('.upload-file')[0])
   r.assignBrowse($('.upload-folder')[0], true)
 
-  // When chosing to close overview of upload overview then all incomplete file uploads will be canceled.
+  // When choosing to close overview of upload overview then all incomplete file uploads will be canceled.
   $('.btn-close-uploads-overview').on('click', function () {
     r.cancel()
     $('#files').html('')
@@ -232,7 +256,11 @@ $(function () {
 
       $.each(sortedFiles, function (key, file) {
         const secureFile = secureFilename(file.name)
-        logUpload(file.uniqueIdentifier, secureFile)
+        const folders = file.relativePath.substring(0, file.relativePath.lastIndexOf('/'))
+        const fileName = file.relativePath.substring(0, file.relativePath.lastIndexOf('/') + 1) + secureFile
+        logUpload(file.uniqueIdentifier, fileName)
+        const folderName = file.relativePath.substring(0, file.relativePath.indexOf('/'))
+        let overwrite = false
 
         const $self = $('#' + file.uniqueIdentifier)
         // Pause btn
@@ -262,29 +290,44 @@ $(function () {
           $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
         })
 
-        if (!(uploadFolder)) {
-          if (filenames.includes(secureFile)) {
-            file.pause()
-            $self.find('.msg').text('Upload paused')
-            $self.find('.overwrite-div').removeClass('hidden')
-            $self.find('.upload-cancel').hide()
-            $self.find('.upload-pause').hide()
-            // Overwrite btn
-            $self.find('.upload-overwrite').on('click', function () {
-              file.resume()
-              $self.find('.overwrite-div').addClass('hidden')
-              $self.find('.upload-pause').show()
-              $self.find('.upload-cancel').show()
-              $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-            })
-
-            // No Overwrite btn
-            $self.find('.upload-no-overwrite').on('click', function () {
-              file.cancel()
-              $self.find('.overwrite-div').addClass('hidden')
-              $self.remove()
-            })
+        if (uploadFolder) {
+          if (filenames.includes(folderName)) {
+            overwrite = true
           }
+        } else {
+          if (filenames.includes(secureFile)) {
+            overwrite = true
+          }
+        }
+        // Check for apostrophe in folder name
+        if (folders.indexOf('\'') > -1) {
+          // It seems like you must first pause, then cancel
+          file.pause()
+          file.cancel()
+          $self.find('.msg').text('Upload cancelled: folder must not contain an apostrophe')
+          $self.find('.upload-pause').addClass('hidden')
+          $self.find('.upload-cancel').addClass('hidden')
+        } else if (overwrite) {
+          file.pause()
+          $self.find('.msg').text('Upload paused')
+          $self.find('.overwrite-div').removeClass('hidden')
+          $self.find('.upload-cancel').hide()
+          $self.find('.upload-pause').hide()
+          // Overwrite btn
+          $self.find('.upload-overwrite').on('click', function () {
+            file.resume()
+            $self.find('.overwrite-div').addClass('hidden')
+            $self.find('.upload-pause').show()
+            $self.find('.upload-cancel').show()
+            $self.find('.msg').html('<i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
+          })
+
+          // No Overwrite btn
+          $self.find('.upload-no-overwrite').on('click', function () {
+            file.cancel()
+            $self.find('.overwrite-div').addClass('hidden')
+            $self.remove()
+          })
         }
       })
     }
@@ -373,10 +416,29 @@ $(function () {
   dragElement(document.getElementById('uploads'))
 })
 
+function createTooltips () {
+  // Let user know why cannot upload files.
+  const folderCreate = $('.btn-group button.folder-create').parent()
+  folderCreateTooltip = new bootstrap.Tooltip(folderCreate)
+  folderCreateTooltip.disable()
+
+  const uploadMenu = $('button#uploadMenu').parent()
+  uploadMenuTooltip = new bootstrap.Tooltip(uploadMenu)
+  uploadMenuTooltip.disable()
+
+  const downloadChecksumReportText = $('.download-report-text').parent()
+  downloadChecksumReportTextTooltip = new bootstrap.Tooltip(downloadChecksumReportText)
+  downloadChecksumReportTextTooltip.disable()
+
+  const downloadChecksumReportCSV = $('.download-report-csv').parent()
+  downloadChecksumReportCSVTooltip = new bootstrap.Tooltip(downloadChecksumReportCSV)
+  downloadChecksumReportCSVTooltip.disable()
+}
+
 function secureFilename (file) {
   // mirrors behaviour of unicode_secure_filename in util.py
   let result = ''
-  result = file.replace(/[\u{0000}-\u{001F}\u{007F}\\\/]/gu, '')
+  result = file.replace(/[\u{0000}-\u{001F}\u{007F}\\\/]/gu, '') // eslint-disable-line no-control-regex, no-useless-escape
 
   if (result === '..') {
     return ''
@@ -624,8 +686,35 @@ function browse (dir = '', changeHistory = false) {
 
   buildFileBrowser(dir)
   $('button.upload').attr('data-path', dir)
-  $('button.upload-folder').attr('data-path', dir)
   $('button.folder-create').attr('data-path', dir)
+
+  apostropheFolderHints(dir)
+}
+
+function apostropheFolderHints (dir) {
+  // Apostrophe in the name, so disable upload/creation
+  if (dir.indexOf('\'') > -1) {
+    if (folderCreateTooltip) {
+      folderCreateTooltip.enable()
+    }
+    if (uploadMenuTooltip) {
+      uploadMenuTooltip.enable()
+    }
+    $('.btn-group button.folder-create').addClass('disabled')
+    $('.btn-group button.upload').attr('data-path', '')
+    $('.btn-group button.upload').prop('disabled', true)
+  } else {
+    if (folderCreateTooltip) {
+      folderCreateTooltip.disable()
+    }
+    if (uploadMenuTooltip) {
+      uploadMenuTooltip.disable()
+    }
+    $('.btn-group button.folder-create').removeClass('disabled')
+    // Enable uploads.
+    $('.btn-group button.upload').attr('data-path', dir)
+    $('.btn-group button.upload').prop('disabled', false)
+  }
 }
 
 function makeBreadcrumb (dir) {

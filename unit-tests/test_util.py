@@ -6,17 +6,22 @@ __license__   = 'GPLv3, see LICENSE'
 
 import sys
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 sys.path.append("..")
 
-from util import get_validated_static_path
-from util import is_email_in_domains
-from util import unicode_secure_filename
+from util import (
+    get_theme_directories,
+    get_validated_static_path,
+    is_email_in_domains,
+    is_relative_url,
+    length_check,
+    unicode_secure_filename,
+)
 
 
 class UtilTest(TestCase):
-    def test_is_email_in_domains(self):
+    def test_is_email_in_domains(self) -> None:
         self.assertEqual(is_email_in_domains("peter", ["uu.nl"]), False)
         self.assertEqual(is_email_in_domains("peter@uu.nl", ["uu.nl"]), True)
         self.assertEqual(is_email_in_domains("peter@vu.nl", ["uu.nl"]), False)
@@ -29,7 +34,7 @@ class UtilTest(TestCase):
         self.assertEqual(is_email_in_domains("peter@ai.cs.uu.nl", ["*.cs.uu.nl"]), True)
         self.assertEqual(is_email_in_domains("peter@ai.hum.uu.nl", ["*.cs.uu.nl"]), False)
 
-    def test_unicode_secure_filename(self):
+    def test_unicode_secure_filename(self) -> None:
         self.assertEqual(unicode_secure_filename('../../hi abc.txt'), '....hi abc.txt')
         self.assertEqual(unicode_secure_filename('....//hi abc.txt'), '....hi abc.txt')
         self.assertEqual(unicode_secure_filename('....\/hi abc.txt'), '....hi abc.txt')
@@ -59,12 +64,12 @@ class UtilTest(TestCase):
         self.assertEqual(unicode_secure_filename('\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019'
                                                  '\u001A\u001B\u001C\u001D\u001E\u001F\u007F'), '')
 
-    def exists_return_value(self, pathname):
+    def exists_return_value(self, pathname: str) -> bool:
         """ Mock path.exists function. True if path does not contain "theme" and "uu" """
         return not ("theme" in pathname and "uu" in pathname)
 
     @patch("os.path.exists")
-    def test_static_loader_valid_path(self, mock_exists):
+    def test_static_loader_valid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # uu theme
         static_dir, asset_name = get_validated_static_path(
@@ -86,61 +91,68 @@ class UtilTest(TestCase):
         self.assertEqual(asset_name, "logo.svg")
 
     @patch("os.path.exists")
-    def test_static_loader_invalid_path(self, mock_exists):
+    def test_static_loader_invalid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # Too short
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/?sawerw", "/", "/var/www/yoda/themes", "uu"
-            )
+            ),
+            ("", "")
         )
         # Path traversal attack
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/assets/../../../../etc/passwd?werwrwr",
                 "/assets/../../../../etc/passwd",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
         # non-printable characters
         full_path = "/assets/" + chr(13) + "img/logo.svg?werwer"
         path = "/assets/" + chr(13) + "img/logo.svg"
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "uu"
-            )
+            ),
+            ("", "")
         )
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "wur"
-            )
+            ),
+            ("", "")
         )
         # non-printable characters in asset name
         full_path = "/assets/img/l" + chr(13) + "ogo.svg?werwer"
         path = "/assets/img/l" + chr(13) + "ogo.svg"
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "uu"
-            )
+            ),
+            ("", "")
         )
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 full_path, path, "/var/www/yoda/themes", "wur"
-            )
+            ),
+            ("", "")
         )
         # .. in file name
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/assets/img/lo..go.svg?sklaerw",
                 "/assets/img/lo..go.svg?sklaerw",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
 
     @patch("os.path.exists")
-    def test_static_loader_module_valid_path(self, mock_exists):
+    def test_static_loader_module_valid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # uu theme
         static_dir, asset_name = get_validated_static_path(
@@ -167,23 +179,70 @@ class UtilTest(TestCase):
         self.assertEqual(asset_name, "select2-bootstrap-5-theme.css")
 
     @patch("os.path.exists")
-    def test_static_loader_module_invalid_path(self, mock_exists):
+    def test_static_loader_module_invalid_path(self, mock_exists: Mock) -> None:
         mock_exists.side_effect = self.exists_return_value
         # Invalid module name
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/../assets/../research/static/research/css/research.css?sklwrawe",
                 "/../assets/../research/static/research/css/research.css",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
         # Path traversal attack
-        self.assertIsNone(
+        self.assertEqual(
             get_validated_static_path(
                 "/group_manager/assets/../../../../../../etc/passwd?werwrwr",
                 "/group_manager/assets/../../../../../../etc/passwd",
                 "/var/www/yoda/themes",
                 "uu",
-            )
+            ),
+            ("", "")
         )
+
+    def test_length_check_empty(self) -> None:
+        """Test that an empty banner message is identified as invalid."""
+        _, is_valid = length_check("")
+        self.assertFalse(is_valid)
+
+    def test_length_check_too_long(self) -> None:
+        """Test that a too-long banner message is identified as invalid."""
+        _, is_valid = length_check("a" * 257)  # 257 characters long
+        self.assertFalse(is_valid)
+
+    def test_length_check_valid(self) -> None:
+        """Test that a valid banner message is accepted."""
+        _, is_valid = length_check("Maintenance scheduled from 1 July 7:00 to 2 July 9:00.")
+        self.assertTrue(is_valid)
+
+    def test_get_theme_directories_specific_path(self) -> None:
+        """Test that the specific theme path returns themes correctly"""
+        with patch('util.listdir', return_value=['vu', 'wur']), \
+                patch('util.path.isdir', return_value=True):
+            expected_result = ['uu', 'vu', 'wur']
+            result = get_theme_directories('/var/www/yoda/themes')
+            assert result == expected_result
+
+    def test_get_theme_directories_path_not_exist(self) -> None:
+        """Test that non-existent path returns an empty list"""
+        with patch('util.listdir', side_effect=Exception):
+            result = get_theme_directories('/non/existent/path')
+            assert result == []
+
+    def test_get_theme_directories_only_files(self) -> None:
+        """Test that only files or no directory exists, returns the default uu theme"""
+        with patch('util.listdir', return_value=['vu.txt', 'wur.doc']), \
+                patch('util.path.isdir', return_value=False):
+            expected_result = ['uu']
+            result = get_theme_directories('/test/path')
+            assert result == expected_result
+
+    def test_is_relative_url(self) -> None:
+        self.assertEqual(is_relative_url("http://www.uu.nl"), False)
+        self.assertEqual(is_relative_url("https://www.uu.nl"), False)
+        self.assertEqual(is_relative_url("http://username:password@www.uu.nl"), False)
+        self.assertEqual(is_relative_url("https://username:password@www.uu.nl"), False)
+        self.assertEqual(is_relative_url("/foo/bar/bat"), True)
+        self.assertEqual(is_relative_url("foo/bar/bat"), True)

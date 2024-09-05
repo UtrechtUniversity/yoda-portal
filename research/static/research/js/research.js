@@ -1,4 +1,4 @@
-/* global Flow, Option */
+/* global bootstrap, Flow, Option */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
@@ -11,6 +11,10 @@ $(document).ajaxSend(function (e, request, settings) {
 })
 
 let preservableFormatsLists = null
+let folderCreateTooltip
+let uploadMenuTooltip
+let downloadChecksumReportTextTooltip
+let downloadChecksumReportCSVTooltip
 let currentFolder
 let filenames = []
 let hasReadRights = true
@@ -26,6 +30,7 @@ $(function () {
 
   // Needed for the table to show the links depending on permissions
   topInformation(currentFolder, true)
+  createTooltips()
 
   if ($('#file-browser').length) {
     startBrowsing()
@@ -189,13 +194,30 @@ $(function () {
       let table = '<table class="table table-striped"><tbody>'
 
       table += '<thead><tr><th>Filename</th><th>Size</th><th>Checksum</th></tr></thead>'
-      $.each(data, function (index, obj) {
-        table += `<tr>
-                     <td>${obj.name}</td>
-                     <td>${obj.size}</td>
-                     <td>${obj.checksum}</td>
-                </tr>`
-      })
+      if (data.length > 0) {
+        $.each(data, function (index, obj) {
+          table += `<tr>
+                      <td>${obj.name}</td>
+                      <td>${obj.size}</td>
+                      <td>${obj.checksum}</td>
+                  </tr>`
+        })
+        if (downloadChecksumReportTextTooltip) {
+          downloadChecksumReportTextTooltip.disable()
+        }
+        if (downloadChecksumReportCSVTooltip) {
+          downloadChecksumReportCSVTooltip.disable()
+        }
+      } else {
+        $('#showChecksumReport .modal-footer .download-report-text').removeAttr('href')
+        $('#showChecksumReport .modal-footer .download-report-csv').removeAttr('href')
+        if (downloadChecksumReportTextTooltip) {
+          downloadChecksumReportTextTooltip.enable()
+        }
+        if (downloadChecksumReportCSVTooltip) {
+          downloadChecksumReportCSVTooltip.enable()
+        }
+      }
       table += '</tbody></table>'
 
       $('#showChecksumReport .modal-body #checksumReport').html(table)
@@ -268,16 +290,11 @@ $(function () {
     handleFileDelete($(this).attr('data-collection'), $(this).attr('data-name'))
   })
 
-  // FILE stage
-  $('body').on('click', 'a.file-stage', function () {
-    handleFileStage($(this).attr('data-collection'), $(this).attr('data-name'))
-  })
-
   $('.upload-folder').on('click', function () {
     uploadFolder = true
   })
 
-  $('.upload-file').on('click', function (){
+  $('.upload-file').on('click', function () {
     uploadFolder = false
   })
 
@@ -287,6 +304,7 @@ $(function () {
     chunkSize: 25 * 1024 * 1024,
     forceChunkSize: true,
     simultaneousUploads: 1,
+    testChunks: false, // Disabled because of need to be able to overwrite files with different content
     query: { csrf_token: Yoda.csrf.tokenValue, filepath: '' }
   })
   // Flow.js isn't supported, fall back on a different method
@@ -299,7 +317,7 @@ $(function () {
   r.assignBrowse($('.upload-file')[0])
   r.assignBrowse($('.upload-folder')[0], true)
 
-  // When chosing to close overview of upload overview then all incomplete file uploads will be canceled.
+  // When choosing to close overview of upload overview then all incomplete file uploads will be canceled.
   $('.btn-close-uploads-overview').on('click', function () {
     r.cancel()
     $('#files').html('')
@@ -323,8 +341,10 @@ $(function () {
 
       $.each(sortedFiles, function (key, file) {
         const secureFile = secureFilename(file.name)
-        logUpload(file.uniqueIdentifier, secureFile)
-        const folderName = file.relativePath.substring(0, file.relativePath.indexOf("/"))
+        const folders = file.relativePath.substring(0, file.relativePath.lastIndexOf('/'))
+        const fileName = file.relativePath.substring(0, file.relativePath.lastIndexOf('/') + 1) + secureFile
+        logUpload(file.uniqueIdentifier, fileName)
+        const folderName = file.relativePath.substring(0, file.relativePath.indexOf('/'))
         let overwrite = false
 
         const $self = $('#' + file.uniqueIdentifier)
@@ -359,13 +379,20 @@ $(function () {
           if (filenames.includes(folderName)) {
             overwrite = true
           }
-        }
-        else {
+        } else {
           if (filenames.includes(secureFile)) {
             overwrite = true
           }
         }
-        if (overwrite) {
+        // Check for apostrophe in folder name
+        if (folders.indexOf('\'') > -1) {
+          // It seems like you must first pause, then cancel
+          file.pause()
+          file.cancel()
+          $self.find('.msg').text('Upload cancelled: folder must not contain an apostrophe')
+          $self.find('.upload-pause').addClass('hidden')
+          $self.find('.upload-cancel').addClass('hidden')
+        } else if (overwrite) {
           file.pause()
           $self.find('.msg').text('Upload paused')
           $self.find('.overwrite-div').removeClass('hidden')
@@ -558,10 +585,29 @@ $(function () {
   dragElement(document.getElementById('uploads'))
 })
 
+function createTooltips () {
+  // Let user know why cannot upload files.
+  const folderCreate = $('.btn-group button.folder-create').parent()
+  folderCreateTooltip = new bootstrap.Tooltip(folderCreate)
+  folderCreateTooltip.disable()
+
+  const uploadMenu = $('button#uploadMenu').parent()
+  uploadMenuTooltip = new bootstrap.Tooltip(uploadMenu)
+  uploadMenuTooltip.disable()
+
+  const downloadChecksumReportText = $('.download-report-text').parent()
+  downloadChecksumReportTextTooltip = new bootstrap.Tooltip(downloadChecksumReportText)
+  downloadChecksumReportTextTooltip.disable()
+
+  const downloadChecksumReportCSV = $('.download-report-csv').parent()
+  downloadChecksumReportCSVTooltip = new bootstrap.Tooltip(downloadChecksumReportCSV)
+  downloadChecksumReportCSVTooltip.disable()
+}
+
 function secureFilename (file) {
   // mirrors behaviour of unicode_secure_filename in util.py
   let result = ''
-  result = file.replace(/[\u{0000}-\u{001F}\u{007F}\\\/]/gu, '')
+  result = file.replace(/[\u{0000}-\u{001F}\u{007F}\\\/]/gu, '') // eslint-disable-line no-control-regex, no-useless-escape
 
   if (result === '..') {
     return ''
@@ -772,19 +818,6 @@ async function handleFileDelete (collection, fileName) {
     fileMgmtDialogAlert('file-delete', result.status_info)
   }
   $('#file-delete .btn-confirm-file-delete').html('Delete file')
-}
-
-async function handleFileStage (collection, fileName) {
-  const result = await Yoda.call('tape_archive_stage',
-    { path: Yoda.basePath + collection + '/' + fileName },
-    { quiet: true, rawResult: true }
-  )
-
-  if (result.status === 'ok') {
-    Yoda.set_message('success', 'Successfully requested to bring file <' + fileName + '> online')
-  } else {
-    Yoda.set_message('error', 'Failed to request to bring file <' + fileName + '> online')
-  }
 }
 
 // Alerts regarding folder/file management
@@ -1027,17 +1060,6 @@ const tableRenderer = {
     elem.attr('title', date.toString()) // (should include seconds and TZ info)
     return elem[0].outerHTML
   },
-  state: (_, __, row) => {
-    let state = $('<span>')
-    if (row.type === 'data' && row.state === 'OFL') {
-      state = $('<span class="badge bg-secondary" title="Stored offline on tape archive">Offline</span>')
-    } else if (row.type === 'data' && row.state === 'UNM') {
-      state = $('<span class="badge bg-secondary" title="Migrating from tape archive to disk">Bringing online</span>')
-    } else if (row.type === 'data' && row.state === 'MIG') {
-      state = $('<span class="badge bg-secondary" title="Migrating from disk to tape archive">Storing offline</span>')
-    }
-    return state[0].outerHTML
-  },
   context: (_, __, row) => {
     const actions = $('<div class="dropdown-menu">')
 
@@ -1051,19 +1073,11 @@ const tableRenderer = {
       actions.append(`<a href="#" class="dropdown-item folder-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this folder">Move</a>`)
       actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
     } else {
-      if (row.state === 'OFL') {
-        actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`)
-      } else if (row.state === 'MIG' || row.state === 'UNM') {
-        // no context menu for data objects migrating from or to tape archive
-        return ''
-      } else {
-        actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
-
-        actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this file">Rename</a>`)
-        actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this file">Copy</a>`)
-        actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this file">Move</a>`)
-        actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
-      }
+      actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this file">Rename</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this file">Copy</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this file">Move</a>`)
+      actions.append(`<a href="#" class="dropdown-item file-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
     }
 
     const dropdown = $(`<div class="dropdown">
@@ -1094,7 +1108,6 @@ function startBrowsing () {
       // (enabling this as is may result in duplicated results for data objects)
       { render: tableRenderer.size, data: 'size' },
       { render: tableRenderer.date, orderable: false, data: 'modify_time' },
-      { render: tableRenderer.state, orderable: false },
       { render: tableRenderer.context, orderable: false }],
     ajax: getFolderContents,
     processing: true,
@@ -1251,9 +1264,16 @@ function topInformation (dir, showAlert) {
       $('.top-information').hide()
       $('.top-info-buttons').hide()
 
+      if (folderCreateTooltip) {
+        folderCreateTooltip.disable()
+      }
+      if (uploadMenuTooltip) {
+        uploadMenuTooltip.disable()
+      }
+
       // Set folder status badge and actions.
       if (typeof status !== 'undefined') {
-        if (status === '') {
+        if (status === '' || status === 'SECURED' || status === 'FOLDER') {
           statusText = ''
           actions.lock = 'Lock'
           actions.submit = 'Submit'
@@ -1267,11 +1287,6 @@ function topInformation (dir, showAlert) {
           actions.unsubmit = 'Unsubmit'
         } else if (status === 'ACCEPTED') {
           statusText = 'Accepted'
-        } else if (status === 'SECURED') {
-          statusText = 'Secured'
-          actions.lock = 'Lock'
-          actions.submit = 'Submit'
-          actions.cleanup = 'Clean up temporary files'
         } else if (status === 'REJECTED') {
           statusText = 'Rejected'
           actions.lock = 'Lock'
@@ -1316,8 +1331,15 @@ function topInformation (dir, showAlert) {
         }
       }
 
-      // Check if folder is writable.
-      if (hasWriteRights && (status === '' || status === 'REJECTED' || status === 'SECURED')) {
+      if (dir.indexOf('\'') > -1) {
+        if (folderCreateTooltip) {
+          folderCreateTooltip.enable()
+        }
+        if (uploadMenuTooltip) {
+          uploadMenuTooltip.enable()
+        }
+      } else if (hasWriteRights && (status === '' || status === 'REJECTED' || status === 'SECURED' || status === 'FOLDER')) {
+        // Check if folder is writable.
         // Enable uploads.
         $('.btn-group button.upload').attr('data-path', dir)
         $('.btn-group button.upload').prop('disabled', false)

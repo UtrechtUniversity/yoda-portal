@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
@@ -12,7 +12,6 @@ import jwt
 import requests
 from flask import (
     Blueprint,
-    current_app as app,
     flash,
     g,
     redirect,
@@ -20,14 +19,20 @@ from flask import (
     request,
     Response,
     session,
-    url_for
+    url_for,
 )
-from irods.exception import CAT_INVALID_AUTHENTICATION, CAT_INVALID_USER, iRODSException, PAM_AUTH_PASSWORD_FAILED
+from flask import current_app as app
+from irods.exception import (
+    CAT_INVALID_AUTHENTICATION,
+    CAT_INVALID_USER,
+    iRODSException,
+    PAM_AUTH_PASSWORD_FAILED,
+)
 from irods.session import iRODSSession
 
 import api
 import connman
-from util import is_email_in_domains, log_error
+from util import is_email_in_domains, is_relative_url, log_error
 
 # Blueprint creation
 user_bp = Blueprint('user_bp', __name__,
@@ -55,7 +60,7 @@ def gate() -> Response:
         session['login_username'] = username
 
         redirect_target = request.args.get('redirect_target')
-        if redirect_target is not None:
+        if redirect_target is not None and is_relative_url(redirect_target):
             session['redirect_target'] = redirect_target
 
         # If the username matches the domain set for OIDC
@@ -179,10 +184,9 @@ def settings() -> Response:
             flash('Saving settings failed!', 'danger')
 
     # Load user settings.
-    response = api.call('settings_load', data={})
-    settings = response['data']
+    session['settings'] = api.call('settings_load', data={})['data']
 
-    return render_template('user/settings.html', **settings)
+    return render_template('user/settings.html', **session['settings'])
 
 
 @user_bp.route('/data_access')
@@ -193,6 +197,12 @@ def data_access() -> Response:
     return render_template('user/data_access.html',
                            tokens=response['data'],
                            token_lifetime=token_lifetime)
+
+
+@user_bp.route('/data_transfer')
+def data_transfer() -> Response:
+    """Data Transfer page."""
+    return render_template('user/data_transfer.html')
 
 
 @user_bp.route('/callback')
@@ -383,7 +393,7 @@ def callback() -> Response:
 
         # Redirect to gate when exception has occurred.
         if exception_occurred:
-            return redirect(url_for('user_bp.gate'))
+            return redirect(url_for('user_bp.gate'))  # noqa: B012
 
     return redirect(original_destination())
 
@@ -444,7 +454,7 @@ def authenticated() -> bool:
 
 def original_destination() -> str:
     target = session.get('redirect_target')
-    if target is not None:
+    if target is not None and is_relative_url(target):
         session['redirect_target'] = None
         return target
     else:
@@ -467,14 +477,24 @@ def prepare_user() -> None:
         g.irods = irods
 
         try:
-            # Check for notifications.
             endpoints = ["static", "call", "upload_get", "upload_post"]
             if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
+                # Check for notifications.
                 response = api.call('notifications_load', data={})
                 g.notifications = len(response['data'])
-                # Load saved settings
-                response = api.call('settings_load', data={})
-                g.settings = response['data']
+
+                # Load saved settings.
+                if session.get('settings', None) is None:
+                    response = api.call('settings_load', data={})
+                    session['settings'] = response['data']
+                g.settings = session.get('settings')
+
+                # Check for admin access.
+                if session.get('admin', None) is None:
+                    response = api.call("admin_has_access", data={})
+                    session['admin'] = response['data']
+                g.admin = session.get('admin')
+
         except PAM_AUTH_PASSWORD_FAILED:
             # Password is not valid any more (probably OIDC access token).
             connman.clean(session.sid)

@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ super() }} &dash; Search{% endblock title %}
+{% block title %}{{ super() }} - Search{% endblock title %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='lib/purify-3.1.6/js/purify.min.js') }}"></script>
 <script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
 <script src="{{ url_for('search_bp.static', filename='js/revision.js') }}"></script>
 <script src="{{ url_for('search_bp.static', filename='js/search.js') }}"></script>
@@ -34,11 +35,11 @@
             <select name="status" class="form-control search-status hide">
                 <option disabled selected value>Select status...</option>
                 <optgroup label="Research">
+                    <option value="research:FOLDER">Unlocked</option>
                     <option value="research:LOCKED">Locked</option>
                     <option value="research:SUBMITTED">Submitted for vault</option>
                     <option value="research:ACCEPTED">Accepted for vault</option>
                     <option value="research:REJECTED">Rejected for vault</option>
-                    <option value="research:SECURED">Secured in vault</option>
                 </optgroup>
                 <optgroup label="Vault">
                     <option value="vault:UNPUBLISHED">Unpublished</option>

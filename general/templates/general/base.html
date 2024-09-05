@@ -22,7 +22,8 @@
             {% endif %}
             <script>
                 Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'};
-                Yoda.textFileExtensions = {{ config.get('TEXT_FILE_EXTENSIONS') | safe }}
+                Yoda.textFileExtensions = {{ config.get('TEXT_FILE_EXTENSIONS') | safe }};
+                Yoda.version = '{{ config.get('YODA_VERSION') }}';
                 {% if g.user %}
                 Yoda.basePath = '/{{ g.irods.zone }}/home';
                 Yoda.user = {
@@ -44,11 +45,12 @@
 
     <body class="d-flex flex-column min-vh-100">
         {% if config.get('YODA_ENVIRONMENT') != "production" %}{% include 'environment.html' %}{% endif %}
+        {% if config.get('banner').get('enabled') %}{% include 'banner.html' %}{% endif %}
         <header class="py-3">
             <div class="container">
                 <div class="row">
                     <div class="col-md-2">
-                        <a href="{{ url_for('general_bp.index') }}" class="logo mb-lg-0 me-lg-auto text-dark text-decoration-none"></a>
+                        <a href="{{ url_for('general_bp.index') }}" class="logo mb-lg-0 me-lg-auto text-dark text-decoration-none" title="Go to home page"></a>
                     </div>
                     <div class="col"></div>
                     <div class="col-md-5">
@@ -75,11 +77,11 @@
                                 <select id="top-search-status" class="form-control top-search-status hidden">
                                     <option disabled selected value>Select status...</option>
                                     <optgroup label="Research">
+                                        <option value="research:FOLDER">Unlocked</option>
                                         <option value="research:LOCKED">Locked</option>
                                         <option value="research:SUBMITTED">Submitted for vault</option>
                                         <option value="research:ACCEPTED">Accepted for vault</option>
                                         <option value="research:REJECTED">Rejected for vault</option>
-                                        <option value="research:SECURED">Secured in vault</option>
                                     </optgroup>
                                     <optgroup label="Vault">
                                         <option value="vault:UNPUBLISHED">Unpublished</option>
@@ -89,7 +91,7 @@
                                         <option value="vault:DEPUBLISHED">Depublished</option>
                                     </optgroup>
                                 </select>
-                              <button type="button" class="btn btn-outline-secondary top-start-search" data-items-per-page="25"><i class="fa-solid fa-search" aria-hidden="true"></i></button>
+                              <button type="button" class="btn btn-outline-secondary top-start-search" data-items-per-page="25" title="Search"><i class="fa-solid fa-search" aria-hidden="true"></i></button>
                             </div>
                             {% endif %}
                         {% endif %}

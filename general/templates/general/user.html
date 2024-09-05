@@ -11,7 +11,11 @@
             {% if config.get('TOKENS_ENABLED') %}
             <a class="dropdown-item" href="{{ url_for('user_bp.data_access') }}">Data Access Password</a>
             {% endif %}
+            <a class="dropdown-item" href="{{ url_for('user_bp.data_transfer') }}">Data Transfer</a>
             <div class="dropdown-divider"></div>
+            {% if g.admin %}
+            <a class="dropdown-item" href="{{ url_for('admin_bp.index') }}">Administration</a>
+            {% endif %}
             <a class="dropdown-item" href="{{ url_for('group_manager_bp.index') }}">Group Manager</a>
             <a class="dropdown-item" href="{{ url_for('stats_bp.index') }}">Statistics</a>
             <div class="dropdown-divider"></div>
@@ -19,5 +23,5 @@
         </div>
     </div>
 {% else %}
-    <a class="btn btn-primary" href="{{ url_for('user_bp.gate') }}">Sign in</a>
+    <a class="btn btn-primary" href="{{ url_for('user_bp.gate') }}" title="Go to sign in page">Sign in</a>
 {% endif %}

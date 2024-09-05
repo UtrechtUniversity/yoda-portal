@@ -1,4 +1,4 @@
-name: "Python lint and unit tests"
+name: "Python lint and unit/integration tests"
 
 on: [push, pull_request]
 
@@ -9,9 +9,9 @@ jobs:
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -27,10 +27,12 @@ jobs:
 
       - name: Check static typing
         run: |
-          mypy . --explicit-package-bases || true
+          mypy . --explicit-package-bases
 
-      - name: Run unit tests
+      - name: Run unit and integration tests
         run: |
+          sudo apt -y install apache2-dev
+          python -m pip install -r requirements.txt
           cd unit-tests
           python -m unittest
 

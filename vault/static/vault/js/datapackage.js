@@ -11,6 +11,7 @@ $(document).ajaxSend(function (e, request, settings) {
 })
 
 let currentFolder
+let group
 let bounds = [[1, 1], [1, 1]]
 let mymap = null
 let maplayer = null
@@ -143,6 +144,7 @@ $(function () {
     currentFolder = browseStartDir
     // Canonicalize path somewhat, for convenience.
     currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '')
+    group = currentFolder.split('/')[2].split('[')[0]
   }
 
   $('.btn-copy-to-clipboard').on('click', function () {
@@ -351,7 +353,10 @@ function metadataShow () {
 
   $('.action-confirm-copy-as-new-deposit').on('click', function () {
     Yoda.call('deposit_copy_data_package',
-      { reference: $(this).attr('data-yoda-reference') },
+      {
+        reference: $(this).attr('data-yoda-reference'),
+        deposit_group: group
+      },
       { rawResult: true })
       .then((result) => {
         if (!result || Object.keys(result.data).length === 0) {

@@ -1,4 +1,4 @@
-/* global Option */
+/* global bootstrap, Option */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
@@ -14,8 +14,13 @@ let preservableFormatsLists = null
 let currentFolder
 let dataPackage = null
 let hasReadRights = true
+let researchGroupAccess = true
+let downloadChecksumReportTextTooltip
+let downloadChecksumReportCSVTooltip
 
 $(function () {
+  createTooltips()
+
   // Extract current location from query string (default to '').
   currentFolder = decodeURIComponent((/(?:\?|&)dir=([^&]*)/
     .exec(window.location.search) || [0, ''])[1])
@@ -41,7 +46,6 @@ $(function () {
     showMetadataForm($(this).attr('data-path'))
   })
 
-  // Show checksum report
   $('body').on('click', 'a.action-show-checksum-report', function () {
     const folder = $(this).attr('data-folder')
     const downloadUrl = 'browse/download_checksum_report?path=' + encodeURIComponent(folder)
@@ -56,13 +60,30 @@ $(function () {
       let table = '<table class="table table-striped"><tbody>'
 
       table += '<thead><tr><th>Filename</th><th>Size</th><th>Checksum</th></tr></thead>'
-      $.each(data, function (index, obj) {
-        table += `<tr>
-                     <td>${obj.name}</td>
-                     <td>${obj.size}</td>
-                     <td>${obj.checksum}</td>
-                </tr>`
-      })
+      if (data.length > 0) {
+        $.each(data, function (index, obj) {
+          table += `<tr>
+                      <td>${obj.name}</td>
+                      <td>${obj.size}</td>
+                      <td>${obj.checksum}</td>
+                  </tr>`
+        })
+        if (downloadChecksumReportTextTooltip) {
+          downloadChecksumReportTextTooltip.disable()
+        }
+        if (downloadChecksumReportCSVTooltip) {
+          downloadChecksumReportCSVTooltip.disable()
+        }
+      } else {
+        $('#showChecksumReport .modal-footer .download-report-text').removeAttr('href')
+        $('#showChecksumReport .modal-footer .download-report-csv').removeAttr('href')
+        if (downloadChecksumReportTextTooltip) {
+          downloadChecksumReportTextTooltip.enable()
+        }
+        if (downloadChecksumReportCSVTooltip) {
+          downloadChecksumReportCSVTooltip.enable()
+        }
+      }
       table += '</tbody></table>'
 
       $('#showChecksumReport .modal-body #checksumReport').html(table)
@@ -181,14 +202,24 @@ $(function () {
 
     $('#confirmAgreementConditions .modal-body').text('') // clear it first
 
-    Yoda.call('vault_get_publication_terms', {}).then((data) => {
-      $('#confirmAgreementConditions .modal-body').html(data)
+    // Fetch publication terms from the Flask endpoint
+    $.ajax({
+      url: '/admin/get_publication_terms',
+      type: 'GET',
+      success: function (response) {
+        $('#confirmAgreementConditions .modal-body').html(response.terms)
 
-      // Set default status and show dialog.
-      $('.action-confirm-submit-for-publication').prop('disabled', true)
-      $('#confirmAgreementConditions .confirm-conditions').prop('checked', false)
+        // Set default status and show dialog.
+        $('.action-confirm-submit-for-publication').prop('disabled', true)
+        $('#confirmAgreementConditions .confirm-conditions').prop('checked', false)
 
-      $('#confirmAgreementConditions').modal('show')
+        $('#confirmAgreementConditions').modal('show')
+      },
+      error: function () {
+        console.error('Failed to load publication terms.')
+        // Handle error case
+        $('#confirmAgreementConditions .modal-body').html('Failed to load publication terms.')
+      }
     })
   })
 
@@ -228,12 +259,25 @@ $(function () {
     e.preventDefault()
   })
 
-  $('body').on('click', 'a.action-grant-vault-access', function () {
-    vaultAccess('grant', $(this).attr('data-folder'))
+  $('body').on('click', 'a.action-change-vault-access', function () {
+    // Show more detailed information on changing read permissions
+    if (researchGroupAccess) {
+      $('.action-confirm-revoke-read-permissions').attr('data-folder', $(this).attr('data-folder'))
+      $('#confirmRevokeReadPermissions').modal('show')
+    } else {
+      $('.action-confirm-grant-read-permissions').attr('data-folder', $(this).attr('data-folder'))
+      $('#confirmGrantReadPermissions').modal('show')
+    }
   })
 
-  $('body').on('click', 'a.action-revoke-vault-access', function () {
+  $('#confirmRevokeReadPermissions').on('click', '.action-confirm-revoke-read-permissions', function () {
+    $('#confirmRevokeReadPermissions').modal('hide')
     vaultAccess('revoke', $(this).attr('data-folder'))
+  })
+
+  $('#confirmGrantReadPermissions').on('click', '.action-confirm-grant-read-permissions', function () {
+    $('#confirmGrantReadPermissions').modal('hide')
+    vaultAccess('grant', $(this).attr('data-folder'))
   })
 
   $('body').on('click', 'a.action-depublish-publication', function () {
@@ -274,12 +318,17 @@ $(function () {
     $('#vaultUnarchive').modal('hide')
     vaultUnarchive($(this).attr('data-folder'))
   })
-
-  // FILE stage
-  $('body').on('click', 'a.file-stage', function () {
-    handleFileStage($(this).attr('data-collection'), $(this).attr('data-name'))
-  })
 })
+
+function createTooltips () {
+  const downloadChecksumReportText = $('.download-report-text').parent()
+  downloadChecksumReportTextTooltip = new bootstrap.Tooltip(downloadChecksumReportText)
+  downloadChecksumReportTextTooltip.disable()
+
+  const downloadChecksumReportCSV = $('.download-report-csv').parent()
+  downloadChecksumReportCSVTooltip = new bootstrap.Tooltip(downloadChecksumReportCSV)
+  downloadChecksumReportCSVTooltip.disable()
+}
 
 function changeBrowserUrl (path) {
   let url = window.location.pathname
@@ -513,30 +562,12 @@ const tableRenderer = {
     elem.attr('title', date.toString()) // (should include seconds and TZ info)
     return elem[0].outerHTML
   },
-  state: (_, __, row) => {
-    let state = $('<span>')
-    if (row.type === 'data' && row.state === 'OFL') {
-      state = $('<span class="badge bg-secondary" title="Stored offline on tape archive">Offline</span>')
-    } else if (row.type === 'data' && row.state === 'UNM') {
-      state = $('<span class="badge bg-secondary" title="Migrating from tape archive to disk">Bringing online</span>')
-    } else if (row.type === 'data' && row.state === 'MIG') {
-      state = $('<span class="badge bg-secondary" title="Migrating from disk to tape archive">Storing offline</span>')
-    }
-    return state[0].outerHTML
-  },
   context: (_, __, row) => {
     const actions = $('<div class="dropdown-menu">')
 
     if (row.type === 'coll') { return '' }
 
-    if (row.state === 'OFL') {
-      actions.append(`<a href="#" class="dropdown-item file-stage" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Bring this file online">Bring online</a>`)
-    } else if (row.state === 'MIG' || row.state === 'UNM') {
-      // no context menu for data objects migrating from or to tape archive
-      return ''
-    } else {
-      actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
-    }
+    actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
 
     const dropdown = $(`<div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${Yoda.htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -567,7 +598,6 @@ function startBrowsing () {
       // (enabling this as is may result in duplicated results for data objects)
       { render: tableRenderer.size, data: 'size' },
       { render: tableRenderer.date, orderable: false, data: 'modify_time' },
-      { render: tableRenderer.state, orderable: false },
       { render: tableRenderer.context, orderable: false }],
     ajax: getFolderContents,
     processing: true,
@@ -680,10 +710,13 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
       const userType = data.member_type
       const hasDatamanager = data.has_datamanager
       const isDatamanager = data.is_datamanager
-      const researchGroupAccess = data.research_group_access
       const actions = []
       const downloadable = data.downloadable
       const archive = data.archive
+      researchGroupAccess = data.research_group_access
+      const allVersions = data.all_versions
+      const baseDOI = data.base_doi
+      const packageDOI = data.package_doi
 
       $('.btn-group button.metadata-form').hide()
       $('.top-information').hide()
@@ -790,16 +823,51 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
           $('.alert.is-processing').show()
         } else {
           metadataInfo(dir)
+          if (vaultStatus === 'PUBLISHED' || vaultStatus === 'PENDING_DEPUBLICATION' || vaultStatus === 'PENDING_REPUBLICATION' || vaultStatus === 'DEPUBLISHED') {
+            $('.metadata-form-size').addClass('col-lg-8')
+            $('.meta-title-size').removeClass('col-lg-2').addClass('col-lg-3')
+            $('.meta-content-size').removeClass('col-lg-10').addClass('col-lg-9')
+
+            // List DOIs
+            const listDOIs = $('.version tbody')
+            const baseDOISpan = $('.base_doi span')
+            let ld = ''
+            let highlight = ''
+            let bdoi = ''
+            for (let i = 0; i < allVersions.length; i++) {
+              if (packageDOI === allVersions[i][1] && allVersions.length > 1) {
+                highlight = ' class="highlight"'
+              } else {
+                highlight = ''
+              }
+
+              ld += '<tr' + highlight + '><td>' +
+              '<a href="https://doi.org/' + allVersions[i][1] + '">https://doi.org/' + allVersions[i][1] + '</a>' +
+              '</td><td>' +
+              '<small title="' + allVersions[i][2] + '">' + allVersions[i][0] + '</small>' +
+              '</td></tr>'
+            }
+            listDOIs.html(ld)
+            if (baseDOI != null) {
+              bdoi += '<a href="https://doi.org/' + baseDOI + '">https://doi.org/' + baseDOI + '</a><br>'
+              baseDOISpan.html(bdoi)
+              $('.base_doi').show()
+            } else {
+              $('.base_doi').hide()
+            }
+            $('.version').show()
+          } else {
+            $('.metadata-form-size').removeClass('col-lg-8')
+            $('.meta-title-size').removeClass('col-lg-3').addClass('col-lg-2')
+            $('.meta-content-size').removeClass('col-lg-9').addClass('col-lg-10')
+            $('.version').hide()
+          }
         }
 
         // Datamanager sees access buttons in vault.
         $('.top-info-buttons').show()
         if (isDatamanager) {
-          if (researchGroupAccess) {
-            actions['revoke-vault-access'] = 'Revoke read access to research group'
-          } else {
-            actions['grant-vault-access'] = 'Grant read access to research group'
-          }
+          actions['change-vault-access'] = 'Change who has read access'
         }
       }
 
@@ -834,6 +902,10 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
       if (typeof vaultStatus !== 'undefined') {
         $('.top-information').show()
         $('.top-info-buttons').show()
+
+        // Trigger tooltips.
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]:not(.download-report-text):not(.download-report-csv)')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl)) // eslint-disable-line no-unused-vars
       }
       if (rebuildFileBrowser) {
         buildFileBrowser(dir)
@@ -852,7 +924,7 @@ function handleActionsList (actions, folder) {
     'republish-publication', 'vault-download', 'vault-archival',
     'vault-unarchive']
 
-  const possibleVaultActions = ['grant-vault-access', 'revoke-vault-access',
+  const possibleVaultActions = ['change-vault-access',
     'copy-vault-package-to-research',
     'check-for-unpreservable-files',
     'show-checksum-report']
@@ -1019,19 +1091,6 @@ function vaultAccess (action, folder) {
 
     topInformation(folder, false)
   }, 'json')
-}
-
-async function handleFileStage (collection, fileName) {
-  const result = await Yoda.call('tape_archive_stage',
-    { path: Yoda.basePath + collection + '/' + fileName },
-    { quiet: true, rawResult: true }
-  )
-
-  if (result.status === 'ok') {
-    Yoda.set_message('success', 'Successfully requested to bring file <' + fileName + '> online')
-  } else {
-    Yoda.set_message('error', 'Failed to request to bring file <' + fileName + '> online')
-  }
 }
 
 function metadataInfo (dir) {

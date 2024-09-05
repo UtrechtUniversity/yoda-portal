@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2023, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import json
 from os import path
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
-from jinja2 import ChoiceLoader, FileSystemLoader
 
+from admin.admin import admin_bp, set_theme_loader
 from api import api_bp
 from datarequest.datarequest import datarequest_bp
 from deposit.deposit import deposit_bp
@@ -18,14 +19,14 @@ from fileviewer.fileviewer import fileviewer_bp
 from general.general import general_bp
 from group_manager.group_manager import group_manager_bp
 from intake.intake import intake_bp
+from monitor import Monitor
 from open_search.open_search import open_search_bp
 from research.research import research_bp
 from search.search import search_bp
 from stats.stats import stats_bp
 from user.user import user_bp
-from util import get_validated_static_path
+from util import get_validated_static_path, log_error
 from vault.vault import vault_bp
-
 
 app = Flask(__name__, static_folder='assets')
 app.json.sort_keys = False
@@ -34,13 +35,56 @@ app.json.sort_keys = False
 with app.app_context():
     app.config.from_pyfile('flask.cfg')
 
-# Add theme loader.
-theme_path = path.join(app.config.get('YODA_THEME_PATH'), app.config.get('YODA_THEME'))
-theme_loader = ChoiceLoader([
-    FileSystemLoader(theme_path),
-    app.jinja_loader,
-])
-app.jinja_loader = theme_loader
+
+def load_admin_setting() -> Dict[str, Any]:
+    """Load or initialize admin settings from a JSON file.
+
+    If no setting file exists, it writes default loaded_settings and returns them.
+
+    If a setting file exists, it reads and returns the updated loaded_settings.
+
+    :returns: admin settings from file or default settings
+    """
+
+    # configure default admin settings
+    config_folder = app.config['YODA_CONFIG_PATH']
+    settings_file_path = path.join(config_folder, 'admin_settings.json')
+    default_settings = {
+        'banner': {
+            'enabled': False,
+            'importance': False,
+            'message': ''
+        },
+        'YODA_THEME': app.config.get('YODA_THEME')
+    }
+
+    try:
+        # If file doesn't exist, create and write the default configuration
+        if not path.exists(settings_file_path):
+            with open(settings_file_path, 'w') as file:
+                json.dump(default_settings, file)
+            return default_settings
+
+        # If the file exists, read and return the setting
+        with open(settings_file_path, 'r') as file:
+            loaded_settings = json.load(file)
+            merged_settings = {
+                'banner': {
+                    **default_settings['banner'],
+                    **loaded_settings.get('banner', {})
+                },
+                'YODA_THEME': loaded_settings.get('YODA_THEME', default_settings['YODA_THEME'])
+            }
+            return merged_settings
+    except Exception:
+        log_error("Unexpected error occurred.", True)
+    return default_settings
+
+
+# Load admin settings
+app.config.update(load_admin_setting())
+# Load theme templates
+set_theme_loader(app)
 
 # Setup values for the navigation bar used in
 # general/templates/general/base.html
@@ -83,6 +127,13 @@ app.config['search-items-per-page'] = 10
 # Start Flask-Session
 Session(app)
 
+# Start monitoring thread for extracting tech support information
+with app.app_context():
+    # Monitor signal file can be set to empty to completely disable monitor thread.
+    if app.config.get("MONITOR_SIGNAL_FILE", "/var/www/yoda/show-tech.sig") != "":
+        monitor_thread = Monitor(app.config)
+        monitor_thread.start()
+
 # Register blueprints
 with app.app_context():
     app.register_blueprint(general_bp)
@@ -94,6 +145,7 @@ with app.app_context():
     app.register_blueprint(vault_bp, url_prefix='/vault')
     app.register_blueprint(search_bp, url_prefix='/search')
     app.register_blueprint(api_bp, url_prefix='/api/')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
     if app.config.get('DEPOSIT_ENABLED'):
         app.register_blueprint(deposit_bp, url_prefix='/deposit')
     if app.config.get('OPEN_SEARCH_ENABLED'):
@@ -125,15 +177,16 @@ def static_loader() -> Optional[Response]:
 
     :returns: Static file
     """
-    result = get_validated_static_path(
+    static_dir, asset_name = get_validated_static_path(
         request.full_path,
         request.path,
         app.config.get('YODA_THEME_PATH'),
         app.config.get('YODA_THEME')
     )
-    if result is not None:
-        static_dir, asset_name = result
+    if static_dir and asset_name:
         return send_from_directory(static_dir, asset_name)
+    else:
+        return None
 
 
 @app.before_request
@@ -144,9 +197,7 @@ def protect_pages() -> Optional[Response]:
                                                     'user_bp.gate',
                                                     'user_bp.callback',
                                                     'api_bp._call',
-                                                    'static']:
-        return None
-    elif g.get('user', None) is not None:
+                                                    'static'] or g.get('user', None) is not None:
         return None
     else:
         return redirect(url_for('user_bp.gate', redirect_target=request.full_path))

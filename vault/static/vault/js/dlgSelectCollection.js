@@ -1,3 +1,4 @@
+/* global DOMPurify */
 'use strict'
 
 let urlEncodedPath = ''
@@ -67,7 +68,7 @@ async function copyVaultPackageToDynamic (urlEncodedOrigin, urlEncodedTarget) {
     )
 
     if (result.status === 'ok') {
-      let html = 'Datapackage succesfully registered for copying to research area. Actual copying will start soon'
+      let html = 'Datapackage successfully registered for copying to research area. Actual copying will start soon'
       html += ' <a href="/research/?dir=' + dlgCurrentFolder + '">Go to research area</a>'
       dlgSelectAlertShow(html)
     } else { // non api error
@@ -100,7 +101,7 @@ function dlgShowFolderSelectDialog (orgPath) {
 /// alert handling
 function dlgSelectAlertShow (errorMessage) {
   $('#dlg-select-alert-panel').removeClass('hide')
-  $('#dlg-select-alert-panel span').html(errorMessage)
+  $('#dlg-select-alert-panel span').html(DOMPurify.sanitize(errorMessage))
 }
 
 function dlgSelectAlertHide () {
@@ -323,14 +324,14 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
     html = '<li class="browse-select" data-path="">Research</li>'
     let path = ''
     $.each(parts, function (k, part) {
-      path += '/' + encodeURIComponent(part)
+      path += '/' + part
 
       // Active item
       const valueString = Yoda.htmlEncode(part).replace(/ /g, '&nbsp;')
       if (k === (totalParts - 1)) {
         html += '<li class="active">' + valueString + '</li>'
       } else {
-        html += '<li class="browse-select" data-path="' + path + '">' + valueString + '</li>'
+        html += '<li class="browse-select" data-path="' + Yoda.htmlEncode(path) + '">' + valueString + '</li>'
       }
     })
   }

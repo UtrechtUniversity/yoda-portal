@@ -11,15 +11,25 @@ from typing import List, Optional
 
 import magic
 from flask import (
-    abort, Blueprint, current_app as app, g, jsonify, make_response, redirect,
-    render_template, request, Response, send_file, session, url_for
+    abort,
+    Blueprint,
+    g,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    Response,
+    send_file,
+    session,
+    url_for,
 )
+from flask import current_app as app
 from irods.message import iRODSMessage
 from markupsafe import escape
 from werkzeug.utils import secure_filename
 
 import api
-
 
 datarequest_bp = Blueprint(
     'datarequest_bp',
@@ -107,7 +117,10 @@ def view(request_id: str) -> Response:
     if not is_project_manager and not is_datamanager and not is_dac_member and not is_request_owner:
         abort(403)
 
-    request_info         = api.call('datarequest_get', {'request_id': request_id})['data']
+    request_info = api.call('datarequest_get', {'request_id': request_id})['data']
+    if not request_info:
+        abort(403)
+
     request_status       = request_info['requestStatus']
     human_request_status = human_readable_status[request_status].value
     available_documents  = request_info['requestAvailableDocuments']
@@ -167,7 +180,7 @@ def upload_attachment(request_id: str) -> Response:
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'attachments', filename)
 
     result = api.call('datarequest_attachment_upload_permission', {'request_id': request_id, 'action': 'grant'})
-    if not result['status'] == 'ok':
+    if result['status'] != 'ok':
         abort(500)
 
     session = g.irods
@@ -187,10 +200,10 @@ def upload_attachment(request_id: str) -> Response:
         return response
 
     result = api.call('datarequest_attachment_post_upload_actions', {'request_id': request_id, 'filename': filename})
-    if not result['status'] == 'ok':
+    if result['status'] != 'ok':
         abort(500)
     result = api.call('datarequest_attachment_upload_permission', {'request_id': request_id, 'action': 'grantread'})
-    if not result['status'] == 'ok':
+    if result['status'] != 'ok':
         abort(500)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
@@ -329,7 +342,7 @@ def upload_dta(request_id: str) -> Response:
     # Verify that uploaded file is a PDF
     mimetype = magic.from_buffer(request.files['file'].stream.read(2048), mime=True)
     request.files['file'].stream.seek(0)
-    if not mimetype == "application/pdf":
+    if mimetype != 'application/pdf':
         response = make_response(jsonify({"message": "Only PDF files are permitted to be uploaded."}), 422)
         response.headers["Content-Type"] = "application/json"
         return response
@@ -338,7 +351,7 @@ def upload_dta(request_id: str) -> Response:
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'dta', filename)
 
     result = api.call('datarequest_dta_upload_permission', {'request_id': request_id, 'action': 'grant'})
-    if not result['status'] == 'ok':
+    if result['status'] != 'ok':
         abort(500)
 
     session = g.irods
@@ -358,10 +371,10 @@ def upload_dta(request_id: str) -> Response:
         return response
 
     result = api.call('datarequest_dta_post_upload_actions', {'request_id': request_id, 'filename': filename})
-    if not result['status'] == 'ok':
+    if result['status'] != 'ok':
         abort(500)
     result = api.call('datarequest_dta_upload_permission', {'request_id': request_id, 'action': 'revoke'})
-    if not result['status'] == 'ok':
+    if result['status'] != 'ok':
         abort(500)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
@@ -396,7 +409,7 @@ def upload_signed_dta(request_id: str) -> Response:
     # Verify that uploaded file is a PDF
     mimetype = magic.from_buffer(request.files['file'].stream.read(2048), mime=True)
     request.files['file'].stream.seek(0)
-    if not mimetype == "application/pdf":
+    if mimetype != 'application/pdf':
         response = make_response(jsonify({"message": "Only PDF files are permitted to be uploaded."}), 422)
         response.headers["Content-Type"] = "application/json"
         return response
@@ -405,7 +418,7 @@ def upload_signed_dta(request_id: str) -> Response:
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'signed_dta', filename)
 
     result = api.call('datarequest_signed_dta_upload_permission', {'request_id': request_id, 'action': 'grant'})
-    if not result['status'] == 'ok':
+    if result['status'] != 'ok':
         abort(500)
 
     session = g.irods
@@ -425,10 +438,10 @@ def upload_signed_dta(request_id: str) -> Response:
         return response
 
     result = api.call('datarequest_signed_dta_post_upload_actions', {'request_id': request_id, 'filename': filename})
-    if not result['status'] == 'ok':
+    if result['status'] != 'ok':
         abort(500)
     result = api.call('datarequest_signed_dta_upload_permission', {'request_id': request_id, 'action': 'grantread'})
-    if not result['status'] == 'ok':
+    if result['status'] != 'ok':
         abort(500)
 
     response = make_response(jsonify({"message": "Chunk upload succeeded"}), 200)
