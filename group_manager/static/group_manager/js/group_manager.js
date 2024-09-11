@@ -310,6 +310,7 @@ function readCsvFile (e) {
       presentationColumns.forEach(function myFunction (column) {
         table += '<td>' + groupDef[column] + '</td>'
       })
+      table += '<td id="success-import-' + groupDef.groupname + '"></td>'
       table += '<td id="error-import-' + groupDef.groupname + '"></td>'
       table += '</tr>'
     })
@@ -367,27 +368,33 @@ async function processImportedRow (row) {
   const importRowData = row.attr('importRowData')
 
   try {
-    await Yoda.call('group_process_csv',
-      {
-        csv_header_and_data: importRowData,
-        allow_update: $('#import-allow-updates').is(':checked'),
-        delete_users: $('#import-delete-users').is(':checked')
-      },
-      { quiet: true }).then((data) => {
-      // Successful import -> set correct classes and feedback to inform user
-      row.addClass('import-groupname-done')
-      $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>')
-      row.addClass('import-csv-group-ok')
+    const response = await Yoda.call('group_process_csv',
+    {
+      csv_header_and_data: importRowData,
+      allow_update: $('#import-allow-updates').is(':checked'),
+      delete_users: $('#import-delete-users').is(':checked')
+    },
+    { quiet: true, rawResult: true })
+    // Successful import -> set correct classes and feedback to inform user
+    row.addClass('import-groupname-done')
+    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>')
+    row.addClass('import-csv-group-ok')
 
-      // Solely added for test automation - splinter.
-      // This was the only way to be able to perform an automated click work on a row.
-      // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
-      $('#processed-indicator-' + groupname).on('click', function () {
-        const groupName = 'research-' + groupname
-        $('#dlg-import-groups-csv').modal('hide')
-        Yoda.groupManager.unfoldToGroup(groupName)
-        Yoda.groupManager.selectGroup(groupName)
-      })
+    row.addClass('table-success')
+    let successHtml = ''
+      response.status_info.forEach(function myFunction (item) {
+        successHtml += item + '<br/>'
+    })
+    $('#success-import-' + groupname).html(successHtml)
+    
+    // Solely added for test automation - splinter.
+    // This was the only way to be able to perform an automated click work on a row.
+    // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
+    $('#processed-indicator-' + groupname).on('click', function () {
+      const groupName = 'research-' + groupname
+      $('#dlg-import-groups-csv').modal('hide')
+      Yoda.groupManager.unfoldToGroup(groupName)
+      Yoda.groupManager.selectGroup(groupName)
     })
   } catch (error) {
     // Row processing encountered problems => inform user and add appropriate classes.
