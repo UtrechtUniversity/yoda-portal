@@ -369,12 +369,12 @@ async function processImportedRow (row) {
 
   try {
     const response = await Yoda.call('group_process_csv',
-    {
-      csv_header_and_data: importRowData,
-      allow_update: $('#import-allow-updates').is(':checked'),
-      delete_users: $('#import-delete-users').is(':checked')
-    },
-    { quiet: true, rawResult: true })
+      {
+        csv_header_and_data: importRowData,
+        allow_update: $('#import-allow-updates').is(':checked'),
+        delete_users: $('#import-delete-users').is(':checked')
+      },
+      { quiet: true, rawResult: true })
     // Successful import -> set correct classes and feedback to inform user
     row.addClass('import-groupname-done')
     $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>')
@@ -382,11 +382,11 @@ async function processImportedRow (row) {
 
     row.addClass('table-success')
     let successHtml = ''
-      response.status_info.forEach(function myFunction (item) {
-        successHtml += item + '<br/>'
+    response.status_info.forEach(function myFunction (item) {
+      successHtml += item + '<br/>'
     })
     $('#success-import-' + groupname).html(successHtml)
-    
+
     // Solely added for test automation - splinter.
     // This was the only way to be able to perform an automated click work on a row.
     // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
