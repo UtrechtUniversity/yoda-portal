@@ -374,7 +374,8 @@ async function processImportedRow (row) {
         allow_update: $('#import-allow-updates').is(':checked'),
         delete_users: $('#import-delete-users').is(':checked')
       },
-      { quiet: true, rawResult: true })
+      { quiet: true, rawResult: true }
+    )
     // Successful import -> set correct classes and feedback to inform user
     row.addClass('import-groupname-done')
     $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>')
