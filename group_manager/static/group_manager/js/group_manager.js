@@ -834,7 +834,7 @@ $(function () {
          * \return
          */
     isManagerOfGroup: function (groupName) {
-      return (this.isMemberOfGroup(groupName) && // eslint-disable-line
+      return (this.isMemberOfGroup(groupName) &&
                     (this.accessLevels.indexOf(this.groups[groupName]
                       .members[this.userNameFull].access) >=
                         this.accessLevels.indexOf('manager')))
@@ -851,7 +851,7 @@ $(function () {
          * \return
          */
     canManageGroup: function (groupName) {
-      return this.isRodsAdmin || this.isManagerOfGroup(groupName) // eslint-disable-line
+      return this.isRodsAdmin || this.isManagerOfGroup(groupName)
     },
 
     /**
@@ -902,7 +902,7 @@ $(function () {
         (this.userNameFull in this.groups['priv-category-add'].members &&
         this.userNameFull in this.groups['priv-group-add'].members &&
         // ... and the user must be a manager of at least one group in the category
-        this.isManagerInCategory(categoryName)))) // eslint-disable-line
+        this.isManagerInCategory(categoryName))))
 
       // (previously, priv-category-add was sufficient where we now require rodsadmin in most cases)
     },
@@ -926,7 +926,7 @@ $(function () {
         (this.userNameFull in this.groups['priv-category-add'].members &&
         this.userNameFull in this.groups['priv-group-add'].members &&
         // ... and the user must be a manager of at least one group in the category
-        this.isManagerInCategory(categoryName)))) // eslint-disable-line
+        this.isManagerInCategory(categoryName))))
     },
 
     // }}}
@@ -1000,7 +1000,7 @@ $(function () {
     selectGroup: function (groupName) {
       const group = this.groups[groupName]
       const categoryName = group.category
-      const userCanManage = this.canManageGroup(groupName) // eslint-disable-line
+      const userCanManage = this.canManageGroup(groupName)
 
       // Tree
       const $groupList = $('#group-list')
@@ -1013,9 +1013,9 @@ $(function () {
 
       if ($group.is($oldGroup)) { return }
 
-      this.deselectGroup() // eslint-disable-line
+      this.deselectGroup()
 
-      this.unfoldToGroup(groupName) // eslint-disable-line
+      this.unfoldToGroup(groupName)
 
       // handle visibility of correct update cards.
       $('.properties-create').addClass('hidden')
@@ -1221,7 +1221,7 @@ $(function () {
          * \brief Deselects the selected group, if any.
          */
     deselectGroup: function () {
-      this.deselectUser() // eslint-disable-line
+      this.deselectUser()
 
       const $groupPanel = $('.card.groups')
       $groupPanel.find('.delete-button').addClass('disabled')
@@ -1267,11 +1267,11 @@ $(function () {
       }
 
       // inform users of member count and selection count
-      this.updateGroupMemberCount($('#group-list .active.group').attr('data-name')) // eslint-disable-line
+      this.updateGroupMemberCount($('#group-list .active.group').attr('data-name'))
 
       const countSelected = $('#user-list .active').length
       const $userPanel = $('.card.users')
-      if (this.canManageGroup($('#group-list .active.group').attr('data-name'))) { // eslint-disable-line
+      if (this.canManageGroup($('#group-list .active.group').attr('data-name'))) {
         if (countSelected > 0) {
           $userPanel.find('.delete-button').removeClass('disabled')
           $userPanel.find('.update-button').removeClass('disabled')
@@ -1753,13 +1753,13 @@ $(function () {
       // specific datamanager-group testing dependent on mode
       if (newProperties.name.startsWith('datamanager-')) {
         if (action === 'create') {
-          if (!this.canCreateDatamanagerGroup(newProperties.category)) { // eslint-disable-line
+          if (!this.canCreateDatamanagerGroup(newProperties.category)) {
             window.alert('Datamanager group names may only contain lowercase letters (a-z) and hyphens (-).')
             resetSubmitButton()
             return
           }
         } else if (action === 'update') {
-          if (!this.canUpdateDatamanagerGroup(newProperties.category)) { // eslint-disable-line
+          if (!this.canUpdateDatamanagerGroup(newProperties.category)) {
             window.alert('Insufficient permissions to update this datamanager group.')
             resetSubmitButton()
             return
@@ -1796,7 +1796,7 @@ $(function () {
       }
 
       // Check if schema id is valid.
-      if (this.prefixHasSchemaId(this.getPrefix(newProperties.name)) && !this.schemaIDs.includes(newProperties.schema_id)) { // eslint-disable-line
+      if (this.prefixHasSchemaId(this.getPrefix(newProperties.name)) && !this.schemaIDs.includes(newProperties.schema_id)) {
         window.alert('Please select a valid metadata schema as it is a required field.')
         resetSubmitButton()
         return
@@ -1838,7 +1838,7 @@ $(function () {
 
       // Avoid trying to set a schema id for groups that
       // can't have one.
-      if (!this.prefixHasSchemaId(this.getPrefix(newProperties.name))) { delete postData.group_schema_id } // eslint-disable-line
+      if (!this.prefixHasSchemaId(this.getPrefix(newProperties.name))) { delete postData.group_schema_id }
 
       if (action === 'update') {
         const selectedGroup = this.groups[$($('#group-list .group.active')[0]).attr('data-name')];
@@ -1856,11 +1856,11 @@ $(function () {
 
       // Avoid trying to set/update a data classification for groups that
       // can't have one.
-      if (!this.prefixHasDataClassification(this.getPrefix(newProperties.name))) { delete postData.group_data_classification } // eslint-disable-line
+      if (!this.prefixHasDataClassification(this.getPrefix(newProperties.name))) { delete postData.group_data_classification }
 
       // Avoid trying to set/update a expiration date for groups that
       // can't have one.
-      if (!this.prefixHasExpirationDate(this.getPrefix(newProperties.name))) { delete postData.group_expiration_date } // eslint-disable-line
+      if (!this.prefixHasExpirationDate(this.getPrefix(newProperties.name))) { delete postData.group_expiration_date }
 
       $.ajax({
         url: $(button).attr('action'),
@@ -1917,7 +1917,7 @@ $(function () {
       $('#group-list .group.active')
         .addClass('delete-pending disabled')
         .attr('title', 'Removal pending')
-      this.deselectGroup() // eslint-disable-line
+      this.deselectGroup()
 
       const that = this
 
@@ -2079,7 +2079,7 @@ $(function () {
       // Get the new role name from the button element before we deselect the user.
       const newRole = $(el).attr('data-target-role')
 
-      this.deselectUser() // eslint-disable-line
+      this.deselectUser()
 
       $.ajax({
         url: $(el).attr('data-action'),
@@ -2201,7 +2201,7 @@ $(function () {
       // }}}
 
       // Set initial state of group create button {{{
-      if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) { // eslint-disable-line
+      if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
         $('.div-show-search-groups').removeClass('d-none')
       } else {
         $('.div-show-search-groups').addClass('d-none')
@@ -2386,10 +2386,10 @@ $(function () {
       // }}}
       // }}}
 
-      this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-schema-id, .selectify-user-name, .selectify-search') // eslint-disable-line
+      this.selectifyInputs('.selectify-category, .selectify-subcategory, .selectify-schema-id, .selectify-user-name, .selectify-search')
       $('.selectify-data-classification').select2()
 
-      if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) { // eslint-disable-line
+      if (this.isMemberOfGroup('priv-group-add') || this.isRodsAdmin) {
         const $groupPanel = $('.card.groups')
         $groupPanel.find('.create-button').removeClass('disabled')
       }
@@ -2403,15 +2403,15 @@ $(function () {
           a += '<td><a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research space"><i class="fa-regular fa-folder"></i></a></td>'
         }
 
-        if (this.isManagerOfGroup(groupName)) { // eslint-disable-line
+        if (this.isManagerOfGroup(groupName)) {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
             a + '<td>&nbsp;<i class="fa fa-crown mt-1" title="You manage this group"></i>' + '</td></tr></table>'
           )
-        } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) { // eslint-disable-line
+        } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
             a + '<td>&nbsp;<i class="fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>' + '</td></tr></table>'
           )
-        } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access === 'reader') { // eslint-disable-line
+        } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access === 'reader') {
           $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
             a + '<td>&nbsp;<i class="fa-solid fa-eye mt-1" title="You have read access to this group"></i>' + '</td></tr></table>'
           )
@@ -2434,19 +2434,19 @@ $(function () {
       const selectedGroup = Yoda.storage.session.get('selected-group')
       if (selectedGroup !== null && selectedGroup in this.groups) {
         // Automatically select the last selected group within this session (bound to this tab).
-        this.selectGroup(selectedGroup) // eslint-disable-line
+        this.selectGroup(selectedGroup)
       }
 
       if (Object.keys(this.groups).length < this.CATEGORY_FOLD_THRESHOLD) {
         // Unfold all categories containing non-priv groups if the user has access to less than
         // CATEGORY_FOLD_THRESHOLD groups.
         for (const groupName in this.groups) {
-          if (!groupName.match(/^priv-/)) { this.unfoldToGroup(groupName) } // eslint-disable-line
+          if (!groupName.match(/^priv-/)) { this.unfoldToGroup(groupName) }
         }
       } else {
         // When the user can only access a single category, unfold it automatically.
         const $categoryEls = $('#group-list .category')
-        if ($categoryEls.length === 1) { this.unfoldToGroup($categoryEls.find('.group').attr('data-name')) } // eslint-disable-line
+        if ($categoryEls.length === 1) { this.unfoldToGroup($categoryEls.find('.group').attr('data-name')) }
       }
 
       $(window).on('beforeunload', function () {
