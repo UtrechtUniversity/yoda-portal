@@ -200,9 +200,9 @@ function readCsvFile (e) {
     // remove unwanted characters
     contents = contents.replaceAll('"', '').replaceAll("'", '').replaceAll(' ', '').replaceAll('\r', '')
 
-    // remove extra newlines at end of file
+    // remove extra newline(s) at end of file
     while (contents[contents.length - 1] === '\n') {
-      contents = contents.slice(0, contents.length - 1);
+      contents = contents.slice(0, contents.length - 1)
     }
 
     // ensure correct separator ','
