@@ -12,9 +12,11 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install standard
+      - name: Install standard and React plugin for ESlint
         run: |
-          npm install standard --location=global
+          npm install standard@17.1.2 --location=global
+          npm install eslint@8.57.1 --location=global
+          npm install eslint-plugin-react@7.37.1 --location=global
 
       - name: Lint with standard
         run: |
