@@ -406,6 +406,7 @@ async function processImportedRow (row) {
 
       $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
       row.addClass('table-danger')
+      let errorHtml = ''
       // collect error messages and maken 1 string to present to user.
       if (response.status_info) {
         response.status_info.forEach(function myFunction (item) {
