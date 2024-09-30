@@ -42,5 +42,3 @@ docs/_build/
 
 # Flask Secret Key
 flask_secret_key
-
-node_modules
