@@ -376,7 +376,6 @@ async function processImportedRow (row) {
     { quiet: true, rawResult: true })
   // Check if response is not null and handle it
   if (response) {
-    console.log(response)
     const status = response.status
 
     if (status === 'ok') {
@@ -408,7 +407,13 @@ async function processImportedRow (row) {
       $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
       row.addClass('table-danger')
       // collect error messages and maken 1 string to present to user.
-      let errorHtml = response.status_info ? response.status_info.join('<br/>') : 'An unknown error occurred.'
+      if (response.status_info) {
+        response.status_info.forEach(function myFunction (item) {
+          errorHtml += item + '<br/>'
+        })
+      } else {
+        errorHtml = 'An unknown error occurred.'
+      }
       $('#error-import-' + groupname).html(errorHtml)
     }
   } else {
