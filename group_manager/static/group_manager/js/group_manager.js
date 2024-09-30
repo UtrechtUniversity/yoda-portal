@@ -367,48 +367,56 @@ async function processImportedRow (row) {
   const groupname = row.attr('groupname')
   const importRowData = row.attr('importRowData')
 
-  try {
-    const response = await Yoda.call('group_process_csv',
-      {
-        csv_header_and_data: importRowData,
-        allow_update: $('#import-allow-updates').is(':checked'),
-        delete_users: $('#import-delete-users').is(':checked')
-      },
-      { quiet: true, rawResult: true })
-    // Successful import -> set correct classes and feedback to inform user
-    row.addClass('import-groupname-done')
-    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>')
-    row.addClass('import-csv-group-ok')
+  const response = await Yoda.call('group_process_csv',
+    {
+      csv_header_and_data: importRowData,
+      allow_update: $('#import-allow-updates').is(':checked'),
+      delete_users: $('#import-delete-users').is(':checked')
+    },
+    { quiet: true, rawResult: true })
+  // Check if response is not null and handle it
+  if (response) {
+    console.log(response)
+    const status = response.status
 
-    row.addClass('table-success')
-    let successHtml = ''
-    response.status_info.forEach(function myFunction (item) {
-      successHtml += item + '<br/>'
-    })
-    $('#success-import-' + groupname).html(successHtml)
+    if (status === 'ok') {
+      // Successful import -> set correct classes and feedback to inform user
+      row.addClass('import-groupname-done')
+      $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>')
+      row.addClass('import-csv-group-ok')
 
-    // Solely added for test automation - splinter.
-    // This was the only way to be able to perform an automated click work on a row.
-    // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
-    $('#processed-indicator-' + groupname).on('click', function () {
-      const groupName = 'research-' + groupname
-      $('#dlg-import-groups-csv').modal('hide')
-      Yoda.groupManager.unfoldToGroup(groupName)
-      Yoda.groupManager.selectGroup(groupName)
-    })
-  } catch (error) {
-    // Row processing encountered problems => inform user and add appropriate classes.
-    row.addClass('import-groupname-done')
+      row.addClass('table-success')
+      let successHtml = ''
+      response.status_info.forEach(function myFunction (item) {
+        successHtml += item + '<br/>'
+      })
+      $('#success-import-' + groupname).html(successHtml)
 
-    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
+      // Solely added for test automation - splinter.
+      // This was the only way to be able to perform an automated click work on a row.
+      // in itself this functionality is superfluous - as it is dealt with in $('.import-csv-group-ok').click(function() {}
+      $('#processed-indicator-' + groupname).on('click', function () {
+        const groupName = 'research-' + groupname
+        $('#dlg-import-groups-csv').modal('hide')
+        Yoda.groupManager.unfoldToGroup(groupName)
+        Yoda.groupManager.selectGroup(groupName)
+      })
+    } else {
+      // Row processing encountered problems => inform user and add appropriate classes.
+      row.addClass('import-groupname-done')
+
+      $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
+      row.addClass('table-danger')
+      // collect error messages and maken 1 string to present to user.
+      let errorHtml = response.status_info ? response.status_info.join('<br/>') : 'An unknown error occurred.'
+      $('#error-import-' + groupname).html(errorHtml)
+    }
+  } else {
     row.addClass('table-danger')
-    // collect error messages and maken 1 string to present to user.
-    let errorHtml = ''
-    error.status_info.forEach(function myFunction (item) {
-      errorHtml += item + '<br/>'
-    })
-    $('#error-import-' + groupname).html(errorHtml)
+    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
+    $('#error-import-' + groupname).html('An unexpected error occurred.')
   }
+
   // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
   if ($('.import-groupname').length === $('.import-groupname-done').length) {
     // only enable new groups that have been successfully added
