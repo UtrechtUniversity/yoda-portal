@@ -302,6 +302,7 @@ function readCsvFile (e) {
     presentationColumns.forEach(function myFunction (column) {
       table += '<th>' + column.replace('_', ' ') + '</th>'
     })
+    table += '<th>status</th>'
     table += '<td></td></tr></thead><tbody>'
 
     newResult.forEach(function myFunction (groupDef, i) {
@@ -310,8 +311,7 @@ function readCsvFile (e) {
       presentationColumns.forEach(function myFunction (column) {
         table += '<td>' + groupDef[column] + '</td>'
       })
-      table += '<td id="success-import-' + groupDef.groupname + '"></td>'
-      table += '<td id="error-import-' + groupDef.groupname + '"></td>'
+      table += '<td id="import-' + groupDef.groupname + '"></td>'
       table += '</tr>'
     })
 
@@ -389,7 +389,7 @@ async function processImportedRow (row) {
       response.status_info.forEach(function myFunction (item) {
         successHtml += item + '<br/>'
       })
-      $('#success-import-' + groupname).html(successHtml)
+      $('#import-' + groupname).html(successHtml)
 
       // Solely added for test automation - splinter.
       // This was the only way to be able to perform an automated click work on a row.
@@ -415,12 +415,12 @@ async function processImportedRow (row) {
       } else {
         errorHtml = 'An unknown error occurred.'
       }
-      $('#error-import-' + groupname).html(errorHtml)
+      $('#import-' + groupname).html(errorHtml)
     }
   } else {
     row.addClass('table-danger')
     $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
-    $('#error-import-' + groupname).html('An unexpected error occurred.')
+    $('#import-' + groupname).html('An unexpected error occurred.')
   }
 
   // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
