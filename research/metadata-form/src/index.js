@@ -731,6 +731,11 @@ function loadForm() {
                     $('#metadata-form').removeClass('hide');
                 }
 
+                // If maintenance banner is visible, add padding to metadata form header
+                if ($('div[name="banner head"]').length) {
+                    $('#metadata-form .card-header').addClass('pt-4 pb-3')
+                }
+
                 // Specific required textarea handling
                 $('textarea').each(function() {
                     if ($(this).attr('required')) {
