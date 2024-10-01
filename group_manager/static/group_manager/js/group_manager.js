@@ -302,6 +302,7 @@ function readCsvFile (e) {
     presentationColumns.forEach(function myFunction (column) {
       table += '<th>' + column.replace('_', ' ') + '</th>'
     })
+    table += '<th>status</th>'
     table += '<td></td></tr></thead><tbody>'
 
     newResult.forEach(function myFunction (groupDef, i) {
@@ -310,7 +311,7 @@ function readCsvFile (e) {
       presentationColumns.forEach(function myFunction (column) {
         table += '<td>' + groupDef[column] + '</td>'
       })
-      table += '<td id="error-import-' + groupDef.groupname + '"></td>'
+      table += '<td id="import-' + groupDef.groupname + '"></td>'
       table += '</tr>'
     })
 
@@ -366,18 +367,29 @@ async function processImportedRow (row) {
   const groupname = row.attr('groupname')
   const importRowData = row.attr('importRowData')
 
-  try {
-    await Yoda.call('group_process_csv',
-      {
-        csv_header_and_data: importRowData,
-        allow_update: $('#import-allow-updates').is(':checked'),
-        delete_users: $('#import-delete-users').is(':checked')
-      },
-      { quiet: true }).then((data) => {
+  const response = await Yoda.call('group_process_csv',
+    {
+      csv_header_and_data: importRowData,
+      allow_update: $('#import-allow-updates').is(':checked'),
+      delete_users: $('#import-delete-users').is(':checked')
+    },
+    { quiet: true, rawResult: true })
+  // Check if response is not null and handle it
+  if (response) {
+    const status = response.status
+
+    if (status === 'ok') {
       // Successful import -> set correct classes and feedback to inform user
       row.addClass('import-groupname-done')
       $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>')
       row.addClass('import-csv-group-ok')
+
+      row.addClass('table-success')
+      let successHtml = ''
+      response.status_info.forEach(function myFunction (item) {
+        successHtml += item + '<br/>'
+      })
+      $('#import-' + groupname).html(successHtml)
 
       // Solely added for test automation - splinter.
       // This was the only way to be able to perform an automated click work on a row.
@@ -388,20 +400,29 @@ async function processImportedRow (row) {
         Yoda.groupManager.unfoldToGroup(groupName)
         Yoda.groupManager.selectGroup(groupName)
       })
-    })
-  } catch (error) {
-    // Row processing encountered problems => inform user and add appropriate classes.
-    row.addClass('import-groupname-done')
+    } else {
+      // Row processing encountered problems => inform user and add appropriate classes.
+      row.addClass('import-groupname-done')
 
-    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
+      $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
+      row.addClass('table-danger')
+      let errorHtml = ''
+      // collect error messages and maken 1 string to present to user.
+      if (response.status_info) {
+        response.status_info.forEach(function myFunction (item) {
+          errorHtml += item + '<br/>'
+        })
+      } else {
+        errorHtml = 'An unknown error occurred.'
+      }
+      $('#import-' + groupname).html(errorHtml)
+    }
+  } else {
     row.addClass('table-danger')
-    // collect error messages and maken 1 string to present to user.
-    let errorHtml = ''
-    error.status_info.forEach(function myFunction (item) {
-      errorHtml += item + '<br/>'
-    })
-    $('#error-import-' + groupname).html(errorHtml)
+    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
+    $('#import-' + groupname).html('An unexpected error occurred.')
   }
+
   // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
   if ($('.import-groupname').length === $('.import-groupname-done').length) {
     // only enable new groups that have been successfully added
