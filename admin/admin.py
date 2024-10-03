@@ -3,6 +3,7 @@
 __copyright__ = 'Copyright (c) 2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import os
 import html
 import json
 from functools import wraps
@@ -16,6 +17,7 @@ from flask import (
     Flask,
     g,
     jsonify,
+    make_response,
     redirect,
     render_template,
     request,
@@ -29,6 +31,8 @@ from markupsafe import escape
 
 import api
 from util import get_theme_directories, length_check
+from werkzeug.utils import secure_filename
+from irods.message import iRODSMessage
 
 # Blueprint configuration
 admin_bp = Blueprint("admin_bp", __name__,
@@ -271,3 +275,48 @@ def get_publication_terms()  -> Optional[str]:
         flash("Failed to load publication terms from API", "error")
 
     return "Error: failed to read publication terms"
+
+
+@admin_bp.route('/upload_file_formats', methods=['POST'])
+@admin_required
+def upload_file_formats():
+    filename = secure_filename(request.files['file'].filename)
+    if not filename.endswith('.json'):
+        flash("Uploaded file for file formats is not a JSON file.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    file_path = os.path.join("/" + g.irods.zone, 'yoda', 'file_formats', filename)
+
+    # Get the chunk data.
+    data = request.files['file']
+    encode_unicode_content = iRODSMessage.encode_unicode(data.stream.read())
+
+    try:
+        with g.irods.data_objects.open(file_path, 'w') as obj_desc:
+            obj_desc.write(encode_unicode_content)
+        obj_desc.close()
+        flash("File Formats uploaded successfully.", "success")
+    except Exception:
+        flash("Failed to upload File Formats", "error")
+
+    return redirect(url_for("admin_bp.index"))
+
+
+@admin_bp.route('/delete_file_formats', methods=['POST'])
+@admin_required
+def delete_file_formats():
+    filename = request.form.get('filename')
+
+    if not filename:
+        flash("No File Formats specified for deletion.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    file_path = os.path.join("/" + g.irods.zone, 'yoda', 'file_formats', filename + '.json')
+    print(file_path)
+    try:
+        g.irods.data_objects.unlink(file_path, force=True)
+        flash(f"File '{filename}' deleted successfully.", "success")
+    except Exception as e:
+        flash("Failed to delete File Formats.", "danger")
+
+    return redirect(url_for("admin_bp.index"))

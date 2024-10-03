@@ -4,7 +4,9 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='lib/purify-3.1.6/js/purify.min.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/jquery-3.7.1/jquery-3.7.1.min.js') }}"></script>
 <script src="{{ url_for('admin_bp.static', filename='js/create_preview.js') }}"></script>
+<script src="{{ url_for('admin_bp.static', filename='js/file_formats.js') }}"></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -63,7 +65,7 @@
                 </div>
 
                 <!-- Publication Terms Section -->
-                <div>
+                <div class="mb-4">
                     <h2 class="card-title">Publication Terms</h2>
                     <div class="d-flex justify-content-start align-items-end">
                         <form action="{{ url_for('admin_bp.set_publication_terms') }}" method="post"
@@ -77,6 +79,29 @@
                             <button type="submit" id="admin-set-terms" class="btn btn-primary">Set Terms</button>
                             <button type="button" id="admin-create-preview" class="btn btn-secondary ms-2">Preview
                                 Terms</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- File Formats Section -->
+                <div class="mb-4">
+                    <h2 class="card-title">File Formats</h2>
+                    <div class="mb-3">
+                        <label>List of File Formats:</label>
+                        <form action="{{ url_for('admin_bp.delete_file_formats') }}" method="post" class="flex-fill me-2 needs-validation" novalidate>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <select class="form-control" id="file-formats-list" name="filename" required>
+                                <option value="" disabled selected>Select a file format to delete</option>
+                            </select>
+                            <button type="submit" class="btn btn-danger" id="delete-format-button" disabled>Delete File Formats</button>
+                        </form>
+                    </div>
+                    <div class="mb-3">
+                        <label>Upload new File Formats:</label>
+                        <form action="{{ url_for('admin_bp.upload_file_formats') }}" method="post" enctype="multipart/form-data" class="flex-fill me-2 needs-validation" novalidate>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="file" name="file" id="file" class="d-none" required>
+                            <button type="button" class="btn btn-primary" id="upload-button">Upload File Formats</button>
                         </form>
                     </div>
                 </div>
