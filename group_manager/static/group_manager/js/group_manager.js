@@ -2408,32 +2408,28 @@ $(function () {
         $groupPanel.find('.create-button').removeClass('disabled')
       }
 
-      let a = ''
       // Indicate which groups are managed by this user.
+      const groupList = document.querySelector('#group-list')
+      let icons = ''
       for (const groupName in this.groups) {
-        a = '<table class="float-end"><tr>'
+        const group = groupList.querySelector('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]')
+
+        icons = '<table class="float-end"><tr>'
 
         if (groupName.match(/^(research)-/)) {
-          a += '<td><a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research space"><i class="fa-regular fa-folder"></i></a></td>'
+          icons += '<td><a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research space"><i class="fa-regular fa-folder"></i></a></td>'
         }
 
         if (this.isManagerOfGroup(groupName)) {
-          $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            a + '<td>&nbsp;<i class="fa fa-crown mt-1" title="You manage this group"></i>' + '</td></tr></table>'
-          )
+          icons += '<td>&nbsp;<i class="fa fa-crown mt-1" title="You manage this group"></i>' + '</td></tr></table>'
         } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
-          $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            a + '<td>&nbsp;<i class="fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>' + '</td></tr></table>'
-          )
+          icons += '<td>&nbsp;<i class="fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>' + '</td></tr></table>'
         } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access === 'reader') {
-          $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            a + '<td>&nbsp;<i class="fa-solid fa-eye mt-1" title="You have read access to this group"></i>' + '</td></tr></table>'
-          )
+          icons += '<td>&nbsp;<i class="fa-solid fa-eye mt-1" title="You have read access to this group"></i>' + '</td></tr></table>'
         } else {
-          $('#group-list .group[data-name="' + Yoda.escapeQuotes(groupName) + '"]').append(
-            a + '<td style="width: 26px;"></td></tr></table>'
-          )
+          icons += '<td style="width: 26px;"></td></tr></table>'
         }
+        group.insertAdjacentHTML('beforeend', icons)
       }
 
       const isCollapsed = Yoda.storage.session.get('is-collapsed')
