@@ -213,7 +213,7 @@ def set_publication_terms() -> Response:
 
     :return: A redirection response to the admin index page.
     """
-    # Retrives new terms from the POST request
+    # Retrieves new terms from the POST request
     new_terms = request.form['publicationTerms']
     sanitized_terms = html.escape(new_terms)
 

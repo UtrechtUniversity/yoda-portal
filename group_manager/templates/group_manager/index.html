@@ -9,7 +9,7 @@
 {% endblock style %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='lib/purify-3.1.6/js/purify.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/purify-3.1.7/js/purify.min.js') }}"></script>
     <script src="{{ url_for('group_manager_bp.static', filename='js/group_manager.js') }}"></script>
     <script src="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.full.min.js') }}"></script>
     <script>
@@ -33,10 +33,10 @@
                 Groups
                 <ul class="nav nav-pills float-end" id="pills-tab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="btn btn-sm me-1 {% if show_list == "TREE" %}active{% endif %}" id="pills-tree-tab" data-bs-toggle="pill" data-bs-target="#pills-tree" type="button" role="tab" aria-controls="pills-tree" aria-selected="{% if show_list == "TREE" %} true {% else %} false {% endif %}">Tree view</button>
+                        <button class="btn btn-sm me-1 {% if g.settings.group_manager_view == "TREE" %}active{% endif %}" id="pills-tree-tab" data-bs-toggle="pill" data-bs-target="#pills-tree" type="button" role="tab" aria-controls="pills-tree" aria-selected="{% if g.settings.group_manager_view == "TREE" %} true {% else %} false {% endif %}">Tree view</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="btn btn-sm {% if show_list == "LIST" %}active{% endif %}" id="pills-list-tab" data-bs-toggle="pill" data-bs-target="#pills-list" type="button" role="tab" aria-controls="pills-list" aria-selected="{% if show_list == "LIST" %} true {% else %} false {% endif %}">List view</button>
+                        <button class="btn btn-sm {% if g.settings.group_manager_view == "LIST" %}active{% endif %}" id="pills-list-tab" data-bs-toggle="pill" data-bs-target="#pills-list" type="button" role="tab" aria-controls="pills-list" aria-selected="{% if g.settings.group_manager_view == "LIST" %} true {% else %} false {% endif %}">List view</button>
                     </li>
                 </ul>
             </div>
@@ -46,7 +46,7 @@
                 </select>
             </div>
             <div class="tab-content" id="pills-tabContent">
-                <div class="tab-pane {% if show_list == "TREE" %} show active {% endif %}" id="pills-tree" role="tabpanel" aria-labelledby="pills-tree-tab">
+                <div class="tab-pane {% if g.settings.group_manager_view == "TREE" %} show active {% endif %}" id="pills-tree" role="tabpanel" aria-labelledby="pills-tree-tab">
                     <div class="card groups">
                         <div class="list-group" id="group-list">
 
@@ -78,7 +78,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane {% if show_list == "LIST" %} show active {% endif %}" id="pills-list" role="tabpanel" aria-labelledby="pills-list-tab">
+                <div class="tab-pane {% if g.settings.group_manager_view == "LIST" %} show active {% endif %}" id="pills-list" role="tabpanel" aria-labelledby="pills-list-tab">
                     <div class="card groups">
 
                         <div id="result-user-search-groups"></div>
