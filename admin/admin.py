@@ -277,7 +277,7 @@ def get_publication_terms()  -> Optional[str]:
 
 @admin_bp.route('/upload_file_formats', methods=['POST'])
 @admin_required
-def upload_file_formats():
+def upload_file_formats() -> Response:
     filename = secure_filename(request.files['file'].filename)
     if not filename.endswith('.json'):
         flash("Uploaded file for file formats is not a JSON file.", "danger")
@@ -302,7 +302,7 @@ def upload_file_formats():
 
 @admin_bp.route('/delete_file_formats', methods=['POST'])
 @admin_required
-def delete_file_formats():
+def delete_file_formats() -> Response:
     filename = request.form.get('filename')
 
     if not filename:
