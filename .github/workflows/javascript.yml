@@ -21,3 +21,10 @@ jobs:
       - name: Lint with standard
         run: |
           standard
+
+      - name: Check for webpack bundles produced in development mode
+        run: |
+          if grep -l 'ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").' $(find . -name "*.js")
+          then echo "Error: found a webpack bundle that was produced in development mode (needs to be production mode)"
+               exit 1
+          fi
