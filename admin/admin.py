@@ -24,8 +24,8 @@ from flask import (
     url_for,
 )
 from flask import current_app as app
-from jinja2 import ChoiceLoader, FileSystemLoader
 from irods.message import iRODSMessage
+from jinja2 import ChoiceLoader, FileSystemLoader
 from markupsafe import escape
 from werkzeug.utils import secure_filename
 
