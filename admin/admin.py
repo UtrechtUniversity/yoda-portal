@@ -278,22 +278,46 @@ def get_publication_terms()  -> Optional[str]:
 @admin_bp.route('/upload_file_formats', methods=['POST'])
 @admin_required
 def upload_file_formats() -> Response:
+    file = request.files['file']
     filename = secure_filename(request.files['file'].filename)
+
     if not filename.endswith('.json'):
-        flash("Uploaded file for file formats is not a JSON file.", "danger")
+        flash(f"File Formats '{filename}' is not a JSON file.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    if request.content_length > 1 * 1024 * 1024:
+        flash(f"File Formats '{filename}' exceeds the 1 MB size limit.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    try:
+        file_content = file.read().decode('utf-8')
+        data = json.loads(file_content)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        flash(f"File Formats '{filename}' contains invalid JSON.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    required_keys = ["name", "help", "advice", "formats"]
+    if not all(key in data for key in required_keys):
+        flash(f"File Formats '{filename}' is missing required keys.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    if not isinstance(data['name'], str) or not isinstance(data['help'], str) or not isinstance(data['advice'], str):
+        flash(f"File Formats '{filename}' has invalid types for 'name', 'help', or 'advice'.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    if not isinstance(data['formats'], list) or not all(isinstance(ext, str) for ext in data['formats']):
+        flash(f"File Formats '{filename}' has an invalid 'formats' field. It should be a list of extensions.", "danger")
         return redirect(url_for("admin_bp.index"))
 
     file_path = path.join("/" + g.irods.zone, 'yoda', 'file_formats', filename)
 
-    # Get the chunk data.
-    data = request.files['file']
-    encode_unicode_content = iRODSMessage.encode_unicode(data.stream.read())
+    encode_unicode_content = iRODSMessage.encode_unicode(file_content)
 
     try:
         with g.irods.data_objects.open(file_path, 'w') as obj_desc:
             obj_desc.write(encode_unicode_content)
         obj_desc.close()
-        flash("File Formats uploaded successfully.", "success")
+        flash(f"File Formats '{filename}' uploaded successfully.", "success")
     except Exception:
         flash("Failed to upload File Formats", "error")
 
@@ -313,7 +337,7 @@ def delete_file_formats() -> Response:
 
     try:
         g.irods.data_objects.unlink(file_path, force=False)
-        flash(f"File Formats '{filename}' deleted successfully.", "success")
+        flash(f"File Formats '{filename}.json' deleted successfully.", "success")
     except Exception:
         flash("Failed to delete File Formats.", "danger")
 
