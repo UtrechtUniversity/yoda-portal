@@ -3,7 +3,6 @@
 __copyright__ = 'Copyright (c) 2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-import os
 import html
 import json
 from functools import wraps
@@ -17,7 +16,6 @@ from flask import (
     Flask,
     g,
     jsonify,
-    make_response,
     redirect,
     render_template,
     request,
@@ -29,10 +27,11 @@ from flask import current_app as app
 from jinja2 import ChoiceLoader, FileSystemLoader
 from markupsafe import escape
 
+from irods.message import iRODSMessage
+from werkzeug.utils import secure_filename
+
 import api
 from util import get_theme_directories, length_check
-from werkzeug.utils import secure_filename
-from irods.message import iRODSMessage
 
 # Blueprint configuration
 admin_bp = Blueprint("admin_bp", __name__,
@@ -285,7 +284,7 @@ def upload_file_formats():
         flash("Uploaded file for file formats is not a JSON file.", "danger")
         return redirect(url_for("admin_bp.index"))
 
-    file_path = os.path.join("/" + g.irods.zone, 'yoda', 'file_formats', filename)
+    file_path = path.join("/" + g.irods.zone, 'yoda', 'file_formats', filename)
 
     # Get the chunk data.
     data = request.files['file']
@@ -311,12 +310,12 @@ def delete_file_formats():
         flash("No File Formats specified for deletion.", "danger")
         return redirect(url_for("admin_bp.index"))
 
-    file_path = os.path.join("/" + g.irods.zone, 'yoda', 'file_formats', filename + '.json')
-    print(file_path)
+    file_path = path.join("/" + g.irods.zone, 'yoda', 'file_formats', filename + '.json')
+
     try:
-        g.irods.data_objects.unlink(file_path, force=True)
-        flash(f"File '{filename}' deleted successfully.", "success")
-    except Exception as e:
+        g.irods.data_objects.unlink(file_path, force=False)
+        flash(f"File Formats '{filename}' deleted successfully.", "success")
+    except Exception:
         flash("Failed to delete File Formats.", "danger")
 
     return redirect(url_for("admin_bp.index"))

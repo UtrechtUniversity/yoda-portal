@@ -87,17 +87,21 @@
                 <div class="mb-4">
                     <h2 class="card-title">File Formats</h2>
                     <div class="mb-3">
-                        <label>List of File Formats:</label>
+                        <label>List of current File Formats:</label>
                         <form action="{{ url_for('admin_bp.delete_file_formats') }}" method="post" class="flex-fill me-2 needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <select class="form-control" id="file-formats-list" name="filename" required>
-                                <option value="" disabled selected>Select a file format to delete</option>
-                            </select>
+                            <div class="mb-3">
+                                <select class="form-control" id="file-formats-list" name="filename" required>
+                                    <option value="" disabled selected>Select File Formats to delete</option>
+                                </select>
+                            </div>
                             <button type="submit" class="btn btn-danger" id="delete-format-button" disabled>Delete File Formats</button>
                         </form>
                     </div>
-                    <div class="mb-3">
-                        <label>Upload new File Formats:</label>
+                    <div>
+                        <div class="mb-3">
+                            <label>Upload new File Formats:</label>
+                        </div>
                         <form action="{{ url_for('admin_bp.upload_file_formats') }}" method="post" enctype="multipart/form-data" class="flex-fill me-2 needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="file" name="file" id="file" class="d-none" required>
