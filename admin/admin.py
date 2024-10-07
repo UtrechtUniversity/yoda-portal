@@ -319,7 +319,7 @@ def upload_file_formats() -> Response:
         obj_desc.close()
         flash(f"File Formats '{filename}' uploaded successfully.", "success")
     except Exception:
-        flash("Failed to upload File Formats", "error")
+        flash(f"Failed to upload File Formats '{filename}'.", "danger")
 
     return redirect(url_for("admin_bp.index"))
 
