@@ -24,8 +24,10 @@ from flask import (
     url_for,
 )
 from flask import current_app as app
+from irods.message import iRODSMessage
 from jinja2 import ChoiceLoader, FileSystemLoader
 from markupsafe import escape
+from werkzeug.utils import secure_filename
 
 import api
 from util import get_theme_directories, length_check
@@ -271,3 +273,72 @@ def get_publication_terms()  -> Optional[str]:
         flash("Failed to load publication terms from API", "error")
 
     return "Error: failed to read publication terms"
+
+
+@admin_bp.route('/upload_file_formats', methods=['POST'])
+@admin_required
+def upload_file_formats() -> Response:
+    file = request.files['file']
+    filename = secure_filename(request.files['file'].filename)
+
+    if not filename.endswith('.json'):
+        flash(f"File format list '{filename}' is not a JSON file.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    if request.content_length > 1 * 1024 * 1024:
+        flash(f"File format list '{filename}' exceeds the 1 MB size limit.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    try:
+        file_content = file.read().decode('utf-8')
+        data = json.loads(file_content)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        flash(f"File format list '{filename}' contains invalid JSON.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    required_keys = ["name", "help", "advice", "formats"]
+    if not all(key in data for key in required_keys):
+        flash(f"File format list '{filename}' is missing required keys.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    if not isinstance(data['name'], str) or not isinstance(data['help'], str) or not isinstance(data['advice'], str):
+        flash(f"File format list '{filename}' has invalid types for 'name', 'help', or 'advice'.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    if not isinstance(data['formats'], list) or not all(isinstance(ext, str) for ext in data['formats']):
+        flash(f"File format list '{filename}' has an invalid 'formats' field. It should be a list of extensions.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    file_path = path.join("/" + g.irods.zone, 'yoda', 'file_formats', filename)
+
+    encode_unicode_content = iRODSMessage.encode_unicode(file_content)
+
+    try:
+        with g.irods.data_objects.open(file_path, 'w') as obj_desc:
+            obj_desc.write(encode_unicode_content)
+        obj_desc.close()
+        flash(f"File format list '{filename}' uploaded successfully.", "success")
+    except Exception:
+        flash(f"Failed to upload file format list '{filename}'.", "danger")
+
+    return redirect(url_for("admin_bp.index"))
+
+
+@admin_bp.route('/delete_file_formats', methods=['POST'])
+@admin_required
+def delete_file_formats() -> Response:
+    filename = request.form.get('filename')
+
+    if not filename:
+        flash("No file format list specified for deletion.", "danger")
+        return redirect(url_for("admin_bp.index"))
+
+    file_path = path.join("/" + g.irods.zone, 'yoda', 'file_formats', filename + '.json')
+
+    try:
+        g.irods.data_objects.unlink(file_path, force=False)
+        flash(f"File format list '{filename}.json' deleted successfully.", "success")
+    except Exception:
+        flash(f"Failed to delete file format list '{filename}.json'.", "danger")
+
+    return redirect(url_for("admin_bp.index"))
