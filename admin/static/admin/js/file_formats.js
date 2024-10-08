@@ -3,7 +3,7 @@
 
 $(function () {
   Yoda.call('vault_preservable_formats_lists').then((data) => {
-    $('#file-formats-list').html("<option value='' disabled selected>Select a file format list</option>")
+    $('#file-formats-list').html("<option value='' disabled selected>Select file format list to delete</option>")
     for (const list in data) {
       if (Object.prototype.hasOwnProperty.call(data, list)) {
         $('#file-formats-list').append(new Option(data[list].name, list))

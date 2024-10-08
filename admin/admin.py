@@ -282,31 +282,31 @@ def upload_file_formats() -> Response:
     filename = secure_filename(request.files['file'].filename)
 
     if not filename.endswith('.json'):
-        flash(f"File Formats '{filename}' is not a JSON file.", "danger")
+        flash(f"File format list '{filename}' is not a JSON file.", "danger")
         return redirect(url_for("admin_bp.index"))
 
     if request.content_length > 1 * 1024 * 1024:
-        flash(f"File Formats '{filename}' exceeds the 1 MB size limit.", "danger")
+        flash(f"File format list '{filename}' exceeds the 1 MB size limit.", "danger")
         return redirect(url_for("admin_bp.index"))
 
     try:
         file_content = file.read().decode('utf-8')
         data = json.loads(file_content)
     except (json.JSONDecodeError, UnicodeDecodeError):
-        flash(f"File Formats '{filename}' contains invalid JSON.", "danger")
+        flash(f"File format list '{filename}' contains invalid JSON.", "danger")
         return redirect(url_for("admin_bp.index"))
 
     required_keys = ["name", "help", "advice", "formats"]
     if not all(key in data for key in required_keys):
-        flash(f"File Formats '{filename}' is missing required keys.", "danger")
+        flash(f"File format list '{filename}' is missing required keys.", "danger")
         return redirect(url_for("admin_bp.index"))
 
     if not isinstance(data['name'], str) or not isinstance(data['help'], str) or not isinstance(data['advice'], str):
-        flash(f"File Formats '{filename}' has invalid types for 'name', 'help', or 'advice'.", "danger")
+        flash(f"File format list '{filename}' has invalid types for 'name', 'help', or 'advice'.", "danger")
         return redirect(url_for("admin_bp.index"))
 
     if not isinstance(data['formats'], list) or not all(isinstance(ext, str) for ext in data['formats']):
-        flash(f"File Formats '{filename}' has an invalid 'formats' field. It should be a list of extensions.", "danger")
+        flash(f"File format list '{filename}' has an invalid 'formats' field. It should be a list of extensions.", "danger")
         return redirect(url_for("admin_bp.index"))
 
     file_path = path.join("/" + g.irods.zone, 'yoda', 'file_formats', filename)
@@ -317,9 +317,9 @@ def upload_file_formats() -> Response:
         with g.irods.data_objects.open(file_path, 'w') as obj_desc:
             obj_desc.write(encode_unicode_content)
         obj_desc.close()
-        flash(f"File Formats '{filename}' uploaded successfully.", "success")
+        flash(f"File format list '{filename}' uploaded successfully.", "success")
     except Exception:
-        flash(f"Failed to upload File Formats '{filename}'.", "danger")
+        flash(f"Failed to upload file format list '{filename}'.", "danger")
 
     return redirect(url_for("admin_bp.index"))
 
@@ -330,15 +330,15 @@ def delete_file_formats() -> Response:
     filename = request.form.get('filename')
 
     if not filename:
-        flash("No File Formats specified for deletion.", "danger")
+        flash("No file format list specified for deletion.", "danger")
         return redirect(url_for("admin_bp.index"))
 
     file_path = path.join("/" + g.irods.zone, 'yoda', 'file_formats', filename + '.json')
 
     try:
         g.irods.data_objects.unlink(file_path, force=False)
-        flash(f"File Formats '{filename}.json' deleted successfully.", "success")
+        flash(f"File format list '{filename}.json' deleted successfully.", "success")
     except Exception:
-        flash("Failed to delete File Formats.", "danger")
+        flash(f"Failed to delete file format list '{filename}.json'.", "danger")
 
     return redirect(url_for("admin_bp.index"))

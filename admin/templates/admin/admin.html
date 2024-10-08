@@ -82,29 +82,33 @@
                     </div>
                 </div>
 
-                <!-- File Formats Section -->
+                <!-- Preservable file formats Section -->
                 <div class="mb-4">
-                    <h2 class="card-title">File Formats</h2>
+                    <h2 class="card-title">Preservable file formats</h2>
+                    <p>
+                        Preservable file formats define how files are stored in Yoda for long-term accessibility and usability. Functional admin can also manage file format lists using iRODS commands. For more details, refer to the 
+                        <a href="https://utrechtuniversity.github.io/yoda/administration/installing-preservable-file-formats.html" target="_blank">technical documentation</a>.
+                    </p>
                     <div class="mb-3">
-                        <label>List of current File Formats:</label>
+                        <label>Current file format lists:</label>
                         <form action="{{ url_for('admin_bp.delete_file_formats') }}" method="post" class="flex-fill me-2 needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="mb-3">
                                 <select class="form-control" id="file-formats-list" name="filename" required>
-                                    <option value="" disabled selected>Select File Formats to delete</option>
+                                    <option value="" disabled selected>Select file format list to delete</option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-danger" id="delete-format-button" disabled>Delete File Formats</button>
+                            <button type="submit" class="btn btn-danger" id="delete-format-button" disabled>Delete file format list</button>
                         </form>
                     </div>
                     <div>
                         <div class="mb-3">
-                            <label>Upload new File Formats:</label>
+                            <label>Upload new file format list:</label>
                         </div>
                         <form action="{{ url_for('admin_bp.upload_file_formats') }}" method="post" enctype="multipart/form-data" class="flex-fill me-2 needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="file" name="file" id="file" class="d-none" required>
-                            <button type="button" class="btn btn-primary" id="upload-button">Upload File Formats</button>
+                            <button type="button" class="btn btn-primary" id="upload-button">Upload file format list</button>
                         </form>
                     </div>
                 </div>
