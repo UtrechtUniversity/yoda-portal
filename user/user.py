@@ -5,6 +5,7 @@ __license__   = 'GPLv3, see LICENSE'
 
 import json
 import secrets
+from datetime import datetime
 from typing import List
 from uuid import uuid4
 
@@ -91,6 +92,7 @@ def login() -> Response:
             return render_template('user/login.html', login_placeholder=get_login_placeholder())
 
         session['login_username'] = username
+        session['login_time'] = datetime.now()
         g.login_username = username
 
         # Check if someone isn't trying to sneak past OIDC login.
