@@ -4,10 +4,11 @@ __copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
+import threading
 from os import path
 from typing import Any, Dict, Optional
 
-from flask import Flask, g, redirect, request, Response, send_from_directory, url_for
+from flask import Flask, g, redirect, request, Response, send_from_directory, session, url_for
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 
@@ -128,10 +129,12 @@ app.config['search-items-per-page'] = 10
 Session(app)
 
 # Start monitoring thread for extracting tech support information
-with app.app_context():
-    # Monitor signal file can be set to empty to completely disable monitor thread.
-    if app.config.get("MONITOR_SIGNAL_FILE", "/var/www/yoda/show-tech.sig") != "":
-        monitor_thread = Monitor(app.config)
+# Monitor signal file can be set to empty to completely disable monitor thread
+monitor_enabled: bool = app.config.get("MONITOR_SIGNAL_FILE", "/var/www/yoda/show-tech.sig") != ""
+monitor_data: Dict[int, Dict[str, Any]] = {}
+if monitor_enabled:
+    with app.app_context():
+        monitor_thread: Monitor = Monitor(app.config, monitor_data)
         monitor_thread.start()
 
 # Register blueprints
@@ -201,6 +204,28 @@ def protect_pages() -> Optional[Response]:
         return None
     else:
         return redirect(url_for('user_bp.gate', redirect_target=request.full_path))
+
+
+@app.before_request
+def add_monitor_data() -> None:
+    if monitor_enabled:
+        monitor_data[threading.get_ident()] = {"Username": session.get("login_username", None),
+                                               "Login time": session.get("login_time", None),
+                                               "Request method": request.method,
+                                               "Request endpoint": request.endpoint,
+                                               "Request arguments": request.args}
+
+
+@app.after_request
+def cleanup_monitor_data(response: Response) -> Response:
+    if monitor_enabled:
+        try:
+            thread_id: int = threading.get_ident()
+            monitor_data.pop(thread_id)
+        except KeyError:
+            # No need to do anything if thread monitor data is not present
+            pass
+    return response
 
 
 @app.after_request
