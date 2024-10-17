@@ -115,11 +115,11 @@ def api_error_handler(error: Exception) -> Response:
     data: Dict[str, Any] = {}
     code = 500
 
-    if type(error) == InvalidAPIError:
+    if type(error) is InvalidAPIError:
         code = 400
         status_info = "Bad API request"
 
-    if type(error) == UnauthorizedAPIAccessError:
+    if type(error) is UnauthorizedAPIAccessError:
         code = 401
         status_info = "Not authorized to use the API"
 
