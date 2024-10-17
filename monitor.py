@@ -13,6 +13,7 @@ import traceback
 from datetime import datetime
 from io import StringIO
 from threading import Timer
+from typing import Any, Dict
 
 import flask
 import humanize
@@ -21,9 +22,10 @@ import psutil
 
 class Monitor(Timer):
 
-    def __init__(self, config: flask.config.Config):
+    def __init__(self, config: flask.config.Config, monitor_data: Dict[int, Dict[str, Any]]):
         self.interval = 1
         self.config = config
+        self.monitor_data = monitor_data
         Timer.__init__(self, self.interval, self.record_info_if_needed)
 
     def get_signal_file(self) -> str:
@@ -78,6 +80,13 @@ class Monitor(Timer):
 
         for thread_id, stack in sys._current_frames().items():
             output.write(f"Thread ID: {thread_id}\n")
+
+            thread_monitor_data = self.monitor_data.get(thread_id, {})
+            for monitor_variable in thread_monitor_data:
+                monitor_value = str(thread_monitor_data.get(monitor_variable))
+                output.write(f"{monitor_variable}: {monitor_value}\n")
+
+            output.write("Traceback:\n")
             for filename, line_number, function_name, line in traceback.extract_stack(stack):
                 output.write(f"  {filename}:{line_number} [{function_name}]\n")
                 output.write(f"     {line}\n" if line else "")
