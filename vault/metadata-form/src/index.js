@@ -532,6 +532,10 @@ class YodaButtons extends React.Component {
         return (<div><span className="text-sm float-start text-muted text-center ms-3 mt-1">Required for the vault:</span><div className="form-completeness progress float-start ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
     }
 
+    renderCloseButton() {
+        return(<div class="input-group-sm has-feedback float-end"><a class="btn btn-secondary" href={"/research/browse?dir=" + encodeURIComponent(path)}>Close</a></div>);
+    }
+
     renderButtons() {
         let buttons = [];
 
@@ -548,8 +552,16 @@ class YodaButtons extends React.Component {
 
     render() {
         return (
-            <div className="form-group">
-                <div className="row yodaButtons">
+            <div className="form-group sticky-top">
+                <div className="row">
+                    <div className="col-sm-12 card-header metadata-card">
+                        <h5 className="card-title float-start">
+                            Metadata form - {path}
+                        </h5>
+                        {this.renderCloseButton()}
+                    </div>
+                </div>
+                <div className="row yodaButtons metadata-card pt-2 pb-2">
                     <div className="col-sm-12">
                         {this.renderButtons()}
                     </div>
@@ -582,8 +594,6 @@ class Container extends React.Component {
                 <YodaButtons saveMetadata={this.saveMetadata}
                              updateMetadata={this.updateMetadata} />
                 <YodaForm ref={(form) => {this.form=form;}}/>
-                <YodaButtons saveMetadata={this.saveMetadata}
-                             updateMetadata={this.updateMetadata} />
             </div>
         );
     }
