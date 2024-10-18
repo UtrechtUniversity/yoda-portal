@@ -521,23 +521,34 @@ class YodaButtons extends React.Component {
     }
 
     renderSaveButton() {
-        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary float-start">Save</button>);
+        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary float-start me-3" title="Save metadata">Save</button>);
     }
 
     renderDeleteButton() {
-        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn float-end">Delete all metadata </button>);
+        return (<button onClick={deleteMetadata} type="button" className="btn btn-danger delete-all-metadata-btn me-3" title="Delete all metadata">Delete</button>);
     }
 
     renderCloneButton() {
-        return (<button onClick={this.props.cloneMetadata} type="button" className="btn btn-primary clone-metadata-btn float-end">Clone from parent folder</button>);
+        return (<button onClick={this.props.cloneMetadata} type="button" className="btn btn-primary clone-metadata-btn me-3" title="Clone from parent folder">Clone</button>);
     }
 
     renderFormCompleteness() {
-        return (<div><span className="text-sm float-start text-muted text-center ms-3 mt-1">Required for the vault:</span><div className="form-completeness progress float-start ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
+        return (<div><span className="text-sm float-start text-muted text-center ms-3 mt-1">Required for Vault:</span><div className="form-completeness progress float-start ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
     }
 
     renderCloseButton() {
-        return(<div class="input-group-sm has-feedback float-end"><a class="btn btn-secondary" href={"/research/browse?dir=" + encodeURIComponent(path)}>Close</a></div>);
+        return(<a class="btn btn-secondary" href={"/research/browse?dir=" + encodeURIComponent(path)}>Close</a>);
+    }
+
+    renderCompletenessBar() {
+        let completenessBar = [];
+
+        if (formProperties.data.can_edit) {
+            completenessBar.push(this.renderFormCompleteness());
+        }
+
+        return (<div>{completenessBar}</div>);
+
     }
 
     renderButtons() {
@@ -545,7 +556,6 @@ class YodaButtons extends React.Component {
 
         if (formProperties.data.can_edit) {
             buttons.push(this.renderSaveButton());
-            buttons.push(this.renderFormCompleteness());
 
             // Delete and clone are mutually exclusive.
             if (formProperties.data.metadata !== null)
@@ -553,23 +563,24 @@ class YodaButtons extends React.Component {
             else if (formProperties.data.can_clone)
                 buttons.push(this.renderCloneButton());
         }
+
+        buttons.push(this.renderCloseButton());
+
         return (<div>{buttons}</div>);
     }
 
     render() {
         return (
             <div className="form-group sticky-top">
-                <div className="row">
-                    <div className="col-sm-12 card-header metadata-card">
-                        <h5 className="card-title float-start">
-                            Metadata form - {path}
-                        </h5>
-                        {this.renderCloseButton()}
-                    </div>
-                </div>
-                <div className="row yodaButtons metadata-card pt-2 pb-2">
-                    <div className="col-sm-12">
-                        {this.renderButtons()}
+                <div className="row card-header metadata-card">
+                    <h5 className="col-sm-4 float-start">
+                        Metadata form - {path}
+                    </h5>
+                    <div className="col-sm-8 yodaButtons">
+                        {this.renderCompletenessBar()}
+                        <div class="float-end">
+                            {this.renderButtons()}
+                        </div>
                     </div>
                 </div>
             </div>
