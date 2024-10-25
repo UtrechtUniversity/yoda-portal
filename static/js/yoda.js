@@ -57,6 +57,23 @@ Yoda.load = function () {
   }
 }
 
+Yoda.notifications = function () {
+  // Load notifications.
+  Yoda.call('notifications_load').then((data) => {
+    if (data.length > 0) {
+      const notificationBell = document.getElementById('notification-bell')
+      if (notificationBell) {
+        notificationBell.classList.remove('hidden')
+      }
+
+      const notificationCountElement = document.getElementById('notification-count')
+      if (notificationCountElement) {
+        notificationCountElement.textContent = data.length
+      }
+    }
+  })
+}
+
 // Yoda.api = {
 Yoda.call = async function (path, data = {}, options = {}) {
   // Bare API call.

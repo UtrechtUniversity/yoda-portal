@@ -30,6 +30,7 @@ from markupsafe import escape
 from werkzeug.utils import secure_filename
 
 import api
+from cache_config import clear_api_cache_keys, clear_view_cache_keys
 from util import get_theme_directories, length_check
 
 # Blueprint configuration
@@ -175,6 +176,9 @@ def save_settings(settings: Dict[str, Any], flash_msg: str) -> Response:
         # Load the theme template if the current theme is changed
         set_theme_loader(app, remove_cache=True)
 
+    if app.config.get('CACHING_ENABLED', False):
+        clear_view_cache_keys(all_users=True)
+        clear_api_cache_keys("admin_save_settings")
     flash(flash_msg, 'success')
 
     return redirect(url_for("admin_bp.index"))

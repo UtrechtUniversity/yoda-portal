@@ -12,8 +12,7 @@
         <div class="col-md-8">
             <h1>Notifications</h1>
         </div>
-        <div class="col-md-4">
-            {% if notifications %}
+        <div id="notification-tools" class="col-md-4 hidden">
             <button type="button" class="btn btn-primary float-end mt-2" id="notifications_dismiss_all" title="Mark all done">
                 Mark all done <i class="fa-solid fa-check" aria-hidden="true"></i>
             </button>
@@ -27,24 +26,7 @@
                     <a class="dropdown-item" href="{{ url_for('user_bp.notifications', sort_order="asc") }}">Oldest first</a>
                 </div>
             </div>
-            {% endif %}
         </div>
     </div>
-    {% if notifications %}
-    <div class="list-group">
-        {% for notification in notifications %}
-        <a href="{% if notification.link %}{{ notification.link }}{% else %}#{% endif %}" class="list-group-item list-group-item-action">
-            <div class="d-flex w-100 justify-content-between">
-                <p class="mb-1">{{ notification.message }}</p>
-                <small class="text-muted">{{ notification.datetime }}</small>
-            </div>
-            {% if notification.actor %}<small class="float-start me-2"><i class="fa-solid fa-user" aria-hidden="true"></i> {{ notification.actor }}</small>{% endif %}
-            {% if notification.data_package %}<small class="float-start"><i class="fa-solid fa-box-archive" aria-hidden="true"></i> {{ notification.data_package }}</small>{% endif %}
-            <h5 class="dismiss-notification float-end" data-id="{{ notification.identifier }}" title="Done"><i class="fa-solid fa-check" aria-hidden="true"></i></h5>
-        </a>
-        {% endfor %}
-    </div>
-    {% else %}
-    <p>All caught up! You have no new notifications.</p>
-    {% endif %}
+    <div id="notifications" class="list-group"></div>
 {% endblock content %}

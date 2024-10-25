@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2025, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
@@ -14,6 +14,7 @@ from flask_wtf.csrf import CSRFProtect
 
 from admin.admin import admin_bp, set_theme_loader
 from api import api_bp
+from cache_config import cache
 from datarequest.datarequest import datarequest_bp
 from deposit.deposit import deposit_bp
 from fileviewer.fileviewer import fileviewer_bp
@@ -28,6 +29,7 @@ from user.user import user_bp
 from util import get_validated_static_path, log_error
 from vault.vault import vault_bp
 
+
 app = Flask(__name__, static_folder='assets')
 app.json.sort_keys = False
 
@@ -40,7 +42,6 @@ def load_admin_setting() -> Dict[str, Any]:
     """Load or initialize admin settings from a JSON file.
 
     If no setting file exists, it writes default loaded_settings and returns them.
-
     If a setting file exists, it reads and returns the updated loaded_settings.
 
     :returns: admin settings from file or default settings
@@ -81,38 +82,24 @@ def load_admin_setting() -> Dict[str, Any]:
     return default_settings
 
 
-# Load admin settings
+# Load admin settings.
 app.config.update(load_admin_setting())
-# Load theme templates
+
+# Load theme templates.
 set_theme_loader(app)
 
-# Setup values for the navigation bar used in
-# general/templates/general/base.html
-app.config['modules'] = []
-
-if app.config.get('RESEARCH_ENABLED'):
-    app.config['modules'].append(
-        {'name': 'Research', 'function': 'research_bp.index'}
-    )
-if app.config.get('DEPOSIT_ENABLED'):
-    app.config['modules'].append(
-        {'name': 'Deposit', 'function': 'deposit_bp.index'}
-    )
-if app.config.get('DATAREQUEST_ENABLED'):
-    app.config['modules'].append(
-        {'name': 'Datarequest', 'function': 'datarequest_bp.index'}
-    )
-
-app.config['modules'].append(
+# Setup values for the navigation bar used in general/templates/general/base.html
+app.config['modules'] = [
+    {'name': 'Research', 'function': 'research_bp.index'} if app.config.get('RESEARCH_ENABLED') else None,
+    {'name': 'Deposit', 'function': 'deposit_bp.index'} if app.config.get('DEPOSIT_ENABLED') else None,
+    {'name': 'Datarequest', 'function': 'datarequest_bp.index'} if app.config.get('DATAREQUEST_ENABLED') else None,
     {'name': 'Vault', 'function': 'vault_bp.index'},
-)
-app.config['modules'].append(
     {'name': 'Statistics', 'function': 'stats_bp.index'},
-)
-app.config['modules'].append(
     {'name': 'Group Manager', 'function': 'group_manager_bp.index'},
-)
+]
 
+# Filter out None values.
+app.config['modules'] = [module for module in app.config['modules'] if module]
 app.config['modules_list'] = [module['name'] for module in app.config['modules']]
 
 # Default nr of items in browser list
@@ -122,6 +109,10 @@ app.config['search-items-per-page'] = 10
 
 # Start Flask-Session
 Session(app)
+
+# Initialize the cache.
+if app.config.get('CACHING_ENABLED', False):
+    cache.init_app(app)
 
 # Start monitoring thread for extracting tech support information
 # Monitor signal file can be set to empty to completely disable monitor thread
