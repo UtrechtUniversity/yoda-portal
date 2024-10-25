@@ -6,6 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 from flask import Blueprint, redirect, render_template, request, Response, session, url_for
 from flask_wtf.csrf import CSRFError
 
+from cache_config import cache_view
 from util import log_error
 
 general_bp = Blueprint('general_bp', __name__,
@@ -15,6 +16,7 @@ general_bp = Blueprint('general_bp', __name__,
 
 
 @general_bp.route('/')
+@cache_view()
 def index() -> Response:
     return render_template('index.html')
 

@@ -6,6 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 from flask import Blueprint, make_response, render_template, request, Response
 
 import api
+from cache_config import cache_view
 
 group_manager_bp = Blueprint('group_manager_bp', __name__,
                              template_folder='templates',
@@ -67,6 +68,7 @@ def get_subcategories() -> Response:
 
 
 @group_manager_bp.route('/get_schemas', methods=['POST'])
+@cache_view()
 def get_schemas() -> Response:
     response = api.call('schema_get_schemas', data={})
 
@@ -126,46 +128,6 @@ def group_update() -> Response:
 
     if not property_updated:
         response = {'status': 'ok', 'status_info': 'Nothing changed'}
-
-    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
-    output.headers["Content-type"] = "application/json"
-    return output
-
-
-@group_manager_bp.route('/group_delete', methods=['POST'])
-def group_delete() -> Response:
-    response = api.call('group_delete', data={'group_name': request.form['group_name']})
-
-    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
-    output.headers["Content-type"] = "application/json"
-    return output
-
-
-@group_manager_bp.route('/user_create', methods=['POST'])
-def user_create() -> Response:
-    response = api.call('group_user_add', data={'username': request.form['user_name'],
-                                                'group_name': request.form['group_name']})
-
-    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
-    output.headers["Content-type"] = "application/json"
-    return output
-
-
-@group_manager_bp.route('/user_update', methods=['POST'])
-def user_update() -> Response:
-    response = api.call('group_user_update_role', data={'username': request.form['user_name'],
-                                                        'group_name': request.form['group_name'],
-                                                        'new_role': request.form['new_role']})
-
-    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
-    output.headers["Content-type"] = "application/json"
-    return output
-
-
-@group_manager_bp.route('/user_delete', methods=['POST'])
-def user_delete() -> Response:
-    response = api.call('group_remove_user_from_group', data={'username': request.form['user_name'],
-                                                              'group_name': request.form['group_name']})
 
     output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
     output.headers["Content-type"] = "application/json"

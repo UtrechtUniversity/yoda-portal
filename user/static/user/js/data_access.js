@@ -1,6 +1,20 @@
 'use strict'
 
 $(document).ready(function () {
+  Yoda.call('token_load').then((data) => {
+    const container = document.getElementById('tokens')
+
+    data.forEach(token => {
+      container.innerHTML += `
+            <div class="list-group-item d-inline-flex">
+                <label class="col-sm-7">${token.label}</label>
+                <span class="col-sm-3">${token.exp_time}</span>
+                <button type="button" class="btn btn-danger col-sm-2 delete-token">Delete</button>
+            </div>
+        `
+    })
+  })
+
   $('body').on('click', '.delete-token', function (e) {
     const label = $(this).siblings('label').text()
     Yoda.call('token_delete', { label }, { quiet: true }).then(

@@ -23,6 +23,7 @@ from irods.exception import CAT_NO_ACCESS_PERMISSION
 
 import api
 import connman
+from cache_config import cache_view
 
 vault_bp = Blueprint('vault_bp', __name__,
                      template_folder='templates',
@@ -32,15 +33,9 @@ vault_bp = Blueprint('vault_bp', __name__,
 
 @vault_bp.route('/')
 @vault_bp.route('/browse')
+@cache_view()
 def index() -> Response:
-    dir = request.args.get('dir')
-
-    if dir is None:
-        dir = ''
-
-    return render_template('vault/browse.html',
-                           activeModule='vault',
-                           dir=dir)
+    return render_template('vault/browse.html')
 
 
 @vault_bp.route('/browse/download')

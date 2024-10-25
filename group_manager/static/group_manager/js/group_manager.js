@@ -522,113 +522,86 @@ async function processImportedRow (row) {
   }
 }
 
-async function processUserroleChange (row, actionUrl, newRole, groupName) {
+async function processUserroleChange (row, newRole, groupName) {
   // Process one user at a time to change userrole.
   const userName = row.attr('data-name')
 
-  $.ajax({
-    url: actionUrl,
-    type: 'post',
-    dataType: 'json',
-    data: {
-      group_name: groupName,
-      user_name: userName,
-      new_role: newRole
+  const result = await Yoda.call('group_user_update_role', {
+    username: userName,
+    group_name: groupName,
+    new_role: newRole
+  }, { quiet: true, rawResult: true })
+
+  if (result.status === 'ok') {
+    // Keep track of which rows have been updated
+    row.addClass('update-done')
+
+    // Set the internal administration with latest situation without having to reach for the dbs
+    Yoda.groupManager.groups[groupName].members[userName].access = newRole
+
+    // when update-done length is equal to active length, all has been dealt with.
+    // => Data must be reloaded
+    if ($('#user-list .active').length === $('#user-list .update-done').length) {
+      // Force-regenerate the user list after completion of the entire process
+      Yoda.groupManager.deselectGroup()
+      Yoda.groupManager.selectGroup(groupName)
+
+      Yoda.set_message('success', 'User roles were updated successfully.')
     }
-  }).done(function (result) {
-    if ('status' in result) {
-      console.log('User update completed with status ' + result.status)
-    }
-    if ('status' in result && result.status === 0) {
-      // Keep track of which rows have been
-      row.addClass('update-done')
+  } else {
+    // Something went wrong
+    $('#user-list .user.update-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]')
+      .removeClass('update-pending disabled')
+      .attr('title', '')
 
-      // Set the internal administration with latest situation without having to reach for the dbs
-      Yoda.groupManager.groups[groupName].members[userName].access = newRole
-
-      // when update-done length is equal to active length, all has been dealt with.
-      // => Data must be reloaded
-      if ($('#user-list .active').length === $('#user-list .update-done').length) {
-        // Force-regenerate the user list after completion of the entire process
-        Yoda.groupManager.deselectGroup()
-        Yoda.groupManager.selectGroup(groupName)
-
-        Yoda.set_message('success', 'User roles were updated successfully.')
-      }
-    } else {
-      // Something went wrong
-      $('#user-list .user.update-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]')
-        .removeClass('update-pending disabled')
-        .attr('title', '')
-
-      if ('message' in result) { window.alert(result.message) } else {
-        window.alert(
-          'Error: Could not change the role for the selected member due to an internal error.\n' +
-                    'Please contact a Yoda administrator'
-        )
-      }
-    }
-  }).fail(function (result) {
-    Yoda.groupManager.ifRequestNotAborted(result, function () {
-      window.alert('Error: Could not change the role for the selected member due to an internal error.\nPlease contact a Yoda administrator')
-    })
-  })
+    // Handle error
+    const errorMessage = result.message ||
+        'Error: Could not change the role for the selected member due to an internal error.\n' +
+        'Please contact a Yoda administrator'
+    window.alert(errorMessage)
+  }
 }
 
-async function removeUserFromGroup (row, actionUrl, groupName) {
-  // Remove a user from the indicated group as part of mutiple selection of users.
+async function removeUserFromGroup (row, groupName) {
+  // Remove a user from the indicated group as part of multiple selection of users.
   const userName = row.attr('data-name')
 
-  $.ajax({
-    url: actionUrl,
-    type: 'post',
-    dataType: 'json',
-    data: {
-      group_name: groupName,
-      user_name: userName
+  const result = await Yoda.call('group_remove_user_from_group', {
+    username: userName,
+    group_name: groupName
+  }, { quiet: true, rawResult: true })
+
+  if (result.status === 'ok') {
+    // Mark row as done
+    row.addClass('remove-done')
+
+    // Update internal administration
+    delete Yoda.groupManager.groups[groupName].members[userName]
+
+    if ($('#user-list .active').length === $('#user-list .remove-done').length) {
+      // Force-regenerate the user list after completion of entire process
+      Yoda.groupManager.deselectGroup()
+      Yoda.groupManager.selectGroup(groupName)
+      Yoda.set_message('success', 'Users were removed successfully.')
     }
-  }).done(function (result) {
-    if ('status' in result) { console.log('User remove completed with status ' + result.status) }
-    if ('status' in result && result.status === 0) {
-      // Mark row as done
-      row.addClass('remove-done')
-
-      // Update internal administration
-      delete Yoda.groupManager.groups[groupName].members[userName]
-
-      if ($('#user-list .active').length === $('#user-list .remove-done').length) {
-        // Force-regenerate the user list after completion of entire process
-        Yoda.groupManager.deselectGroup()
-        Yoda.groupManager.selectGroup(groupName)
-
-        Yoda.set_message('success', 'Users were removed successfully.')
-      }
-    } else {
-      // Something went wrong
-      if ('message' in result) { window.alert(result.message) } else {
-        window.alert(
-          'Error: Could not remove the selected member from the group due to an internal error.\n' +
-                    'Please contact a Yoda administrator'
-        )
-      }
-    }
-  }).fail(function (result) {
-    Yoda.groupManager.ifRequestNotAborted(result, function () {
-      window.alert('Error: Could not remove the selected member from the group due to an internal error.\nPlease contact a Yoda administrator')
-    })
-  })
+  } else {
+    // Handle error
+    const errorMessage = result.message ||
+      'Error: Could not remove the selected member from the group due to an internal error.\n' +
+      'Please contact a Yoda administrator'
+    window.alert(errorMessage)
+  }
 }
 
 $(function () {
   // Multiple user role change
   $('.users.card .update-button').on('click', function (e) {
     const newRole = $(this).attr('data-target-role')
-    const actionUrl = $(this).attr('data-action')
     const groupName = $('#group-list .group.active').attr('data-name')
 
     // Step through selected users and update per row
     $('#user-list .active.user').each(function myFunction () {
-      processUserroleChange($(this), actionUrl, newRole, groupName)
+      processUserroleChange($(this), newRole, groupName)
     })
   })
 
@@ -653,12 +626,11 @@ $(function () {
     // that.onClickUserDelete($('.users.card .delete-button')[0]);
     $('#modal-user-delete').modal('hide')
 
-    const actionUrl = $('#btn-remove-user-from-group').attr('data-action')
     const groupName = $('#group-list .group.active').attr('data-name')
 
     // Step through selected users and update per row
     $('#user-list .active.user').each(function myFunction () {
-      removeUserFromGroup($(this), actionUrl, groupName)
+      removeUserFromGroup($(this), groupName)
     })
   })
 
@@ -1951,7 +1923,7 @@ $(function () {
     /**
          * \brief Handle a group delete button click event.
          */
-    onClickGroupDelete: function (el) {
+    onClickGroupDelete: async function (el) {
       const groupName = $('#group-list .group.active').attr('data-name')
       const nextGroupName = $('#result-user-search-groups .user-search-result-group.table-active').next().attr('user-search-result-group')
 
@@ -1960,51 +1932,40 @@ $(function () {
         .attr('title', 'Removal pending')
       this.deselectGroup()
 
-      const that = this
+      const result = await Yoda.call('group_delete', {
+        group_name: groupName
+      }, { quiet: true, rawResult: true })
 
-      $.ajax({
-        url: $(el).attr('data-action'),
-        type: 'post',
-        dataType: 'json',
-        data: {
-          group_name: groupName
-        }
-      }).done(function (result) {
-        if ('status' in result && result.status === 0) {
-          // Give the user some feedback.
-          Yoda.storage.session.set('messages',
-            Yoda.storage.session.get('messages', []).concat({
-              type: 'success',
-              message: 'Removed group ' + groupName + '.'
-            })
-          )
-
-          if (nextGroupName) {
-            Yoda.storage.session.set('selected-group', nextGroupName)
-          }
-
-          $(window).on('beforeunload', function () {
-            $(window).scrollTop(0)
+      if (result.status === 'ok') {
+        // Give the user some feedback.
+        Yoda.storage.session.set('messages',
+          Yoda.storage.session.get('messages', []).concat({
+            type: 'success',
+            message: 'Removed group ' + groupName + '.'
           })
-          window.location.reload(true)
-        } else {
-          // Something went wrong.
+        )
 
-          // Re-enable group list entry.
-          $('#group-list .group.delete-pending[data-name="' + Yoda.escapeQuotes(groupName) + '"]').removeClass('delete-pending disabled').attr('title', '')
-
-          if ('message' in result) { window.alert(result.message) } else {
-            window.alert(
-              'Error: Could not remove the selected group due to an internal error.\n' +
-                            'Please contact a Yoda administrator'
-            )
-          }
+        if (nextGroupName) {
+          Yoda.storage.session.set('selected-group', nextGroupName)
         }
-      }).fail(function (result) {
-        that.ifRequestNotAborted(result, function () {
-          window.alert('Error: Could not remove the selected group due to an internal error.\nPlease contact a Yoda administrator')
+
+        $(window).on('beforeunload', function () {
+          $(window).scrollTop(0)
         })
-      })
+        window.location.reload(true)
+      } else {
+        // Something went wrong.
+
+        // Re-enable group list entry.
+        $('#group-list .group.delete-pending[data-name="' + Yoda.escapeQuotes(groupName) + '"]').removeClass('delete-pending disabled').attr('title', '')
+
+        if ('message' in result) { window.alert(result.message) } else {
+          window.alert(
+            'Error: Could not remove the selected group due to an internal error.\n' +
+                                'Please contact a Yoda administrator'
+          )
+        }
+      }
     },
 
     /**
@@ -2018,7 +1979,7 @@ $(function () {
          * \param el the form element
          * \param e  a submit event
          */
-    onSubmitUserCreate: function (el, e) {
+    onSubmitUserCreate: async function (el, e) {
       e.preventDefault()
 
       if ($(el).find('input[type="submit"]').hasClass('disabled')) { return }
@@ -2044,124 +2005,46 @@ $(function () {
 
       const that = this
 
-      $.ajax({
-        url: $(el).attr('action'),
-        type: 'post',
-        dataType: 'json',
-        data: {
-          group_name: groupName,
-          user_name: userName
+      const result = await Yoda.call('group_user_add', {
+        username: userName,
+        group_name: groupName
+      }, { quiet: true, rawResult: true })
+
+      if (result.status === 'ok') {
+        that.groups[groupName].members[userName] = {
+          // XXX
+          access: 'normal'
         }
-      }).done(function (result) {
-        if ('status' in result) { console.log('User add completed with status ' + result.status) }
-        if ('status' in result && result.status === 0) {
-          that.groups[groupName].members[userName] = {
-            // XXX
-            access: 'normal'
-          }
 
-          $(el).find('#f-user-create-name').val(null).trigger('change')
+        $(el).find('#f-user-create-name').val(null).trigger('change')
 
-          that.deselectGroup()
-          that.selectGroup(groupName)
+        that.deselectGroup()
+        that.selectGroup(groupName)
 
-          const $userList = $('#user-list')
-          const $user = $userList.find('.user[data-name="' + Yoda.escapeQuotes(userName) + '"]')
+        const $userList = $('#user-list')
+        const $user = $userList.find('.user[data-name="' + Yoda.escapeQuotes(userName) + '"]')
 
-          // that.selectUser(userName);
-          that.selectUser($user)
+        // that.selectUser(userName);
+        that.selectUser($user)
 
-          // Give a visual hint that the user was added.
-          $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]')[0].scrollIntoView({
-            block: 'center',
-            behavior: 'smooth'
-          })
-          $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once')
-
-          // open the select-user select2 for ease of use
-          $('.selectify-user-name').trigger('select2:open')
-        } else {
-          // Something went wrong. :(
-          if ('message' in result) { window.alert(result.message) } else {
-            window.alert(
-              'Error: Could not add a member due to an internal error.\n' +
-                            'Please contact a Yoda administrator'
-            )
-          }
-        }
-        $(el).find('input[type="submit"]').removeClass('disabled').val('Add')
-      }).fail(function (result) {
-        that.ifRequestNotAborted(result, function () {
-          window.alert('Error: Could not add a member due to an internal error.\nPlease contact a Yoda administrator')
-          $(el).find('input[type="submit"]').removeClass('disabled').val('Add')
+        // Give a visual hint that the user was added.
+        $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]')[0].scrollIntoView({
+          block: 'center',
+          behavior: 'smooth'
         })
-      })
-    },
+        $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once')
 
-    /**
-         * \brief Handle a change role button click event.
-         *
-         * `this` is assumed to be the groupManager object, not the form element
-         * that was submitted.
-         *
-         * \param el
-         * \param e
-         */
-    onClickUserUpdate: function (el, e) {
-      const that = this
-
-      const groupName = $('#group-list .group.active').attr('data-name')
-      const userName = $('#user-list   .user.active').attr('data-name')
-
-      $('#user-list .user.active')
-        .addClass('update-pending disabled')
-        .attr('title', 'Update pending')
-
-      // Get the new role name from the button element before we deselect the user.
-      const newRole = $(el).attr('data-target-role')
-
-      this.deselectUser()
-
-      $.ajax({
-        url: $(el).attr('data-action'),
-        type: 'post',
-        dataType: 'json',
-        data: {
-          group_name: groupName,
-          user_name: userName,
-          new_role: newRole
+        // open the select-user select2 for ease of use
+        $('.selectify-user-name').trigger('select2:open')
+      } else {
+        // Something went wrong. :(
+        if ('message' in result) { window.alert(result.message) } else {
+          window.alert(
+            'Error: Could not add a member due to an internal error.\n' +
+                          'Please contact a Yoda administrator'
+          )
         }
-      }).done(function (result) {
-        if ('status' in result) { console.log('User update completed with status ' + result.status) }
-        if ('status' in result && result.status === 0) {
-          // Update user role.
-          that.groups[groupName].members[userName].access = newRole
-
-          // Force-regenerate the user list.
-          that.deselectGroup()
-          that.selectGroup(groupName)
-
-          // Give a visual hint that the user was updated.
-          $('#user-list .user[data-name="' + Yoda.escapeQuotes(userName) + '"]').addClass('blink-once')
-        } else {
-          // Something went wrong. :(
-
-          $('#user-list .user.update-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]')
-            .removeClass('update-pending disabled')
-            .attr('title', '')
-
-          if ('message' in result) { window.alert(result.message) } else {
-            window.alert(
-              'Error: Could not change the role for the selected member due to an internal error.\n' +
-                            'Please contact a Yoda administrator'
-            )
-          }
-        }
-      }).fail(function (result) {
-        that.ifRequestNotAborted(result, function () {
-          window.alert('Error: Could not change the role for the selected member due to an internal error.\nPlease contact a Yoda administrator')
-        })
-      })
+      }
     },
 
     /**

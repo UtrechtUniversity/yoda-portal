@@ -32,6 +32,7 @@ from irods.message import iRODSMessage
 
 import api
 import connman
+from cache_config import cache_view
 from util import log_error, unicode_secure_filename
 
 research_bp = Blueprint('research_bp', __name__,
@@ -88,15 +89,9 @@ threading.Thread(target=irods_writer, name='irods-writer', daemon=True).start()
 
 @research_bp.route('/')
 @research_bp.route('/browse')
+@cache_view()
 def index() -> Response:
-    dir = request.args.get('dir')
-
-    if dir is None:
-        dir = ''
-
-    return render_template('research/browse.html',
-                           activeModule='research',
-                           dir=dir)
+    return render_template('research/browse.html')
 
 
 @research_bp.route('/browse/download')
