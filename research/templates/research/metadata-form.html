@@ -75,19 +75,17 @@
 <div id="metadata-form" class="row hide">
     <div class="col-md-12">
         <div class="card">
-            <div class="card-body">
-                <div id="no-metadata" class="hide">
-                    <p>There is no metadata present for this folder.</p>
-                </div>
-                <div id="no-metadata-and-locked" class="hide">
-                    <p>There is no metadata present for this folder and the folder is locked.</p>
-                </div>
-                <div id="form"
-                     data-path="{{ path }}"
-                     data-csrf_token_name="{{ tokenName | urlencode }}"
-                     data-csrf_token_hash="{{ tokenHash | urlencode }}">
-                    <p>Loading metadata <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
-                </div>
+            <div id="no-metadata" class="hide card-body">
+                <p>There is no metadata present for this folder.</p>
+            </div>
+            <div id="no-metadata-and-locked" class="hide card-body">
+                <p>There is no metadata present for this folder and the folder is locked.</p>
+            </div>
+            <div id="form"
+                    data-path="{{ path }}"
+                    data-csrf_token_name="{{ tokenName | urlencode }}"
+                    data-csrf_token_hash="{{ tokenHash | urlencode }}">
+                <p>Loading metadata <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
             </div>
         </div>
     </div>

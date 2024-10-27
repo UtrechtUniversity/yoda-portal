@@ -537,7 +537,7 @@ class YodaButtons extends React.Component {
     }
 
     renderCloseButton() {
-        return(<a class="btn btn-secondary" href={"/research/browse?dir=" + encodeURIComponent(path)}>Close</a>);
+        return(<a class="btn btn-secondary" href={"/research/browse?dir=" + encodeURIComponent(path)} title="Close metadata form">Close</a>);
     }
 
     renderCompletenessBar() {
@@ -571,14 +571,14 @@ class YodaButtons extends React.Component {
 
     render() {
         return (
-            <div className="form-group sticky-top">
-                <div className="row card-header metadata-card">
+            <div className="card-header bg-body sticky-top">
+                <div className="row">
                     <h5 className="col-sm-4 float-start">
                         Metadata form - {path}
                     </h5>
                     <div className="col-sm-8 yodaButtons">
                         {this.renderCompletenessBar()}
-                        <div class="float-end">
+                        <div className="float-end">
                             {this.renderButtons()}
                         </div>
                     </div>
@@ -628,7 +628,9 @@ class Container extends React.Component {
                 <YodaButtons saveMetadata={this.saveMetadata}
                              deleteMetadata={deleteMetadata}
                              cloneMetadata={this.cloneMetadata} />
-                <YodaForm ref={(form) => {this.form=form;}}/>
+                <div className="card-body">
+                    <YodaForm ref={(form) => {this.form=form;}}/>
+                </div>
             </div>
         );
     }
@@ -753,7 +755,8 @@ function loadForm() {
 
                 // If maintenance banner is visible, add padding to metadata form header
                 if ($('div[name="banner head"]').length) {
-                    $('#metadata-form .card-header').addClass('pt-4 pb-3')
+                    $('#metadata-form .card-header').addClass('pt-4 pb-3');
+                    $('#metadata-form .card-header').css('top', '0.5rem');
                 }
 
                 // Specific required textarea handling

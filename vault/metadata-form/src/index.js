@@ -98,7 +98,7 @@ const enumWidget = (props) => {
         neutral90: 'var(--neutral-10)',
 
          /*
-          * One of the few bootstrap variables we can use with themeing react-select!
+          * One of the few bootstrap variables we can use with theming react-select!
           * control/boxShadow(focused)
           * control/borderColor(focused)
           * control/borderColor:hover(focused)
@@ -146,7 +146,7 @@ const enumWidget = (props) => {
     });
 
     // If the final item was not numeric, it is not yet added to the name_hierarchy array
-    // Therefore, do it now explicitely
+    // Therefore, do it now explicitly
     if (!last_was_numeric) {
         name_hierarchy[level_counter] = level_name;
     }
@@ -521,19 +521,32 @@ class YodaButtons extends React.Component {
     }
 
     renderSaveButton() {
-        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary float-start">Save</button>);
+        return (<button onClick={this.props.saveMetadata} type="submit" className="btn btn-primary float-start me-3" title="Save metadata">Save</button>);
     }
 
     renderUpdateButton() {
-        return (<button onClick={this.props.updateMetadata} type="button" className="btn btn-primary">Update metadata</button>);
+        return (<button onClick={this.props.updateMetadata} type="button" className="btn btn-primary me-3" title="Update metadata">Update</button>);
     }
 
     renderFormCompleteness() {
-        return (<div><span className="text-sm float-start text-muted text-center ms-3 mt-1">Required for the vault:</span><div className="form-completeness progress float-start ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
+        return (<div><span className="text-sm float-start text-muted text-center ms-3 mt-1">Required for Vault:</span><div className="form-completeness progress float-start ms-3 mt-2 w-25" data-bs-toggle="tooltip" title=""><div className="progress-bar bg-success"></div></div></div>);
     }
 
     renderCloseButton() {
-        return(<div class="input-group-sm has-feedback float-end"><a class="btn btn-secondary" href={"/research/browse?dir=" + encodeURIComponent(path)}>Close</a></div>);
+        return(<a class="btn btn-secondary" href={"/vault/browse?dir=" + encodeURIComponent(path)} title="Close metadata form">Close</a>);
+    }
+
+    renderCompletenessBar() {
+        let completenessBar = [];
+
+        if (formProperties.data.can_edit) {
+            if (actual_edit_mode) {
+                completenessBar.push(this.renderFormCompleteness());
+            }
+        }
+
+        return (<div>{completenessBar}</div>);
+
     }
 
     renderButtons() {
@@ -544,32 +557,31 @@ class YodaButtons extends React.Component {
                 buttons.push(this.renderUpdateButton());
             } else {
                 buttons.push(this.renderSaveButton());
-                buttons.push(this.renderFormCompleteness());
             }
+            buttons.push(this.renderCloseButton());
         }
         return (<div>{buttons}</div>);
     }
 
     render() {
         return (
-            <div className="form-group sticky-top">
+            <div className="card-header bg-body sticky-top">
                 <div className="row">
-                    <div className="col-sm-12 card-header metadata-card">
-                        <h5 className="card-title float-start">
-                            Metadata form - {path}
-                        </h5>
-                        {this.renderCloseButton()}
-                    </div>
-                </div>
-                <div className="row yodaButtons metadata-card pt-2 pb-2">
-                    <div className="col-sm-12">
-                        {this.renderButtons()}
+                    <h5 className="col-sm-8 pt-1 float-start">
+                       Metadata form - {path}
+                    </h5>
+                    <div className="col-sm-4 yodaButtons">
+                        {this.renderCompletenessBar()}
+                        <div className="float-end">
+                            {this.renderButtons()}
+                        </div>
                     </div>
                 </div>
             </div>
         );
     }
 }
+
 
 class Container extends React.Component {
     constructor(props) {
@@ -593,7 +605,9 @@ class Container extends React.Component {
             <div>
                 <YodaButtons saveMetadata={this.saveMetadata}
                              updateMetadata={this.updateMetadata} />
-                <YodaForm ref={(form) => {this.form=form;}}/>
+                <div className="card-body">
+                    <YodaForm ref={(form) => {this.form=form;}}/>
+                </div>
             </div>
         );
     }
@@ -693,7 +707,14 @@ function loadForm() {
 
             // If maintenance banner is visible, add padding to metadata form header
             if ($('div[name="banner head"]').length) {
-                $('#metadata-form .card-header').addClass('pt-4 pb-3')
+                $('#metadata-form .card-header').addClass('pt-4 pb-3');
+                $('#metadata-form .card-header').css('top', '0.5rem');
+            }
+
+            // If progress bar is visible, change division of grid
+            if ($('.form-completeness').length > 0) {
+                $('#metadata-form .card-header .row h5').addClass('col-sm-4').removeClass('col-sm-8');
+                $('#metadata-form .card-header .yodaButtons').addClass('col-sm-8').removeClass('col-sm-4');
             }
 
             // Specific required textarea handling
