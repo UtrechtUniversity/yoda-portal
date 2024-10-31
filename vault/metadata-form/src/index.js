@@ -706,7 +706,7 @@ function loadForm() {
             }
 
             // If maintenance banner is visible, add padding to metadata form header
-            if ($('div[name="banner head"]').length || $('.non-production').length) {
+            if ($('#maintenance-banner').length || $('.non-production').length) {
                 $('#metadata-form .card-header').addClass('pt-4 pb-3');
                 $('#metadata-form .card-header').css('top', '0.5rem');
             }
