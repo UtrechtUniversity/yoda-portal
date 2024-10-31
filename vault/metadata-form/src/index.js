@@ -606,7 +606,7 @@ class YodaButtons extends React.Component {
             <div className="card-header bg-body sticky-top">
                 <div className="row">
                     <h5 className="col-sm-4 float-start">
-                        Metadata form - {path}
+                       Metadata form - {path}
                     </h5>
                     <div className="col-sm-8 yodaButtons">
                         {this.renderCompletenessBar()}
