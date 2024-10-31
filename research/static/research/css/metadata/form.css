@@ -22,7 +22,3 @@
 #metadata-form .d-flex, #metadata-form  .col {
     padding: 0 15px;
 }
-
-.metadata-card {
-    background-color: rgba(var(--bs-body-bg-rgb), 1);
-}
