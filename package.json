@@ -6,7 +6,6 @@
     ],
     "ignore": [
       "**/lib/",
-      "**/intake/",
       "**/metadata-form/",
       "metadata-form.js",
       "datarequest/static/**"
