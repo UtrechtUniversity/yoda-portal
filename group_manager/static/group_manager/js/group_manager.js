@@ -2408,30 +2408,6 @@ $(function () {
         $groupPanel.find('.create-button').removeClass('disabled')
       }
 
-      // Indicate which groups are managed by this user.
-      const groupList = document.querySelector('#group-list')
-      let icons = ''
-      for (const groupName in this.groups) {
-        const group = groupList.querySelector('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]')
-
-        icons = '<table class="float-end"><tr>'
-
-        if (groupName.match(/^(research)-/)) {
-          icons += '<td><a href="/research/?dir=' + encodeURIComponent('/' + groupName) + '" title="Go to group ' + groupName + ' in research space"><i class="fa-regular fa-folder"></i></a></td>'
-        }
-
-        if (this.isManagerOfGroup(groupName)) {
-          icons += '<td>&nbsp;<i class="fa fa-crown mt-1" title="You manage this group"></i>' + '</td></tr></table>'
-        } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
-          icons += '<td>&nbsp;<i class="fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>' + '</td></tr></table>'
-        } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access === 'reader') {
-          icons += '<td>&nbsp;<i class="fa-solid fa-eye mt-1" title="You have read access to this group"></i>' + '</td></tr></table>'
-        } else {
-          icons += '<td style="width: 26px;"></td></tr></table>'
-        }
-        group.insertAdjacentHTML('beforeend', icons)
-      }
-
       const isCollapsed = Yoda.storage.session.get('is-collapsed')
       if (isCollapsed !== null && isCollapsed === 'true') {
         $('.collapsible-group-properties').removeClass('show')
@@ -2458,6 +2434,54 @@ $(function () {
         const $categoryEls = $('#group-list .category')
         if ($categoryEls.length === 1) { this.unfoldToGroup($categoryEls.find('.group').attr('data-name')) }
       }
+
+      // Indicate which groups are managed by this user.
+      const groupList = document.querySelector('#group-list')
+      const fragment = document.createDocumentFragment() // Create a document fragment for batch updates
+
+      for (const groupName in this.groups) {
+        const group = groupList.querySelector('.group[data-name="' + Yoda.escapeQuotes(groupName) + '"]')
+
+        if (!group) continue // Skip if the group is not found
+
+        const table = document.createElement('table')
+        table.className = 'float-end'
+        const row = document.createElement('tr')
+
+        if (groupName.match(/^(research)-/)) {
+          const linkCell = document.createElement('td')
+          const link = document.createElement('a')
+          link.href = '/research/?dir=' + encodeURIComponent('/' + groupName)
+          link.title = 'Go to group ' + groupName + ' in research space'
+          link.innerHTML = '<i class="fa-regular fa-folder"></i>'
+          linkCell.appendChild(link)
+          row.appendChild(linkCell)
+        }
+
+        if (this.isManagerOfGroup(groupName)) {
+          const managerCell = document.createElement('td')
+          managerCell.innerHTML = '&nbsp;<i class="fa fa-crown mt-1" title="You manage this group"></i>'
+          row.appendChild(managerCell)
+        } else if (!this.isMemberOfGroup(groupName) && this.isRodsAdmin) {
+          const adminCell = document.createElement('td')
+          adminCell.innerHTML = '&nbsp;<i class="fa-solid fa-wrench mt-1" title="You are not a member of this group, but you can manage it as an iRODS administrator"></i>'
+          row.appendChild(adminCell)
+        } else if (this.isMemberOfGroup(groupName) && this.groups[groupName].members[this.userNameFull].access === 'reader') {
+          const readerCell = document.createElement('td')
+          readerCell.innerHTML = '&nbsp;<i class="fa-solid fa-eye mt-1" title="You have read access to this group"></i>'
+          row.appendChild(readerCell)
+        } else {
+          const emptyCell = document.createElement('td')
+          emptyCell.style.width = '26px'
+          row.appendChild(emptyCell)
+        }
+
+        table.appendChild(row)
+        group.appendChild(table) // Append the table to the group
+      }
+
+      // Append all changes to the DOM at once
+      groupList.appendChild(fragment)
 
       $(window).on('beforeunload', function () {
         that.unloading = true
