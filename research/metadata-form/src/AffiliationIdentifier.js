@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
-import { render } from 'react-dom'
 import CreatableSelect from 'react-select/creatable'
 import axios from 'axios'
-import { FieldProps } from '@rjsf/utils'
 
 class AffiliationIdentifier extends React.Component {
   constructor (props) {
@@ -176,7 +174,7 @@ class AffiliationIdentifier extends React.Component {
       classesName += ' is-invalid'
     }
 
-    // If Affiliation is required, Name is laways required.
+    // If Affiliation is required, Name is always required.
     if (affiliationRequired) {
       reqName = '*'
 
