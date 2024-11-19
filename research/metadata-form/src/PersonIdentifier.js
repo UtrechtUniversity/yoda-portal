@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
-import { render } from 'react-dom'
 import Select from 'react-select'
-import { FieldProps } from '@rjsf/utils'
 import InputMask from 'react-input-mask'
 
 // The Person Identifier field will always be a combination of Name_Identifier_Scheme and Name_Identifier.
@@ -46,7 +44,7 @@ class PersonIdentifier extends React.Component {
 
     // Dependant on selected name scheme the corresponding identifier field shows/does different things
     //  Selected scheme dependent help text handling
-    // default value from schema (independent of name_scheme
+    // default value from schema (independent of name_scheme)
     let helpIdentifier = this.props.uiSchema.Name_Identifier['ui:help']
     if (typeof this.props.uiSchema.Name_Identifier['ui:help-' + Name_Identifier_Scheme] !== 'undefined') {
       helpIdentifier = this.props.uiSchema.Name_Identifier['ui:help-' + Name_Identifier_Scheme]

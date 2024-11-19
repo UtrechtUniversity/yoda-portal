@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { render } from "react-dom";
+import { createRoot } from 'react-dom/client';
 import Form from '@rjsf/bootstrap-4';
 import { customizeValidator } from '@rjsf/validator-ajv8';
 import Ajv2019 from 'ajv/dist/2019';
@@ -96,7 +96,7 @@ const enumWidget = (props) => {
         neutral90: 'var(--neutral-10)',
 
          /*
-          * One of the few bootstrap variables we can use with themeing react-select!
+          * One of the few bootstrap variables we can use with theming react-select!
           * control/boxShadow(focused)
           * control/borderColor(focused)
           * control/borderColor:hover(focused)
@@ -127,10 +127,10 @@ const enumWidget = (props) => {
     var list = props.id.replace('yoda_', '').split('_');
     var name_hierarchy = [], level_counter = 0, level_name = '', last_was_numeric = false;
 
-    // Determination of actual field name is based on seperation of id by numbers (which are introduced by React)
+    // Determination of actual field name is based on separation of id by numbers (which are introduced by React)
     // Example (first level only) Ancillary_Equipment_0
     // Example 2: Contact_0_Person_Identifier_Scheme consists of 2 fields
-    // This way an array can be constructed listing the hierachy of names leading up the id of the field
+    // This way an array can be constructed listing the hierarchy of names leading up the id of the field
     list.forEach(function (item, index) {
         if (isNaN(item)) {
             last_was_numeric = false;
@@ -144,7 +144,7 @@ const enumWidget = (props) => {
     });
 
     // If the final item was not numeric, it is not yet added to the name_hierarchy array
-    // Therefore, do it now explicitely
+    // Therefore, do it now explicitly
     if (!last_was_numeric) {
         name_hierarchy[level_counter] = level_name;
     }
@@ -463,7 +463,25 @@ class YodaForm extends React.Component {
     }
 
     onChange(form) {
-        console.log(form);
+        // Turn save mode off.
+        saving = false;
+        const formContext = { saving: false };
+        // TODO this won't work properly for schemas with Keyword field not in this specific format
+        if (form.formData.Keywords && form.formData.Keywords.value) {
+            form.formData.Keywords = form.formData.Keywords.value.map(val => ({
+                "Subject": val.label,
+                "subjectScheme": "EPOS MSL",
+                "schemeURI": "https://github.com/UtrechtUniversity/msl_vocabularies",
+                "valueURI": val.value.split(":").slice(1).join(":")
+            }))
+        }
+
+        this.setState({
+            formData: form.formData,
+            formContext: formContext
+        });
+
+        // Update form completeness bar
         updateCompleteness();
     }
 
@@ -474,7 +492,6 @@ class YodaForm extends React.Component {
     }
 
     transformErrors(errors) {
-        console.log(errors);
         // Strip errors when saving.
         if (saving) {
             return errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies' && e.name !== 'enum' && e.name !== 'type');
@@ -497,6 +514,7 @@ class YodaForm extends React.Component {
                   showErrorList={"top"}
                   widgets={widgets}
                   templates={templates}
+                  omitExtraData={true}
                   onSubmit={onSubmit}
                   onChange={this.onChange.bind(this)}
                   onError={this.onError.bind(this)}
@@ -648,7 +666,7 @@ function loadForm() {
             formProperties = data;
 
             if (formProperties.data !== null) {
-                // These ary only present when there is a form to show (i.e. no
+                // These are only present when there is a form to show (i.e. no
                 // validation errors, and no transformation needed).
                 schema       = formProperties.data.schema;
                 uiSchema     = formProperties.data.uischema;
@@ -715,7 +733,8 @@ function loadForm() {
                 if (!formProperties.data.can_edit)
                     uiSchema['ui:readonly'] = true;
 
-                render(<Container/>, document.getElementById('form'));
+                const root = createRoot(document.getElementById('form'));
+                root.render(<Container/>);
 
                 // Form may already be visible (with "loading" text).
                 if ($('#metadata-form').hasClass('hide')) {

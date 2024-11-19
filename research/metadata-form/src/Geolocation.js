@@ -1,6 +1,4 @@
 import React, { Component } from 'react'
-import { render } from 'react-dom'
-import { FieldProps } from '@rjsf/utils'
 import Modal from 'react-modal'
 import { MapContainer, TileLayer, Marker, FeatureGroup } from 'react-leaflet'
 import L from 'leaflet'
