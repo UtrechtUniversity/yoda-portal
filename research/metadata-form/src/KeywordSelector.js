@@ -18,10 +18,9 @@ class KeywordSelector extends React.Component {
     this.colorPrimary = getComputedStyle(document.documentElement).getPropertyValue('--bs-primary');
     this.lightModeSelectColor = getComputedStyle(document.documentElement).getPropertyValue('--bs-black');
     this.lightModeSelectBgColor = getComputedStyle(document.documentElement).getPropertyValue('--bs-secondary-bg');
-    this.darkModeSelectColor = getComputedStyle(document.documentElement).getPropertyValue('--bs-body-bg');
-    // TODO This color is slightly blue idk why
-    // this.darkModeSelectBgColor = getComputedStyle(document.documentElement).getPropertyValue('--bs-gray-dark');
-    this.darkModeSelectBgColor = getComputedStyle(document.documentElement).getPropertyValue('--bs-tertiary-color');
+    // From react-select theming
+    this.darkModeSelectColor = "#dee2e6";
+    this.darkModeSelectBgColor = '#2b3035';
   }
 
   async loadData() {
@@ -102,14 +101,20 @@ class KeywordSelector extends React.Component {
                     <ConfigProvider
                       theme={{
                         algorithm: this.colorMode === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
-                        token: {
+                        token: this.colorMode === 'dark'? {
+                          // Copied from our react-select dark mode theme
+                          colorPrimary: '#495057',
+                          colorBgContainer: "#212529",
+                          colorBgContainerDisabled: "#212529",
+                          colorBgElevated: "#212529",
+                        } : {
                           colorPrimary: this.colorPrimary,
                         },
                         components: {
                           TreeSelect: {
-                            // nodeSelectedColor: this.colorMode === 'dark' ? this.darkModeSelectColor : this.lightModeSelectColor,
+                            nodeSelectedColor: this.colorMode === 'dark' ? this.darkModeSelectColor : this.lightModeSelectColor,
                             nodeSelectedBg: this.colorMode === 'dark' ? this.darkModeSelectBgColor : this.lightModeSelectBgColor,
-                            // nodeHoverColor: this.colorMode === 'dark' ? this.darkModeSelectColor : this.lightModeSelectColor,
+                            nodeHoverColor: this.colorMode === 'dark' ? this.darkModeSelectColor : this.lightModeSelectColor,
                             nodeHoverBg: this.colorMode === 'dark' ? this.darkModeSelectBgColor : this.lightModeSelectBgColor,
                           },
                         },
@@ -132,6 +137,7 @@ class KeywordSelector extends React.Component {
                           multiple
                           disabled={this.props.readonly}
                           onChange={this.onChange}
+                          size="large"
                           treeData={this.state.treeData}
                       />
                     </ConfigProvider>
