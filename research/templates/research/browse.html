@@ -81,18 +81,18 @@
 </div>
 
 <div class="modal" tabindex="-1" role="dialog" id="cleanup-collection">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-body">
-                <h5 class="modal-title">Clean up collection</h5>
-                <div class="alert alert-warning" id="alert-panel-cleanup-collection">
+            <div class="modal-header d-flex flex-column align-items-start">
+                <h5 class="modal-title mb-2">Clean up collection</h5>
+                <div class="alert alert-warning w-100" id="alert-panel-cleanup-collection">
                     <span></span>
                 </div>
-
                 <p><b><span id="collection"></span></b></p>
+            </div>
 
+            <div class="modal-body">
                 <div id="cleanup-files"></div>
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
