@@ -28,6 +28,74 @@ let form = document.getElementById('form');
 const validatorAjvDraft7 = customizeValidator({ ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
 const validatorAjv2019 = customizeValidator({ AjvClass: Ajv2019, ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
 
+const darkThemeColors = {
+    /* For theme color guidance: https://github.com/JedWatson/react-select/issues/3692#issuecomment-523425096 */
+    /*
+    * control/backgroundColor
+    * menu/backgroundColor
+    * option/color(selected)
+    */
+    neutral0: '#212529',
+
+    /*
+    * control/backgroundColor(disabled)
+    */
+    neutral5: '#212529',
+
+    /*
+    * control/borderColor(disabled)
+    * multiValue/backgroundColor
+    * indicators(separator)/backgroundColor(disabled)
+    */
+    neutral10: '#343a40',
+
+    /*
+    * control/borderColor
+    * option/color(disabled)
+    * indicators/color
+    * indicators(separator)/backgroundColor
+    * indicators(loading)/color
+    */
+    neutral20: '#343a40',
+
+    /*
+    * control/borderColor(focused)
+    * control/borderColor:hover
+    */
+    neutral30: '#343a40',
+
+    /*
+    * input/color
+    * multiValue(label)/color
+    * singleValue/color
+    * indicators/color(focused)
+    * indicators/color:hover(focused)
+    */
+    neutral80: 'var(--neutral-10)',
+    neutral90: 'var(--neutral-10)',
+
+    /*
+    * One of the few bootstrap variables we can use with theming react-select!
+    * control/boxShadow(focused)
+    * control/borderColor(focused)
+    * control/borderColor:hover(focused)
+    * option/backgroundColor(selected)
+    * option/backgroundColor:active(selected)
+    */
+    primary: 'var(--bs-primary)',
+
+    /*
+    * option/backgroundColor(focused)
+    */
+    primary25: '#2b3035',
+
+    /*
+    * option/backgroundColor:active
+    */
+    primary50: '#2b3035',
+    primary75: '#2b3035'
+}
+
 const enumWidget = (props) => {
     let enumArray = props['schema']['enum'];
     let enumNames = props['schema']['enumNames'];
@@ -49,76 +117,8 @@ const enumWidget = (props) => {
         })
     };
 
-    const darkThemeColors = {
-        /* For theme color guidance: https://github.com/JedWatson/react-select/issues/3692#issuecomment-523425096 */
-        /*
-         * control/backgroundColor
-         * menu/backgroundColor
-         * option/color(selected)
-         */
-        neutral0: '#212529',
-
-        /*
-         * control/backgroundColor(disabled)
-         */
-        neutral5: '#212529',
-
-        /*
-         * control/borderColor(disabled)
-         * multiValue/backgroundColor
-         * indicators(separator)/backgroundColor(disabled)
-         */
-        neutral10: '#343a40',
-
-        /*
-         * control/borderColor
-         * option/color(disabled)
-         * indicators/color
-         * indicators(separator)/backgroundColor
-         * indicators(loading)/color
-         */
-        neutral20: '#343a40',
-
-        /*
-         * control/borderColor(focused)
-         * control/borderColor:hover
-         */
-        neutral30: '#343a40',
-
-        /*
-         * input/color
-         * multiValue(label)/color
-         * singleValue/color
-         * indicators/color(focused)
-         * indicators/color:hover(focused)
-         */
-        neutral80: 'var(--neutral-10)',
-        neutral90: 'var(--neutral-10)',
-
-         /*
-          * One of the few bootstrap variables we can use with theming react-select!
-          * control/boxShadow(focused)
-          * control/borderColor(focused)
-          * control/borderColor:hover(focused)
-          * option/backgroundColor(selected)
-          * option/backgroundColor:active(selected)
-          */
-        primary: 'var(--bs-primary)',
-
-        /*
-         * option/backgroundColor(focused)
-         */
-        primary25: '#2b3035',
-
-        /*
-         * option/backgroundColor:active
-         */
-        primary50: '#2b3035',
-        primary75: '#2b3035',
-    };
-
     // Check what theme is set
-    const colorMode = document.documentElement.getAttribute('data-bs-theme');
+    const colorMode = props.formContext.colorMode
 
     let required = props.required
     let error = "should be equal to one of the allowed values";
@@ -189,7 +189,7 @@ const enumWidget = (props) => {
                     styles={customStyles}
                     theme={(theme) => ({
                         ...theme,
-                        colors: (colorMode === 'dark') ? {...theme.colors, ...darkThemeColors} : {...theme.colors},
+                        colors: (colorMode === 'dark') ? {...theme.colors, ...props.formContext.darkThemeColors} : {...theme.colors},
                     })}
             />
         </div>
@@ -454,7 +454,9 @@ class YodaForm extends React.Component {
         super(props);
 
         const formContext = {
-            saving: false
+            saving: false,
+            colorMode: document.documentElement.getAttribute('data-bs-theme'),
+            darkThemeColors: darkThemeColors
         };
         this.state = {
             formData: yodaFormData,
@@ -462,18 +464,18 @@ class YodaForm extends React.Component {
         };
     }
 
-    onChange(form) {
+    onChange(form, id) {
+        let formContext = {...this.state.formContext};
         // Turn save mode off.
-        saving = false;
-        const formContext = { saving: false };
-        // TODO this won't work properly for schemas with Keyword field not in this specific format
-        if (form.formData.Keywords && form.formData.Keywords.value) {
-            form.formData.Keywords = form.formData.Keywords.value.map(val => ({
-                "Subject": val.label,
-                "subjectScheme": "EPOS MSL",
-                "schemeURI": "https://github.com/UtrechtUniversity/msl_vocabularies",
-                "valueURI": val.value.split(":").slice(1).join(":")
-            }))
+        formContext.saving = false;
+
+        if (id === "yoda_Keywords" &&
+            form.formData.Keywords && 
+            form.formData.Keywords.value &&
+            form.formData.Keywords.value.length &&
+            Object.keys(form.schema.properties.Keywords.items.properties).includes("Subject")) {
+        
+            form.formData.Keywords = this.updateHierarchicalKeywords(form, form.formData.Keywords.value)
         }
 
         this.setState({
@@ -483,6 +485,25 @@ class YodaForm extends React.Component {
 
         // Update form completeness bar
         updateCompleteness();
+    }
+
+    updateHierarchicalKeywords = (form, value) => {
+        const newVal = value.map(val => {
+            if (val.value.endsWith(":")) {
+                // User created keyword
+                return {
+                    "Subject": val.label,
+                }
+            } else {
+                return {
+                    "Subject": val.label,
+                    "subjectScheme": form.uiSchema.Keywords["ui:subjectScheme"],
+                    "schemeURI": form.uiSchema.Keywords["ui:schemeURI"],
+                    "valueURI": val.value.split(":").slice(1).join(":")
+                }
+            }
+        })
+        return newVal
     }
 
     onError(form) {
