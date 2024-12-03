@@ -10,7 +10,7 @@ import Vocabulary from "./Vocabulary";
 import AffiliationIdentifier from  "./AffiliationIdentifier";
 import PersonIdentifier from "./PersonIdentifier";
 import { withTheme } from "@rjsf/core";
-import KeywordSelector from "./KeywordSelector";
+import HierarchicalKeywordSelector from './HierarchicalKeywordSelector'
 
 const path = $('#form').attr('data-path');
 
@@ -205,7 +205,7 @@ const fields = {
     vocabulary: Vocabulary,
     affiliation_identifier: AffiliationIdentifier,
     person_identifier: PersonIdentifier,
-    keyword_selector: KeywordSelector
+    hierarchical_keyword_selector: HierarchicalKeywordSelector
 };
 
 const CustomArrayFieldTemplate = (props) => {
@@ -469,13 +469,13 @@ class YodaForm extends React.Component {
         // Turn save mode off.
         formContext.saving = false;
 
-        if (id === "yoda_Keywords" &&
-            form.formData.Keywords && 
-            form.formData.Keywords.value &&
-            form.formData.Keywords.value.length &&
-            Object.keys(form.schema.properties.Keywords.items.properties).includes("Subject")) {
+        if (id === "yoda_HierarchicalKeyword" &&
+            form.formData.HierarchicalKeyword && 
+            form.formData.HierarchicalKeyword.value &&
+            form.formData.HierarchicalKeyword.value.length &&
+            Object.keys(form.schema.properties.HierarchicalKeyword.items.properties).includes("Subject")) {
         
-            form.formData.Keywords = this.updateHierarchicalKeywords(form, form.formData.Keywords.value)
+            form.formData.HierarchicalKeyword = this.updateHierarchicalKeywords(form, form.formData.HierarchicalKeyword.value)
         }
 
         this.setState({
@@ -497,8 +497,8 @@ class YodaForm extends React.Component {
             } else {
                 return {
                     "Subject": val.label,
-                    "subjectScheme": form.uiSchema.Keywords["ui:subjectScheme"],
-                    "schemeURI": form.uiSchema.Keywords["ui:schemeURI"],
+                    "subjectScheme": form.uiSchema.HierarchicalKeyword["ui:subjectScheme"],
+                    "schemeURI": form.uiSchema.HierarchicalKeyword["ui:schemeURI"],
                     "valueURI": val.value.split(":").slice(1).join(":")
                 }
             }
