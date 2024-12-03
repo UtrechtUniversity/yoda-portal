@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios'
 import { TreeSelect, ConfigProvider, theme } from 'antd'
 
-class KeywordSelector extends React.Component {
+class HierarchicalKeywordSelector extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -130,7 +130,6 @@ class KeywordSelector extends React.Component {
   }
 
   handleChange = (newValue) => {
-    // TODO more robust check
     const userKeywords = this.getUserKeywords(newValue)
     const newUserCreatedTree = this.createUserKeywordTree(userKeywords)
 
@@ -234,4 +233,4 @@ class KeywordSelector extends React.Component {
   }
 }
 
-export default KeywordSelector
+export default HierarchicalKeywordSelector
