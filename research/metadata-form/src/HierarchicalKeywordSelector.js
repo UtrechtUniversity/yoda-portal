@@ -204,10 +204,11 @@ class HierarchicalKeywordSelector extends React.Component {
                 style={{
                   width: '100%'
                 }}
-                // dropdownStyle={{
-                //   maxHeight: 400,
-                //   overflow: 'auto',
-                // }}
+                dropdownStyle={{
+                  // Set the z-index to match $zindex-dropdown from bootstrap
+                  // Otherwise it goes above the banners
+                  zIndex: 1000
+                }}
                 value={this.state.value}
                 placeholder='Select keyword'
                 placement='bottomLeft'
