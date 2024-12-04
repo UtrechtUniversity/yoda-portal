@@ -153,7 +153,7 @@ with app.app_context():
 
 # CSRF protection.
 csrf = CSRFProtect(app)
-
+app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token lifetime tied to the life of the session.
 
 @app.before_request
 def static_loader() -> Optional[Response]:
