@@ -3,8 +3,10 @@
 __copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-from flask import Blueprint, redirect, render_template, Response, url_for
+from flask import Blueprint, redirect, render_template, request, Response, session, url_for
 from flask_wtf.csrf import CSRFError
+
+from util import log_error
 
 general_bp = Blueprint('general_bp', __name__,
                        template_folder='templates/general',
@@ -19,6 +21,8 @@ def index() -> Response:
 
 @general_bp.app_errorhandler(CSRFError)
 def csrf_error(e: Exception) -> Response:
+    username = session.get("login_username", "N/A")
+    log_error(f"CSRF error occurred for user {username} on path {request.path}.")
     return redirect(url_for('user_bp.login'))
 
 
