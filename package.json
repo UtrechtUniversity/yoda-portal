@@ -8,6 +8,7 @@
       "**/lib/",
       "**/intake/",
       "**/metadata-form/",
+      "metadata_form/**",
       "metadata-form.js",
       "datarequest/static/**"
     ]
