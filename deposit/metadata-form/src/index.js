@@ -1,16 +1,16 @@
 import React, { Component } from "react";
-import { render } from "react-dom";
+import { createRoot } from 'react-dom/client';
 import Form from '@rjsf/bootstrap-4';
 import { customizeValidator } from '@rjsf/validator-ajv8';
 import Ajv2019 from 'ajv/dist/2019';
 import { getTemplate } from '@rjsf/utils';
 import Select from 'react-select';
-import Geolocation from "./Geolocation";
-import Vocabulary from "./Vocabulary";
-import AffiliationIdentifier from  "./AffiliationIdentifier";
-import PersonIdentifier from "./PersonIdentifier";
+import AffiliationIdentifier from 'YodaFields/AffiliationIdentifier'
+import Geolocation from 'YodaFields/Geolocation'
+import HierarchicalKeywordSelector from 'YodaFields/HierarchicalKeywordSelector'
+import PersonIdentifier from 'YodaFields/PersonIdentifier'
+import Vocabulary from 'YodaFields/Vocabulary'
 import { withTheme } from "@rjsf/core";
-
 
 const path = $('#form').attr('data-path');
 
@@ -28,6 +28,74 @@ let form = document.getElementById('form');
 
 const validatorAjvDraft7 = customizeValidator({ ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
 const validatorAjv2019 = customizeValidator({ AjvClass: Ajv2019, ajvOptionsOverrides: {verbose: true, addUsedSchema: false } });
+
+const darkThemeColors = {
+    /* For theme color guidance: https://github.com/JedWatson/react-select/issues/3692#issuecomment-523425096 */
+    /*
+    * control/backgroundColor
+    * menu/backgroundColor
+    * option/color(selected)
+    */
+    neutral0: '#212529',
+
+    /*
+    * control/backgroundColor(disabled)
+    */
+    neutral5: '#212529',
+
+    /*
+    * control/borderColor(disabled)
+    * multiValue/backgroundColor
+    * indicators(separator)/backgroundColor(disabled)
+    */
+    neutral10: '#343a40',
+
+    /*
+    * control/borderColor
+    * option/color(disabled)
+    * indicators/color
+    * indicators(separator)/backgroundColor
+    * indicators(loading)/color
+    */
+    neutral20: '#343a40',
+
+    /*
+    * control/borderColor(focused)
+    * control/borderColor:hover
+    */
+    neutral30: '#343a40',
+
+    /*
+    * input/color
+    * multiValue(label)/color
+    * singleValue/color
+    * indicators/color(focused)
+    * indicators/color:hover(focused)
+    */
+    neutral80: 'var(--neutral-10)',
+    neutral90: 'var(--neutral-10)',
+
+    /*
+    * One of the few bootstrap variables we can use with theming react-select!
+    * control/boxShadow(focused)
+    * control/borderColor(focused)
+    * control/borderColor:hover(focused)
+    * option/backgroundColor(selected)
+    * option/backgroundColor:active(selected)
+    */
+    primary: 'var(--bs-primary)',
+
+    /*
+    * option/backgroundColor(focused)
+    */
+    primary25: '#2b3035',
+
+    /*
+    * option/backgroundColor:active
+    */
+    primary50: '#2b3035',
+    primary75: '#2b3035'
+}
 
 const enumWidget = (props) => {
     let enumArray = props['schema']['enum'];
@@ -50,76 +118,8 @@ const enumWidget = (props) => {
         })
     };
 
-    const darkThemeColors = {
-        /* For theme color guidance: https://github.com/JedWatson/react-select/issues/3692#issuecomment-523425096 */
-        /*
-         * control/backgroundColor
-         * menu/backgroundColor
-         * option/color(selected)
-         */
-        neutral0: '#212529',
-
-        /*
-         * control/backgroundColor(disabled)
-         */
-        neutral5: '#212529',
-
-        /*
-         * control/borderColor(disabled)
-         * multiValue/backgroundColor
-         * indicators(separator)/backgroundColor(disabled)
-         */
-        neutral10: '#343a40',
-
-        /*
-         * control/borderColor
-         * option/color(disabled)
-         * indicators/color
-         * indicators(separator)/backgroundColor
-         * indicators(loading)/color
-         */
-        neutral20: '#343a40',
-
-        /*
-         * control/borderColor(focused)
-         * control/borderColor:hover
-         */
-        neutral30: '#343a40',
-
-        /*
-         * input/color
-         * multiValue(label)/color
-         * singleValue/color
-         * indicators/color(focused)
-         * indicators/color:hover(focused)
-         */
-        neutral80: 'var(--neutral-10)',
-        neutral90: 'var(--neutral-10)',
-
-         /*
-          * One of the few bootstrap variables we can use with themeing react-select!
-          * control/boxShadow(focused)
-          * control/borderColor(focused)
-          * control/borderColor:hover(focused)
-          * option/backgroundColor(selected)
-          * option/backgroundColor:active(selected)
-          */
-        primary: 'var(--bs-primary)',
-
-        /*
-         * option/backgroundColor(focused)
-         */
-        primary25: '#2b3035',
-
-        /*
-         * option/backgroundColor:active
-         */
-        primary50: '#2b3035',
-        primary75: '#2b3035'
-    };
-
     // Check what theme is set
-    const colorMode = document.documentElement.getAttribute('data-bs-theme')
+    const colorMode = props.formContext.colorMode
 
     let required = props.required
     let error = "should be equal to one of the allowed values";
@@ -128,10 +128,10 @@ const enumWidget = (props) => {
     var list = props.id.replace('yoda_', '').split('_');
     var name_hierarchy = [], level_counter = 0, level_name = '', last_was_numeric = false;
 
-    // Determination of actual field name is based on seperation of id by numbers (which are introduced by React)
+    // Determination of actual field name is based on separation of id by numbers (which are introduced by React)
     // Example (first level only) Ancillary_Equipment_0
     // Example 2: Contact_0_Person_Identifier_Scheme consists of 2 fields
-    // This way an array can be constructed listing the hierachy of names leading up the id of the field
+    // This way an array can be constructed listing the hierarchy of names leading up the id of the field
     list.forEach(function (item, index) {
         if (isNaN(item)) {
             last_was_numeric = false;
@@ -190,7 +190,7 @@ const enumWidget = (props) => {
                     styles={customStyles}
                     theme={(theme) => ({
                         ...theme,
-                        colors: (colorMode === 'dark') ? {...theme.colors, ...darkThemeColors} : {...theme.colors},
+                        colors: (colorMode === 'dark') ? {...theme.colors, ...props.formContext.darkThemeColors} : {...theme.colors},
                     })}
             />
         </div>
@@ -205,7 +205,8 @@ const fields = {
     geo: Geolocation,
     vocabulary: Vocabulary,
     affiliation_identifier: AffiliationIdentifier,
-    person_identifier: PersonIdentifier
+    person_identifier: PersonIdentifier,
+    hierarchical_keyword_selector: HierarchicalKeywordSelector
 };
 
 const CustomArrayFieldTemplate = (props) => {
@@ -288,6 +289,7 @@ const CustomArrayFieldTemplate = (props) => {
                                             </button>
                                         </div>
                                     )}
+
                                 </div>
                             </div>
                         )}
@@ -453,7 +455,9 @@ class YodaForm extends React.Component {
         super(props);
 
         const formContext = {
-            saving: false
+            saving: false,
+            colorMode: document.documentElement.getAttribute('data-bs-theme'),
+            darkThemeColors: darkThemeColors
         };
         this.state = {
             formData: yodaFormData,
@@ -461,15 +465,43 @@ class YodaForm extends React.Component {
         };
     }
 
-    onChange(form) {
+    onChange(form, id) {
+        let formContext = {...this.state.formContext};
         // Turn save mode off.
-        saving = false;
-        const formContext = { saving: false };
+        formContext.saving = false;
+
+        if (id === "yoda_HierarchicalKeyword" &&
+            form.formData.HierarchicalKeyword && 
+            form.formData.HierarchicalKeyword.value &&
+            form.formData.HierarchicalKeyword.value.length &&
+            Object.keys(form.schema.properties.HierarchicalKeyword.items.properties).includes("Subject")) {
+        
+            form.formData.HierarchicalKeyword = this.updateHierarchicalKeywords(form, form.formData.HierarchicalKeyword.value)
+        }
 
         this.setState({
             formData: form.formData,
             formContext: formContext
         });
+    }
+
+    updateHierarchicalKeywords = (form, value) => {
+        const newVal = value.map(val => {
+            if (val.value.endsWith(":")) {
+                // User created keyword
+                return {
+                    "Subject": val.label,
+                }
+            } else {
+                return {
+                    "Subject": val.label,
+                    "subjectScheme": form.uiSchema.HierarchicalKeyword["ui:subjectScheme"],
+                    "schemeURI": form.uiSchema.HierarchicalKeyword["ui:schemeURI"],
+                    "valueURI": val.value.split(":").slice(1).join(":")
+                }
+            }
+        })
+        return newVal
     }
 
     onError(form) {
@@ -501,6 +533,7 @@ class YodaForm extends React.Component {
                   showErrorList={"top"}
                   widgets={widgets}
                   templates={templates}
+                  omitExtraData={true}
                   onSubmit={onSubmit}
                   onChange={this.onChange.bind(this)}
                   onError={this.onError.bind(this)}
@@ -631,7 +664,7 @@ function loadForm() {
             formProperties = data;
 
             if (formProperties.data !== null) {
-                // These ary only present when there is a form to show (i.e. no
+                // These are only present when there is a form to show (i.e. no
                 // validation errors, and no transformation needed).
                 schema       = formProperties.data.schema;
                 uiSchema     = formProperties.data.uischema;
@@ -698,7 +731,8 @@ function loadForm() {
                 if (!formProperties.data.can_edit)
                     uiSchema['ui:readonly'] = true;
 
-                render(<Container/>, document.getElementById('form'));
+                const root = createRoot(document.getElementById('form'));
+                root.render(<Container/>);
 
                 // Form may already be visible (with "loading" text).
                 if ($('#metadata-form').hasClass('hide')) {

@@ -23,3 +23,9 @@
     padding: 0 15px;
 }
 
+/* Dark theme specific settings */
+[data-bs-theme="dark"] {
+    .ant-select:hover .ant-select-selector, .ant-select-focused .ant-select-selector {
+        border-color: var(--bs-border-color) !important;
+    }
+}

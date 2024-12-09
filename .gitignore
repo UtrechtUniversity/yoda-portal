@@ -33,9 +33,7 @@ coverage.xml
 docs/_build/
 
 # Node modules
-/research/metadata-form/node_modules/
-/vault/metadata-form/node_modules/
-/deposit/metadata-form/node_modules/
+/metadata_form/src/node_modules/
 
 # Python Virtual Environment
 /venv/
