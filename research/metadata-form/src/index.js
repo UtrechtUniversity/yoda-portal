@@ -5,12 +5,12 @@ import { customizeValidator } from '@rjsf/validator-ajv8';
 import Ajv2019 from 'ajv/dist/2019';
 import { getTemplate } from '@rjsf/utils';
 import Select from 'react-select';
-import Geolocation from "./Geolocation";
-import Vocabulary from "./Vocabulary";
-import AffiliationIdentifier from  "./AffiliationIdentifier";
-import PersonIdentifier from "./PersonIdentifier";
+import AffiliationIdentifier from 'YodaFields/AffiliationIdentifier'
+import Geolocation from 'YodaFields/Geolocation'
+import HierarchicalKeywordSelector from 'YodaFields/HierarchicalKeywordSelector'
+import PersonIdentifier from 'YodaFields/PersonIdentifier'
+import Vocabulary from 'YodaFields/Vocabulary'
 import { withTheme } from "@rjsf/core";
-import HierarchicalKeywordSelector from './HierarchicalKeywordSelector'
 
 const path = $('#form').attr('data-path');
 
