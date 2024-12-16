@@ -33,9 +33,9 @@ class HierarchicalKeywordSelector extends React.Component {
     if (this.props.formData) {
       newVal = this.props.formData.map((keyObj) => {
         if (Object.keys(keyObj).includes('valueURI')) {
-          return { label: keyObj.Subject, value: [keyObj.Subject, keyObj.valueURI].join(':') }
+          return { label: keyObj.subject, value: [keyObj.subject, keyObj.valueUri].join(':') }
         } else {
-          return { label: keyObj.Subject, value: keyObj.Subject + ':' }
+          return { label: keyObj.subject, value: keyObj.subject + ':' }
         }
       })
     }

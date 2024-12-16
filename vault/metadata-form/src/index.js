@@ -475,7 +475,7 @@ class YodaForm extends React.Component {
             form.formData.HierarchicalKeyword && 
             form.formData.HierarchicalKeyword.value &&
             form.formData.HierarchicalKeyword.value.length &&
-            Object.keys(form.schema.properties.HierarchicalKeyword.items.properties).includes("Subject")) {
+            Object.keys(form.schema.properties.HierarchicalKeyword.items.properties).includes("subject")) {
         
             form.formData.HierarchicalKeyword = this.updateHierarchicalKeywords(form, form.formData.HierarchicalKeyword.value)
         }
@@ -494,14 +494,14 @@ class YodaForm extends React.Component {
             if (val.value.endsWith(":")) {
                 // User created keyword
                 return {
-                    "Subject": val.label,
+                    "subject": val.label,
                 }
             } else {
                 return {
-                    "Subject": val.label,
+                    "subject": val.label,
                     "subjectScheme": form.uiSchema.HierarchicalKeyword["ui:subjectScheme"],
-                    "schemeURI": form.uiSchema.HierarchicalKeyword["ui:schemeURI"],
-                    "valueURI": val.value.split(":").slice(1).join(":")
+                    "schemeUri": form.uiSchema.HierarchicalKeyword["ui:schemeUri"],
+                    "valueUri": val.value.split(":").slice(1).join(":")
                 }
             }
         })
