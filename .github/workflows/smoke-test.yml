@@ -111,7 +111,9 @@ jobs:
         docker logs portal.yoda
         docker logs provider.yoda
         docker exec portal.yoda sh -c 'set -x; cat /var/log/apache2/error.log || echo "Apache error log file not found."'
-        docker exec provider.yoda sh -c 'set -x ; cat /var/lib/irods/log/rodsLog*' || echo "rodsLog not found."'
+        docker exec provider.yoda sh -c 'set -x ; cat /var/log/syslog' || echo "rodsLog not found."'
+        cat ../../copytovault.log
+        cat ../../publication.log
 
 # Uncomment section below when needed for debugging.
 #
