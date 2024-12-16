@@ -2,12 +2,12 @@ import React from 'react'
 import axios from 'axios'
 import { TreeSelect, ConfigProvider, theme } from 'antd'
 
-class HierarchicalKeywordSelector extends React.Component {
+class TreeKeywordSelector extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       ...props.formData,
-      // Keyword array in the expected format
+      // Keyword array in the TreeSelect format: each item has label and value
       value: [],
       treeData: null
     }
@@ -32,6 +32,7 @@ class HierarchicalKeywordSelector extends React.Component {
     let newVal = []
     if (this.props.formData) {
       newVal = this.props.formData.map((keyObj) => {
+        // Convert schema structure to expected structure for TreeSelect
         if (Object.keys(keyObj).includes('valueURI')) {
           return { label: keyObj.subject, value: [keyObj.subject, keyObj.valueUri].join(':') }
         } else {
@@ -125,11 +126,14 @@ class HierarchicalKeywordSelector extends React.Component {
   }
 
   handleSelect = (newValue) => {
-    // Find the new node
+    // Find the new node and select its parents as well
     this.putCheckOnParents(this.state.treeData, newValue)
   }
 
   handleChange = (newValue) => {
+    /* Update what has been selected, and update the tree based on whether
+       any user created keywords have been selected or not.
+    */
     const userKeywords = this.getUserKeywords(newValue)
     const newUserCreatedTree = this.createUserKeywordTree(userKeywords)
 
@@ -145,6 +149,7 @@ class HierarchicalKeywordSelector extends React.Component {
   }
 
   handleSearch = (keyword) => {
+    // Add the currently typed word as a custom user keyword in the tree
     this.setState((state) => {
       const userKeywords = this.getUserKeywords(state.value)
       const keyValue = keyword + ':'
@@ -234,4 +239,4 @@ class HierarchicalKeywordSelector extends React.Component {
   }
 }
 
-export default HierarchicalKeywordSelector
+export default TreeKeywordSelector
