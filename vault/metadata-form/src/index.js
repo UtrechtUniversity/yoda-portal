@@ -7,7 +7,7 @@ import { getTemplate } from '@rjsf/utils';
 import Select from 'react-select';
 import AffiliationIdentifier from 'YodaFields/AffiliationIdentifier'
 import Geolocation from 'YodaFields/Geolocation'
-import HierarchicalKeywordSelector from 'YodaFields/HierarchicalKeywordSelector'
+import TreeKeywordSelector from 'YodaFields/TreeKeywordSelector'
 import PersonIdentifier from 'YodaFields/PersonIdentifier'
 import Vocabulary from 'YodaFields/Vocabulary'
 import { withTheme } from "@rjsf/core";
@@ -207,7 +207,7 @@ const fields = {
     vocabulary: Vocabulary,
     affiliation_identifier: AffiliationIdentifier,
     person_identifier: PersonIdentifier,
-    hierarchical_keyword_selector: HierarchicalKeywordSelector
+    tree_keyword_selector: TreeKeywordSelector
 };
 
 const CustomArrayFieldTemplate = (props) => {
@@ -471,13 +471,14 @@ class YodaForm extends React.Component {
         // Turn save mode off.
         formContext.saving = false;
 
-        if (id === "yoda_HierarchicalKeyword" &&
-            form.formData.HierarchicalKeyword && 
-            form.formData.HierarchicalKeyword.value &&
-            form.formData.HierarchicalKeyword.value.length &&
-            Object.keys(form.schema.properties.HierarchicalKeyword.items.properties).includes("subject")) {
+        // Update TreeKeyword field if it exists
+        if (id === "yoda_TreeKeyword" &&
+            form.formData.TreeKeyword && 
+            form.formData.TreeKeyword.value &&
+            form.formData.TreeKeyword.value.length &&
+            Object.keys(form.schema.properties.TreeKeyword.items.properties).includes("subject")) {
         
-            form.formData.HierarchicalKeyword = this.updateHierarchicalKeywords(form, form.formData.HierarchicalKeyword.value)
+            form.formData.TreeKeyword = this.updateTreeKeywords(form, form.formData.TreeKeyword.value)
         }
 
         this.setState({
@@ -489,7 +490,7 @@ class YodaForm extends React.Component {
         updateCompleteness();
     }
 
-    updateHierarchicalKeywords = (form, value) => {
+    updateTreeKeywords = (form, value) => {
         const newVal = value.map(val => {
             if (val.value.endsWith(":")) {
                 // User created keyword
@@ -499,8 +500,8 @@ class YodaForm extends React.Component {
             } else {
                 return {
                     "subject": val.label,
-                    "subjectScheme": form.uiSchema.HierarchicalKeyword["ui:subjectScheme"],
-                    "schemeUri": form.uiSchema.HierarchicalKeyword["ui:schemeUri"],
+                    "subjectScheme": form.uiSchema.TreeKeyword["ui:subjectScheme"],
+                    "schemeUri": form.uiSchema.TreeKeyword["ui:schemeUri"],
                     "valueUri": val.value.split(":").slice(1).join(":")
                 }
             }
