@@ -164,12 +164,24 @@ class TreeKeywordSelector extends React.Component {
     })
   }
 
+  renderLabel = () => {
+    const title = this.props.schema.title || this.props.uiSchema['ui:title']
+    const required = this.props.required
+    let label = <label className='w-100'>{title}</label>
+    if (this.props.rawErrors !== undefined || (required && this.props.formData == null)) {
+      label = <label className='w-100 text-danger'>{title}*</label>
+    } else if (required) {
+      label = <label className='w-100'>{title}*</label>
+    }
+    return label
+  }
+
   render () {
     return (
       <div className='col-12 field-wrapper'>
         <div className='form-group mb-0'>
           <div className='mb-0 form-group keyword-selector'>
-            <label className='w-100'>{this.props.schema.title}</label>
+            {this.renderLabel()}
             <ConfigProvider
               theme={{
                 algorithm: this.colorMode === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
@@ -206,6 +218,7 @@ class TreeKeywordSelector extends React.Component {
               <TreeSelect
                 labelInValue
                 showSearch
+                status={this.props.rawErrors !== undefined ? 'error' : null}
                 style={{
                   width: '100%'
                 }}
