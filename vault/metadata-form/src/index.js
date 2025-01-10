@@ -449,21 +449,22 @@ const templates = {
     FieldTemplate: CustomFieldTemplate
 };
 
-const onSubmit = ({formData}) => submitData(formData);
+const onSubmit = ({ formData }) => submitData(formData)
 
 class YodaForm extends React.Component {
-    constructor(props) {
-        super(props);
+    constructor (props) {
+        super(props)
 
         const formContext = {
             saving: false,
             colorMode: document.documentElement.getAttribute('data-bs-theme'),
             darkThemeColors: darkThemeColors
-        };
+        }
+
         this.state = {
             formData: yodaFormData,
             formContext: formContext
-        };
+        }
     }
 
     onChange(form, id) {
@@ -471,7 +472,7 @@ class YodaForm extends React.Component {
         // Turn save mode off.
         formContext.saving = false;
 
-        // Update TreeKeyword field if it exists
+        // Update TreeKeyword field if it exists and was the one changed
         if (id === "yoda_TreeKeyword" &&
             form.formData.TreeKeyword && 
             form.formData.TreeKeyword.value &&
