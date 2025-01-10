@@ -28,10 +28,20 @@ class TreeKeywordSelector extends React.Component {
     return await res.data
   }
 
+  isEmpty (obj) {
+    for (const prop in obj) {
+      if (Object.hasOwn(obj, prop)) {
+        return false
+      }
+    }
+    return true
+  }
+
   componentDidMount () {
     let newVal = []
     if (this.props.formData) {
-      newVal = this.props.formData.map((keyObj) => {
+      // Filter out empty objects (when no keyword has been selected yet for example)
+      newVal = this.props.formData.filter(x => !this.isEmpty(x)).map((keyObj) => {
         // Convert schema structure to expected structure for TreeSelect
         if (Object.keys(keyObj).includes('valueURI')) {
           return { label: keyObj.subject, value: [keyObj.subject, keyObj.valueUri].join(':') }
@@ -164,14 +174,18 @@ class TreeKeywordSelector extends React.Component {
     })
   }
 
+  fieldNeedsAttention = () => {
+    // There are errors or there are no keywords and this is a required field
+    return this.props.rawErrors !== undefined || (this.props.required && (!Array.isArray(this.state.value) || !this.state.value.length))
+  }
+
   renderLabel = () => {
     const title = this.props.schema.title || this.props.uiSchema['ui:title']
     const required = this.props.required
-    let label = <label className='w-100'>{title}</label>
-    if (this.props.rawErrors !== undefined || (required && this.props.formData == null)) {
-      label = <label className='w-100 text-danger'>{title}*</label>
-    } else if (required) {
-      label = <label className='w-100'>{title}*</label>
+    const fullLine = title + (required ? '*' : '')
+    let label = <label className='w-100'>{fullLine}</label>
+    if (this.fieldNeedsAttention()) {
+      label = <label className='w-100 text-danger'>{fullLine}</label>
     }
     return label
   }
@@ -218,7 +232,7 @@ class TreeKeywordSelector extends React.Component {
               <TreeSelect
                 labelInValue
                 showSearch
-                status={this.props.rawErrors !== undefined ? 'error' : null}
+                status={this.fieldNeedsAttention() ? 'error' : null}
                 style={{
                   width: '100%'
                 }}
