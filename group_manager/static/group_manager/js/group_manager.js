@@ -428,7 +428,6 @@ async function processImportedRow (row) {
     // only enable new groups that have been successfully added
     $('.import-csv-group-ok').on('click', function () {
       const groupName = 'research-' + $(this).attr('groupname')
-      $('#dlg-import-groups-csv').modal('hide')
       Yoda.groupManager.unfoldToGroup(groupName)
       Yoda.groupManager.selectGroup(groupName)
     })
