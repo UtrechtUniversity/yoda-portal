@@ -501,7 +501,7 @@ async function processImportedRow (row) {
 
       // Get the selected group if exists and reselect it to get the changes.
       // If no active group, no group is selected.
-      const activeGroupName = Yoda.storage.session.get('selected-group');
+      const activeGroupName = Yoda.storage.session.get('selected-group')
       if (activeGroupName) {
         Yoda.groupManager.selectGroup(activeGroupName)
       }
