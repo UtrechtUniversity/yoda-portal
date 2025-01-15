@@ -425,14 +425,6 @@ async function processImportedRow (row) {
 
   // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
   if ($('.import-groupname').length === $('.import-groupname-done').length) {
-    // only enable new groups that have been successfully added
-    $('.import-csv-group-ok').on('click', function () {
-      const groupName = 'research-' + $(this).attr('groupname')
-      $('#dlg-import-groups-csv').modal('hide')
-      Yoda.groupManager.unfoldToGroup(groupName)
-      Yoda.groupManager.selectGroup(groupName)
-    })
-
     // Renew the data of the left pane as new groups have been added not yet loaded.
     Yoda.call('group_data').then((groupdata) => {
       Yoda.groupManager.groupHierarchy = groupdata.group_hierarchy
