@@ -183,11 +183,11 @@ class TreeKeywordSelector extends React.Component {
     const title = this.props.schema.title || this.props.uiSchema['ui:title']
     const required = this.props.required
     const fullLine = title + (required ? '*' : '')
-    let label = <label className='w-100'>{fullLine}</label>
-    if (this.fieldNeedsAttention()) {
-      label = <label className='w-100 text-danger'>{fullLine}</label>
-    }
-    return label
+    const labelClasses = "w-100" + (required ? ' select-required' : '')
+      + (this.fieldNeedsAttention() ? ' text-danger' : '')
+      + ((!('minItems' in this.props.schema) && required) || 
+        (required && 'minItems' in this.props.schema && this.state.value.length >= this.props.schema.minItems) ? ' select-filled' : '')
+    return <label className={labelClasses}>{fullLine}</label>
   }
 
   render () {
