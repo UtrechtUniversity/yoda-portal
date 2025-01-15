@@ -498,6 +498,11 @@ async function processImportedRow (row) {
         catIdx = catIdx + 1
       }
       $('#group-list').html(html)
+
+      const activeGroupName = Yoda.storage.session.get('selected-group');
+      if (activeGroupName) {
+        Yoda.groupManager.selectGroup(activeGroupName)
+      }
     })
   }
 }
