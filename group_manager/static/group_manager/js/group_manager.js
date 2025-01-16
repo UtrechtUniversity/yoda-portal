@@ -490,6 +490,13 @@ async function processImportedRow (row) {
         catIdx = catIdx + 1
       }
       $('#group-list').html(html)
+
+      // Get the selected group if exists and reselect it to get the changes.
+      // If no active group, no group is selected.
+      const activeGroupName = Yoda.storage.session.get('selected-group')
+      if (activeGroupName) {
+        Yoda.groupManager.selectGroup(activeGroupName)
+      }
     })
   }
 }
