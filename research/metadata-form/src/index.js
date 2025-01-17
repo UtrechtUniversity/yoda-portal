@@ -500,7 +500,9 @@ class YodaForm extends React.Component {
                 return {
                     "subject": val.label,
                     "subjectScheme": form.uiSchema.TreeKeyword["ui:subjectScheme"],
-                    "schemeUri": form.uiSchema.TreeKeyword["ui:schemeUri"],
+                    "schemeUri": "ui:schemeUri" in form.uiSchema.TreeKeyword ?
+                        form.uiSchema.TreeKeyword["ui:schemeUri"] :
+                        val.value.split(":").slice(1).join(":").split("/").slice(0,-1).join("/") + "/",
                     "valueUri": val.value.split(":").slice(1).join(":")
                 }
             }
