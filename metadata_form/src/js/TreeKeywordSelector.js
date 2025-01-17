@@ -6,7 +6,6 @@ class TreeKeywordSelector extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      ...props.formData,
       // Keyword array in the TreeSelect format: each item has label and value
       value: [],
       treeData: null
@@ -20,6 +19,31 @@ class TreeKeywordSelector extends React.Component {
     // From react-select theming
     this.darkModeSelectColor = '#dee2e6'
     this.darkModeSelectBgColor = props.formContext.darkThemeColors.primary25
+
+    this.lightTokenTheme = {
+      colorPrimary: this.colorPrimary
+    // colorPrimaryBorder: this.colorPrimary,
+    // colorPrimary: "#000000",
+    }
+    this.darkTokenTheme = {
+      colorPrimary: '#ffffff',
+      // Copied from our react-select dark mode theme
+      colorBgContainer: this.props.formContext.darkThemeColors.neutral0,
+      colorBgContainerDisabled: this.props.formContext.darkThemeColors.neutral0,
+      colorBgElevated: this.props.formContext.darkThemeColors.neutral0
+    }
+    this.lightTreeSelectTheme = {
+      nodeSelectedColor: this.lightModeSelectColor,
+      nodeSelectedBg: this.lightModeSelectBgColor,
+      nodeHoverColor: this.lightModeSelectColor,
+      nodeHoverBg: this.lightModeSelectBgColor
+    }
+    this.darkTreeSelectTheme = {
+      nodeSelectedColor: this.darkModeSelectColor,
+      nodeSelectedBg: this.darkModeSelectBgColor,
+      nodeHoverColor: this.darkModeSelectColor,
+      nodeHoverBg: this.darkModeSelectBgColor
+    }
   }
 
   async loadData () {
@@ -43,7 +67,7 @@ class TreeKeywordSelector extends React.Component {
       // Filter out empty objects (when no keyword has been selected yet for example)
       newVal = this.props.formData.filter(x => !this.isEmpty(x)).map((keyObj) => {
         // Convert schema structure to expected structure for TreeSelect
-        if (Object.keys(keyObj).includes('valueURI')) {
+        if (Object.keys(keyObj).includes('valueUri')) {
           return { label: keyObj.subject, value: [keyObj.subject, keyObj.valueUri].join(':') }
         } else {
           return { label: keyObj.subject, value: keyObj.subject + ':' }
@@ -175,7 +199,7 @@ class TreeKeywordSelector extends React.Component {
   }
 
   fieldNeedsAttention = () => {
-    // There are errors or there are no keywords and this is a required field
+    // There are errors, or there are no keywords and this is a required field
     return this.props.rawErrors !== undefined || (this.props.required && (!Array.isArray(this.state.value) || !this.state.value.length))
   }
 
@@ -183,10 +207,12 @@ class TreeKeywordSelector extends React.Component {
     const title = this.props.schema.title || this.props.uiSchema['ui:title']
     const required = this.props.required
     const fullLine = title + (required ? '*' : '')
-    const labelClasses = "w-100" + (required ? ' select-required' : '')
-      + (this.fieldNeedsAttention() ? ' text-danger' : '')
-      + ((!('minItems' in this.props.schema) && required) || 
-        (required && 'minItems' in this.props.schema && this.state.value.length >= this.props.schema.minItems) ? ' select-filled' : '')
+    const labelClasses = 'w-100' + (required ? ' select-required' : '') +
+      (this.fieldNeedsAttention() ? ' text-danger' : '') +
+      ((!('minItems' in this.props.schema) && required) ||
+        (required && 'minItems' in this.props.schema && this.state.value.length >= this.props.schema.minItems)
+        ? ' select-filled'
+        : '')
     return <label className={labelClasses}>{fullLine}</label>
   }
 
@@ -200,32 +226,12 @@ class TreeKeywordSelector extends React.Component {
               theme={{
                 algorithm: this.colorMode === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
                 token: this.colorMode === 'dark'
-                  ? {
-                      colorPrimary: '#ffffff',
-                      // Copied from our react-select dark mode theme
-                      colorBgContainer: this.props.formContext.darkThemeColors.neutral0,
-                      colorBgContainerDisabled: this.props.formContext.darkThemeColors.neutral0,
-                      colorBgElevated: this.props.formContext.darkThemeColors.neutral0
-                    }
-                  : {
-                      colorPrimary: this.colorPrimary
-                    // colorPrimaryBorder: this.colorPrimary,
-                    // colorPrimary: "#000000",
-                    },
+                  ? this.darkTokenTheme
+                  : this.lightTokenTheme,
                 components: {
                   TreeSelect: this.colorMode === 'dark'
-                    ? {
-                        nodeSelectedColor: this.darkModeSelectColor,
-                        nodeSelectedBg: this.darkModeSelectBgColor,
-                        nodeHoverColor: this.darkModeSelectColor,
-                        nodeHoverBg: this.darkModeSelectBgColor
-                      }
-                    : {
-                        nodeSelectedColor: this.lightModeSelectColor,
-                        nodeSelectedBg: this.lightModeSelectBgColor,
-                        nodeHoverColor: this.lightModeSelectColor,
-                        nodeHoverBg: this.lightModeSelectBgColor
-                      }
+                    ? this.darkTreeSelectTheme
+                    : this.lightTreeSelectTheme
                 }
               }}
             >
