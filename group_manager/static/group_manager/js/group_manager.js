@@ -20,6 +20,13 @@ function collapseUncollapseOnScroll () {
   const topOfScreenPoint = 60
   const collapsePoint = 300
   const st = Math.floor(window.scrollY)
+  // Should be height of: header + search bar + whichever tree/list is visible
+  const groupsListHeight = $('#groups-card-header').outerHeight() +
+    ($('#pills-tree.show').outerHeight() || 0) +
+    ($('#pills-list.show').outerHeight() || 0) +
+    $('#search').outerHeight()
+  // group properties + group members list (+ priv buttons)
+  const groupOverviewHeight = $('#group-overview').outerHeight()
   let collapseEl = bootstrap.Collapse.getInstance('#group-properties')
   if (!collapseEl) {
     collapseEl = new bootstrap.Collapse('#group-properties', {
@@ -29,6 +36,10 @@ function collapseUncollapseOnScroll () {
 
   if (Math.abs(lastScrollTop - st) <= delta) {
     return
+  } else if (groupsListHeight < groupOverviewHeight) {
+    // Skip if group list shorter than screen
+    lastScrollTop = st
+    return
   }
 
   if (st <= lastScrollTop && st <= topOfScreenPoint) {
@@ -37,7 +48,7 @@ function collapseUncollapseOnScroll () {
   } else if (st > lastScrollTop &&
     st > collapsePoint &&
     Math.abs(lastScrollTop - st) <= collapseDelta &&
-    $('#group-overview').outerHeight() + buffer > $(window).height()) {
+    groupOverviewHeight + buffer > $(window).height()) {
     // Have scrolled down at least a little
     bootstrap.Collapse.getInstance('#group-properties').hide()
   }
