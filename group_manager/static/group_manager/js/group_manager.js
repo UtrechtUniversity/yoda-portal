@@ -215,41 +215,7 @@ function readCsvFile (e) {
     const csvRowsCorrected = []
 
     // Parse the CSV data using PapaParse
-    let result
-    /* global Papa */
-    Papa.parse(contents, {
-      header: true, // Automatically treat the first row as headers
-      dynamicTyping: true, // Automatically detect data types (e.g., numbers, strings)
-      skipEmptyLines: true, // Ignore empty lines in the CSV
-      complete: function (parsedData) {
-        const headers = parsedData.meta.fields // Extract headers from the parsed result
-        const rows = parsedData.data // Extract rows as an array of objects
-
-        // Normalize headers (remove legacy suffixes like manager:, member:, viewer:)
-        headers.forEach(function (header, index) {
-          if (/^(manager|member|viewer):/.test(header)) {
-            headers[index] = header.substring(0, header.indexOf(':'))
-          }
-        })
-
-        // Map rows to align with normalized headers
-        result = rows.map(function (row) {
-          const normalizedRow = {}
-          headers.forEach(function (header) {
-            if (row[header] != null && row[header] !== '') {
-              if (!(header in normalizedRow)) {
-                normalizedRow[header] = []
-              }
-              normalizedRow[header].push(row[header]) // Add each value to the array
-            }
-          })
-          return normalizedRow
-        })
-
-        // Log or further process the result
-        console.log(result)
-      }
-    })
+    const result = parseCsv(contents)
 
     // For compressing all columns to keys: category, subcategory, groupname, schema, expiration, and usercount
     const presentationColumns = ['groupname', 'category', 'subcategory', 'schema_id', 'expiration_date', 'users']
@@ -360,6 +326,46 @@ function readCsvFile (e) {
     $('.process-csv').prop('disabled', false)
   }
   reader.readAsText(file)
+}
+
+function parseCsv(contents) {
+  /* global Papa */
+  const parsedData = Papa.parse(contents, {
+    header: true, // Automatically treat the first row as headers
+    dynamicTyping: true, // Automatically detect data types (e.g., numbers, strings)
+    skipEmptyLines: true, // Ignore empty lines in the CSV
+  })
+
+  const headers = parsedData.meta.fields // Extract headers from the parsed result
+  const rows = parsedData.data // Extract rows as an array of objects
+
+  // Normalize headers (remove legacy suffixes like manager:, member:, viewer:)
+  headers.forEach(function (header, index) {
+    if (/^(manager|member|viewer):/.test(header)) {
+      headers[index] = header.substring(0, header.indexOf(':'))
+    }
+  })
+
+  // Map rows to align with normalized headers
+  const arr = rows.map(function (row) {
+    const normalizedRow = {}
+    headers.forEach(function (header) {
+      if (row[header] != null && row[header] !== '') {
+        if (!(header in normalizedRow)) {
+          normalizedRow[header] = []
+        }
+        normalizedRow[header].push(row[header])
+      }
+    })
+    return normalizedRow
+  })
+
+  // Remove any trailing empty object if present
+  if (arr.length > 0 && jQuery.isEmptyObject(arr[arr.length - 1])) {
+    return arr.slice(0, arr.length - 1)
+  }
+
+  return arr
 }
 
 async function processImportedRow (row) {
