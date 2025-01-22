@@ -220,19 +220,19 @@ def set_publication_terms() -> Response:
     # Save new terms to local file
     try:
         publication_terms_path = path.join(app.config['YODA_CONFIG_PATH'], 'publication_terms.html')
-  
+
         # Read current content first, in case writing fails
         with open(publication_terms_path, 'r', encoding='utf-8') as file:
-            old_terms = file.read()    
+            old_terms = file.read()
         with open(publication_terms_path, 'w', encoding='utf-8') as file:
             file.write(sanitized_terms)
-    
+
         flash("Publication terms updated successfully.", "success")
         return redirect(url_for("admin_bp.index"))
     except Exception:
         with open(publication_terms_path, 'w', encoding='utf-8') as file:
             file.write(old_terms)
-    
+
         flash("Failed to update publication terms.", "error")
 
     return redirect(url_for("admin_bp.index"))
