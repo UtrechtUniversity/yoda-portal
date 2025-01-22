@@ -360,7 +360,6 @@ function parseCsv(contents) {
     return normalizedRow
   })
 
-  // Remove any trailing empty object if present
   if (arr.length > 0 && jQuery.isEmptyObject(arr[arr.length - 1])) {
     return arr.slice(0, arr.length - 1)
   }
