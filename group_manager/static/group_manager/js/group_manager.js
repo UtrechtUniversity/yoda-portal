@@ -339,12 +339,12 @@ function readCsvFile (e) {
   reader.readAsText(file)
 }
 
-function parseCsv(contents) {
+function parseCsv (contents) {
   /* global Papa */
   const parsedData = Papa.parse(contents, {
     header: true, // Automatically treat the first row as headers
     dynamicTyping: true, // Automatically detect data types (e.g., numbers, strings)
-    skipEmptyLines: true, // Ignore empty lines in the CSV
+    skipEmptyLines: true // Ignore empty lines in the CSV
   })
 
   const headers = parsedData.meta.fields // Extract headers from the parsed result
