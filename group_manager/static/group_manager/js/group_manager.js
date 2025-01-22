@@ -216,6 +216,7 @@ function readCsvFile (e) {
 
     // Parse the CSV data using PapaParse
     let result
+    /* global Papa */
     Papa.parse(contents, {
       header: true, // Automatically treat the first row as headers
       dynamicTyping: true, // Automatically detect data types (e.g., numbers, strings)
@@ -247,7 +248,7 @@ function readCsvFile (e) {
 
         // Log or further process the result
         console.log(result)
-      },
+      }
     })
 
     // For compressing all columns to keys: category, subcategory, groupname, schema, expiration, and usercount
@@ -339,7 +340,7 @@ function readCsvFile (e) {
     table += '<td></td></tr></thead><tbody>'
 
     newResult.forEach(function myFunction (groupDef, i) {
-      let safeRowData = csvRowsCorrected[i].replace(/"/g, '&quot;')
+      const safeRowData = csvRowsCorrected[i].replace(/"/g, '&quot;')
       table += '<tr id="' + groupDef.groupname + '" class="import-groupname" groupname="' + groupDef.groupname + '" importRowData="' + csvHeader + '\n' + safeRowData + '">'
       table += '<td id="processed-indicator-' + groupDef.groupname + '"></td>'
       presentationColumns.forEach(function myFunction (column) {
@@ -360,7 +361,6 @@ function readCsvFile (e) {
   }
   reader.readAsText(file)
 }
-
 
 async function processImportedRow (row) {
   // Row specific processing of the imported csv
