@@ -220,12 +220,20 @@ def set_publication_terms() -> Response:
     # Save new terms to local file
     try:
         publication_terms_path = path.join(app.config['YODA_CONFIG_PATH'], 'publication_terms.html')
-        with open(publication_terms_path, 'w') as file:
+
+        # Read current content first, in case writing fails
+        with open(publication_terms_path, 'r', encoding='utf-8') as file:
+            old_terms = file.read()
+        with open(publication_terms_path, 'w', encoding='utf-8') as file:
             file.write(sanitized_terms)
+
         flash("Publication terms updated successfully.", "success")
         return redirect(url_for("admin_bp.index"))
     except Exception:
-        flash("Failed to update publication terms", "error")
+        with open(publication_terms_path, 'w', encoding='utf-8') as file:
+            file.write(old_terms)
+
+        flash("Failed to update publication terms.", "error")
 
     return redirect(url_for("admin_bp.index"))
 
@@ -250,7 +258,7 @@ def get_publication_terms()  -> Optional[str]:
     # Attempt to read from local file
     if path.exists(publication_terms_path):
         try:
-            with open(publication_terms_path, 'r') as file:
+            with open(publication_terms_path, 'r', encoding='utf-8') as file:
                 publication_terms_html = file.read()
                 return html.unescape(publication_terms_html)  # Convert escaped terms to html
         except Exception:
@@ -263,16 +271,16 @@ def get_publication_terms()  -> Optional[str]:
 
         # Save the data to a local file if it was fetched from the API
         try:
-            with open(publication_terms_path, 'w') as file:
+            with open(publication_terms_path, 'w', encoding='utf-8') as file:
                 file.write(html.escape(publication_terms_html))
         except Exception:
-            flash("Failed to save publication terms to file", "error")
+            flash("Failed to save publication terms to file.", "error")
 
         return publication_terms_html
     except Exception:
-        flash("Failed to load publication terms from API", "error")
+        flash("Failed to load publication terms from API.", "error")
 
-    return "Error: failed to read publication terms"
+    return "Error: failed to read publication terms."
 
 
 @admin_bp.route('/upload_file_formats', methods=['POST'])
