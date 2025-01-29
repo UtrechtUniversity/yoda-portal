@@ -1557,7 +1557,7 @@ $(function () {
                   // If group is deposit only load compatible schemas
                   const prefix = $('#f-group-create-name').attr('data-prefix')
 
-                  if (prefix !== "deposit-" || that.DEPOSIT_COMPATIBLE_SCHEMAS.includes(schema)){
+                  if (prefix !== 'deposit-' || that.DEPOSIT_COMPATIBLE_SCHEMAS.includes(schema)) {
                     results.push({
                       id: schema,
                       text: schema
@@ -2339,11 +2339,10 @@ $(function () {
         }
 
         // If deposit group is selected then automatically switch schema to the compatible one
-        if (newPrefix === "deposit-"){
+        if (newPrefix === 'deposit-') {
           const defaultDepositSchema = that.DEPOSIT_COMPATIBLE_SCHEMAS[0]
-          console.log(defaultDepositSchema)
           const depositSchemaOption = new Option(defaultDepositSchema, defaultDepositSchema, true, true)
-          $("#f-group-create-schema-id").append(depositSchemaOption).trigger('change')
+          $('#f-group-create-schema-id').append(depositSchemaOption).trigger('change')
           $('#f-group-create-schema-id').val(defaultDepositSchema).trigger('change')
         }
 
