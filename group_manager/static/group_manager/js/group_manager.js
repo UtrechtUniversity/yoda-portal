@@ -761,6 +761,8 @@ $(function () {
     /// The default prefix when adding a new group.
     GROUP_DEFAULT_PREFIX: 'research-',
 
+    DEPOSIT_COMPATIBLE_SCHEMAS: ['dag-0'],
+
     unloading: false, /// < Set to true when a navigation action is detected. Used for better error reporting.
 
     groupHierarchy: null, /// < A group hierarchy object. See Yoda.groupManager.load().
@@ -1557,10 +1559,15 @@ $(function () {
 
               schemas.forEach(function (schema) {
                 if (schema.startsWith(query)) {
-                  results.push({
-                    id: schema,
-                    text: schema
-                  })
+                  // If group is deposit only load compatible schemas
+                  const prefix = $('#f-group-create-name').attr('data-prefix')
+
+                  if (prefix !== 'deposit-' || that.DEPOSIT_COMPATIBLE_SCHEMAS.includes(schema)) {
+                    results.push({
+                      id: schema,
+                      text: schema
+                    })
+                  }
                 }
               })
 
@@ -2334,6 +2341,14 @@ $(function () {
           } else {
             $('.schema-id').hide()
           }
+        }
+
+        // If deposit group is selected then automatically switch schema to the compatible one
+        if (newPrefix === 'deposit-') {
+          const defaultDepositSchema = that.DEPOSIT_COMPATIBLE_SCHEMAS[0]
+          const depositSchemaOption = new Option(defaultDepositSchema, defaultDepositSchema, true, true)
+          $('#f-group-create-schema-id').append(depositSchemaOption).trigger('change')
+          $('#f-group-create-schema-id').val(defaultDepositSchema).trigger('change')
         }
 
         const hadRetentionPeriod = that.prefixHasExpirationDate(oldPrefix)
