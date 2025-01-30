@@ -209,7 +209,7 @@ function readCsvFile (e) {
     let contents = e.target.result
 
     // remove unwanted characters
-    contents = contents.replaceAll('"', '').replaceAll("'", '').replaceAll(' ', '').replaceAll('\r', '')
+    contents = contents.replaceAll("'", '').replaceAll(' ', '').replaceAll('\r', '')
 
     // remove extra newline(s) at end of file
     while (contents[contents.length - 1] === '\n') {
@@ -225,8 +225,8 @@ function readCsvFile (e) {
     const csvRows = contents.slice(contents.indexOf('\n') + 1).split('\n')
     const csvRowsCorrected = []
 
-    // parse the csv file data to be able to present in a table
-    const result = csvToArray(contents)
+    // Parse the CSV data using PapaParse
+    const result = parseCsv(contents)
 
     // For compressing all columns to keys: category, subcategory, groupname, schema, expiration, and usercount
     const presentationColumns = ['groupname', 'category', 'subcategory', 'schema_id', 'expiration_date', 'users']
@@ -317,7 +317,8 @@ function readCsvFile (e) {
     table += '<td></td></tr></thead><tbody>'
 
     newResult.forEach(function myFunction (groupDef, i) {
-      table += '<tr id="' + groupDef.groupname + '" class="import-groupname" groupname="' + groupDef.groupname + '" importRowData="' + csvHeader + '\n' + csvRowsCorrected[i] + '">'
+      const safeRowData = csvRowsCorrected[i].replace(/"/g, '&quot;')
+      table += '<tr id="' + groupDef.groupname + '" class="import-groupname" groupname="' + groupDef.groupname + '" importRowData="' + csvHeader + '\n' + safeRowData + '">'
       table += '<td id="processed-indicator-' + groupDef.groupname + '"></td>'
       presentationColumns.forEach(function myFunction (column) {
         table += '<td>' + groupDef[column] + '</td>'
@@ -338,32 +339,36 @@ function readCsvFile (e) {
   reader.readAsText(file)
 }
 
-function csvToArray (str, delimiter = ',') {
-  const headers = str.slice(0, str.indexOf('\n')).split(delimiter)
-  const rows = str.slice(str.indexOf('\n') + 1).split('\n')
+function parseCsv (contents) {
+  /* global Papa */
+  const parsedData = Papa.parse(contents, {
+    header: true, // Automatically treat the first row as headers
+    dynamicTyping: true, // Automatically detect data types (e.g., numbers, strings)
+    skipEmptyLines: true // Ignore empty lines in the CSV
+  })
 
-  // If we have headers with legacy suffixes, normalize them by removing each suffix
-  // e.g. "manager:manager1" becomes "manager".
-  headers.forEach(function (element, number, headers) {
-    const headerValue = headers[number]
-    if (/^(manager|member|viewer):/.test(headerValue)) {
-      headers[number] = headerValue.substring(0, headerValue.indexOf(':'))
+  const headers = parsedData.meta.fields // Extract headers from the parsed result
+  const rows = parsedData.data // Extract rows as an array of objects
+
+  // Normalize headers (remove legacy suffixes like manager:, member:, viewer:)
+  headers.forEach(function (header, index) {
+    if (/^(manager|member|viewer):/.test(header)) {
+      headers[index] = header.substring(0, header.indexOf(':'))
     }
   })
 
+  // Map rows to align with normalized headers
   const arr = rows.map(function (row) {
-    const values = row.split(delimiter)
-    const el = headers.reduce(function (object, header, index) {
-      if (values[index] != null && values[index] !== '') {
-        if (!(header in object)) {
-          object[header] = []
+    const normalizedRow = {}
+    headers.forEach(function (header) {
+      if (row[header] != null && row[header] !== '') {
+        if (!(header in normalizedRow)) {
+          normalizedRow[header] = []
         }
-
-        object[header].push(values[index])
+        normalizedRow[header].push(row[header])
       }
-      return object
-    }, {})
-    return el
+    })
+    return normalizedRow
   })
 
   if (arr.length > 0 && jQuery.isEmptyObject(arr[arr.length - 1])) {
