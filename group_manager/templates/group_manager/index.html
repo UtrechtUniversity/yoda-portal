@@ -9,9 +9,10 @@
 {% endblock style %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='lib/purify-3.2.1/js/purify.min.js') }}"></script>
-    <script src="{{ url_for('group_manager_bp.static', filename='js/group_manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/purify-3.2.3/js/purify.min.js') }}"></script>
+    <script src="{{ url_for('group_manager_bp.static', filename='lib/papaparse-5.5.1/papaparse.min.js') }}"></script>
     <script src="{{ url_for('group_manager_bp.static', filename='lib/select2/select2.full.min.js') }}"></script>
+    <script src="{{ url_for('group_manager_bp.static', filename='js/group_manager.js') }}"></script>
     <script>
     $(function() {
         Yoda.groupManager.load({{ group_hierarchy | safe }}, {{ schema_ids | safe }}, '{{ schema_id_default }}', '{{ user_type }}', '{{ user_zone }}');
