@@ -5,7 +5,6 @@
     "build-research": "./node_modules/.bin/webpack --name research",
     "build-deposit": "./node_modules/.bin/webpack --name deposit",
     "build-vault": "./node_modules/.bin/webpack --name vault",
-    "build-all-dev": "./node_modules/.bin/webpack --name all --mode development",
     "build-research-dev": "./node_modules/.bin/webpack --name research --mode development",
     "build-deposit-dev": "./node_modules/.bin/webpack --name deposit --mode development",
     "build-vault-dev": "./node_modules/.bin/webpack --name vault --mode development"
