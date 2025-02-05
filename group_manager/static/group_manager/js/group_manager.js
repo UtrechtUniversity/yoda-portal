@@ -317,6 +317,7 @@ function readCsvFile (e) {
     table += '<td></td></tr></thead><tbody>'
 
     newResult.forEach(function myFunction (groupDef, i) {
+      // replace special characters not to cause errors to ids
       const sanitizedGroupname = groupDef.groupname.replace(/[^a-zA-Z0-9-_]/g, '-')
       const safeRowData = csvRowsCorrected[i].replace(/"/g, '&quot;')
       table += '<tr id="' + sanitizedGroupname + '" class="import-groupname" groupname="' + groupDef.groupname + '" importRowData="' + csvHeader + '\n' + safeRowData + '">'
@@ -420,6 +421,7 @@ async function processImportedRow (row) {
     } else {
       // Row processing encountered problems => inform user and add appropriate classes.
       row.addClass('import-groupname-done')
+      // replace special characters not to cause errors to ids
       const sanitizedGroupname = groupname.replace(/[^a-zA-Z0-9-_]/g, '-')
       $('#processed-indicator-' + sanitizedGroupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
       row.addClass('table-danger')
@@ -436,7 +438,7 @@ async function processImportedRow (row) {
     }
   } else {
     row.addClass('table-danger')
-    // replace special characters
+    // replace special characters not to cause errors to ids
     const sanitizedGroupname = groupname.replace(/[^a-zA-Z0-9-_]/g, '-')
     $('#processed-indicator-' + sanitizedGroupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
     $('#import-' + sanitizedGroupname).html('An unexpected error occurred.')
