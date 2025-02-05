@@ -436,7 +436,7 @@ async function processImportedRow (row) {
     }
   } else {
     row.addClass('table-danger')
-    // replace special characters 
+    // replace special characters
     const sanitizedGroupname = groupname.replace(/[^a-zA-Z0-9-_]/g, '-')
     $('#processed-indicator-' + sanitizedGroupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
     $('#import-' + sanitizedGroupname).html('An unexpected error occurred.')
