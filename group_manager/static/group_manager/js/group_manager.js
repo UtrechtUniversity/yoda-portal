@@ -317,13 +317,15 @@ function readCsvFile (e) {
     table += '<td></td></tr></thead><tbody>'
 
     newResult.forEach(function myFunction (groupDef, i) {
+      // replace special characters not to cause errors to ids
+      const sanitizedGroupname = groupDef.groupname.replace(/[^a-zA-Z0-9-_]/g, '-')
       const safeRowData = csvRowsCorrected[i].replace(/"/g, '&quot;')
-      table += '<tr id="' + groupDef.groupname + '" class="import-groupname" groupname="' + groupDef.groupname + '" importRowData="' + csvHeader + '\n' + safeRowData + '">'
-      table += '<td id="processed-indicator-' + groupDef.groupname + '"></td>'
+      table += '<tr id="' + sanitizedGroupname + '" class="import-groupname" groupname="' + groupDef.groupname + '" importRowData="' + csvHeader + '\n' + safeRowData + '">'
+      table += '<td id="processed-indicator-' + sanitizedGroupname + '"></td>'
       presentationColumns.forEach(function myFunction (column) {
         table += '<td>' + groupDef[column] + '</td>'
       })
-      table += '<td id="import-' + groupDef.groupname + '"></td>'
+      table += '<td id="import-' + sanitizedGroupname + '"></td>'
       table += '</tr>'
     })
 
@@ -419,8 +421,9 @@ async function processImportedRow (row) {
     } else {
       // Row processing encountered problems => inform user and add appropriate classes.
       row.addClass('import-groupname-done')
-
-      $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
+      // replace special characters not to cause errors to ids
+      const sanitizedGroupname = groupname.replace(/[^a-zA-Z0-9-_]/g, '-')
+      $('#processed-indicator-' + sanitizedGroupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
       row.addClass('table-danger')
       let errorHtml = ''
       // collect error messages and maken 1 string to present to user.
@@ -431,12 +434,14 @@ async function processImportedRow (row) {
       } else {
         errorHtml = 'An unknown error occurred.'
       }
-      $('#import-' + groupname).html(errorHtml)
+      $('#import-' + sanitizedGroupname).html(errorHtml)
     }
   } else {
     row.addClass('table-danger')
-    $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
-    $('#import-' + groupname).html('An unexpected error occurred.')
+    // replace special characters not to cause errors to ids
+    const sanitizedGroupname = groupname.replace(/[^a-zA-Z0-9-_]/g, '-')
+    $('#processed-indicator-' + sanitizedGroupname).html('<i class="fa-solid fa-circle-exclamation"></i>')
+    $('#import-' + sanitizedGroupname).html('An unexpected error occurred.')
   }
 
   // if all is complete reload the left pane with data and setup click capability to open newly added groups in the groupmananger
