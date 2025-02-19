@@ -9,9 +9,9 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import DataSelection, { DataSelectionTable } from "./DataSelection.js";
 
 let save = false;
+let submit = false;
 
 document.addEventListener("DOMContentLoaded", async () => {
-
     // Get data request schema and uiSchema
     Yoda.call("datarequest_schema_get", {schema_name: "datarequest_submission"})
     .then(response => {
@@ -86,11 +86,13 @@ class Container extends React.Component {
 
     submitForm() {
         save = false;
+        submit = true;
         this.form.submitButton.click();
     }
 
     saveForm() {
         save = true;
+        submit = false;
         this.form.submitButton.click();
     }
 
@@ -121,6 +123,7 @@ class YodaForm extends React.Component {
                   uiSchema={this.props.uiSchema}
                   formData={this.props.formData}
                   validate={this.props.validate}
+                  liveValidate={true}
                   fields={fields}
                   onSubmit={onSubmit}
                   showErrorList={false}
@@ -169,23 +172,23 @@ const fields = {
   DataSelection: DataSelectionTable
 };
 
-function transformErrors(errors) {
-    // Don't report any errors when saving as draft
-    if (save) {
-        return [];
+function transformErrors(errors) {     
+    // Filter errors when filling in form or saving as draft, except maxLength error
+    if (!submit) {
+        errors = errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies' && e.name !== 'enum' && e.name !== 'type');
+    } else {
+        // Filter out incorrect errors. These are erroneously added because of edge cases to do with
+        // nesting, conditionals and the use of oneOf.
+        var filtered_errors = [];
+        errors.map(error => {
+            if (!['should match exactly one schema in oneOf',
+                  'should be equal to one of the allowed values'].includes(error.message)) {
+                filtered_errors.push(error);
+            }
+        });
+        errors = filtered_errors; 
     }
-
-    // Filter out incorrect errors. These are erroneously added because of edge cases to do with
-    // nesting, conditionals and the use of oneOf.
-    var filtered_errors = [];
-    errors.map(error => {
-        if (!["should match exactly one schema in oneOf",
-              "should be equal to one of the allowed values"].includes(error.message)) {
-            filtered_errors.push(error)
-        }
-    });
-    errors = filtered_errors;
-
+    
     // Scroll to first error (ugly but works). A proper solution isn't available yet, see:
     // https://github.com/rjsf-team/react-jsonschema-form/issues/1791
     if (errors.length !== 0) {
