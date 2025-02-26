@@ -1,4 +1,4 @@
-name: "Python lint and unit/integration tests"
+name: "Python lint and unit tests"
 
 on: [push, pull_request]
 
@@ -29,8 +29,9 @@ jobs:
         run: |
           mypy . --explicit-package-bases || true
 
-      - name: Run unit and integration tests
+      - name: Run unit tests
         run: |
+          sudo apt update
           sudo apt -y install apache2-dev
           python -m pip install -r requirements.txt
           cd unit-tests
