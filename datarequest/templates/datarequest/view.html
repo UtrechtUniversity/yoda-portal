@@ -242,7 +242,7 @@
 
                 <hr>
 
-                <p><b>Title: </b>{{ request['datarequest']['study_information']['title'] }}</p>
+                <p><b>Title: </b>{{ request['datarequest']['study_information']['title'] if 'study_information' in request['datarequest'] else '' }}</p>
                 <p><b>Status: </b>{{ human_request_status }}</p>
                 <p><b>Requestee: </b>{{ request['owner'] }}</p>
                 <p><b>Purpose: </b>{{ request['datarequest']['purpose'] }}
