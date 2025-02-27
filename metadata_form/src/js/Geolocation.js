@@ -227,7 +227,7 @@ class Geolocation extends React.Component {
           onRequestClose={this.closeModal}
           style={{
             overlay: {
-              backgroundColor: '#212529BF',
+              backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529bf' : '#ffffffbf',
               zIndex: 1064
             },
             content: {
@@ -239,7 +239,7 @@ class Geolocation extends React.Component {
               transform: 'translate(-50%, -50%)',
               width: '70%',
               height: '625px',
-              backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529' : '#fffaf8',
+              backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529' : '#ffffff',
               border: this.props.formContext.colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
             },
           }}
