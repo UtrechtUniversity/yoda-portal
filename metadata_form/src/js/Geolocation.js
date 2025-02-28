@@ -7,19 +7,6 @@ import { EditControl } from 'react-leaflet-draw'
 let globalGeoBoxCounter = 0 // Additions for being able to manually add geoBoxes
 let globalThis = null
 
-const customModalStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-    width: '70%',
-    height: '625px'
-  }
-}
-
 class Geolocation extends React.Component {
   constructor (props) {
     super(props)
@@ -39,6 +26,30 @@ class Geolocation extends React.Component {
     this.geoBoxID = globalGeoBoxCounter
     this.showModal = false
     globalGeoBoxCounter++
+
+    this.modalStyle = {
+      overlay: {
+        backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529bf' : '#ffffffbf',
+        zIndex: 1064
+      },
+      content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        width: '70%',
+        height: '625px',
+        backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529' : '#ffffff',
+        border: this.props.formContext.colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+      }
+    }
+
+    this.coordsStyle = {
+      backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529' : '#fff',
+      border: this.props.formContext.colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+    }
   }
 
   openModal (e) {
@@ -233,7 +244,7 @@ class Geolocation extends React.Component {
           isOpen={this.showModal}
           onAfterOpen={this.afterOpenModal}
           onRequestClose={this.closeModal}
-          style={customModalStyles}
+          style={this.modalStyle}
           ariaHideApp={false}
         >
           <MapContainer ref='map' center={[48.760, 13.275]} zoom={4} animate={false}>
@@ -265,10 +276,10 @@ class Geolocation extends React.Component {
 
           <div className='row'>
             <div className='col-sm-12 mt-1'>
-              <label>North:</label> <input type='text' className='geoInputCoords geoLat0 me-1' boxid={this.geoBoxID} disabled={this.props.readonly} />
-              <label>West:</label> <input type='text' className='geoInputCoords geoLng0 me-1' boxid={this.geoBoxID} disabled={this.props.readonly} />
-              <label>South:</label> <input type='text' className='geoInputCoords geoLat1' boxid={this.geoBoxID} disabled={this.props.readonly} />
-              <label>East:</label> <input type='text' className='geoInputCoords geoLng1 me-1' boxid={this.geoBoxID} disabled={this.props.readonly} />
+              <label>North:</label> <input type='text' className='geoInputCoords geoLat0 me-1' style={this.coordsStyle} boxid={this.geoBoxID} disabled={this.props.readonly} />
+              <label>West:</label> <input type='text' className='geoInputCoords geoLng0 me-1' style={this.coordsStyle} boxid={this.geoBoxID} disabled={this.props.readonly} />
+              <label>South:</label> <input type='text' className='geoInputCoords geoLat1 me-1' style={this.coordsStyle} boxid={this.geoBoxID} disabled={this.props.readonly} />
+              <label>East:</label> <input type='text' className='geoInputCoords geoLng1 me-1' style={this.coordsStyle} boxid={this.geoBoxID} disabled={this.props.readonly} />
               <button className='btn btn-outline-secondary float-end' onClick={(e) => { this.closeModal(e) }}>Close</button>
             </div>
           </div>
