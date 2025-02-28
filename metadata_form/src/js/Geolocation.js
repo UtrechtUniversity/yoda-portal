@@ -27,6 +27,25 @@ class Geolocation extends React.Component {
     this.showModal = false
     globalGeoBoxCounter++
 
+    this.modalStyle = {
+      overlay: {
+        backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529bf' : '#ffffffbf',
+        zIndex: 1064
+      },
+      content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        width: '70%',
+        height: '625px',
+        backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529' : '#ffffff',
+        border: this.props.formContext.colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+      }
+    }
+
     this.coordsStyle = {
       backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529' : '#fff',
       border: this.props.formContext.colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
@@ -225,24 +244,7 @@ class Geolocation extends React.Component {
           isOpen={this.showModal}
           onAfterOpen={this.afterOpenModal}
           onRequestClose={this.closeModal}
-          style={{
-            overlay: {
-              backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529bf' : '#ffffffbf',
-              zIndex: 1064
-            },
-            content: {
-              top: '50%',
-              left: '50%',
-              right: 'auto',
-              bottom: 'auto',
-              marginRight: '-50%',
-              transform: 'translate(-50%, -50%)',
-              width: '70%',
-              height: '625px',
-              backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529' : '#ffffff',
-              border: this.props.formContext.colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
-            },
-          }}
+          style={this.modalStyle}
           ariaHideApp={false}
         >
           <MapContainer ref='map' center={[48.760, 13.275]} zoom={4} animate={false}>
