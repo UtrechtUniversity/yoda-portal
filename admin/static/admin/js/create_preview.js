@@ -1,9 +1,9 @@
 /* global bootstrap, DOMPurify */
 'use strict'
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
   // Preview publication terms in a modal.
-  $('#admin-create-preview').on('click', function () {
+  document.getElementById('admin-create-preview').addEventListener('click', function () {
     // Get the content of the textarea and sanitize it.
     const termsText = document.getElementById('admin-publication-terms').value
     const sanitizedContent = DOMPurify.sanitize(termsText)
@@ -18,7 +18,10 @@ $(document).ready(function () {
   })
 
   // Click the Confirm button to dismiss
-  $('#confirmAgreementConditions').on('click', '.action-confirm-submit-for-publication', function () {
-    $('#confirmAgreementConditions').modal('hide')
+  document.getElementById('confirmAgreementConditions').addEventListener('click', function (event) {
+    if (event.target.classList.contains('action-confirm-submit-for-publication')) {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('confirmAgreementConditions'))
+      modal.hide()
+    }
   })
 })
