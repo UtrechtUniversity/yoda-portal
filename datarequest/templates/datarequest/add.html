@@ -3,6 +3,7 @@
 {% block title %}{{ super() }} - Datarequest {{ request_id }} - Add request{% endblock title %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='lib/jquery-3.7.1/jquery-3.7.1.min.js') }}"></script>
 <script> window.config = {
   draft_request_id: '{{ draft_request_id }}',
   previous_request_id: '{{ previous_request_id }}'
