@@ -45,8 +45,13 @@ $(function () {
   createTooltips()
 
   if ($('#file-browser').length) {
-    startBrowsing()
-  }
+    startBrowsing(() => {
+        if (currentFile) {
+            const table = $('#file-browser').DataTable();
+            jumpToDataInCache(table, currentFile);
+        }
+    });
+}
 
   window.onbeforeunload = function (e) {
     if (!$('#uploads').hasClass('hidden')) {
@@ -1049,7 +1054,7 @@ const getFolderContents = (() => {
     cacheSortCol,
     cacheSortOrder
   });
-  
+
   // Allow manually clearing results (needed during soft-reload after uploading a file).
   fn.dropCache = () => { cache = [] }
   return fn
@@ -1124,8 +1129,7 @@ const tableRenderer = {
   }
 }
 
-function startBrowsing () {
-  // #TODO: console.log(page.info())
+function startBrowsing () { // reconsider callback needed?
   console.log("startBrowsing")
   const table = $('#file-browser').DataTable({ //$ = jQuery selector  // id CSS selector // initialize DataTable
     bFilter: false, // Disables search box
@@ -1162,7 +1166,15 @@ function startBrowsing () {
   $('#file-browser').on('length.dt', function (e, settings, len) {
     Yoda.storage.session.set('pageLength', len)
   })
+
+  //table.on('draw.dt', function () {
+  //  if (typeof callback === 'function') {
+  //      callback();
+  //  }
+  // });
+
   browse(currentFolder)
+  
 }
 
 function toggleLocksList (folder) {
@@ -1618,4 +1630,29 @@ function logUpload (id, file) {
                   <div class="col-md-3 msg"><i class="fa-solid fa-spinner fa-spin fa-fw"></i></div>
                </div>`
   $('#files').append(log)
+}
+
+function jumpToDataInCache(table, data) { // FIXME: missing the column parameter
+  const cacheInfo = getFolderContents.getCache();
+  
+  // Validate cache
+  if (cacheInfo.cacheFolder !== currentFolder ||
+      cacheInfo.cacheSortCol !== table.order()[0][0] ||
+      cacheInfo.cacheSortOrder !== table.order()[0][1]) {
+      console.log('Cache invalid. Reloading...');
+      table.ajax.reload(); // FIXME: Retry after reload needed?
+      return;
+  }
+
+  // Search cached data
+  const pos = cacheInfo.cache.findIndex(item => item.name === data);
+
+  if (pos >= 0) {
+      const globalPos = cacheInfo.cacheStart + pos;
+      const page = Math.floor(globalPos / table.page.info().length);
+      table.page(page).draw(false);
+      console.log(`Jumped to page ${page}`);
+  } else {
+      console.log('Data not in cached batch'); //FIXME: User feedbacl message needed?
+  }
 }
