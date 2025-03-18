@@ -189,6 +189,10 @@ def settings() -> Response:
         if response['status'] == 'ok':
             # Save the color mode now so that the display changes immediately.
             g.settings['color_mode'] = settings['color_mode']
+
+            if app.config.get('CACHING_ENABLED', False):
+                clear_view_cache_keys()
+
             flash('Settings saved successfully', 'success')
         else:
             flash('Saving settings failed!', 'danger')
