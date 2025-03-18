@@ -1,6 +1,5 @@
 /* global bootstrap, Flow, Option */
 'use strict'
-
 $(document).ajaxSend(function (e, request, settings) {
   // Append a CSRF token to all AJAX POST requests.
   if (settings.type === 'POST' && settings.data.length) {
@@ -16,20 +15,33 @@ let uploadMenuTooltip
 let downloadChecksumReportTextTooltip
 let downloadChecksumReportCSVTooltip
 let currentFolder
+let currentFile
 let filenames = []
 let hasReadRights = true
 let uploadFolder = false
 
 $(function () {
-  // Extract current location from query string (default to '').
-  currentFolder = decodeURIComponent((/(?:\?|&)dir=([^&]*)/
-    .exec(window.location.search) || [0, ''])[1])
+  // Parse URL parameters 
+  const urlParams = new URLSearchParams(window.location.search);
+  
+  // Handle 'dir' parameter
+  currentFolder = urlParams.get('dir') || '';
+  currentFolder = decodeURIComponent(currentFolder)
+    .replace(/\/+/g, '/')
+    .replace(/\/$/, '');
 
-  // Canonicalize path somewhat, for convenience.
-  currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '')
-
+  // Handle optional 'scrollTo' parameter
+  if (urlParams.has('scrollTo')) {
+    currentFile = decodeURIComponent(urlParams.get('scrollTo'))
+      .replace(/\/+/g, '/')
+      .replace(/\/$/, '');
+  }
+  console.log("Current folder:", currentFolder);
+  console.log("Current file:", currentFile);
+  
   // Needed for the table to show the links depending on permissions
   topInformation(currentFolder, true)
+  // TODO: Need permission check for files as well?
   createTooltips()
 
   if ($('#file-browser').length) {
@@ -972,6 +984,13 @@ const getFolderContents = (() => {
          args.order[0].column === cacheSortCol &&
          args.start >= cacheStart &&
          args.start + args.length <= cacheStart + batchSize) {
+      console.log("cache.length", cache.length)
+      console.log("currentFolder", currentFolder)
+      console.log("cacheFolder", cacheFolder)
+      console.log("args.start", args.start)
+      console.log("cacheStart", cacheStart)
+      console.log("args.length", args.length)
+
       return cache.slice(args.start - cacheStart, args.start - cacheStart + args.length)
     } else {
       // Nope, load new data via the API.
@@ -1022,6 +1041,15 @@ const getFolderContents = (() => {
     cb(callback)
   })()
 
+    // Expose cache data
+  fn.getCache = () => ({
+    cache,
+    cacheStart,
+    cacheFolder,
+    cacheSortCol,
+    cacheSortOrder
+  });
+  
   // Allow manually clearing results (needed during soft-reload after uploading a file).
   fn.dropCache = () => { cache = [] }
   return fn
@@ -1097,13 +1125,15 @@ const tableRenderer = {
 }
 
 function startBrowsing () {
-  $('#file-browser').DataTable({
-    bFilter: false,
-    bInfo: false,
-    bLengthChange: true,
+  // #TODO: console.log(page.info())
+  console.log("startBrowsing")
+  const table = $('#file-browser').DataTable({ //$ = jQuery selector  // id CSS selector // initialize DataTable
+    bFilter: false, // Disables search box
+    bInfo: false, // Hides "Showing X of Y" info
+    bLengthChange: true, // Shows "Show X entries" dropdown
     language: {
       emptyTable: 'No accessible files/folders present',
-      lengthMenu: '_MENU_'
+      lengthMenu: '_MENU_', 
     },
     dom: '<"top">frt<"bottom"lp><"clear">',
     columns: [{ render: tableRenderer.multiselect, orderable: false, data: 'name' },
@@ -1122,6 +1152,13 @@ function startBrowsing () {
     order: [[1, 'asc']],
     pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
   })
+  // Example: Print initial page length
+  console.log("Initial Page Length:", table.page.len())
+
+  // Example: Print current sorting order
+  console.log("Current Sort Order:", table.order())
+
+  console.log("data column", table.column(0).data())
   $('#file-browser').on('length.dt', function (e, settings, len) {
     Yoda.storage.session.set('pageLength', len)
   })
