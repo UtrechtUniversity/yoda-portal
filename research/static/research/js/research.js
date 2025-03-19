@@ -43,14 +43,10 @@ $(function () {
   topInformation(currentFolder, true)
   // TODO: Need permission check for files as well?
   createTooltips()
+  console.log("#file-browser').length", $('#file-browser').length);
 
-  if ($('#file-browser').length) {
-    startBrowsing(() => {
-        if (currentFile) {
-            const table = $('#file-browser').DataTable();
-            jumpToDataInCache(table, currentFile);
-        }
-    });
+  if ($('#file-browser').length) { 
+    startBrowsing();
 }
 
   window.onbeforeunload = function (e) {
@@ -952,11 +948,19 @@ function makeBreadcrumb (dir) {
 }
 
 function buildFileBrowser (dir) {
-  const fileBrowser = $('#file-browser').DataTable()
-  getFolderContents.dropCache()
-  fileBrowser.ajax.reload()
+  const table = $('#file-browser').DataTable();
+  getFolderContents.dropCache();
+  
+  table.ajax.reload(() => {
+    if (currentFile) {
+      // Small timeout to ensure render completes
+      setTimeout(() => {
+        jumpToDataInCache(table, currentFile);
+      }, 100);
+    }
+  }, false); 
 
-  return true
+  return true;
 }
 
 // Fetches directory contents to populate the listing table.
@@ -1129,7 +1133,7 @@ const tableRenderer = {
   }
 }
 
-function startBrowsing () { // reconsider callback needed?
+function startBrowsing () { 
   console.log("startBrowsing")
   const table = $('#file-browser').DataTable({ //$ = jQuery selector  // id CSS selector // initialize DataTable
     bFilter: false, // Disables search box
@@ -1156,10 +1160,10 @@ function startBrowsing () { // reconsider callback needed?
     order: [[1, 'asc']],
     pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
   })
-  // Example: Print initial page length
+  // Print initial page length
   console.log("Initial Page Length:", table.page.len())
 
-  // Example: Print current sorting order
+  // Print current sorting order
   console.log("Current Sort Order:", table.order())
 
   console.log("data column", table.column(0).data())
@@ -1167,15 +1171,10 @@ function startBrowsing () { // reconsider callback needed?
     Yoda.storage.session.set('pageLength', len)
   })
 
-  //table.on('draw.dt', function () {
-  //  if (typeof callback === 'function') {
-  //      callback();
-  //  }
-  // });
-
   browse(currentFolder)
-  
 }
+
+
 
 function toggleLocksList (folder) {
   const isVisible = $('.lock').is(':visible')
@@ -1635,7 +1634,7 @@ function logUpload (id, file) {
 function jumpToDataInCache(table, data) { // FIXME: missing the column parameter
   const cacheInfo = getFolderContents.getCache();
   
-  // Validate cache
+  // TODO: Not needed probably. Validate cache
   if (cacheInfo.cacheFolder !== currentFolder ||
       cacheInfo.cacheSortCol !== table.order()[0][0] ||
       cacheInfo.cacheSortOrder !== table.order()[0][1]) {
