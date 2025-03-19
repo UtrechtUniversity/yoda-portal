@@ -947,22 +947,17 @@ function makeBreadcrumb (dir) {
   $('nav ol.breadcrumb').html(html)
 }
 
-function buildFileBrowser (dir) {
+function buildFileBrowser(dir) {
   const table = $('#file-browser').DataTable();
   getFolderContents.dropCache();
-  
   table.ajax.reload(() => {
     if (currentFile) {
-      // Small timeout to ensure render completes
-      setTimeout(() => {
-        jumpToDataInCache(table, currentFile);
-      }, 100);
+      jumpToDataInCache(table, currentFile);
     }
-  }, false); 
+  }, false);
 
   return true;
 }
-
 // Fetches directory contents to populate the listing table.
 const getFolderContents = (() => {
   // Close over some state variables.
