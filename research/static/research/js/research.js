@@ -21,20 +21,20 @@ let hasReadRights = true
 let uploadFolder = false
 
 $(function () {
-  // Parse URL parameters 
-  const urlParams = new URLSearchParams(window.location.search);
+  // Parse URL parameters
+  const urlParams = new URLSearchParams(window.location.search)
   
   // Handle 'dir' parameter
-  currentFolder = urlParams.get('dir') || '';
+  currentFolder = urlParams.get('dir') || ''
   currentFolder = decodeURIComponent(currentFolder)
     .replace(/\/+/g, '/')
-    .replace(/\/$/, '');
+    .replace(/\/$/, '')
 
   // Handle optional 'scrollTo' parameter
   if (urlParams.has('scrollTo')) {
     currentFile = decodeURIComponent(urlParams.get('scrollTo'))
       .replace(/\/+/g, '/')
-      .replace(/\/$/, '');
+      .replace(/\/$/, '')
   }
   console.log("Current folder:", currentFolder);
   console.log("Current file:", currentFile);
@@ -947,17 +947,18 @@ function makeBreadcrumb (dir) {
   $('nav ol.breadcrumb').html(html)
 }
 
-function buildFileBrowser(dir) {
-  const table = $('#file-browser').DataTable();
-  getFolderContents.dropCache();
-  table.ajax.reload(() => {
-    if (currentFile) {
-      jumpToDataInCache(table, currentFile);
-    }
-  }, false);
+  function buildFileBrowser(dir) {
+    const table = $('#file-browser').DataTable()
+    getFolderContents.dropCache()
+    table.ajax.reload(() => {
+      if (currentFile) {
+        jumpToDataInCache(table, currentFile);
+      }
+    }, false)
 
-  return true;
-}
+    return true
+  }
+
 // Fetches directory contents to populate the listing table.
 const getFolderContents = (() => {
   // Close over some state variables.
@@ -988,13 +989,6 @@ const getFolderContents = (() => {
          args.order[0].column === cacheSortCol &&
          args.start >= cacheStart &&
          args.start + args.length <= cacheStart + batchSize) {
-      console.log("cache.length", cache.length)
-      console.log("currentFolder", currentFolder)
-      console.log("cacheFolder", cacheFolder)
-      console.log("args.start", args.start)
-      console.log("cacheStart", cacheStart)
-      console.log("args.length", args.length)
-
       return cache.slice(args.start - cacheStart, args.start - cacheStart + args.length)
     } else {
       // Nope, load new data via the API.
@@ -1052,7 +1046,7 @@ const getFolderContents = (() => {
     cacheFolder,
     cacheSortCol,
     cacheSortOrder
-  });
+  })
 
   // Allow manually clearing results (needed during soft-reload after uploading a file).
   fn.dropCache = () => { cache = [] }
@@ -1627,26 +1621,26 @@ function logUpload (id, file) {
 }
 
 function jumpToDataInCache(table, data) { // FIXME: missing the column parameter
-  const cacheInfo = getFolderContents.getCache();
+  const cacheInfo = getFolderContents.getCache()
   
   // TODO: Not needed probably. Validate cache
   if (cacheInfo.cacheFolder !== currentFolder ||
       cacheInfo.cacheSortCol !== table.order()[0][0] ||
       cacheInfo.cacheSortOrder !== table.order()[0][1]) {
-      console.log('Cache invalid. Reloading...');
-      table.ajax.reload(); // FIXME: Retry after reload needed?
-      return;
+      console.log('Cache invalid. Reloading...')
+      table.ajax.reload() // FIXME: Retry after reload needed?
+      return
   }
 
   // Search cached data
-  const pos = cacheInfo.cache.findIndex(item => item.name === data);
+  const pos = cacheInfo.cache.findIndex(item => item.name === data)
 
   if (pos >= 0) {
-      const globalPos = cacheInfo.cacheStart + pos;
-      const page = Math.floor(globalPos / table.page.info().length);
-      table.page(page).draw(false);
-      console.log(`Jumped to page ${page}`);
+      const globalPos = cacheInfo.cacheStart + pos
+      const page = Math.floor(globalPos / table.page.info().length)
+      table.page(page).draw(false)
+      console.log(`Jumped to page ${page}`)
   } else {
-      console.log('Data not in cached batch'); //FIXME: User feedbacl message needed?
+      console.log('Data not in cached batch') //FIXME: User feedbacl message needed?
   }
 }
