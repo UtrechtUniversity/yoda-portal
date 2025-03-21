@@ -949,7 +949,7 @@ function buildFileBrowser (dir) {
   getFolderContents.dropCache()
   fileBrowser.ajax.reload(() => {
     if (currentFile) {
-      jumpToDataInCache(table, currentFile)
+      jumpToDataInCache(fileBrowser, currentFile)
     }
   }, false)
 
