@@ -30,18 +30,11 @@
         <button type="button" class="btn btn-primary mb-3 btn-generate-dap" data-bs-toggle="modal" data-bs-target="#dataAccessPassword">
           Generate new data access password
         </button>
-        <div class="list-group">
+        <div id="tokens" class="list-group">
             <div class="list-group-item d-inline-flex">
                 <label class="col-sm-7">Password Label</label>
                 <span class="col-sm-3">Expiration Time</span>
             </div>
-            {% for t in tokens %}
-            <div class="list-group-item d-inline-flex">
-                <label class="col-sm-7">{{ t.label }}</label>
-                <span class="col-sm-3">{{ t.exp_time }}</span>
-                <button type="button" class="btn btn-danger col-sm-2 delete-token">Delete</button>
-            </div>
-            {% endfor %}
         </div>
     </div>
 </div>

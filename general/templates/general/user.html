@@ -1,11 +1,11 @@
 {% if g.user %}
     <div class="dropdown">
         <button type="button" class="btn btn-primary dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        {{ g.user }} {% if g.notifications %}<i class="fa-solid fa-bell" aria-hidden="true"></i>{% endif %}
+        {{ g.user }} <i id="notification-bell" class="fa-solid fa-bell hidden" aria-hidden="true"></i>
         </button>
         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
             <a class="dropdown-item" href="{{ url_for('user_bp.notifications') }}">
-                Notifications {% if g.notifications %}<span class="badge bg-primary">{{ g.notifications }}</span>{% endif %}
+                Notifications <span id="notification-count" class="badge bg-primary"></span>
             </a>
             <a class="dropdown-item" href="{{ url_for('user_bp.settings') }}">Settings</a>
             {% if config.get('TOKENS_ENABLED') %}

@@ -1,3 +1,4 @@
+/* global $ */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {

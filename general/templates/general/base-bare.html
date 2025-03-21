@@ -19,11 +19,11 @@
             <script src="{{ url_for('static', filename='js/yoda.js') }}"></script>
             {% if g.user %}
             <script src="{{ url_for('static', filename='lib/jquery-3.7.1/jquery-3.7.1.min.js') }}"></script>
-            <script src="{{ url_for('static', filename='js/yoda-top-search.js') }}"></script>
             {% endif %}
             <script>
                 Yoda.csrf = {tokenName: 'csrf_token', tokenValue: '{{ csrf_token() }}'};
                 Yoda.textFileExtensions = {{ config.get('TEXT_FILE_EXTENSIONS') | safe }}
+                Yoda.version = '{{ config.get('YODA_VERSION') }}';
                 {% if g.user %}
                 Yoda.basePath = '/{{ g.irods.zone }}/home';
                 Yoda.user = {

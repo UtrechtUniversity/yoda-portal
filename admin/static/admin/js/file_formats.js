@@ -1,12 +1,15 @@
 /* global Option */
 'use strict'
 
-$(function () {
+document.addEventListener('DOMContentLoaded', function () {
   Yoda.call('vault_preservable_formats_lists').then((data) => {
-    $('#file-formats-list').html("<option value='' disabled selected>Select file format list to delete</option>")
+    const fileFormatsList = document.getElementById('file-formats-list')
+    fileFormatsList.innerHTML = "<option value='' disabled selected>Select file format list to delete</option>"
+
     for (const list in data) {
       if (Object.prototype.hasOwnProperty.call(data, list)) {
-        $('#file-formats-list').append(new Option(data[list].name, list))
+        const option = new Option(data[list].name, list)
+        fileFormatsList.appendChild(option)
       }
     }
   })
@@ -21,11 +24,8 @@ $(function () {
     }
   })
 
-  $('#file-formats-list').on('change', function () {
-    if ($(this).val()) {
-      $('#delete-format-button').prop('disabled', false)
-    } else {
-      $('#delete-format-button').prop('disabled', true)
-    }
+  document.getElementById('file-formats-list').addEventListener('change', function () {
+    const deleteFormatButton = document.getElementById('delete-format-button')
+    deleteFormatButton.disabled = !this.value // Disable if no value is selected
   })
 })

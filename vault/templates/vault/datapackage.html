@@ -10,6 +10,7 @@
 {% endblock style %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='lib/jquery-3.7.1/jquery-3.7.1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/datapackage.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>

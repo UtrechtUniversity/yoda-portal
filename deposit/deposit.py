@@ -24,6 +24,7 @@ from irods.exception import CAT_NO_ACCESS_PERMISSION
 
 import api
 import connman
+from cache_config import cache_view
 
 deposit_bp = Blueprint('deposit_bp', __name__,
                        template_folder='templates',
@@ -41,6 +42,7 @@ deposit_bp = Blueprint('deposit_bp', __name__,
 
 @deposit_bp.route('/')
 @deposit_bp.route('/browse')
+@cache_view()
 def index() -> Response:
     """Deposit overview"""
     return render_template('deposit/overview.html',
@@ -166,6 +168,7 @@ def submit() -> Response:
 
 
 @deposit_bp.route('/thank-you')
+@cache_view()
 def thankyou() -> Response:
     """Step 4: Thank you"""
     return render_template('deposit/thank-you.html')

@@ -6,6 +6,7 @@ __license__   = 'GPLv3, see LICENSE'
 from flask import Blueprint, make_response, render_template, Response
 
 import api
+from cache_config import cache_view
 
 stats_bp = Blueprint('stats_bp', __name__,
                      template_folder='templates',
@@ -14,8 +15,8 @@ stats_bp = Blueprint('stats_bp', __name__,
 
 
 @stats_bp.route('/')
+@cache_view()
 def index() -> Response:
-    # resource_tiers_response = api.call('resource_resource_and_tier_data', data={})
     category_response = api.call('resource_category_stats', data={})
 
     return render_template('stats/stats.html',
@@ -24,6 +25,7 @@ def index() -> Response:
 
 
 @stats_bp.route('/export')
+@cache_view()
 def export() -> Response:
     response = api.call('resource_monthly_category_stats', data={})
 

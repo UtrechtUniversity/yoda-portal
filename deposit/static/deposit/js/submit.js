@@ -1,4 +1,4 @@
-/* global path */
+/* global $, path */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {

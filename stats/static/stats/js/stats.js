@@ -1,21 +1,30 @@
-/* global Chart */
+/* global Chart, DataTable */
 'use strict'
 
-$(document).ready(function () {
-  if ($('#group-browser').length) {
+document.addEventListener('DOMContentLoaded', function () {
+  const groupBrowser = document.getElementById('group-browser')
+
+  if (groupBrowser) {
     startBrowsing()
   }
 
-  $('#search-group-table').on('keyup', function () {
-    $('#group-browser').DataTable().search($('#search-group-table').val()).draw()
+  const searchGroupTable = document.getElementById('search-group-table')
+  searchGroupTable.addEventListener('keyup', function () {
+    const dataTable = groupBrowser.DataTable()
+    dataTable.search(searchGroupTable.value).draw()
   })
 
-  $('#startdate_min').on('click', function () {
-    $('#startdate').val(getISODateString(chartDateLabels[0]))
+  const startDateMin = document.getElementById('startdate_min')
+  startDateMin.addEventListener('click', function () {
+    const startDateInput = document.getElementById('startdate')
+    startDateInput.value = getISODateString(chartDateLabels[0])
     chartFilterDate()
   })
-  $('#enddate_max').on('click', function () {
-    $('#enddate').val(getISODateString(chartDateLabels[chartDateLabels.length - 1]))
+
+  const endDateMax = document.getElementById('enddate_max')
+  endDateMax.addEventListener('click', function () {
+    const endDateInput = document.getElementById('enddate')
+    endDateInput.value = getISODateString(chartDateLabels[chartDateLabels.length - 1])
     chartFilterDate()
   })
 })
@@ -37,19 +46,20 @@ let chartVisibilityStatus = [true, true, true]
 
 // Handling of new chart
 function getGroupDetails (group) {
-  // when data is present show chart including the date buttons and legend.
-  Yoda.call('resource_full_year_differentiated_group_storage',
-    { group_name: group }).then((data) => {
+  // When data is present, show chart including the date buttons and legend.
+  Yoda.call('resource_full_year_differentiated_group_storage', { group_name: group }).then((data) => {
     // Labels on the x-axis -> dates
     chartDateLabels = data.labels
 
-    // 4 dimensional array holding all data for research, vault, revisions and total
+    // 4-dimensional array holding all data for research, vault, revisions, and total
     let nrOfPoints = 0
     const chartTotals = []
     const totals = []
+
     while (nrOfPoints < data.research.length) {
       chartTotals[nrOfPoints] = data.research[nrOfPoints] + data.vault[nrOfPoints] + data.revision[nrOfPoints]
       totals[nrOfPoints] = data.total[nrOfPoints]
+
       // This can happen when old statistics data has been upgraded
       if (totals[nrOfPoints] > chartTotals[nrOfPoints]) {
         chartTotals[nrOfPoints] = totals[nrOfPoints]
@@ -57,34 +67,39 @@ function getGroupDetails (group) {
 
       nrOfPoints++
     }
+
     if (group.startsWith('grp') || group.startsWith('intake')) {
       chartDatapoints = [data.research, data.vault, data.revision, data.total]
     } else {
       chartDatapoints = [data.research, data.vault, data.revision, chartTotals]
     }
 
+    const storageChart = document.getElementById('storage-chart')
+    const storageChartMessage = document.getElementById('storage-chart-message')
+
     if (nrOfPoints > 0) {
       // Take over the min/max date range based upon the actual dataset minimum and maximum.
       document.getElementById('startdate').value = chartDateLabels[0]
       document.getElementById('enddate').value = chartDateLabels[nrOfPoints - 1]
 
-      // Set chart the buttons to the initial text again.
+      // Set chart buttons to the initial text again.
       document.getElementById('legend-' + chartDatasetLabels[0].toLowerCase()).innerHTML = chartDatasetLabels[0]
       document.getElementById('legend-' + chartDatasetLabels[1].toLowerCase()).innerHTML = chartDatasetLabels[1]
       document.getElementById('legend-' + chartDatasetLabels[2].toLowerCase()).innerHTML = chartDatasetLabels[2]
 
-      // Reset the representation of visibilty of each dataset (research, vault, revisions).
+      // Reset the representation of visibility of each dataset (research, vault, revisions).
       chartVisibilityStatus = [true, true, true]
 
       // Make chart visible and hide messaging part.
-      $('#storage-chart').removeClass('hidden')
-      $('#storage-chart-message').addClass('hidden')
+      storageChart.classList.remove('hidden')
+      storageChartMessage.classList.add('hidden')
 
-      chartShow(group) // Create or update of chart.
+      chartShow(group) // Create or update the chart.
     } else {
-      $('#storage-chart-message').html('<p>No storage information found.</p>')
-      $('#storage-chart').addClass('hidden')
-      $('#storage-chart-message').removeClass('hidden')
+      const message = '<p>No storage information found.</p>'
+      storageChartMessage.innerHTML = message
+      storageChart.classList.add('hidden')
+      storageChartMessage.classList.remove('hidden')
     }
   })
 }
@@ -256,14 +271,15 @@ function chartToggleData (legendButton) { // eslint-disable-line no-unused-vars
 
   chartFilterDate()
 
+  const legendElement = document.getElementById('legend-' + chartDatasetLabels[legendButton].toLowerCase())
   if (visibilityData) {
     chart.hide(legendButton)
-    // set the button labels correctly including strike through
-    document.getElementById('legend-' + chartDatasetLabels[legendButton].toLowerCase()).innerHTML = '<strike>' + chartDatasetLabels[legendButton] + '</strike>'
+    // Set the button labels correctly including strike through
+    legendElement.innerHTML = '<strike>' + chartDatasetLabels[legendButton] + '</strike>'
   } else {
     chart.show(legendButton)
-    // set the button labels correctly
-    document.getElementById('legend-' + chartDatasetLabels[legendButton].toLowerCase()).innerHTML = chartDatasetLabels[legendButton]
+    // Set the button labels correctly
+    legendElement.innerHTML = chartDatasetLabels[legendButton]
   }
 }
 
@@ -274,7 +290,7 @@ function chartFilterDate () {
   const startdate = new Date(document.getElementById('startdate').value)
   const enddate = new Date(document.getElementById('enddate').value)
 
-  // check datepicker values against the values in the array of dates present and select the nearest to the picked date.
+  // Check datepicker values against the values in the array of dates present and select the nearest to the picked date.
   const nearstartdate = getNearestDate(startdate)
   const nearenddate = getNearestDate(enddate)
 
@@ -285,55 +301,53 @@ function chartFilterDate () {
     console.log('invalid period')
     return
   }
+
   const filterDate = dates.slice(indexstartdate, indexenddate + 1)
 
   chart.config.data.labels = filterDate
 
-  const arAllDatapoints = [[...chartDatapoints[0]], [...chartDatapoints[1]], [...chartDatapoints[2]], [...chartDatapoints[3]]]
+  const arAllDatapoints = [
+    [...chartDatapoints[0]],
+    [...chartDatapoints[1]],
+    [...chartDatapoints[2]],
+    [...chartDatapoints[3]]
+  ]
   const filterDatapoints = []
 
   // Split into relevant data only.
-  let i = 0
-  while (i < 4) {
+  for (let i = 0; i < 4; i++) {
     filterDatapoints[i] = arAllDatapoints[i].slice(indexstartdate, indexenddate + 1)
-    i++
   }
 
-  let day = 0
-
-  while (day < filterDatapoints[0].length) {
+  for (let day = 0; day < filterDatapoints[0].length; day++) {
     let newTotal = 0
-    let j = 0
     const allAreVisible = chartVisibilityStatus[0] && chartVisibilityStatus[1] && chartVisibilityStatus[2]
-    while (j < 3) {
+
+    for (let j = 0; j < 3; j++) {
       if (chartVisibilityStatus[j]) {
-        newTotal = newTotal + filterDatapoints[j][day]
+        newTotal += filterDatapoints[j][day]
       }
-      j++
     }
+
     // Handling the case where old statistics data has been upgraded.
     // If all categories are visible, display the old statistics total.
     // If even one category is not visible, default to the calculated total of the visible categories.
     if (!allAreVisible || filterDatapoints[3][day] <= newTotal) {
       filterDatapoints[3][day] = newTotal
     }
-
-    day++
   }
 
   // Pass all datasets to chart
-  i = 0
-  while (i < 4) {
+  for (let i = 0; i < 4; i++) {
     chart.config.data.datasets[i].data = filterDatapoints[i]
-    i++
   }
 
   chart.update()
 }
 
 function startBrowsing () {
-  $('#group-browser').DataTable({
-    // "bFilter": true,
+  const groupBrowser = document.getElementById('group-browser')
+  const dataTable = new DataTable(groupBrowser, {
     bInfo: false,
     bLengthChange: true,
     language: {
@@ -341,41 +355,47 @@ function startBrowsing () {
       lengthMenu: '_MENU_'
     },
     dom: '<"top">frt<"bottom"lp><"clear">',
-    columns: [{ render: tableRenderer.name, data: 'name', bSearchable: true },
+    columns: [
+      { render: tableRenderer.name, data: 'name', bSearchable: true },
       { render: tableRenderer.size, data: 'size' },
-      { render: tableRenderer.member_count, data: 'member_count', orderable: false }],
+      { render: tableRenderer.member_count, data: 'member_count', orderable: false }
+    ],
     ajax: getFolderContents,
     processing: true,
     serverSide: true,
     iDeferLoading: 0,
     order: [[0, 'asc']],
-    // "searching": true,
     fnDrawCallback: function () {
-      $('#group-browser td').on('click', function () {
-        const groupName = $(this).parent().find('.list-group-item').attr('data-name')
-        getGroupDetails(groupName)
-        $('#selected-group').text('Group ' + groupName)
+      const cells = groupBrowser.querySelectorAll('td')
+      cells.forEach(cell => {
+        cell.addEventListener('click', function () {
+          const groupName = this.parentElement.querySelector('.list-group-item').getAttribute('data-name')
+          getGroupDetails(groupName)
+          document.getElementById('selected-group').textContent = 'Group ' + groupName
+        })
       })
     },
     pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
   })
-  $('#group-browser').on('length.dt', function (e, settings, len) {
+
+  groupBrowser.addEventListener('length.dt', function (e, settings, len) {
     Yoda.storage.session.set('pageLength', len)
   })
 
-  const groupBrowser = $('#group-browser').DataTable()
   getFolderContents.dropCache()
-  groupBrowser.ajax.reload()
+  dataTable.ajax.reload()
 
   // to prevent dtatables own search field from showing
-  $('#group-browser_filter').addClass('hidden')
+  const filterElement = document.getElementById('group-browser_filter')
+  if (filterElement) {
+    filterElement.classList.add('hidden')
+  }
 
   return true
 }
 
 // rendering part
 
-// getFolderContents
 // Fetches directory contents to populate the listing table.
 const getFolderContents = (() => {
   // Close over some state variables.
@@ -399,25 +419,26 @@ const getFolderContents = (() => {
   let i = 0 // Keep simultaneous requests from interfering.
 
   const get = async (args) => {
+    const searchGroupTable = document.getElementById('search-group-table')
+
     // Check if we can use the cache.
     if (cache.length &&
          args.order[0].dir === cacheSortOrder &&
          args.order[0].column === cacheSortCol &&
-         $('#search-group-table').val() === cacheSearch &&
+         searchGroupTable.value === cacheSearch &&
          args.start >= cacheStart &&
          args.start + args.length <= cacheStart + batchSize) {
       return cache.slice(args.start - cacheStart, args.start - cacheStart + args.length)
     } else {
       // Nope, load new data via the API.
       const j = ++i
-      const result = await Yoda.call('resource_browse_group_data',
-        {
-          offset: args.start,
-          limit: batchSize,
-          sort_order: args.order[0].dir,
-          sort_on: ['name', 'size'][args.order[0].column],
-          search_groups: $('#search-group-table').val()
-        })
+      const result = await Yoda.call('resource_browse_group_data', {
+        offset: args.start,
+        limit: batchSize,
+        sort_order: args.order[0].dir,
+        sort_on: ['name', 'size'][args.order[0].column],
+        search_groups: searchGroupTable.value
+      })
 
       // If another request has come while we were waiting, simply drop this one.
       if (i !== j) return null
@@ -426,8 +447,7 @@ const getFolderContents = (() => {
       total = result.total
       cacheStart = args.start
       cache = result.items
-      // cacheFolder    = currentFolder;
-      cacheSearch = $('#search-group-table').val()
+      cacheSearch = searchGroupTable.value
       cacheSortCol = args.order[0].column
       cacheSortOrder = args.order[0].dir
 

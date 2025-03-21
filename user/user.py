@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2025, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import contextlib
 import json
 import secrets
+import ssl
+import time
 from datetime import datetime
 from typing import List
 from uuid import uuid4
@@ -13,6 +16,7 @@ import jwt
 import requests
 from flask import (
     Blueprint,
+    copy_current_request_context,
     flash,
     g,
     redirect,
@@ -33,6 +37,7 @@ from irods.session import iRODSSession
 
 import api
 import connman
+from cache_config import cache_view, clear_view_cache_keys, executor, get_api_cache_functions, populate_api_cache
 from util import is_email_in_domains, is_relative_url, log_error
 
 # Blueprint creation
@@ -149,18 +154,21 @@ def login() -> Response:
 @user_bp.route('/logout')
 def logout() -> Response:
     """Logout user and redirect to index."""
-    connman.clean(session.sid)
+    caching_enabled = app.config.get('CACHING_ENABLED', False)
+
+    # Clear view cache keys for user.
+    if caching_enabled:
+        clear_view_cache_keys()
+
+    try:
+        connman.clean(session.sid)
+    except ssl.SSLError as e:
+        # Suppress APPLICATION_DATA_AFTER_CLOSE_NOTIFY error.
+        if str(e) == 'APPLICATION_DATA_AFTER_CLOSE_NOTIFY':
+            contextlib.suppress(ssl.SSLError)
+
     session.clear()
     return redirect(url_for('general_bp.index'))
-
-
-@user_bp.route('/notifications')
-def notifications() -> Response:
-    """Notifications page."""
-    sort_order = request.args.get('sort_order', 'desc')
-    response = api.call('notifications_load', data={'sort_order': sort_order})
-    session['notifications'] = len(response['data'])
-    return render_template('user/notifications.html', notifications=response['data'])
 
 
 @user_bp.route('/settings', methods=['GET', 'POST'])
@@ -181,6 +189,10 @@ def settings() -> Response:
         if response['status'] == 'ok':
             # Save the color mode now so that the display changes immediately.
             g.settings['color_mode'] = settings['color_mode']
+
+            if app.config.get('CACHING_ENABLED', False):
+                clear_view_cache_keys()
+
             flash('Settings saved successfully', 'success')
         else:
             flash('Saving settings failed!', 'danger')
@@ -191,17 +203,24 @@ def settings() -> Response:
     return render_template('user/settings.html', **session['settings'])
 
 
+@user_bp.route('/notifications')
+@cache_view()
+def notifications() -> Response:
+    """Notifications page."""
+    return render_template('user/notifications.html')
+
+
 @user_bp.route('/data_access')
+@cache_view()
 def data_access() -> Response:
     """Data Access Passwords overview"""
-    response = api.call('token_load')
     token_lifetime = app.config.get('TOKEN_LIFETIME')
     return render_template('user/data_access.html',
-                           tokens=response['data'],
                            token_lifetime=token_lifetime)
 
 
 @user_bp.route('/data_transfer')
+@cache_view()
 def data_transfer() -> Response:
     """Data Transfer page."""
     return render_template('user/data_transfer.html')
@@ -460,9 +479,40 @@ def original_destination() -> str:
         return url_for('general_bp.index')
 
 
+def load_settings() -> None:
+    """Loads settings from the API if not already present in the session."""
+    if session.get('settings') is None:
+        response = api.call('settings_load', data={})
+        session['settings'] = response['data']
+    g.settings = session.get('settings')
+
+
+def check_admin_access() -> None:
+    """Checks if the user has admin access if not already present in the session."""
+    if session.get('admin') is None:
+        response = api.call("admin_has_access", data={})
+        session['admin'] = response['data']
+    g.admin = session.get('admin')
+
+
+def should_populate_api_cache() -> bool:
+    """Determines if the API cache should be populated.
+
+    Checks if at least 60 seconds (1 minute) have passed since the last execution
+
+    :returns: True if the cache should be populated, False otherwise
+    """
+    last_execution_time = session.get('last_execution_time', 0)
+    current_time = time.time()
+    if app.config.get('CACHING_ENABLED', False) and current_time - last_execution_time >= 60:
+        session['last_execution_time'] = current_time
+        return True
+    return False
+
+
 @user_bp.before_app_request
 def prepare_user() -> None:
-    user_id = session.get('user_id', None)
+    user_id = session.get('user_id')
     irods = connman.get(session.sid)
     login_username = session.get('login_username')
 
@@ -478,22 +528,19 @@ def prepare_user() -> None:
         try:
             endpoints = ["static", "call", "upload_get", "upload_post"]
             if request.endpoint is not None and not request.endpoint.endswith(tuple(endpoints)):
-                # Check for notifications.
-                response = api.call('notifications_load', data={})
-                g.notifications = len(response['data'])
+                load_settings()
+                check_admin_access()
 
-                # Load saved settings.
-                if session.get('settings', None) is None:
-                    response = api.call('settings_load', data={})
-                    session['settings'] = response['data']
-                g.settings = session.get('settings')
+                @copy_current_request_context
+                def populate_api_cache_thread(fn: str, user: str, irods: str, session_id: str) -> None:
+                    """Populates the API cache in a separate thread."""
+                    with app.app_context():
+                        populate_api_cache(fn, user, irods, session_id)
 
-                # Check for admin access.
-                if session.get('admin', None) is None:
-                    response = api.call("admin_has_access", data={})
-                    session['admin'] = response['data']
-                g.admin = session.get('admin')
-
+                if should_populate_api_cache():
+                    cache_functions = get_api_cache_functions()
+                    for fn in cache_functions:
+                        executor.submit(populate_api_cache_thread, fn, g.user, g.irods, session.sid)
         except PAM_AUTH_PASSWORD_FAILED:
             # Password is not valid any more (probably OIDC access token).
             connman.clean(session.sid)

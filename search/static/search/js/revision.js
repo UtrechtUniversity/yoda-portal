@@ -1,4 +1,4 @@
-/* global DOMPurify */
+/* global $, DOMPurify */
 'use strict'
 
 // Handles content of two tables
