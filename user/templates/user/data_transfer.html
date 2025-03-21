@@ -3,7 +3,6 @@
 {% block title %}{{ super() }} - Data Transfer{% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='lib/jquery-3.7.1/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ url_for('user_bp.static', filename='js/data_transfer.js') }}"></script>
     <script src="{{ url_for('static', filename='lib/highlight-js-11.9.0/highlight.min.js') }}"></script>
     <script>

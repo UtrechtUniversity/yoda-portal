@@ -1,7 +1,7 @@
 /* global hljs */
 'use strict'
 
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
   hljs.highlightAll()
 
   const snippets = document.getElementsByTagName('pre')
@@ -10,44 +10,50 @@ $(document).ready(function () {
     snippets[i].innerHTML = '<button id="button' + (i + 1) + '" class="hljs-copy btn btn-secondary btn-copy-to-clipboard mt-2 me-2 float-end"><i class="fa fa-copy"></i> Copy</button>' + snippets[i].innerHTML
   }
 
-  $('.btn-copy-to-clipboard').on('click', function (event) {
-    let codeBlockId
-    if (this.id === 'button1') {
-      codeBlockId = 'code-block1'
-    } else {
-      codeBlockId = 'code-block2'
-    }
+  const copyButtons = document.querySelectorAll('.btn-copy-to-clipboard')
+  copyButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      let codeBlockId
+      if (this.id === 'button1') {
+        codeBlockId = 'code-block1'
+      } else {
+        codeBlockId = 'code-block2'
+      }
 
-    const codeContent = document.getElementById(codeBlockId).textContent
-    const textArea = document.createElement('textarea')
-    textArea.textContent = codeContent
-    document.body.append(textArea)
+      const codeContent = document.getElementById(codeBlockId).textContent
+      const textArea = document.createElement('textarea')
+      textArea.textContent = codeContent
+      document.body.append(textArea)
 
-    textArea.select()
-    document.execCommand('copy')
+      textArea.select()
+      document.execCommand('copy')
 
-    textArea.remove()
+      textArea.remove()
+    })
   })
 
-  $('.btn-download-file').on('click', function (event) {
-    let codeBlockId
-    let filename
-    if (this.id === 'download-button1') {
-      codeBlockId = 'code-block1'
-      filename = 'irods_environment.json'
-    } else {
-      codeBlockId = 'code-block2'
-      filename = 'config.yml'
-    }
+  const downloadButtons = document.querySelectorAll('.btn-download-file')
+  downloadButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      let codeBlockId
+      let filename
+      if (this.id === 'download-button1') {
+        codeBlockId = 'code-block1'
+        filename = 'irods_environment.json'
+      } else {
+        codeBlockId = 'code-block2'
+        filename = 'config.yml'
+      }
 
-    const codeContent = document.getElementById(codeBlockId).textContent
-    const link = document.createElement('a')
-    const file = new Blob([codeContent], { type: 'text/plain' })
+      const codeContent = document.getElementById(codeBlockId).textContent
+      const link = document.createElement('a')
+      const file = new Blob([codeContent], { type: 'text/plain' })
 
-    link.href = URL.createObjectURL(file)
-    link.download = filename
-    link.click()
+      link.href = URL.createObjectURL(file)
+      link.download = filename
+      link.click()
 
-    URL.revokeObjectURL(link.href)
+      URL.revokeObjectURL(link.href)
+    })
   })
 })
