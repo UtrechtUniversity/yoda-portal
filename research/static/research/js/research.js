@@ -945,9 +945,9 @@ function makeBreadcrumb (dir) {
 }
 
 function buildFileBrowser (dir) {
-  const table = $('#file-browser').DataTable()
+  const fileBrowser = $('#file-browser').DataTable()
   getFolderContents.dropCache()
-  table.ajax.reload(() => {
+  fileBrowser.ajax.reload(() => {
     if (currentFile) {
       jumpToDataInCache(table, currentFile)
     }
