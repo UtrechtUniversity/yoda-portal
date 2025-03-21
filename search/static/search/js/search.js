@@ -116,11 +116,9 @@ const resultsRenderer = {
   name: (name, _, row) => {
     let href = ''
     let target = name
-    console.log("initial target name",target)
     if (row.type !== 'coll') {
       target = name.split('/').slice(0, -1).join('/')
     }
-    console.log("target",target)
 
     target = encodeURIComponent(target)
     if (name.startsWith('/vault-')) {
@@ -133,21 +131,17 @@ const resultsRenderer = {
 
     // Add scrollTo parameter for filenames
     if (row.type !== 'coll') {
-      const filename = name.split('/').pop();
-      const encodedFile = encodeURIComponent(filename);
-      href += `&scrollTo=${encodedFile}`;
+      const filename = name.split('/').pop()
+      const encodedFile = encodeURIComponent(filename)
+      href += `&scrollTo=${encodedFile}`
     }
 
-    console.log("encoded target",target)
-    console.log("encoded href",href)
-    console.log("${Yoda.htmlEncode(href)}",Yoda.htmlEncode(href))
     if (row.type === 'coll') {
       return `<a class="browse-search" href="${Yoda.htmlEncode(href)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>`
     } else {
       return `<a class="browse-search" href="${Yoda.htmlEncode(href)}"><i class="fa-regular fa-file"></i> ${Yoda.htmlEncode(name)}</a>`
     }
   },
-
   size: (size, _, row) => {
     if (row.type === 'coll') {
       return ''

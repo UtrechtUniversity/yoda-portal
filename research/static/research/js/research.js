@@ -1,5 +1,6 @@
 /* global bootstrap, Flow, Option */
 'use strict'
+
 $(document).ajaxSend(function (e, request, settings) {
   // Append a CSRF token to all AJAX POST requests.
   if (settings.type === 'POST' && settings.data.length) {
@@ -23,7 +24,7 @@ let uploadFolder = false
 $(function () {
   // Parse URL parameters
   const urlParams = new URLSearchParams(window.location.search)
-  
+
   // Handle 'dir' parameter
   currentFolder = urlParams.get('dir') || ''
   currentFolder = decodeURIComponent(currentFolder)
@@ -36,15 +37,14 @@ $(function () {
       .replace(/\/+/g, '/')
       .replace(/\/$/, '')
   }
-  
+
   // Needed for the table to show the links depending on permissions
   topInformation(currentFolder, true)
-  // TODO: Need permission check for files as well?
   createTooltips()
 
-  if ($('#file-browser').length) { 
-    startBrowsing();
-}
+  if ($('#file-browser').length) {
+    startBrowsing()
+  }
 
   window.onbeforeunload = function (e) {
     if (!$('#uploads').hasClass('hidden')) {
@@ -864,7 +864,7 @@ function browse (dir = '', changeHistory = false) {
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
   topInformation(dir, true) // only here topInformation should show its alertMessage
-  buildFileBrowser(dir)
+  buildFileBrowser()
 }
 
 function handleGoToVaultButton (dir) {
@@ -944,17 +944,17 @@ function makeBreadcrumb (dir) {
   $('nav ol.breadcrumb').html(html)
 }
 
-  function buildFileBrowser(dir) {
-    const table = $('#file-browser').DataTable()
-    getFolderContents.dropCache()
-    table.ajax.reload(() => {
-      if (currentFile) {
-        jumpToDataInCache(table, currentFile);
-      }
-    }, false)
+function buildFileBrowser (dir) {
+  const table = $('#file-browser').DataTable()
+  getFolderContents.dropCache()
+  table.ajax.reload(() => {
+    if (currentFile) {
+      jumpToDataInCache(table, currentFile)
+    }
+  }, false)
 
-    return true
-  }
+  return true
+}
 
 // Fetches directory contents to populate the listing table.
 const getFolderContents = (() => {
@@ -1036,7 +1036,7 @@ const getFolderContents = (() => {
     cb(callback)
   })()
 
-    // Expose cache data
+  // Expose cache data for jumpToDataInCache
   fn.getCache = () => ({
     cache,
     cacheStart,
@@ -1119,14 +1119,14 @@ const tableRenderer = {
   }
 }
 
-function startBrowsing () { 
-  const table = $('#file-browser').DataTable({ //$ = jQuery selector  // id CSS selector // initialize DataTable
-    bFilter: false, // Disables search box
-    bInfo: false, // Hides "Showing X of Y" info
-    bLengthChange: true, // Shows "Show X entries" dropdown
+function startBrowsing () {
+  $('#file-browser').DataTable({
+    bFilter: false,
+    bInfo: false,
+    bLengthChange: true,
     language: {
       emptyTable: 'No accessible files/folders present',
-      lengthMenu: '_MENU_', 
+      lengthMenu: '_MENU_'
     },
     dom: '<"top">frt<"bottom"lp><"clear">',
     columns: [{ render: tableRenderer.multiselect, orderable: false, data: 'name' },
@@ -1145,15 +1145,11 @@ function startBrowsing () {
     order: [[1, 'asc']],
     pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
   })
-
   $('#file-browser').on('length.dt', function (e, settings, len) {
     Yoda.storage.session.set('pageLength', len)
   })
-
   browse(currentFolder)
 }
-
-
 
 function toggleLocksList (folder) {
   const isVisible = $('.lock').is(':visible')
@@ -1610,23 +1606,23 @@ function logUpload (id, file) {
   $('#files').append(log)
 }
 
-function jumpToDataInCache(table, data) { // FIXME: missing the column parameter
+function jumpToDataInCache (table, fileName) {
   const cacheInfo = getFolderContents.getCache()
-  
-  // TODO: Not needed probably. Validate cache
+
+  // Validate cache
   if (cacheInfo.cacheFolder !== currentFolder ||
       cacheInfo.cacheSortCol !== table.order()[0][0] ||
       cacheInfo.cacheSortOrder !== table.order()[0][1]) {
-      table.ajax.reload() // FIXME: Retry after reload needed?
-      return
+    table.ajax.reload()
+    return
   }
 
-  // Search cached data
-  const pos = cacheInfo.cache.findIndex(item => item.name === data)
+  // Search file from cached items
+  const pos = cacheInfo.cache.findIndex(item => item.name === fileName)
 
   if (pos >= 0) {
-      const globalPos = cacheInfo.cacheStart + pos
-      const page = Math.floor(globalPos / table.page.info().length)
-      table.page(page).draw(false)
-  } 
+    const globalPos = cacheInfo.cacheStart + pos
+    const page = Math.floor(globalPos / table.page.info().length)
+    table.page(page).draw(false)
+  }
 }
