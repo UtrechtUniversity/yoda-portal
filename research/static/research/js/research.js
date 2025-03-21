@@ -36,14 +36,11 @@ $(function () {
       .replace(/\/+/g, '/')
       .replace(/\/$/, '')
   }
-  console.log("Current folder:", currentFolder);
-  console.log("Current file:", currentFile);
   
   // Needed for the table to show the links depending on permissions
   topInformation(currentFolder, true)
   // TODO: Need permission check for files as well?
   createTooltips()
-  console.log("#file-browser').length", $('#file-browser').length);
 
   if ($('#file-browser').length) { 
     startBrowsing();
@@ -1123,7 +1120,6 @@ const tableRenderer = {
 }
 
 function startBrowsing () { 
-  console.log("startBrowsing")
   const table = $('#file-browser').DataTable({ //$ = jQuery selector  // id CSS selector // initialize DataTable
     bFilter: false, // Disables search box
     bInfo: false, // Hides "Showing X of Y" info
@@ -1149,13 +1145,7 @@ function startBrowsing () {
     order: [[1, 'asc']],
     pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
   })
-  // Print initial page length
-  console.log("Initial Page Length:", table.page.len())
 
-  // Print current sorting order
-  console.log("Current Sort Order:", table.order())
-
-  console.log("data column", table.column(0).data())
   $('#file-browser').on('length.dt', function (e, settings, len) {
     Yoda.storage.session.set('pageLength', len)
   })
@@ -1627,7 +1617,6 @@ function jumpToDataInCache(table, data) { // FIXME: missing the column parameter
   if (cacheInfo.cacheFolder !== currentFolder ||
       cacheInfo.cacheSortCol !== table.order()[0][0] ||
       cacheInfo.cacheSortOrder !== table.order()[0][1]) {
-      console.log('Cache invalid. Reloading...')
       table.ajax.reload() // FIXME: Retry after reload needed?
       return
   }
@@ -1639,8 +1628,5 @@ function jumpToDataInCache(table, data) { // FIXME: missing the column parameter
       const globalPos = cacheInfo.cacheStart + pos
       const page = Math.floor(globalPos / table.page.info().length)
       table.page(page).draw(false)
-      console.log(`Jumped to page ${page}`)
-  } else {
-      console.log('Data not in cached batch') //FIXME: User feedbacl message needed?
-  }
+  } 
 }
