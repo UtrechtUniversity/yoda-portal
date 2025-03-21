@@ -1,4 +1,4 @@
-/* global bootstrap, Flow, Option */
+/* global $, bootstrap, Flow, Option */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {

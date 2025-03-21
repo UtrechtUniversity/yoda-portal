@@ -1,4 +1,4 @@
-/* global browseStartDir, dpReference, dpIsRestricted, L */
+/* global $, browseStartDir, dpReference, dpIsRestricted, L */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {

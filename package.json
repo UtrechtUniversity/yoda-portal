@@ -1,8 +1,7 @@
 {
   "standard": {
     "globals": [
-      "Yoda",
-      "$"
+      "Yoda"
     ],
     "ignore": [
       "**/lib/",

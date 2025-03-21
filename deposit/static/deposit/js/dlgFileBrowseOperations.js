@@ -1,4 +1,4 @@
-/* global browse, DOMPurify, path */
+/* global $, browse, DOMPurify, path */
 'use strict'
 
 let folderSelectBrowser = null

@@ -1,4 +1,4 @@
-/* global bootstrap, DOMPurify, FileReader, jQuery, Option */
+/* global $, bootstrap, DOMPurify, FileReader, jQuery, Option */
 'use strict'
 
 let enteredUsername = ''
