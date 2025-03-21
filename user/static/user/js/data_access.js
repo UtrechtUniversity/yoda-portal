@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.body.addEventListener('click', function (e) {
     if (e.target.classList.contains('delete-token')) {
-      const label = e.target.previousElementSibling.textContent
+      const tokenItem = e.target.closest('.list-group-item')
+      const label = tokenItem.querySelector('label').textContent
       Yoda.call('token_delete', { label }, { quiet: true }).then(
         (data) => {
           e.target.parentElement.remove()
