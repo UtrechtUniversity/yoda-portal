@@ -150,10 +150,10 @@ def clear_view_cache_keys(all_users: bool = False) -> None:
     :param all_users: If True, clear view cache keys for all users
     """
     if all_users:
-        filter_key = "-view-"
+        filter_key = ":view_"
     else:
         user_identifier = get_user_identifier()
-        filter_key = f"{user_identifier}-view-"
+        filter_key = f"{user_identifier}:view_"
 
     # Get the keys to delete.
     keys_to_delete = list(filter_cache_keys(filter_key))
