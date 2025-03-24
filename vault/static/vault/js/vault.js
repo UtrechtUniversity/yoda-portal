@@ -453,8 +453,9 @@ function buildFileBrowser (dir) {
   fileBrowser.ajax.reload(() => {
     if (currentFile) {
       jumpToDataInCache(fileBrowser, currentFile)
+      currentFile = null
     }
-  }, false)
+  }, true)
 
   return true
 }
