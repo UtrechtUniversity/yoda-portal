@@ -129,6 +129,13 @@ const resultsRenderer = {
       href = '/research/?dir=' + target
     }
 
+    // Add scrollTo parameter for filenames
+    if (row.type !== 'coll') {
+      const filename = name.split('/').pop()
+      const encodedFile = encodeURIComponent(filename)
+      href += `&scrollTo=${encodedFile}`
+    }
+
     if (row.type === 'coll') {
       return `<a class="browse-search" href="${Yoda.htmlEncode(href)}"><i class="fa-regular fa-folder"></i> ${Yoda.htmlEncode(name)}</a>`
     } else {

@@ -16,17 +16,27 @@ let uploadMenuTooltip
 let downloadChecksumReportTextTooltip
 let downloadChecksumReportCSVTooltip
 let currentFolder
+let currentFile
 let filenames = []
 let hasReadRights = true
 let uploadFolder = false
 
 $(function () {
-  // Extract current location from query string (default to '').
-  currentFolder = decodeURIComponent((/(?:\?|&)dir=([^&]*)/
-    .exec(window.location.search) || [0, ''])[1])
+  // Parse URL parameters
+  const urlParams = new URLSearchParams(window.location.search)
 
-  // Canonicalize path somewhat, for convenience.
-  currentFolder = currentFolder.replace(/\/+/g, '/').replace(/\/$/, '')
+  // Handle 'dir' parameter
+  currentFolder = urlParams.get('dir') || ''
+  currentFolder = decodeURIComponent(currentFolder)
+    .replace(/\/+/g, '/')
+    .replace(/\/$/, '')
+
+  // Handle optional 'scrollTo' parameter
+  if (urlParams.has('scrollTo')) {
+    currentFile = decodeURIComponent(urlParams.get('scrollTo'))
+      .replace(/\/+/g, '/')
+      .replace(/\/$/, '')
+  }
 
   // Needed for the table to show the links depending on permissions
   topInformation(currentFolder, true)
@@ -854,7 +864,7 @@ function browse (dir = '', changeHistory = false) {
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
   topInformation(dir, true) // only here topInformation should show its alertMessage
-  buildFileBrowser(dir)
+  buildFileBrowser()
 }
 
 function handleGoToVaultButton (dir) {
@@ -937,7 +947,11 @@ function makeBreadcrumb (dir) {
 function buildFileBrowser (dir) {
   const fileBrowser = $('#file-browser').DataTable()
   getFolderContents.dropCache()
-  fileBrowser.ajax.reload()
+  fileBrowser.ajax.reload(() => {
+    if (currentFile) {
+      jumpToDataInCache(fileBrowser, currentFile)
+    }
+  }, false)
 
   return true
 }
@@ -1021,6 +1035,15 @@ const getFolderContents = (() => {
     }
     cb(callback)
   })()
+
+  // Expose cache data for jumpToDataInCache
+  fn.getCache = () => ({
+    cache,
+    cacheStart,
+    cacheFolder,
+    cacheSortCol,
+    cacheSortOrder
+  })
 
   // Allow manually clearing results (needed during soft-reload after uploading a file).
   fn.dropCache = () => { cache = [] }
@@ -1581,4 +1604,25 @@ function logUpload (id, file) {
                   <div class="col-md-3 msg"><i class="fa-solid fa-spinner fa-spin fa-fw"></i></div>
                </div>`
   $('#files').append(log)
+}
+
+function jumpToDataInCache (table, fileName) {
+  const cacheInfo = getFolderContents.getCache()
+
+  // Validate cache
+  if (cacheInfo.cacheFolder !== currentFolder ||
+      cacheInfo.cacheSortCol !== table.order()[0][0] ||
+      cacheInfo.cacheSortOrder !== table.order()[0][1]) {
+    table.ajax.reload()
+    return
+  }
+
+  // Search file from cached items
+  const pos = cacheInfo.cache.findIndex(item => item.name === fileName)
+
+  if (pos >= 0) {
+    const globalPos = cacheInfo.cacheStart + pos
+    const page = Math.floor(globalPos / table.page.info().length)
+    table.page(page).draw(false)
+  }
 }
