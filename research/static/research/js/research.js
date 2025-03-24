@@ -38,12 +38,9 @@ $(function () {
       .replace(/\/$/, '')
   }
 
-  // Needed for the table to show the links depending on permissions
-  topInformation(currentFolder, true)
-  createTooltips()
-
   if ($('#file-browser').length) {
     startBrowsing()
+    createTooltips()
   }
 
   window.onbeforeunload = function (e) {
