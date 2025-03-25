@@ -1,55 +1,49 @@
-/* global $, path */
+/* global path */
 'use strict'
 
-$(document).ajaxSend(function (e, request, settings) {
-  // Append a CSRF token to all AJAX POST requests.
-  if (settings.type === 'POST' && settings.data.length) {
-    settings.data +=
-             '&' + encodeURIComponent(Yoda.csrf.tokenName) +
-              '=' + encodeURIComponent(Yoda.csrf.tokenValue)
-  }
-})
-
-$(function () {
+document.addEventListener('DOMContentLoaded', function () {
   submitStatus()
 
-  $('body').on('click', 'button#submit', function () {
-    submitToVault()
+  document.body.addEventListener('click', function (event) {
+    if (event.target.matches('button#submit')) {
+      submitToVault()
+    }
   })
 })
 
 async function submitStatus () {
   const status = await getStatus()
-  if (status) {
-    $('#submit').prop('disabled', false)
-  } else {
-    $('#submit').prop('disabled', true)
-  }
+  const submitButton = document.getElementById('submit')
+  submitButton.disabled = !status
 }
 
 async function getStatus () {
   try {
     const status = await Yoda.call('deposit_status', { path })
+    const dataCheck = document.getElementById('data_check')
+    const metadataCheck = document.getElementById('metadata_check')
+
     if (status.data) {
       // Retrieve system metadata of folder.
       Yoda.call('research_system_metadata', { coll: Yoda.basePath + path }).then((data) => {
-        $('.package-size').text(data['Package size'])
+        document.querySelector('.package-size').textContent = data['Package size']
       })
-      $('#data_check').removeClass('fa-times text-danger').addClass('fa-check text-success')
+      dataCheck.classList.remove('fa-times', 'text-danger')
+      dataCheck.classList.add('fa-check', 'text-success')
     } else {
-      $('#data_check').removeClass('fa-check text-success').addClass('fa-times text-danger')
-    }
-    if (status.metadata) {
-      $('#metadata_check').removeClass('fa-times text-danger').addClass('fa-check text-success')
-    } else {
-      $('#metadata_check').removeClass('fa-check text-success').addClass('fa-times text-danger')
+      dataCheck.classList.remove('fa-check', 'text-success')
+      dataCheck.classList.add('fa-times', 'text-danger')
     }
 
-    if (status.data && status.metadata) {
-      return true
+    if (status.metadata) {
+      metadataCheck.classList.remove('fa-times', 'text-danger')
+      metadataCheck.classList.add('fa-check', 'text-success')
     } else {
-      return false
+      metadataCheck.classList.remove('fa-check', 'text-success')
+      metadataCheck.classList.add('fa-times', 'text-danger')
     }
+
+    return status.data && status.metadata
   } catch (e) {
     console.log(e)
     return false
@@ -58,9 +52,7 @@ async function getStatus () {
 
 async function submitToVault () {
   try {
-    const result = await Yoda.call('deposit_submit', { path },
-      { rawResult: true }
-    )
+    const result = await Yoda.call('deposit_submit', { path }, { rawResult: true })
     if (result.status === 'ok') {
       window.location.href = '/deposit/thank-you'
     }
