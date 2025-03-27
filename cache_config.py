@@ -34,16 +34,17 @@ cache = Cache(config=config)
 
 # API cache timeouts configuration.
 API_CACHE_TIMEOUTS = {
-    "group_data":                      {"timeout": 3600},
-    "notifications_load":              {"timeout": 120},
-    "resource_browse_group_data":      {"timeout": 3600},
-    "resource_category_stats":         {"timeout": 3600},
-    "resource_monthly_category_stats": {"timeout": 3600},
-    "schema_get_schemas":              {"timeout": 3600},
-    "settings_load":                   {"timeout": 3600},
-    "token_load":                      {"timeout": 3600},
-    "vault_get_publication_terms":     {"timeout": 3600},
-    "vault_preservable_formats_lists": {"timeout": 3600},
+    "group_data":                                      {"timeout": 3600},
+    "notifications_load":                              {"timeout": 120},
+    "resource_browse_group_data":                      {"timeout": 3600},
+    "resource_category_stats":                         {"timeout": 3600},
+    "resource_monthly_category_stats":                 {"timeout": 3600},
+    "resource_full_year_differentiated_group_storage": {"timeout": 3600},
+    "schema_get_schemas":                              {"timeout": 3600},
+    "settings_load":                                   {"timeout": 3600},
+    "token_load":                                      {"timeout": 3600},
+    "vault_get_publication_terms":                     {"timeout": 3600},
+    "vault_preservable_formats_lists":                 {"timeout": 3600},
 }
 
 # API cache default parameters configuration.

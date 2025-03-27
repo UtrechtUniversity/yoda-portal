@@ -504,7 +504,7 @@ def should_populate_api_cache() -> bool:
     """
     last_execution_time = session.get('last_execution_time', 0)
     current_time = time.time()
-    if app.config.get('CACHING_ENABLED', False) and current_time - last_execution_time >= 60:
+    if app.config.get('CACHING_ENABLED', False) and current_time - last_execution_time >= 120:
         session['last_execution_time'] = current_time
         return True
     return False
