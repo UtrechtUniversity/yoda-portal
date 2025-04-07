@@ -2045,6 +2045,7 @@ $(function () {
           )
         }
       }
+      $(el).find('input[type="submit"]').removeClass('disabled').val('Add')
     },
 
     /**
