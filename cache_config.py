@@ -64,6 +64,7 @@ API_CACHE_CLEAR = {
     "group_user_add":               {"type": "global", "endpoints": ["group_data"]},
     "group_user_update_role":       {"type": "global", "endpoints": ["group_data"]},
     "group_remove_user_from_group": {"type": "global", "endpoints": ["group_data"]},
+    "group_process_csv":            {"type": "global", "endpoints": ["group_data"]},
     "notifications_dismiss":        {"type": "user",   "endpoints": ["notifications_load"]},
     "notifications_dismiss_all":    {"type": "user",   "endpoints": ["notifications_load"]},
     "settings_save":                {"type": "user",   "endpoints": ["settings_load"]},
