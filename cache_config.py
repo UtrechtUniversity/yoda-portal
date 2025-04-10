@@ -34,17 +34,17 @@ cache = Cache(config=config)
 
 # API cache timeouts configuration.
 API_CACHE_TIMEOUTS = {
-    "group_data":                                      {"timeout": 3600},
-    "notifications_load":                              {"timeout": 120},
-    "resource_browse_group_data":                      {"timeout": 3600},
-    "resource_category_stats":                         {"timeout": 3600},
-    "resource_monthly_category_stats":                 {"timeout": 3600},
-    "resource_full_year_differentiated_group_storage": {"timeout": 3600},
-    "schema_get_schemas":                              {"timeout": 3600},
-    "settings_load":                                   {"timeout": 3600},
-    "token_load":                                      {"timeout": 3600},
-    "vault_get_publication_terms":                     {"timeout": 3600},
-    "vault_preservable_formats_lists":                 {"timeout": 3600},
+    "group_data":                                      {"prepopulate": True,  "timeout": 3600},
+    "notifications_load":                              {"prepopulate": True,  "timeout": 120},
+    "resource_browse_group_data":                      {"prepopulate": True,  "timeout": 3600},
+    "resource_category_stats":                         {"prepopulate": True,  "timeout": 3600},
+    "resource_monthly_category_stats":                 {"prepopulate": True,  "timeout": 3600},
+    "resource_full_year_differentiated_group_storage": {"prepopulate": False, "timeout": 3600},
+    "schema_get_schemas":                              {"prepopulate": True,  "timeout": 3600},
+    "settings_load":                                   {"prepopulate": True,  "timeout": 3600},
+    "token_load":                                      {"prepopulate": True,  "timeout": 3600},
+    "vault_get_publication_terms":                     {"prepopulate": True,  "timeout": 3600},
+    "vault_preservable_formats_lists":                 {"prepopulate": True,  "timeout": 3600},
 }
 
 # API cache default parameters configuration.
@@ -112,7 +112,7 @@ def make_key(api_key: Optional[str] = None) -> str:
 
 def get_api_cache_functions() -> list:
     """Return a list of function names from the API_CACHE_TIMEOUTS configuration."""
-    return list(API_CACHE_TIMEOUTS.keys())
+    return [key for key, value in API_CACHE_TIMEOUTS.items() if value["prepopulate"]]
 
 
 def get_api_cache_timeout(fn: str) -> int:
