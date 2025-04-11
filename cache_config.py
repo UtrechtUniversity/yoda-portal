@@ -7,7 +7,7 @@ import hashlib
 import json
 from concurrent.futures import ThreadPoolExecutor
 from functools import wraps
-from typing import Callable, List, Optional
+from typing import Any, Callable, List, Optional
 
 from flask import current_app as app, g, request, session
 from flask_caching import Cache
@@ -110,7 +110,7 @@ def make_key(api_key: Optional[str] = None) -> str:
     return f"{user_identifier}:{key}"
 
 
-def get_api_cache_functions() -> list:
+def get_api_cache_functions() -> List[str]:
     """Return a list of function names from the API_CACHE_TIMEOUTS configuration."""
     return list(API_CACHE_TIMEOUTS.keys())
 
@@ -210,11 +210,11 @@ def populate_api_cache(fn: str, user: str, irods: str, session_id: str) -> None:
                 log_error(f"Error prepopulating cache {fn}: {e}")
 
 
-def cache_view() -> Callable:
+def cache_view() -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Custom decorator to conditionally apply caching to views."""
-    def decorator(f: Callable) -> Callable:
+    def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(f)
-        def wrapped(*args: str, **kwargs: int) -> Callable:
+        def wrapped(*args: str, **kwargs: int) -> Any:
             try:
                 return cache.cached(make_cache_key=make_key)(f)(*args, **kwargs)
             except Exception:

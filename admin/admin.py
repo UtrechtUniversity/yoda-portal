@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2024, Utrecht University'
+__copyright__ = 'Copyright (c) 2024-2025, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import html
@@ -58,7 +58,7 @@ def index() -> Response:
         return abort(403)
 
 
-def admin_required(f: Callable) -> Callable:
+def admin_required(f: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator to check admin privileges.
 
     :param f: Function to decorate
@@ -66,7 +66,7 @@ def admin_required(f: Callable) -> Callable:
     :returns: Wrapped function with admin check
     """
     @wraps(f)
-    def decorated_function(*args: str, **kwargs: int) -> Callable:
+    def decorated_function(*args: str, **kwargs: int) -> Any:
         if not getattr(g, 'admin', False):
             flash('You do not have permission to perform this action.', 'danger')
             return redirect(url_for('admin_bp.index'))
