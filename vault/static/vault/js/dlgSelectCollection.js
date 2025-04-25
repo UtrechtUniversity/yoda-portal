@@ -321,7 +321,7 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
 
   let html = '<li class="active">Research</li>'
   if (totalParts > 0 && parts[0] !== 'undefined') {
-    html = '<li class="browse-select" data-path="">Research</li>'
+    html = '<li class="browse-select breadcrumb-item" data-path="">Research</li>'
     let path = ''
     $.each(parts, function (k, part) {
       path += '/' + part
@@ -329,9 +329,9 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
       // Active item
       const valueString = Yoda.htmlEncode(part).replace(/ /g, '&nbsp;')
       if (k === (totalParts - 1)) {
-        html += '<li class="active">' + valueString + '</li>'
+        html += '<li class="active breadcrumb-item">' + valueString + '</li>'
       } else {
-        html += '<li class="browse-select" data-path="' + Yoda.htmlEncode(path) + '">' + valueString + '</li>'
+        html += '<li class="browse-select breadcrumb-item" data-path="' + Yoda.htmlEncode(path) + '">' + valueString + '</li>'
       }
     })
   }
