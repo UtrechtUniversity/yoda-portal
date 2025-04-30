@@ -931,7 +931,8 @@ $(function () {
         // ... then the user must either be rodsadmin ...
         (this.isRodsAdmin ||
         // ... or the user is in priv-*-add ...
-        (this.userNameFull in this.groups['priv-category-add'].members &&
+        ('priv-category-add' in this.groups && 'priv-group-add' in this.groups &&
+        this.userNameFull in this.groups['priv-category-add'].members &&
         this.userNameFull in this.groups['priv-group-add'].members &&
         // ... and the user must be a manager of at least one group in the category
         this.isManagerInCategory(categoryName))))
@@ -1042,7 +1043,7 @@ $(function () {
       $('#group-properties .delete-button').toggleClass(
         'hidden',
         !(this.isRodsAdmin || (userCanManage && !(groupName.match(that.GROUP_PREFIXES_RESERVED_RE))) ||
-                   (groupName.match(/^datamanager-/) && Yoda.canUpdateDatamanagerGroup(categoryName)))
+                   (groupName.match(/^datamanager-/) && that.canUpdateDatamanagerGroup(categoryName)))
       )
 
       // The category of a datamanager group cannot be changed - the
