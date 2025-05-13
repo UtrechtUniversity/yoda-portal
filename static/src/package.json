@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bootstrap": "^5.3.5"
+    "bootstrap": "^5.3.6"
   }
 }
