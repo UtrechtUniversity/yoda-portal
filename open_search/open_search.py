@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2022-2024, Utrecht University'
+__copyright__ = 'Copyright (c) 2022-2025, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import json
@@ -8,7 +8,6 @@ import re
 from datetime import datetime
 from typing import Any, Dict
 
-import jsonavu
 from flask import Blueprint, jsonify, render_template, request, Response
 from opensearchpy import ConnectionError, OpenSearch
 
@@ -389,7 +388,7 @@ def _metadata() -> Response:
     res = metadata(uuid)
     if res['total_matches'] == 1:
         avus = res['matches'][0]
-        metadata_json = jsonavu.avu2json(avus['attributes'], 'usr')
+        metadata_json = avus['attributes']
 
     # Query data package on UUID.
     res = faceted_query('Data_Package_Reference', uuid, [], [], size=1)  # type: ignore[no-untyped-call]
@@ -429,7 +428,7 @@ def metadata(value: str) -> Dict[str, Any]:
                         'must': [
                             {
                                 'term': {
-                                    'metadataEntries.attribute.raw': 'org_data_package_reference'
+                                    'metadataEntries.attribute.raw': 'Data_Package_Reference'
                                 }
                             }, {
                                 'match': {
@@ -446,16 +445,15 @@ def metadata(value: str) -> Dict[str, Any]:
     response = client.search(body=query, index='yoda')
     matches = []
     for hit in response['hits']['hits']:
-        attributes = []
+        attributes: Dict[str, Any] = {}
         match = {}
         src = hit['_source']
         for avu in src['metadataEntries']:
-            if avu['unit'].startswith('usr_'):
-                attributes.append({
-                    'a': avu['attribute'],
-                    'v': avu['value'],
-                    'u': avu['unit'],
-                })
+            if avu['unit'].startswith('FlatIndex'):
+                if avu['attribute'] in ['Creator', 'Contributor', 'Tag']:
+                    attributes.setdefault(avu['attribute'], []).append(avu['value'])
+                else:
+                    attributes[avu['attribute']] = avu['value']
         match['attributes'] = attributes
         matches.append(match)
     result = {
