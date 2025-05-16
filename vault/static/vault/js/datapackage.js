@@ -49,8 +49,12 @@ mfunction.Collected = function (Collected) {
 mfunction.Contributor = function (Contributor) {
   const contributors = []
   for (const c in Contributor) {
-    const fullname = ''.concat(Contributor[c].Name.Given_Name, ' ', Contributor[c].Name.Family_Name)
-    contributors.push(fullname)
+    if (typeof Contributor[c] === 'string') {
+      contributors.push(Contributor[c])
+    } else {
+      const fullname = ''.concat(Contributor[c].Name.Given_Name, ' ', Contributor[c].Name.Family_Name)
+      contributors.push(fullname)
+    }
   }
   return contributors.join(', ')
 }
@@ -58,9 +62,13 @@ mfunction.Contributor = function (Contributor) {
 mfunction.Creator = function (Creator) {
   const owners = []
   for (const c in Creator) {
-    let fullname = ''.concat(Creator[c].Name.Given_Name, ' ', Creator[c].Name.Family_Name)
-    fullname += ', ' + Creator[c].Affiliation + ', ' + Creator[c].Owner_Role
-    owners.push(fullname)
+    if (typeof Creator[c] === 'string') {
+      owners.push(Creator[c])
+    } else {
+      let fullname = ''.concat(Creator[c].Name.Given_Name, ' ', Creator[c].Name.Family_Name)
+      fullname += ', ' + Creator[c].Affiliation + ', ' + Creator[c].Owner_Role
+      owners.push(fullname)
+    }
   }
   return owners.join(', ')
 }
@@ -266,9 +274,13 @@ function metadataShow () {
   // Creator, Title and Description are 3 fields that are always present.
   const creators = []
   for (const c in metadata.Creator) {
-    let fullname = ''.concat(metadata.Creator[c].Name.Given_Name, ' ', metadata.Creator[c].Name.Family_Name)
-    fullname += ' (' + metadata.Creator[c].Owner_Role + ')'
-    creators.push(fullname)
+    if (typeof metadata.Creator[c] === 'string') {
+      creators.push(metadata.Creator[c])
+    } else {
+      let fullname = ''.concat(metadata.Creator[c].Name.Given_Name, ' ', metadata.Creator[c].Name.Family_Name)
+      fullname += ' (' + metadata.Creator[c].Owner_Role + ')'
+      creators.push(fullname)
+    }
   }
   $('.metadata-creator').text(creators.join(', '))
 
