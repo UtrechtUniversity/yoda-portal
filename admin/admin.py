@@ -333,6 +333,10 @@ def upload_file_formats() -> Response:
     except Exception:
         flash(f"Failed to upload file format list '{filename}'.", "danger")
 
+    if app.config.get('CACHING_ENABLED', False):
+        clear_view_cache_keys(all_users=True)
+        clear_api_cache_keys("admin_save_settings")
+
     return redirect(url_for("admin_bp.index"))
 
 
@@ -352,5 +356,9 @@ def delete_file_formats() -> Response:
         flash(f"File format list '{filename}.json' deleted successfully.", "success")
     except Exception:
         flash(f"Failed to delete file format list '{filename}.json'.", "danger")
+
+    if app.config.get('CACHING_ENABLED', False):
+        clear_view_cache_keys(all_users=True)
+        clear_api_cache_keys("admin_save_settings")
 
     return redirect(url_for("admin_bp.index"))
