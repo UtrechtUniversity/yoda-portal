@@ -474,11 +474,11 @@ class YodaForm extends React.Component {
 
         // Update TreeKeyword field if it exists and was the one changed
         if (id === "yoda_TreeKeyword" &&
-            form.formData.TreeKeyword && 
+            form.formData.TreeKeyword &&
             form.formData.TreeKeyword.value &&
             form.formData.TreeKeyword.value.length &&
             Object.keys(form.schema.properties.TreeKeyword.items.properties).includes("subject")) {
-        
+
             form.formData.TreeKeyword = this.updateTreeKeywords(form, form.formData.TreeKeyword.value)
         }
 
@@ -596,8 +596,10 @@ class YodaButtons extends React.Component {
             } else {
                 buttons.push(this.renderSaveButton());
             }
-            buttons.push(this.renderCloseButton());
         }
+
+        buttons.push(this.renderCloseButton());
+
         return (<div>{buttons}</div>);
     }
 
