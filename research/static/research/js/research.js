@@ -1252,7 +1252,8 @@ function topInformation (dir, showAlert) {
       { path: Yoda.basePath + dir },
       { quiet: true, rawResult: true }).then((dataRaw) => {
       if (dataRaw.status === 'error_nonexistent') {
-        Yoda.set_message('error', 'This research space path does not exist: ' + dir)
+        Yoda.set_message('error', 'This path is not accessible: ' + dir +
+                                  '. Either it does not exist or you do not have the right permissions.')
         $('#file-browser_wrapper').addClass('hide')
         $('.top-information').addClass('hide')
 
