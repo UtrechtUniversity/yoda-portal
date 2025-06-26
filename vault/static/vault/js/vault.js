@@ -1129,7 +1129,7 @@ function metadataInfo (dir) {
       { coll: Yoda.basePath + dir },
       { quiet: true, rawResult: true })
       .then((result) => {
-        if (!result || Object.keys(result.data).length === 0) { return console.info('No result data from meta_form_load') }
+        if (!result || !result.data || Object.keys(result.data).length === 0) { return console.info('No result data from meta_form_load') }
 
         const metadata = result.data.metadata
         $('.metadata-info').show()

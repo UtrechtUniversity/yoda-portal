@@ -246,7 +246,7 @@ function handleOpenMetadataInfo (dir) {
       { coll: Yoda.basePath + dir },
       { rawResult: true })
       .then((result) => {
-        if (!result || Object.keys(result.data).length === 0) { return console.info('No result data from meta_form_load') }
+        if (!result || !result.data || Object.keys(result.data).length === 0) { return console.info('No result data from meta_form_load') }
 
         metadata = result.data.metadata
         // bring separately delivered deposit_date into the metadata dict for ease of reference
