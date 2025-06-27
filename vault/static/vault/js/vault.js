@@ -808,8 +808,10 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
 
           // Archival vault
           if (typeof archive !== 'undefined') {
-            if ((isDatamanager && archive.archivable) && archive.status === false) {
-              actions['vault-archival'] = 'Archive on tape'
+            if ((isDatamanager && archive.archivable) && !archive.status) {
+              actions['vault-archival'] = ['Archive on tape', false]
+            } else if ((isDatamanager && !archive.archivable) && !archive.status) {
+              actions['vault-archival'] = ['Archive on tape', true]
             }
 
             $('.alert.is-archived').hide()
@@ -942,37 +944,52 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
 }
 
 function handleActionsList (actions, folder) {
-  let html = ''
-  let vaultHtml = ''
-  const possibleActions = ['submit-for-publication', 'cancel-publication',
+  const possibleActions = [
+    'submit-for-publication', 'cancel-publication',
     'approve-for-publication', 'depublish-publication',
-    'republish-publication', 'vault-download', 'vault-archival',
-    'vault-unarchive']
+    'republish-publication', 'vault-download',
+    'vault-archival', 'vault-unarchive'
+  ]
 
-  const possibleVaultActions = ['change-vault-access',
-    'copy-vault-package-to-research',
-    'check-for-unpreservable-files',
-    'show-checksum-report']
+  const possibleVaultActions = [
+    'change-vault-access', 'copy-vault-package-to-research',
+    'check-for-unpreservable-files', 'show-checksum-report'
+  ]
 
-  $.each(possibleActions, function (index, value) {
-    if (Object.prototype.hasOwnProperty.call(actions, value)) {
-      html += '<a class="dropdown-item action-' + value + '" data-folder="' + Yoda.htmlEncode(folder) + '">' + actions[value] + '</a>'
-    }
-  })
+  function buildLinks (keys) {
+    let html = ''
+    keys.forEach(function (key) {
+      if (!Object.prototype.hasOwnProperty.call(actions, key)) return
 
-  $.each(possibleVaultActions, function (index, value) {
-    if (Object.prototype.hasOwnProperty.call(actions, value)) {
-      vaultHtml += '<a class="dropdown-item action-' + value + '" data-folder="' + Yoda.htmlEncode(folder) + '">' + actions[value] + '</a>'
-    }
-  })
+      const item = actions[key]
+      let text; let isDisabled = false
 
-  if (html !== '' && vaultHtml !== '') {
-    html += '<div class="dropdown-divider"></div>' + vaultHtml
-  } else if (vaultHtml !== '') {
-    html += vaultHtml
+      if (Array.isArray(item)) {
+        text = item[0]
+        isDisabled = Boolean(item[1])
+      } else {
+        text = item
+      }
+
+      html += '<a class="dropdown-item action-' + key +
+        (isDisabled ? ' disabled"' : '"') +
+        ' data-folder="' + Yoda.htmlEncode(folder) + '">' +
+        Yoda.htmlEncode(text) + '</a>'
+    })
+    return html
   }
 
-  $('.action-list').html(html)
+  const htmlMain = buildLinks(possibleActions)
+  const htmlVault = buildLinks(possibleVaultActions)
+
+  let finalHtml = htmlMain
+  if (htmlMain && htmlVault) {
+    finalHtml += '<div class="dropdown-divider"></div>' + htmlVault
+  } else if (htmlVault) {
+    finalHtml = htmlVault
+  }
+
+  $('.action-list').html(finalHtml)
 }
 
 function showMetadataForm (path) {
