@@ -185,7 +185,6 @@ $(function () {
   metadataInfo(currentFolder)
 })
 
-
 function metadataInfo (dir) {
   if (typeof dir !== 'undefined') {
     Yoda.call('vault_collection_details',
@@ -206,7 +205,7 @@ function metadataInfo (dir) {
       if (dpIsRestricted) {
         handleRestrictedMetadataInfo()
       } else {
-        if (hasReadRights){ 
+        if (hasReadRights) {
           // First collect the information, then present it
           handleOpenMetadataInfo(currentFolder)
         } else {

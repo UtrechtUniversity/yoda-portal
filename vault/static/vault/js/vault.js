@@ -847,15 +847,15 @@ function topInformation (dir, rebuildFileBrowser = false) {
         if (vaultStatus === '' || vaultStatus === 'INCOMPLETE') {
           $('.alert.is-processing').show()
         } else {
-          if (hasReadRights){
+          if (hasReadRights) {
             metadataInfo(dir)
           } else {
             $('.metadata-info').show()
             $('.metadata-title').text(dir)
-            $('.metadata-description').text("N/A")
-            $('.metadata-access').text("N/A")
-            $('.metadata-data-classification').text("N/A")
-            $('.metadata-license').text("N/A")
+            $('.metadata-description').text('N/A')
+            $('.metadata-access').text('N/A')
+            $('.metadata-data-classification').text('N/A')
+            $('.metadata-license').text('N/A')
           }
           if (vaultStatus === 'PUBLISHED' || vaultStatus === 'PENDING_DEPUBLICATION' || vaultStatus === 'PENDING_REPUBLICATION' || vaultStatus === 'DEPUBLISHED') {
             $('.metadata-form-size').addClass('col-lg-8')

@@ -370,15 +370,15 @@ function topInformation (dir) {
         hasReadRights = false
       }
 
-      if (hasReadRights){
+      if (hasReadRights) {
         metadataInfo(dir)
       } else {
         $('.metadata-info').show()
         $('.metadata-title').text(dir)
-        $('.metadata-description').text("N/A")
-        $('.metadata-access').text("N/A")
-        $('.metadata-data-classification').text("N/A")
-        $('.metadata-license').text("N/A")
+        $('.metadata-description').text('N/A')
+        $('.metadata-access').text('N/A')
+        $('.metadata-data-classification').text('N/A')
+        $('.metadata-license').text('N/A')
       }
 
       $('.btn-group button.metadata-form').hide()
