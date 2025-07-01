@@ -15,6 +15,7 @@ let group
 let bounds = [[1, 1], [1, 1]]
 let mymap = null
 let maplayer = null
+let hasReadRights = true
 
 let metadata // Make it global so functions on different levels can access it without having to pass it as a parameter entirely
 // mfunction contains specific presentation functions that are initiated from the template on the base of dpAttr (datapackage attribute)
@@ -180,13 +181,43 @@ $(function () {
     }, 10)
   })
 
-  if (dpIsRestricted) {
-    handleRestrictedMetadataInfo()
-  } else {
-    // First collect the information, then present it
-    handleOpenMetadataInfo(currentFolder)
-  }
+  // TODO: add user check here before handling metadata?
+  metadataInfo(currentFolder)
 })
+
+
+function metadataInfo (dir) {
+  if (typeof dir !== 'undefined') {
+    Yoda.call('vault_collection_details',
+      { path: Yoda.basePath + dir },
+      { quiet: true, rawResult: true }).then((dataRaw) => {
+      const data = dataRaw.data
+      const userType = data.member_type
+      const isDatamanager = data.is_datamanager
+
+      if (userType !== 'none' || isDatamanager) {
+        // Datamanager, Researcher, normal, groupmanager cases
+        hasReadRights = true
+      } else {
+        // Anyone else case
+        hasReadRights = false
+      }
+
+      if (dpIsRestricted) {
+        handleRestrictedMetadataInfo()
+      } else {
+        if (hasReadRights){ 
+          // First collect the information, then present it
+          handleOpenMetadataInfo(currentFolder)
+        } else {
+          $('.metadata-title').text(currentFolder)
+        }
+      }
+    })
+  } else {
+    handleRestrictedMetadataInfo()
+  }
+}
 
 async function handleRestrictedMetadataInfo () {
   /* Collect and present restricted datapackage metadata through the search api based upon a uuid of 1 single datapackage. */

@@ -11,7 +11,7 @@ $(document).ajaxSend(function (e, request, settings) {
 })
 
 let currentFolder
-const hasReadRights = true
+let hasReadRights = true
 
 $(function () {
   // Extract current location from query string (default to '').
@@ -48,7 +48,6 @@ $(function () {
 function browse (dir = '', changeHistory = false) {
   currentFolder = dir
   makeBreadcrumb(dir)
-  metadataInfo(dir)
   topInformation(dir, true) // only here topInformation should show its alertMessage
   buildFileBrowser(dir)
 }
@@ -352,15 +351,35 @@ window.addEventListener('popstate', function (e) {
   browse('dir' in query ? query.dir : '')
 })
 
-function topInformation (dir, showAlert) {
+function topInformation (dir) {
   if (typeof dir !== 'undefined') {
     Yoda.call('vault_collection_details',
       { path: Yoda.basePath + dir }).then((data) => {
       const vaultStatus = data.status
       const vaultActionPending = data.vault_action_pending
       const hasWriteRights = 'yes'
+      const userType = data.member_type
       const isDatamanager = data.is_datamanager
       const actions = []
+
+      if (userType !== 'none' || isDatamanager) {
+        // Datamanager, Researcher, normal, groupmanager cases
+        hasReadRights = true
+      } else {
+        // Anyone else case
+        hasReadRights = false
+      }
+
+      if (hasReadRights){
+        metadataInfo(dir)
+      } else {
+        $('.metadata-info').show()
+        $('.metadata-title').text(dir)
+        $('.metadata-description').text("N/A")
+        $('.metadata-access').text("N/A")
+        $('.metadata-data-classification').text("N/A")
+        $('.metadata-license').text("N/A")
+      }
 
       $('.btn-group button.metadata-form').hide()
       $('.top-information').hide()
