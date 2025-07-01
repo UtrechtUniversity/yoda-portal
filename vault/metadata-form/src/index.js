@@ -101,17 +101,13 @@ const darkThemeColors = {
 const enumWidget = (props) => {
     let enumArray = props['schema']['enum'];
     let enumNames = props['schema']['enumNames'];
-    let title = props['schema']['title'];
-    let placeholder_string = ' ';
+    let placeholderString = props['uiSchema']['ui:placeholder']
 
     if (enumNames == null)
         enumNames = enumArray;
 
-    if (title == 'Research discipline' || title == 'Originating laboratory')
-        placeholder_string = 'Add ' + title.toLowerCase();
-
     let i = enumArray.indexOf(props['value']);
-    let placeholder = enumNames[i] == null ? placeholder_string : enumNames[i];
+    let placeholder = enumNames[i] == null ? (placeholderString ? placeholderString : ' ') : enumNames[i];
 
     let customStyles = {
         control: (styles) => ({
