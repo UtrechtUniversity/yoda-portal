@@ -100,12 +100,13 @@ const darkThemeColors = {
 const enumWidget = (props) => {
     let enumArray = props['schema']['enum'];
     let enumNames = props['schema']['enumNames'];
+    let placeholderString = props['uiSchema']['ui:placeholder']
 
     if (enumNames == null)
         enumNames = enumArray;
 
     let i = enumArray.indexOf(props['value']);
-    let placeholder = enumNames[i] == null ? ' ' : enumNames[i];
+    let placeholder = enumNames[i] == null ? (placeholderString ? placeholderString : ' ') : enumNames[i];
 
     let customStyles = {
         control: (styles) => ({
