@@ -8,7 +8,7 @@
 <script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='js/research.js') }}"></script>
-<script src="{{ url_for('research_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
+<script src="{{ url_for('research_bp.static', filename='js/dlgFileBrowseOperations.js') }}" type="module"></script>
 <script src="{{ url_for('research_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
 {% endblock scripts %}
 
@@ -405,6 +405,7 @@
                             <div class="dropdown-menu" aria-labelledby="multiSelect">
                                 <a class="dropdown-item multiple-move" title="Move">Move</a>
                                 <a class="dropdown-item multiple-copy" title="Copy">Copy</a>
+                                <a class="dropdown-item multiple-download" title="Download">Download</a>
                                 <a class="dropdown-item multiple-delete" title="Delete">Delete</a>
                             </div>
                         </div>
