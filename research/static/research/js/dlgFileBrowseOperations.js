@@ -1,5 +1,5 @@
 /* global $, browse, DOMPurify */
-'use strict'
+import { downloadZip } from '../../../assets/lib/client-zip-2.5.0/index.js'
 
 let folderSelectBrowser = null
 let dlgCurrentFolder = ''
@@ -79,6 +79,86 @@ $(document).ready(function () {
     $('#multi-select-delete').modal('show')
     $('#mutli-select-progress .dlg-multi-action-button').hide()
   })
+
+  $('body').on('click', 'a.multiple-download', async function (event) {
+    event.preventDefault()
+    // Gather checked items
+    const checkedBoxes = $("input[name='multiSelect[]']:checked").toArray()
+
+    // Build the list of download entries
+    const downloadEntries = []
+    for (const box of checkedBoxes) {
+      const $box = $(box)
+      const type = $box.data('type')
+      const name = $box.data('name')
+      const path = $box.val()
+
+      if (type === 'coll') {
+        // Add folder entry
+        downloadEntries.push({ name: name + '/' })
+
+        // Fetch manifest and add each file in the collection
+        const { data } = await Yoda.call(
+          'research_manifest',
+          { coll: Yoda.basePath + path },
+          { quiet: true, rawResult: true }
+        )
+        for (const item of data) {
+          const filepath = `${path}/${item.name}`
+          const url = `/research/browse/download?filepath=${encodeURIComponent(filepath)}`
+          downloadEntries.push({ url, name: name + '/' + item.name })
+        }
+      } else {
+        // Single file: add directly
+        const url = `/research/browse/download?filepath=${encodeURIComponent(path)}`
+        downloadEntries.push({ url, name })
+      }
+    }
+
+    // Trigger ZIP download if we have anything
+    if (downloadEntries.length) {
+      try {
+        await downloadEntriesAsZip(downloadEntries)
+        console.log('ZIP download triggered.')
+      } catch (err) {
+        console.error('ZIP failed:', err)
+      }
+    }
+  })
+
+  async function downloadEntriesAsZip (files) {
+    // Prepare an array of entries for the ZIP.
+    const zipEntries = await Promise.all(
+      files.map(async ({ url, name }) => {
+        // If no URL is provided, include just the name (folder entry).
+        if (!url) return { name }
+
+        // Fetch the file data.
+        const response = await fetch(url)
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`)
+        }
+
+        // Return an entry that client-zip (or similar) can use.
+        return { name, lastModified: Date.now(), input: response }
+      })
+    )
+
+    // Generate the ZIP and get a Blob object.
+    const zipBlob = await downloadZip(zipEntries).blob()
+
+    // Create a temporary anchor element to trigger download.
+    const downloadLink = document.createElement('a')
+    downloadLink.href = URL.createObjectURL(zipBlob)
+    downloadLink.download = 'download.zip'
+
+    // Add the link to the document, click it, then clean up.
+    document.body.appendChild(downloadLink)
+    downloadLink.click()
+    document.body.removeChild(downloadLink)
+    URL.revokeObjectURL(downloadLink.href)
+  }
+
   // handling of breadcrumbs
   $('body').on('click', '.browse-select', function (e) {
     dlgBrowse($(this).attr('data-path'))
