@@ -1,4 +1,4 @@
-/* global $, browse, DOMPurify */
+/* global $, bootstrap, browse, DOMPurify */
 import { downloadZip } from '../../../assets/lib/client-zip-2.5.0/index.js'
 
 let folderSelectBrowser = null
@@ -117,19 +117,21 @@ $(document).ready(function () {
 
     // Trigger ZIP download if we have anything
     if (downloadEntries.length) {
+      bootstrap.Modal.getOrCreateInstance(document.querySelector('#zip-download')).show()
       try {
         await downloadEntriesAsZip(downloadEntries)
         console.log('ZIP download triggered.')
       } catch (err) {
         console.error('ZIP failed:', err)
       }
+      bootstrap.Modal.getOrCreateInstance(document.querySelector('#zip-download')).hide()
     }
   })
 
-  async function downloadEntriesAsZip (files) {
+  async function downloadEntriesAsZip (entries) {
     // Prepare an array of entries for the ZIP.
     const zipEntries = await Promise.all(
-      files.map(async ({ url, name }) => {
+      entries.map(async ({ url, name }) => {
         // If no URL is provided, include just the name (folder entry).
         if (!url) return { name }
 
