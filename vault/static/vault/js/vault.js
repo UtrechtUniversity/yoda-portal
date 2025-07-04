@@ -711,7 +711,7 @@ window.addEventListener('popstate', function (e) {
   browse('dir' in query ? query.dir : '')
 })
 
-function topInformation (dir, showAlert, rebuildFileBrowser = false) {
+function topInformation (dir, rebuildFileBrowser = false) {
   if (typeof dir !== 'undefined') {
     Yoda.call('vault_collection_details',
       { path: Yoda.basePath + dir },
@@ -849,7 +849,16 @@ function topInformation (dir, showAlert, rebuildFileBrowser = false) {
         if (vaultStatus === '' || vaultStatus === 'INCOMPLETE') {
           $('.alert.is-processing').show()
         } else {
-          metadataInfo(dir)
+          if (hasReadRights) {
+            metadataInfo(dir)
+          } else {
+            $('.metadata-info').show()
+            $('.metadata-title').text(dir)
+            $('.metadata-description').text('N/A')
+            $('.metadata-access').text('N/A')
+            $('.metadata-data-classification').text('N/A')
+            $('.metadata-license').text('N/A')
+          }
           if (vaultStatus === 'PUBLISHED' || vaultStatus === 'PENDING_DEPUBLICATION' || vaultStatus === 'PENDING_REPUBLICATION' || vaultStatus === 'DEPUBLISHED') {
             $('.metadata-form-size').addClass('col-lg-8')
             $('.meta-title-size').removeClass('col-lg-2').addClass('col-lg-3')
@@ -1146,7 +1155,7 @@ function metadataInfo (dir) {
       { coll: Yoda.basePath + dir },
       { quiet: true, rawResult: true })
       .then((result) => {
-        if (!result || Object.keys(result.data).length === 0) { return console.info('No result data from meta_form_load') }
+        if (!result || !result.data || Object.keys(result.data).length === 0) { return console.info('No result data from meta_form_load') }
 
         const metadata = result.data.metadata
         $('.metadata-info').show()
