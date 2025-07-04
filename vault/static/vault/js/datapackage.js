@@ -181,7 +181,6 @@ $(function () {
     }, 10)
   })
 
-  // TODO: add user check here before handling metadata?
   metadataInfo(currentFolder)
 })
 
