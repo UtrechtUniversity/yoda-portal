@@ -65,6 +65,10 @@
         color: var(--bs-white);
     }
 
+    .dropdown-item.disabled {
+      color: var(--bs-dropdown-link-disabled-color) !important;
+    }
+
     /* Select 2 selectors */
     .select2-container, .select2-search-container, .select2-input, .select2-chosen, .select2-drop, .select2-drop-mask {
         color: var(--bs-body-color);

@@ -19,6 +19,8 @@ let currentFolder
 let currentFile
 let filenames = []
 let hasReadRights = true
+let hasWriteRights = true
+let status = ''
 let uploadFolder = false
 
 $(function () {
@@ -1141,7 +1143,31 @@ function startBrowsing () {
     serverSide: true,
     iDeferLoading: 0,
     order: [[1, 'asc']],
-    pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
+    pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength')),
+    drawCallback: function (settings) {
+      const actions = {
+        multi: ['a.multiple-copy', 'a.multiple-move', 'a.multiple-delete'],
+        folder: ['a.folder-delete', 'a.folder-rename', 'a.folder-copy', 'a.folder-move'],
+        file: ['a.file-delete', 'a.file-rename', 'a.file-copy', 'a.file-move']
+      }
+
+      // Toggle disabled class.
+      const toggle = (sels, enable) =>
+        sels.flat().forEach(s => $(s).toggleClass('disabled', !enable))
+
+      // Disable all actions.
+      toggle(Object.values(actions), false)
+
+      if (hasReadRights) {
+        // Enable copy actions.
+        toggle(Object.values(actions).map(arr => arr.filter(s => s.endsWith('-copy'))), true)
+      }
+
+      if (hasWriteRights && (status === '' || status === 'REJECTED' || status === 'SECURED' || status === 'FOLDER')) {
+        // Enable all actions.
+        toggle(Object.values(actions), true)
+      }
+    }
   })
   $('#file-browser').on('length.dt', function (e, settings, len) {
     Yoda.storage.session.set('pageLength', len)
@@ -1264,12 +1290,11 @@ function topInformation (dir, showAlert) {
       const data = dataRaw.data
       let statusText = ''
       const basename = data.basename
-      const status = data.status
       const userType = data.member_type
-      let hasWriteRights = true
       const isDatamanager = data.is_datamanager
       const lockCount = data.lock_count
       const isLocked = data.is_locked
+      status = data.status
       let actions = []
 
       $('.btn-group button.metadata-form').hide()
@@ -1278,16 +1303,6 @@ function topInformation (dir, showAlert) {
       $('.btn-group button.upload').prop('disabled', true)
       $('.btn-group button.folder-create').attr('data-path', '')
       $('.btn-group button.folder-create').prop('disabled', true)
-
-      $('a.folder-delete').addClass('disabled')
-      $('a.folder-rename').addClass('disabled')
-      $('a.folder-copy').addClass('disabled')
-      $('a.folder-move').addClass('disabled')
-
-      $('a.file-delete').addClass('disabled')
-      $('a.file-rename').addClass('disabled')
-      $('a.file-copy').addClass('disabled')
-      $('a.file-move').addClass('disabled')
 
       $('.top-information').hide()
       $('.top-info-buttons').hide()
@@ -1337,6 +1352,8 @@ function topInformation (dir, showAlert) {
 
       if (isLocked) {
         hasWriteRights = false
+      } else {
+        hasWriteRights = true
       }
 
       if (userType === 'reader' || userType === 'none') {
@@ -1366,7 +1383,9 @@ function topInformation (dir, showAlert) {
         if (uploadMenuTooltip) {
           uploadMenuTooltip.enable()
         }
-      } else if (hasWriteRights && (status === '' || status === 'REJECTED' || status === 'SECURED' || status === 'FOLDER')) {
+      }
+
+      if (hasWriteRights && (status === '' || status === 'REJECTED' || status === 'SECURED' || status === 'FOLDER')) {
         // Check if folder is writable.
         // Enable uploads.
         $('.btn-group button.upload').attr('data-path', dir)
@@ -1375,15 +1394,6 @@ function topInformation (dir, showAlert) {
         // Enable folder / file manipulations.
         $('.btn-group button.folder-create').attr('data-path', dir)
         $('.btn-group button.folder-create').prop('disabled', false)
-
-        $('a.folder-rename').removeClass('disabled')
-        $('a.folder-copy').removeClass('disabled')
-        $('a.folder-move').removeClass('disabled')
-        $('a.folder-delete').removeClass('disabled')
-        $('a.file-rename').removeClass('disabled')
-        $('a.file-copy').removeClass('disabled')
-        $('a.file-move').removeClass('disabled')
-        $('a.file-delete').removeClass('disabled')
       }
 
       // Lock icon
@@ -1420,6 +1430,10 @@ function topInformation (dir, showAlert) {
 
       const icon = '<i class="fa-regular fa-folder-open" aria-hidden="true"></i>'
       $('.top-information h2').html(`<span class="icon">${icon}</span> ${folderName}${lockIcon}${systemMetadataIcon}${actionLogIcon}${statusBadge}`)
+
+      // Redraw file browser to update context menus.
+      const fileBrowser = $('#file-browser').DataTable()
+      fileBrowser.draw(false)
 
       // Show top information and buttons.
       if (typeof status !== 'undefined') {
