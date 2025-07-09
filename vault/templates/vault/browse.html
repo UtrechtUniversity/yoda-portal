@@ -12,7 +12,7 @@
 <script src="{{ url_for('static', filename='lib/purify-3.2.6/js/purify.min.js') }}"></script>
 <script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
 <script src="{{ url_for('vault_bp.static', filename='js/vault.js') }}"></script>
-<script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}"></script>
+<script src="{{ url_for('vault_bp.static', filename='js/dlgSelectCollection.js') }}" type="module"></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -287,6 +287,22 @@
     </div>
 </div>
 
+<div class="modal" tabindex="-1" role="dialog" id="zip-download">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Download is being prepared
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Your download is being prepared <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <nav aria-label="breadcrumb">
     <div class="breadcrumb-container">
         <a class="btn btn-sm btn-secondary float-end btn-go-to-research mt-2 me-2" data-bs-toggle="tooltip" data-bs-title="Go to research space of group" research-area="">Go to research</a>
@@ -391,6 +407,15 @@
 <table id="file-browser" class="table yoda-table table-striped">
     <thead>
     <tr>
+        <th scope="col">
+            <input class="form-check-input" type="checkbox" id="multi-select-all">
+            <div class="dropdown float-end">
+                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle hide" data-bs-toggle="dropdown" id="multiSelect" aria-haspopup="true" aria-expanded="false"></button>
+                <div class="dropdown-menu" aria-labelledby="multiSelect">
+                    <a class="dropdown-item multiple-download" title="Download">Download</a>
+                </div>
+            </div>
+        </th>
         <th scope="col">Name</th>
         <th scope="col">Size</th>
         <th scope="col">Modified date</th>
