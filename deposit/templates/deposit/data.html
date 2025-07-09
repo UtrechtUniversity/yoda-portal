@@ -19,7 +19,7 @@
 <script src="{{ url_for('deposit_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='js/data.js') }}"></script>
-<script src="{{ url_for('deposit_bp.static', filename='js/dlgFileBrowseOperations.js') }}"></script>
+<script src="{{ url_for('deposit_bp.static', filename='js/dlgFileBrowseOperations.js') }}" type="module"></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -53,6 +53,22 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-close-uploads-overview" data-bs-dismiss="modal" title="Close">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="zip-download">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Download is being prepared
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Your download is being prepared <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
             </div>
         </div>
     </div>
@@ -113,6 +129,7 @@
                             <div class="dropdown-menu" aria-labelledby="multiSelect">
                                 <a class="dropdown-item multiple-move" title="Move">Move</a>
                                 <a class="dropdown-item multiple-copy" title="Copy">Copy</a>
+                                <a class="dropdown-item multiple-download" title="Download">Download</a>
                                 <a class="dropdown-item multiple-delete" title="Delete">Delete</a>
                             </div>
                         </div>
