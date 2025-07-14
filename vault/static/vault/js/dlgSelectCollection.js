@@ -359,7 +359,7 @@ $('body').on('click', 'a.multiple-download', async function (event) {
       // Fetch manifest and add each file in the collection
       const { data } = await Yoda.call(
         'research_manifest',
-        { coll: Yoda.basePath + path },
+        { coll: Yoda.basePath + path, empty_colls: true },
         { quiet: true, rawResult: true }
       )
       for (const item of data) {
