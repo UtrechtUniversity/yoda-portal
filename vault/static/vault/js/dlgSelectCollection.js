@@ -365,7 +365,12 @@ $('body').on('click', 'a.multiple-download', async function (event) {
       for (const item of data) {
         const filepath = `${path}/${item.name}`
         const url = `/vault/browse/download?filepath=${encodeURIComponent(filepath)}`
-        downloadEntries.push({ url, name: name + '/' + item.name })
+
+        if (!item.name.endsWith('/')) {
+          downloadEntries.push({ url, name: name + '/' + item.name })
+        } else {
+          downloadEntries.push({ name: name + '/' + item.name })
+        }
       }
     } else {
       // Single file: add directly
