@@ -3,6 +3,7 @@
 __copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import csv
 import io
 import urllib.parse
 from typing import Iterator
@@ -156,4 +157,3 @@ def download_report() -> Response:
         mimetype=mime,
         headers={'Content-disposition': 'attachment; filename=checksums' + ext}
     )
-
