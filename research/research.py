@@ -304,7 +304,6 @@ def form() -> Response:
 
 @research_bp.route('/browse/download_checksum_report')
 def download_report() -> Response:
-    output = ""
     path = request.args.get("path")
     format = request.args.get("format")
     coll = "/" + g.irods.zone + "/home" + path
@@ -325,6 +324,7 @@ def download_report() -> Response:
     else:
         mime = 'text/plain'
         ext = '.txt'
+        output = ""
         if response['status'] == 'ok':
             for result in response["data"]:
                 output += f"{result['name']} {result['size']} {result['checksum']} \n"
