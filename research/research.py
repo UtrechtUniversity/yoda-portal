@@ -4,6 +4,7 @@ from __future__ import annotations
 __copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import csv
 import io
 import os
 import queue
@@ -312,9 +313,15 @@ def download_report() -> Response:
     if format == 'csv':
         mime = 'text/csv'
         ext = '.csv'
+
+        # create CSV output with quotes
+        output = io.StringIO()
+        writer = csv.writer(output, quoting=csv.QUOTE_MINIMAL)
+
+        writer.writerow(["filename", "size", "checksum"])
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']},{result['size']},{result['checksum']} \n"
+                writer.writerow([result['name'], result['size'], result['checksum']])
     else:
         mime = 'text/plain'
         ext = '.txt'
@@ -323,7 +330,7 @@ def download_report() -> Response:
                 output += f"{result['name']} {result['size']} {result['checksum']} \n"
 
     return Response(
-        output,
+        output.getvalue(),
         mimetype=mime,
         headers={'Content-disposition': 'attachment; filename=checksums' + ext}
     )
