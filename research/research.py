@@ -314,26 +314,26 @@ def download_report() -> Response:
         ext = '.csv'
 
         # create CSV output with quotes
-        output = io.StringIO()
-        writer = csv.writer(output, quoting=csv.QUOTE_MINIMAL)
+        output_io = io.StringIO()
+        writer = csv.writer(output_io, quoting=csv.QUOTE_MINIMAL)
 
         writer.writerow(["filename", "size", "checksum"])
         if response['status'] == 'ok':
             for result in response["data"]:
                 writer.writerow([result['name'], result['size'], result['checksum']])
 
-        final_output = output.getvalue()
+        output = output_io.getvalue()
     else:
         mime = 'text/plain'
         ext = '.txt'
-        output = ""
+        output_str = ""
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']} {result['size']} {result['checksum']} \n"
-        final_output = output
-        
+                output_str += f"{result['name']} {result['size']} {result['checksum']} \n"
+        output = output_str
+
     return Response(
-        final_output    ,
+        output,
         mimetype=mime,
         headers={'Content-disposition': 'attachment; filename=checksums' + ext}
     )
