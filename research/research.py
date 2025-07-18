@@ -305,7 +305,7 @@ def form() -> Response:
 @research_bp.route('/browse/download_checksum_report')
 def download_report() -> Response:
     path = request.args.get("path")
-    format_param = request.args.get("format", "csv")  # default to 'csv'
+    format = request.args.get("format")
     coll = "/" + g.irods.zone + "/home" + path
     response = api.call('research_manifest', data={'coll': coll})
 
