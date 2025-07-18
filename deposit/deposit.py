@@ -155,7 +155,6 @@ def download_report() -> Response:
     )
 
 
-
 @deposit_bp.route('/metadata')
 def metadata() -> Response:
     """Step 2: Document data"""
