@@ -4,6 +4,7 @@ from __future__ import annotations
 __copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import csv
 import io
 import os
 import queue
@@ -303,7 +304,6 @@ def form() -> Response:
 
 @research_bp.route('/browse/download_checksum_report')
 def download_report() -> Response:
-    output = ""
     path = request.args.get("path")
     format = request.args.get("format")
     coll = "/" + g.irods.zone + "/home" + path
@@ -312,15 +312,21 @@ def download_report() -> Response:
     if format == 'csv':
         mime = 'text/csv'
         ext = '.csv'
+        output_io = io.StringIO()
+        writer = csv.writer(output_io, quoting=csv.QUOTE_MINIMAL)
+        writer.writerow(["filename", "size", "checksum"])
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']},{result['size']},{result['checksum']} \n"
+                writer.writerow([result['name'], result['size'], result['checksum']])
+        output = output_io.getvalue()
     else:
         mime = 'text/plain'
         ext = '.txt'
+        lines = []
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']} {result['size']} {result['checksum']} \n"
+                lines.append(f"{result['name']} {result['size']} {result['checksum']}")
+        output = "\n".join(lines)
 
     return Response(
         output,
