@@ -305,7 +305,7 @@ def form() -> Response:
 @research_bp.route('/browse/download_checksum_report')
 def download_report() -> Response:
     path = request.args.get("path")
-    format = request.args.get("format")
+    format_param = request.args.get("format", "csv")  # default to 'csv'
     coll = "/" + g.irods.zone + "/home" + path
     response = api.call('research_manifest', data={'coll': coll})
 
@@ -322,11 +322,11 @@ def download_report() -> Response:
     else:
         mime = 'text/plain'
         ext = '.txt'
-        output_str = ""
+        lines = []
         if response['status'] == 'ok':
             for result in response["data"]:
-                output_str += f"{result['name']} {result['size']} {result['checksum']} \n"
-        output = output_str
+                lines.append(f"{result['name']} {result['size']} {result['checksum']}")
+        output = "\n".join(lines)
 
     return Response(
         output,
