@@ -312,16 +312,12 @@ def download_report() -> Response:
     if format == 'csv':
         mime = 'text/csv'
         ext = '.csv'
-
-        # create CSV output with quotes
         output_io = io.StringIO()
         writer = csv.writer(output_io, quoting=csv.QUOTE_MINIMAL)
-
         writer.writerow(["filename", "size", "checksum"])
         if response['status'] == 'ok':
             for result in response["data"]:
                 writer.writerow([result['name'], result['size'], result['checksum']])
-
         output = output_io.getvalue()
     else:
         mime = 'text/plain'

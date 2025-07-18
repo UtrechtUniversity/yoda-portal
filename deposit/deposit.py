@@ -123,7 +123,6 @@ def download() -> Response:
 
 @deposit_bp.route('/browse/download_checksum_report')
 def download_report() -> Response:
-    output = ""
     path = request.args.get("path")
     format = request.args.get("format")
     coll = "/" + g.irods.zone + "/home" + path
@@ -132,21 +131,28 @@ def download_report() -> Response:
     if format == 'csv':
         mime = 'text/csv'
         ext = '.csv'
+        output_io = io.StringIO()
+        writer = csv.writer(output_io, quoting=csv.QUOTE_MINIMAL)
+        writer.writerow(["filename", "size", "checksum"])
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']},{result['size']},{result['checksum']} \n"
+                writer.writerow([result['name'], result['size'], result['checksum']])
+        output = output_io.getvalue()
     else:
         mime = 'text/plain'
         ext = '.txt'
+        output_str = ""
         if response['status'] == 'ok':
             for result in response["data"]:
-                output += f"{result['name']} {result['size']} {result['checksum']} \n"
+                output_str += f"{result['name']} {result['size']} {result['checksum']} \n"
+        output = output_str
 
     return Response(
         output,
         mimetype=mime,
         headers={'Content-disposition': 'attachment; filename=checksums' + ext}
     )
+
 
 
 @deposit_bp.route('/metadata')
