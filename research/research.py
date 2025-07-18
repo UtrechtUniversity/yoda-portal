@@ -321,6 +321,8 @@ def download_report() -> Response:
         if response['status'] == 'ok':
             for result in response["data"]:
                 writer.writerow([result['name'], result['size'], result['checksum']])
+
+        final_output = output.getvalue()
     else:
         mime = 'text/plain'
         ext = '.txt'
@@ -328,9 +330,10 @@ def download_report() -> Response:
         if response['status'] == 'ok':
             for result in response["data"]:
                 output += f"{result['name']} {result['size']} {result['checksum']} \n"
-
+        final_output = output
+        
     return Response(
-        output.getvalue(),
+        final_output    ,
         mimetype=mime,
         headers={'Content-disposition': 'attachment; filename=checksums' + ext}
     )
