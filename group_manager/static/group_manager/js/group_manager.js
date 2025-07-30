@@ -1208,7 +1208,7 @@ $(function () {
 
           // Construct the user element with appropriate classes and attributes.
           const userAccessClass = `user-access-${user.access}`
-          const userStatusClass = (invited || actionsDisabled) ? 'disabled' : ''
+          const userStatusClass = (actionsDisabled) ? 'disabled' : ''
           const selfClass = isCurrentUser ? 'self' : ''
 
           $user.html(`
