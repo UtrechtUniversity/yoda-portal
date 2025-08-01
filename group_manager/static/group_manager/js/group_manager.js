@@ -1159,42 +1159,49 @@ $(function () {
         }).forEach(function (userName, i) {
           // Loop through the sorted user list and generate the #userList element.
           const user = users[userName]
-
           const $user = $('<span>')
 
-          // Check if user is current user.
-          let me = false
-          if (userName === that.userNameFull) {
-            me = true
-            if (!that.isRodsAdmin) {
-              $user.attr('data-bs-toggle', 'tooltip')
-              $user.attr('data-bs-title', 'You cannot change your own role or remove yourself from this group')
+          // Check if the user is the current user.
+          const isCurrentUser = userName === that.userNameFull
+          let actionsDisabled = false
+
+          // Disable actions on self if not manager or rodsadmin.
+          if (isCurrentUser) {
+            if (user.access !== 'manager' && !that.isRodsAdmin) {
+              actionsDisabled = true
+              $user.attr({
+                'data-bs-toggle': 'tooltip',
+                'data-bs-title': 'You cannot change your own role or remove yourself from this group'
+              })
             }
           }
 
           // Open SRAM invitation.
-          let invited = false
-          if (typeof user.sram !== 'undefined') {
-            invited = true
-            $user.attr('data-bs-toggle', 'tooltip')
-            $user.attr('data-bs-title', 'This user has not accepted the SRAM invitation')
+          const invited = typeof user.sram !== 'undefined'
+          if (invited) {
+            $user.attr({
+              'data-bs-toggle': 'tooltip',
+              'data-bs-title': 'This user has not accepted the SRAM invitation'
+            })
           }
 
-          let displayName = userName
+          // Determine display name based on zone.
           const nameAndZone = userName.split('#')
-          // Only display a user's zone if it differs
-          // from the client's zone.
-          if (nameAndZone[1] === that.zone) { displayName = nameAndZone[0] }
+          const displayName = (nameAndZone[1] === that.zone) ? nameAndZone[0] : userName
 
-          $user.html('<a id="user-' + i + '" class="list-group-item list-group-item-action user user-access-' +
-                     user.access + ((invited || me) ? ' disabled' : '') + (me ? ' self' : '') + '" data-name="' + userName + '">' +
-                     '<input class="form-check-input" type="checkbox" value=""> <i class="fa-solid ' +
-                     (invited ? that.accessIcons.invited : that.accessIcons[user.access]) +
-                     '" aria-hidden="true" title="' +
-                     that.accessNames[user.access] +
-                     '"></i> ' +
-                     Yoda.htmlEncode(displayName) +
-                     '</a>')
+          // Construct the user element with appropriate classes and attributes.
+          const userAccessClass = `user-access-${user.access}`
+          const userStatusClass = (invited || actionsDisabled) ? 'disabled' : ''
+          const selfClass = isCurrentUser ? 'self' : ''
+
+          $user.html(`
+              <a id="user-${i}" class="list-group-item list-group-item-action user ${userAccessClass} ${userStatusClass} ${selfClass}" data-name="${userName}">
+                  <input class="form-check-input" type="checkbox" value="">
+                  <i class="fa-solid ${invited ? that.accessIcons.invited : that.accessIcons[user.access]}" aria-hidden="true" title="${that.accessNames[user.access]}"></i>
+                  ${Yoda.htmlEncode(displayName)}
+              </a>
+          `)
+
           $userList.append($user)
         })
 
