@@ -594,6 +594,9 @@ async function removeUserFromGroup (row, groupName) {
 }
 
 $(function () {
+  // Store the initial state of the CSV import instructions
+  let initialImportCsvHtml = $('#result-import-groups-csv').html()
+
   // Multiple user role change
   $('.users.card .update-button').on('click', function (e) {
     const newRole = $(this).attr('data-target-role')
@@ -643,6 +646,20 @@ $(function () {
 
   $('.import-groups-csv').on('click', function () {
     $('#dlg-import-groups-csv').modal('show')
+  })
+
+  $('#dlg-import-groups-csv').on('hidden.bs.modal', function() {
+    // Safeguard: Store initial instructions if undefined (do this once at page load)
+    if (typeof initialImportCsvHtml === 'undefined') {
+        initialImportCsvHtml = $('#result-import-groups-csv').html()
+    }
+    
+    // Restore initial state
+    $('#result-import-groups-csv').html(initialImportCsvHtml)
+    // Hide the process CSV button
+    $('.div-process-results-import').addClass('hidden')
+    $('.process-csv').prop('disabled', true)
+    $('#file-input').val('') // Clear file input
   })
 
   $('.process-csv').on('click', function () {
