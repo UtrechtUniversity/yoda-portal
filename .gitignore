@@ -33,7 +33,7 @@ coverage.xml
 docs/_build/
 
 # Node modules
-/metadata_form/src/node_modules/
+node_modules
 
 # Python Virtual Environment
 /venv/
