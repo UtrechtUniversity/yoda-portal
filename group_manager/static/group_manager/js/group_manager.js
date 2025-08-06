@@ -648,12 +648,12 @@ $(function () {
     $('#dlg-import-groups-csv').modal('show')
   })
 
-  $('#dlg-import-groups-csv').on('hidden.bs.modal', function() {
+  $('#dlg-import-groups-csv').on('hidden.bs.modal', function () {
     // Safeguard: Store initial instructions if undefined (do this once at page load)
     if (typeof initialImportCsvHtml === 'undefined') {
-        initialImportCsvHtml = $('#result-import-groups-csv').html()
+      initialImportCsvHtml = $('#result-import-groups-csv').html()
     }
-    
+
     // Restore initial state
     $('#result-import-groups-csv').html(initialImportCsvHtml)
     // Hide the process CSV button
