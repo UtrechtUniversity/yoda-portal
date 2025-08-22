@@ -51,7 +51,7 @@ async function getTextObj (currentFileExtension) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('load', function () {
   document.getElementById('file-output').style.display = 'none'
 
   // Extract current location from query string (default to '').
