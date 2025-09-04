@@ -1984,7 +1984,11 @@ $(function () {
         // Re-enable group list entry.
         $('#group-list .group.delete-pending[data-name="' + Yoda.escapeQuotes(groupName) + '"]').removeClass('delete-pending disabled').attr('title', '')
 
-        if ('message' in result) { window.alert(result.message) } else {
+        if ('message' in result) {
+          window.alert(result.message)
+        } else if ('status_info' in result) {
+          window.alert(result.status_info)
+        } else {
           window.alert(
             'Error: Could not remove the selected group due to an internal error.\n' +
                                 'Please contact a Yoda administrator'
