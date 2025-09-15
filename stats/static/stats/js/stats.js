@@ -10,8 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const searchGroupTable = document.getElementById('search-group-table')
   searchGroupTable.addEventListener('keyup', function () {
-    const dataTable = groupBrowser.DataTable()
-    dataTable.search(searchGroupTable.value).draw()
+    if (groupBrowser._dataTableInstance) {
+      groupBrowser._dataTableInstance.search(searchGroupTable.value).draw()
+    }
   })
 
   const startDateMin = document.getElementById('startdate_min')
@@ -377,7 +378,7 @@ function startBrowsing () {
     },
     pageLength: parseInt(Yoda.storage.session.get('pageLength') === null ? Yoda.settings.number_of_items : Yoda.storage.session.get('pageLength'))
   })
-
+  groupBrowser._dataTableInstance = dataTable
   groupBrowser.addEventListener('length.dt', function (e, settings, len) {
     Yoda.storage.session.set('pageLength', len)
   })
