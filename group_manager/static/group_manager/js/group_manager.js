@@ -546,7 +546,7 @@ async function processUserroleChange (row, newRole, groupName) {
       Yoda.groupManager.deselectGroup()
       Yoda.groupManager.selectGroup(groupName)
 
-      Yoda.set_message('success', `Roles for user ${ userName.split('#')[0] } were updated successfully.`)
+      Yoda.set_message('success', `Roles for user ${userName.split('#')[0]} were updated successfully.`)
     }
   } else {
     // Something went wrong
@@ -555,14 +555,14 @@ async function processUserroleChange (row, newRole, groupName) {
       .attr('title', '')
 
     // Handle error
-    const errorMessage = result.message || result.status_info || 
+    const errorMessage = result.message || result.status_info ||
         'Error: Could not change the role for the selected member due to an internal error.\n' +
         'Please contact a Yoda administrator'
     Yoda.set_message('error', errorMessage)
     row.addClass('update-done')
   }
 
-  document.querySelector('.alert').scrollIntoView({ behavior: "smooth"})
+  document.querySelector('.alert').scrollIntoView({ behavior: 'smooth' })
 }
 
 async function removeUserFromGroup (row, groupName) {
