@@ -561,6 +561,8 @@ async function processUserroleChange (row, newRole, groupName) {
     Yoda.set_message('error', errorMessage)
     row.addClass('update-done')
   }
+
+  document.querySelector('.alert').scrollIntoView({ behavior: "smooth"})
 }
 
 async function removeUserFromGroup (row, groupName) {
