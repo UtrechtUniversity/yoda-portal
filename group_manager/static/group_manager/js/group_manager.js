@@ -1331,7 +1331,7 @@ $(function () {
     deselectUser: function () {
       const $userPanel = $('.card.users')
       const $userList = $('#user-list')
-      const viewerButton = document.querySelector("update-button[data-target-role='reader']")
+      const viewerButton = document.querySelector(".update-button[data-target-role='reader']")
       $userList.find('.active').removeClass('active')
       $userPanel.find('.update-button, .delete-button').addClass('disabled')
       // Re-enable the viewer button
