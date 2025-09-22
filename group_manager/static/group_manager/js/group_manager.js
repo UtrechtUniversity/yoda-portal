@@ -1307,12 +1307,21 @@ $(function () {
       // inform users of member count and selection count
       this.updateGroupMemberCount($('#group-list .active.group').attr('data-name'))
 
-      const countSelected = $('#user-list .active').length
+      const $usersSelected = $('#user-list .active')
+      const usersSelected = document.querySelectorAll('#user-list .active')
+      const countSelected = $usersSelected.length
       const $userPanel = $('.card.users')
       if (this.canManageGroup($('#group-list .active.group').attr('data-name'))) {
         if (countSelected > 0) {
           $userPanel.find('.delete-button').removeClass('disabled')
           $userPanel.find('.update-button').removeClass('disabled')
+
+          // Disable demoting current user to viewer if current user is a group manager,
+          // it needs to be two step process
+          const viewerButton = document.querySelector(".update-button[data-target-role='reader']")
+          if (usersSelected != null && viewerButton != null && Array.prototype.some.call(usersSelected, (item) => this.userNameFull === item.getAttribute('data-name'))) {
+            viewerButton.classList.add('disabled')
+          }
           return
         }
       }
@@ -1327,8 +1336,13 @@ $(function () {
     deselectUser: function () {
       const $userPanel = $('.card.users')
       const $userList = $('#user-list')
+      const viewerButton = document.querySelector(".update-button[data-target-role='reader']")
       $userList.find('.active').removeClass('active')
       $userPanel.find('.update-button, .delete-button').addClass('disabled')
+      // Re-enable the viewer button
+      if (viewerButton != null) {
+        viewerButton.classList.remove('disabled')
+      }
     },
 
     /**
