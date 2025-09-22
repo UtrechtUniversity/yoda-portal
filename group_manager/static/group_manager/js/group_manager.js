@@ -539,27 +539,32 @@ async function processUserroleChange (row, newRole, groupName) {
     // Set the internal administration with latest situation without having to reach for the dbs
     Yoda.groupManager.groups[groupName].members[userName].access = newRole
 
-    // when update-done length is equal to active length, all has been dealt with.
-    // => Data must be reloaded
-    if ($('#user-list .active').length === $('#user-list .update-done').length) {
-      // Force-regenerate the user list after completion of the entire process
-      Yoda.groupManager.deselectGroup()
-      Yoda.groupManager.selectGroup(groupName)
-
-      Yoda.set_message('success', 'User roles were updated successfully.')
-    }
+    Yoda.set_message('success', `Roles for user ${userName.split('#')[0]} were updated successfully.`)
   } else {
     // Something went wrong
     $('#user-list .user.update-pending[data-name="' + Yoda.escapeQuotes(userName) + '"]')
       .removeClass('update-pending disabled')
       .attr('title', '')
 
+    // Row that failed should be removed from active
+    row.removeClass('active')
+
     // Handle error
-    const errorMessage = result.message ||
+    const errorMessage = result.message || result.status_info ||
         'Error: Could not change the role for the selected member due to an internal error.\n' +
         'Please contact a Yoda administrator'
-    window.alert(errorMessage)
+    Yoda.set_message('error', errorMessage)
   }
+
+  // When number of selected rows is equal to number of successfully updated rows, all has been dealt with.
+  // => Data must be reloaded
+  if ($('#user-list .active').length === $('#user-list .update-done').length) {
+    // Force-regenerate the user list after completion of the entire process
+    Yoda.groupManager.deselectGroup()
+    Yoda.groupManager.selectGroup(groupName)
+  }
+
+  document.querySelector('.alert').scrollIntoView({ behavior: 'smooth' })
 }
 
 async function removeUserFromGroup (row, groupName) {
