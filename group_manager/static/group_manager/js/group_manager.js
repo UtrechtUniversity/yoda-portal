@@ -1825,7 +1825,7 @@ $(function () {
       }
 
       if (!newProperties.name.startsWith('datamanager-') && !newProperties.name.match(/^(intake|research|deposit)-([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
-        window.alert('Group names may only contain lowercase letters (a-z) and hyphens (-).')
+        window.alert('Group names may only contain numbers, lowercase letters (a-z), and hyphens (-).')
         resetSubmitButton()
         return
       }
@@ -1833,6 +1833,10 @@ $(function () {
       // Check if category is valid.
       if (newProperties.category === '') {
         window.alert('Please select a category.')
+        resetSubmitButton()
+        return
+      } else if (newProperties.category.length > 2700) {
+        window.alert('The category name may be a max of 2700 characters long.')
         resetSubmitButton()
         return
       } else if (!newProperties.category.match(/^([a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/)) {
@@ -1844,6 +1848,10 @@ $(function () {
       // Check if subcategory is valid.
       if (newProperties.subcategory === '') {
         window.alert('Please select a subcategory.')
+        resetSubmitButton()
+        return
+      } else if (newProperties.subcategory.length > 2700) {
+        window.alert('The subcategory name may be a max of 2700 characters long.')
         resetSubmitButton()
         return
       } else if (!newProperties.subcategory.match(/^[a-zA-Z0-9,.()_ -]*$/)) {
@@ -1879,6 +1887,10 @@ $(function () {
       // Check if group description is valid.
       if (!newProperties.description.match(/^[a-zA-Z0-9,.()_ -]*$/)) {
         window.alert('The group description may only contain letters a-z, numbers, spaces, comma\'s, periods, parentheses, underscores (_) and hyphens (-).')
+        resetSubmitButton()
+        return
+      } else if (newProperties.description.length > 2700) {
+        window.alert('The group description may be a max of 2700 characters long.')
         resetSubmitButton()
         return
       }
@@ -2017,16 +2029,16 @@ $(function () {
     },
 
     /**
-         * \brief User add form submission handler.
-         *
-         * Adds a user to the selected group.
-         *
-         * `this` is assumed to be the groupManager object, not the form element
-         * that was submitted.
-         *
-         * \param el the form element
-         * \param e  a submit event
-         */
+      * \brief User add form submission handler.
+      *
+      * Adds a user to the selected group.
+      *
+      * `this` is assumed to be the groupManager object, not the form element
+      * that was submitted.
+      *
+      * \param el the form element
+      * \param e  a submit event
+      */
     onSubmitUserCreate: async function (el, e) {
       e.preventDefault()
 
