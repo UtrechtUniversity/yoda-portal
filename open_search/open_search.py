@@ -390,19 +390,10 @@ def _metadata() -> Response:
         avus = res['matches'][0]
         metadata_json = avus['attributes']
 
-    # Query data package on UUID.
-    res = faceted_query('Data_Package_Reference', uuid, [], [], size=1)  # type: ignore[no-untyped-call]
-
-    # Transform search result into data package metadata.
-    deposit_date = ""
-    if res['total_matches'] == 1:
-        data_package = res['matches'][0]
-
-        for attribute in data_package['attributes']:
-            name = attribute['name']
-            value = attribute['value']
-            if name == 'Creation_Time':
-                deposit_date = datetime.utcfromtimestamp(int(value)).strftime('%Y-%m-%d')
+        deposit_date = ""
+        for attribute in metadata_json:
+            if attribute == 'Creation_Time':
+                deposit_date = datetime.utcfromtimestamp(int(metadata_json[attribute])).strftime('%Y-%m-%d')
 
     response = jsonify({"metadata": metadata_json, "deposit_date": deposit_date})
     response.status_code = res['status']
@@ -462,7 +453,7 @@ def metadata(value: str) -> Dict[str, Any]:
         },
         'matches': matches,
         'total_matches': response['hits']['total']['value'],
-        'status': 'ok'
+        'status': 200
     }
 
     return result
