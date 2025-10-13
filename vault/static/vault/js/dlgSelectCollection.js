@@ -29,8 +29,18 @@ $(document).ready(function () {
     dlgShowFolderSelectDialog($(this).attr('data-folder'))
   })
 
-  $('#btn-copy-package').on('click', function () {
-    copyVaultPackageToDynamic(urlEncodedOrigin, urlEncodedPath)
+  $('#btn-copy-package').on('click', async function () {
+    const $btn = $(this)
+
+    // Disable button and show spinner
+    $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i> Registering copy...')
+
+    try {
+      await copyVaultPackageToDynamic(urlEncodedOrigin, urlEncodedPath)
+    } finally {
+      // Re-enable button after operation completes
+      $btn.prop('disabled', false).html('<i class="fa-solid fa-copy"></i> Copy package to research area')
+    }
   })
 })
 
