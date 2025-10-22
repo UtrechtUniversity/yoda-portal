@@ -770,9 +770,17 @@ function topInformation (dir, rebuildFileBrowser = false) {
       const baseDOI = data.base_doi
       const packageDOI = data.package_doi
 
+      const pathParts = dir.split('/')
+
       $('.btn-group button.metadata-form').hide()
-      $('.top-information').hide()
-      $('.top-info-buttons').hide()
+
+      if (pathParts.length < 2){
+        $('.top-information').hide()
+        $('.top-info-buttons').hide()
+      } else {
+        $('.top-information').show()
+        $('.top-info-buttons').show()        
+      }
 
       if (userType !== 'none' || isDatamanager) {
         // Datamanager, Researcher, normal, groupmanager cases
@@ -959,7 +967,11 @@ function topInformation (dir, rebuildFileBrowser = false) {
       $('.btn-group button.folder-status').prop('disabled', false).next().prop('disabled', false)
 
       // Folder buttons
-      $('.top-information h2').html(`${statusBadge}${archiveBadge}${systemMetadataIcon}${actionLogIcon}`)
+      if (pathParts.length > 2){
+        $('.top-information h2').html(`${statusBadge}${archiveBadge}${systemMetadataIcon}${actionLogIcon}`)
+      } else {
+        $('.top-information h2').hide()        
+      }
 
       // Show top information and buttons.
       if (typeof vaultStatus !== 'undefined') {
