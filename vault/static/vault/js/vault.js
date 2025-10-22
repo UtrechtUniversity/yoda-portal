@@ -774,12 +774,12 @@ function topInformation (dir, rebuildFileBrowser = false) {
 
       $('.btn-group button.metadata-form').hide()
 
-      if (pathParts.length < 2){
+      if (pathParts.length < 2) {
         $('.top-information').hide()
         $('.top-info-buttons').hide()
       } else {
         $('.top-information').show()
-        $('.top-info-buttons').show()        
+        $('.top-info-buttons').show()
       }
 
       if (userType !== 'none' || isDatamanager) {
@@ -967,10 +967,10 @@ function topInformation (dir, rebuildFileBrowser = false) {
       $('.btn-group button.folder-status').prop('disabled', false).next().prop('disabled', false)
 
       // Folder buttons
-      if (pathParts.length > 2){
+      if (pathParts.length > 2) {
         $('.top-information h2').html(`${statusBadge}${archiveBadge}${systemMetadataIcon}${actionLogIcon}`)
       } else {
-        $('.top-information h2').hide()        
+        $('.top-information h2').hide()
       }
 
       // Show top information and buttons.
