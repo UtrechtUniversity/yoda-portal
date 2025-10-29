@@ -770,9 +770,19 @@ function topInformation (dir, rebuildFileBrowser = false) {
       const baseDOI = data.base_doi
       const packageDOI = data.package_doi
 
+      const pathParts = dir.split('/')
+
       $('.btn-group button.metadata-form').hide()
-      $('.top-information').hide()
-      $('.top-info-buttons').hide()
+
+      if (pathParts.length < 2) {
+        // Hide top information and buttons when browsing at vault space level
+        $('.top-information').hide()
+        $('.top-info-buttons').hide()
+      } else {
+        // Show top information and buttons when browsing at group collection level and lower
+        $('.top-information').show()
+        $('.top-info-buttons').show()
+      }
 
       if (userType !== 'none' || isDatamanager) {
         // Datamanager, Researcher, normal, groupmanager cases
@@ -958,18 +968,22 @@ function topInformation (dir, rebuildFileBrowser = false) {
       // Reset action dropdown.
       $('.btn-group button.folder-status').prop('disabled', false).next().prop('disabled', false)
 
-      // Folder buttons
-      $('.top-information h2').html(`${statusBadge}${archiveBadge}${systemMetadataIcon}${actionLogIcon}`)
-
       // Show top information and buttons.
       if (typeof vaultStatus !== 'undefined') {
+        // Arrange folder buttons of data package
+        $('.top-information h2').html(`${statusBadge}${archiveBadge}${systemMetadataIcon}${actionLogIcon}`)
+
         $('.top-information').show()
         $('.top-info-buttons').show()
 
         // Trigger tooltips.
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]:not(.download-report-text):not(.download-report-csv)')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl)) // eslint-disable-line no-unused-vars
+      } else {
+        // Clear folder buttons when not browsing a data package
+        $('.top-information h2').html('')
       }
+
       if (rebuildFileBrowser) {
         buildFileBrowser(dir)
       }
