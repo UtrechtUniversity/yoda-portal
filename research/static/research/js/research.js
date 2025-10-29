@@ -482,8 +482,32 @@ $(function () {
     unlockFolder($(this).attr('data-folder'))
   })
 
-  $('body').on('click', 'a.action-submit', function () {
-    submitToVault($(this).attr('data-folder'))
+  // Submit with the confirmation modal
+  $('body').on('click', 'a.action-submit', function (e) {
+    e.preventDefault()
+    const folder = $(this).attr('data-folder')
+
+    // Stash folder on the modal element
+    $('#submit-confirm').data('folder', folder)
+
+    // Reset radio to default
+    $('#submit-copy').prop('checked', true)
+
+    bootstrap.Modal.getOrCreateInstance(
+      document.getElementById('submit-confirm')
+    ).show()
+  })
+
+  // User confirms and calls submitToVault with flag
+  $('.btn-confirm-submit').on('click', function () {
+    const folder = $('#submit-confirm').data('folder')
+    const deleteResearchCopy = $('#submit-move').is(':checked')
+
+    bootstrap.Modal.getInstance(
+      document.getElementById('submit-confirm')
+    ).hide()
+
+    submitToVault(folder, deleteResearchCopy)
   })
 
   $('body').on('click', 'a.action-check-for-unpreservable-files', function () {
@@ -1518,7 +1542,7 @@ function showMetadataForm (path) {
   window.location.href = 'metadata/form?path=' + encodeURIComponent(path)
 }
 
-async function submitToVault (folder) {
+async function submitToVault (folder, deleteResearchCopy = false) {
   if (typeof folder !== 'undefined') {
     // Set spinner & disable button
     const btnText = $('#statusBadge').html()
@@ -1526,7 +1550,8 @@ async function submitToVault (folder) {
     $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
 
     try {
-      const status = await Yoda.call('folder_submit', { coll: Yoda.basePath + folder })
+      const status = await Yoda.call('folder_submit', { coll: Yoda.basePath + folder, delete_research_copy: deleteResearchCopy })
+
       if (status === 'SUBMITTED') {
         $('#statusBadge').html('Submitted')
       } else if (status === 'ACCEPTED') {

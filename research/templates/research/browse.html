@@ -18,6 +18,44 @@
 {% endblock style %}
 
 {% block content %}
+<div class="modal fade" id="submit-confirm" tabindex="-1" aria-labelledby="submit-confirm-label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg modal-fullscreen-sm-down">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="submit-confirm-label">
+          Submit data package to the vault space
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <p>Do you want to keep a copy of the data package in the research space?</p>
+
+        <div class="form-check mb-1">
+          <input class="form-check-input" type="radio" name="submit-workflow" id="submit-copy" checked>
+          <label class="form-check-label" for="submit-copy">
+            Yes, keep a copy in the research space
+          </label>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="submit-workflow" id="submit-move">
+          <label class="form-check-label" for="submit-move">
+            No, remove it after the successful move to the vault space
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-confirm-submit">
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal" tabindex="-1" role="dialog" id="showUnpreservableFiles">
     <div class="modal-dialog">
         <div class="modal-content">
