@@ -33,7 +33,7 @@ $(document).ready(function () {
     const $btn = $(this)
 
     // Disable button and show spinner
-    $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i> Registering copy...')
+    $btn.prop('disabled', true).html('Registering copy... <i class="fa-solid fa-spinner fa-spin"></i>')
 
     try {
       await copyVaultPackageToDynamic(urlEncodedOrigin, urlEncodedPath)
