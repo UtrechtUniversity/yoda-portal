@@ -879,7 +879,7 @@ function changeBrowserUrl (path) {
 }
 
 function browse (dir = '', changeHistory = false) {
-  resetMultiSelectButton()
+  resetMultiSelectCheckbox()
   currentFolder = dir
   // remove hide class that could have been added when a erroneous vault path was used.
   $('#file-browser_wrapper').removeClass('hide')
@@ -891,7 +891,7 @@ function browse (dir = '', changeHistory = false) {
   buildFileBrowser()
 }
 
-function resetMultiSelectButton () {
+function resetMultiSelectCheckbox () {
   $('#multi-select-all').prop({ checked: false })
   $('#multiSelect').addClass('hide')
   $("input[name='multiSelect[]']").prop('checked', false)
