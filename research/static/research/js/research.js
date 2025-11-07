@@ -879,6 +879,7 @@ function changeBrowserUrl (path) {
 }
 
 function browse (dir = '', changeHistory = false) {
+  resetMultiSelectButton()
   currentFolder = dir
   // remove hide class that could have been added when a erroneous vault path was used.
   $('#file-browser_wrapper').removeClass('hide')
@@ -888,6 +889,12 @@ function browse (dir = '', changeHistory = false) {
   if (changeHistory) { changeBrowserUrl(dir) }
   topInformation(dir, true) // only here topInformation should show its alertMessage
   buildFileBrowser()
+}
+
+function resetMultiSelectButton () {
+  $('#multi-select-all').prop({checked: false, indeterminate: false})
+  $('#multiSelect').addClass('hide')
+  $("input[name='multiSelect[]']").prop('checked', false)
 }
 
 function handleGoToVaultButton (dir) {
@@ -1664,3 +1671,4 @@ function jumpToDataInCache (table, fileName) {
     table.page(page).draw(false)
   }
 }
+
