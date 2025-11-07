@@ -892,7 +892,7 @@ function browse (dir = '', changeHistory = false) {
 }
 
 function resetMultiSelectButton () {
-  $('#multi-select-all').prop({checked: false, indeterminate: false})
+  $('#multi-select-all').prop({ checked: false })
   $('#multiSelect').addClass('hide')
   $("input[name='multiSelect[]']").prop('checked', false)
 }
@@ -1671,4 +1671,3 @@ function jumpToDataInCache (table, fileName) {
     table.page(page).draw(false)
   }
 }
-
