@@ -1128,6 +1128,7 @@ const tableRenderer = {
       if (currentFolder.length === 0) {
         return ''
       }
+      actions.append(`<a href="#" class="dropdown-item folder-download" data-path="${Yoda.htmlEncode(currentFolder + '/' + row.name)}" title="Download this folder">Download</a>`)
       actions.append(`<a href="#" class="dropdown-item folder-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this folder" >Rename</a>`)
       actions.append(`<a href="#" class="dropdown-item folder-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this folder">Copy</a>`)
       actions.append(`<a href="#" class="dropdown-item folder-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this folder">Move</a>`)
@@ -1178,7 +1179,7 @@ function startBrowsing () {
     drawCallback: function (settings) {
       const actions = {
         multi: ['a.multiple-copy', 'a.multiple-move', 'a.multiple-delete'],
-        folder: ['a.folder-delete', 'a.folder-rename', 'a.folder-copy', 'a.folder-move'],
+        folder: ['a.folder-download', 'a.folder-delete', 'a.folder-rename', 'a.folder-copy', 'a.folder-move'],
         file: ['a.file-delete', 'a.file-rename', 'a.file-copy', 'a.file-move']
       }
 
