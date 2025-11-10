@@ -624,9 +624,15 @@ const tableRenderer = {
   context: (_, __, row) => {
     const actions = $('<div class="dropdown-menu">')
 
-    if (row.type === 'coll') { return '' }
-
-    actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
+    if (row.type === 'coll') {
+      // no context menu for toplevel group-collections - these cannot be altered or deleted
+      if (currentFolder.length === 0) {
+        return ''
+      }
+      actions.append(`<a href="#" class="dropdown-item folder-download" data-path="${Yoda.htmlEncode(currentFolder + '/' + row.name)}" title="Download this folder">Download</a>`)
+    } else {
+      actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
+    }
 
     const dropdown = $(`<div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-name="${Yoda.htmlEncode(row.name)}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
