@@ -349,13 +349,63 @@ function dlgMakeBreadcrumb (urlEncodedDir) {
   $('ol.dlg-breadcrumb').html(html)
 }
 
-$('body').on('click', 'a.multiple-download', async function (event) {
+// Unified download handler, which covers both “folder-download” and “multi-select download”
+$('body').on('click', 'a.folder-download, a.multiple-download', async function (event) {
   event.preventDefault()
-  // Gather checked items
-  const checkedBoxes = $("input[name='multiSelect[]']:checked").toArray()
 
-  // Build the list of download entries
+  // Decide what to download based on the link that was clicked
+  const downloadEntries = $(this).hasClass('folder-download')
+    ? await collectFolderEntries($(this).data('path'))
+    : await collectMultiSelectEntries()
+
+  if (!downloadEntries.length) return // nothing selected
+
+  const zipModal = bootstrap.Modal.getOrCreateInstance('#zip-download')
+  zipModal.show()
+
+  try {
+    await downloadEntriesAsZip(downloadEntries)
+    console.log('ZIP download triggered.')
+  } catch (err) {
+    console.error('ZIP failed:', err)
+  } finally {
+    zipModal.hide()
+  }
+})
+
+// Build entry list for a single folder
+async function collectFolderEntries (folderPath) {
+  const folderName = folderPath.split('/').pop()
+
+  // API call for folder manifest
+  const { data } = await Yoda.call(
+    'research_manifest',
+    { coll: Yoda.basePath + folderPath, empty_colls: true },
+    { quiet: true, rawResult: true }
+  )
+
+  // Start with the directory
+  const downloadEntries = [{ name: folderName + '/' }]
+
+  for (const item of data) {
+    if (item.name.endsWith('/')) {
+      // Sub-folder
+      downloadEntries.push({ name: folderName + '/' + item.name })
+    } else {
+      // Single file
+      const filepath = `${folderPath}/${item.name}`
+      const url = '/research/browse/download?filepath=' + encodeURIComponent(filepath)
+      downloadEntries.push({ url, name: folderName + '/' + item.name })
+    }
+  }
+  return downloadEntries
+}
+
+// Build entry list from the checkedBoxes
+async function collectMultiSelectEntries () {
+  const checkedBoxes = $("input[name='multiSelect[]']:checked").toArray()
   const downloadEntries = []
+
   for (const box of checkedBoxes) {
     const $box = $(box)
     const type = $box.data('type')
@@ -363,44 +413,14 @@ $('body').on('click', 'a.multiple-download', async function (event) {
     const path = $box.val()
 
     if (type === 'coll') {
-      // Add folder entry
-      downloadEntries.push({ name: name + '/' })
-
-      // Fetch manifest and add each file in the collection
-      const { data } = await Yoda.call(
-        'research_manifest',
-        { coll: Yoda.basePath + path, empty_colls: true },
-        { quiet: true, rawResult: true }
-      )
-      for (const item of data) {
-        const filepath = `${path}/${item.name}`
-        const url = `/vault/browse/download?filepath=${encodeURIComponent(filepath)}`
-
-        if (!item.name.endsWith('/')) {
-          downloadEntries.push({ url, name: name + '/' + item.name })
-        } else {
-          downloadEntries.push({ name: name + '/' + item.name })
-        }
-      }
+      downloadEntries.push(...(await collectFolderEntries(path))) // reuse folder download func
     } else {
-      // Single file: add directly
-      const url = `/vault/browse/download?filepath=${encodeURIComponent(path)}`
+      const url = '/research/browse/download?filepath=' + encodeURIComponent(path)
       downloadEntries.push({ url, name })
     }
   }
-
-  // Trigger ZIP download if we have anything
-  if (downloadEntries.length) {
-    bootstrap.Modal.getOrCreateInstance(document.querySelector('#zip-download')).show()
-    try {
-      await downloadEntriesAsZip(downloadEntries)
-      console.log('ZIP download triggered.')
-    } catch (err) {
-      console.error('ZIP failed:', err)
-    }
-    bootstrap.Modal.getOrCreateInstance(document.querySelector('#zip-download')).hide()
-  }
-})
+  return downloadEntries
+}
 
 async function downloadEntriesAsZip (entries) {
   // Prepare an array of entries for the ZIP.
