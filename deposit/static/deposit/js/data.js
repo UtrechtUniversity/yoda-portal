@@ -689,6 +689,7 @@ function changeBrowserUrl (path) {
 }
 
 function browse (dir = '', changeHistory = false) {
+  resetMultiSelectCheckbox()
   currentFolder = dir
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
@@ -698,6 +699,12 @@ function browse (dir = '', changeHistory = false) {
   $('button.folder-create').attr('data-path', dir)
 
   apostropheFolderHints(dir)
+}
+
+function resetMultiSelectCheckbox () {
+  $('#multi-select-all').prop({ checked: false })
+  $('#multiSelect').addClass('hide')
+  $("input[name='multiSelect[]']").prop('checked', false)
 }
 
 function apostropheFolderHints (dir) {
