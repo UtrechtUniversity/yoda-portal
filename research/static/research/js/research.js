@@ -200,15 +200,19 @@ $(function () {
 
     Yoda.call('research_manifest',
       { coll: Yoda.basePath + folder }).then((data) => {
+      document.getElementById('number-of-files').textContent = data.files
+      document.getElementById('total-size').textContent = data.size
+      document.getElementById('number-of-checksums').textContent = `${data.checksums} / ${data.files}`
+
       let table = '<table class="table table-striped"><tbody>'
 
       table += '<thead><tr><th>Filename</th><th>Size</th><th>Checksum</th></tr></thead>'
-      if (data.length > 0) {
-        $.each(data, function (index, obj) {
+      if (data.manifest.length > 0) {
+        $.each(data.manifest, function (index, obj) {
           table += `<tr>
                       <td>${obj.name}</td>
-                      <td>${obj.size}</td>
-                      <td>${obj.checksum}</td>
+                      <td>${obj.human_readable_size}</td>
+                      <td><pre>${obj.checksum}</pre></td>
                   </tr>`
         })
         if (downloadChecksumReportTextTooltip) {
