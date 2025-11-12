@@ -377,7 +377,7 @@ async function collectFolderEntries (folderPath) {
   // Start with the directory
   const downloadEntries = [{ name: folderName + '/' }]
 
-  for (const item of data) {
+  for (const item of data.manifest) {
     if (item.name.endsWith('/')) {
       // Sub-folder
       downloadEntries.push({ name: folderName + '/' + item.name })

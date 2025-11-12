@@ -140,16 +140,16 @@ def download_report() -> Response:
         writer = csv.writer(output_io, quoting=csv.QUOTE_MINIMAL)
         writer.writerow(["filename", "size", "checksum"])
         if response['status'] == 'ok':
-            for result in response["data"]:
-                writer.writerow([result['name'], result['size'], result['checksum']])
+            for result in response["data"]["manifest"]:
+                writer.writerow([result['name'], result['human_readable_size'], result['checksum']])
         output = output_io.getvalue()
     else:
         mime = 'text/plain'
         ext = '.txt'
         lines = []
         if response['status'] == 'ok':
-            for result in response["data"]:
-                lines.append(f"{result['name']} {result['size']} {result['checksum']}")
+            for result in response["data"]["manifest"]:
+                lines.append(f"{result['name']} {result['human_readable_size']} {result['checksum']}")
         output = "\n".join(lines)
 
     return Response(
