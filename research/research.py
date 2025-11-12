@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2025, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import csv
@@ -316,16 +316,16 @@ def download_report() -> Response:
         writer = csv.writer(output_io, quoting=csv.QUOTE_MINIMAL)
         writer.writerow(["filename", "size", "checksum"])
         if response['status'] == 'ok':
-            for result in response["data"]:
-                writer.writerow([result['name'], result['size'], result['checksum']])
+            for result in response["data"]["manifest"]:
+                writer.writerow([result['name'], result['human_readable_size'], result['checksum']])
         output = output_io.getvalue()
     else:
         mime = 'text/plain'
         ext = '.txt'
         lines = []
         if response['status'] == 'ok':
-            for result in response["data"]:
-                lines.append(f"{result['name']} {result['size']} {result['checksum']}")
+            for result in response["data"]["manifest"]:
+                lines.append(f"{result['name']} {result['human_readable_size']} {result['checksum']}")
         output = "\n".join(lines)
 
     return Response(
