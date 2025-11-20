@@ -104,7 +104,7 @@ def group_create() -> Response:
                                               'description': request.form['group_description'],
                                               'data_classification': data_classification})
 
-    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
+    output = make_response(response)
     output.headers["Content-type"] = "application/json"
     return output
 
@@ -129,6 +129,6 @@ def group_update() -> Response:
     if not property_updated:
         response = {'status': 'ok', 'status_info': 'Nothing changed'}
 
-    output = make_response({'status': 0 if response['status'] == 'ok' else 1, 'message': response['status_info']})
+    output = make_response(response)
     output.headers["Content-type"] = "application/json"
     return output
