@@ -394,9 +394,7 @@ async function processImportedRow (row) {
     { quiet: true, rawResult: true })
   // Check if response is not null and handle it
   if (response) {
-    const status = response.status
-
-    if (status === 'ok') {
+    if (response.status === 'ok') {
       // Successful import -> set correct classes and feedback to inform user
       row.addClass('import-groupname-done')
       $('#processed-indicator-' + groupname).html('<i class="fa-solid fa-check"></i>')
@@ -550,7 +548,7 @@ async function processUserroleChange (row, newRole, groupName) {
     row.removeClass('active')
 
     // Handle error
-    const errorMessage = result.message || result.status_info ||
+    const errorMessage = result.status_info ||
         'Error: Could not change the role for the selected member due to an internal error.\n' +
         'Please contact a Yoda administrator'
     Yoda.set_message('error', errorMessage)
@@ -591,7 +589,7 @@ async function removeUserFromGroup (row, groupName) {
     }
   } else {
     // Handle error
-    const errorMessage = result.message ||
+    const errorMessage = result.status_info ||
       'Error: Could not remove the selected member from the group due to an internal error.\n' +
       'Please contact a Yoda administrator'
     window.alert(errorMessage)
@@ -1937,7 +1935,7 @@ $(function () {
         dataType: 'json',
         data: postData
       }).done(function (result) {
-        if ('status' in result && result.status === 0) {
+        if ('status' in result && result.status === 'ok') {
           // OK! Make sure the newly added group is selected after reloading the page.
           Yoda.storage.session.set('selected-group', postData.group_name)
 
@@ -1959,8 +1957,8 @@ $(function () {
           // Something went wrong.
           resetSubmitButton()
 
-          if ('message' in result) {
-            window.alert(result.message)
+          if ('status_info' in result) {
+            window.alert(result.status_info)
           } else {
             window.alert(
               'Error: Could not ' + action + ' group due to an internal error.\n' +
@@ -2015,9 +2013,7 @@ $(function () {
         // Re-enable group list entry.
         $('#group-list .group.delete-pending[data-name="' + Yoda.escapeQuotes(groupName) + '"]').removeClass('delete-pending disabled').attr('title', '')
 
-        if ('message' in result) {
-          window.alert(result.message)
-        } else if ('status_info' in result) {
+        if ('status_info' in result) {
           window.alert(result.status_info)
         } else {
           window.alert(
@@ -2098,7 +2094,9 @@ $(function () {
         $('.selectify-user-name').trigger('select2:open')
       } else {
         // Something went wrong. :(
-        if ('message' in result) { window.alert(result.message) } else {
+        if ('status_info' in result) {
+          window.alert(result.status_info)
+        } else {
           window.alert(
             'Error: Could not add a member due to an internal error.\n' +
                           'Please contact a Yoda administrator'
