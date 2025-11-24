@@ -519,6 +519,30 @@ def prepare_user() -> None:
     if login_username:
         g.login_username = login_username
 
+    if irods is None and 'user_id' in session and 'password' in session:
+        # In some situations, we can still have user credentials, but no longer an
+        # iRODS session. This can happen, for example, if the web server has been
+        # restarted. If possible, we want to restore the iRODS session in this case,
+        # so that the user does not have to log in again.
+        try:
+            irods_login(session['user_id'], session['password'])
+            need_to_remove_credentials = False
+        except (CAT_INVALID_USER, CAT_INVALID_AUTHENTICATION):
+            # Cached credentials are apparently no longer valid. Remove them so that
+            # user gets opportunity to log in again.
+            need_to_remove_credentials = True
+        except Exception:
+            # Something unexpected went wrong. Clear credentials, so that user can log
+            # in again in case the error is related to the credentials.
+            log_error(f"Unexpected exception when trying to re-establish iRODS session of user {user_id}.",
+                      True)
+            need_to_remove_credentials = True
+        finally:
+            if need_to_remove_credentials:
+                del (session['user_id'])
+                del (session['password'])
+                irods = None
+
     if user_id is None:
         g.user = None
     elif irods is not None:
