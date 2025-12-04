@@ -455,6 +455,7 @@ const onSubmit = ({ formData }) => submitData(formData)
 class YodaForm extends React.Component {
     constructor (props) {
         super(props)
+        this.formRef = React.createRef()
 
         const formContext = {
             saving: false,
@@ -527,9 +528,20 @@ class YodaForm extends React.Component {
         return errors;
     }
 
+    componentDidMount() {
+        const formInstance = this.formRef.current;
+        const data = formInstance?.state?.formData ?? this.state.formData;
+        this.afterFormLoad(data);
+    }
+
+    afterFormLoad(data) {
+        // Update form completeness bar
+        updateCompleteness();
+    }
+
     render () {
         return (
-            <Form className="metadata-form"
+            <Form ref={this.formRef}
                   schema={schema}
                   idPrefix={"yoda"}
                   uiSchema={uiSchema}
