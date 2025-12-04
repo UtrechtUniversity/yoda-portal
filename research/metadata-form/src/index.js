@@ -453,6 +453,7 @@ const onSubmit = ({ formData }) => submitData(formData)
 class YodaForm extends React.Component {
     constructor (props) {
         super(props)
+        this.formRef = React.createRef()
 
         const formContext = {
             saving: false,
@@ -473,11 +474,11 @@ class YodaForm extends React.Component {
 
         // Update TreeKeyword field if it exists and was the one changed
         if (id === "yoda_TreeKeyword" &&
-            form.formData.TreeKeyword && 
+            form.formData.TreeKeyword &&
             form.formData.TreeKeyword.value &&
             form.formData.TreeKeyword.value.length &&
             Object.keys(form.schema.properties.TreeKeyword.items.properties).includes("subject")) {
-        
+
             form.formData.TreeKeyword = this.updateTreeKeywords(form, form.formData.TreeKeyword.value)
         }
 
@@ -525,9 +526,21 @@ class YodaForm extends React.Component {
         return errors;
     }
 
+    componentDidMount() {
+        const formInstance = this.formRef.current;
+        const data = formInstance?.state?.formData ?? this.state.formData;
+        this.afterFormLoad(data);
+    }
+
+    afterFormLoad(data) {
+        // Update form completeness bar
+        updateCompleteness();
+    }
+
     render () {
         return (
-            <Form className="metadata-form"
+            <Form ref={this.formRef}
+                  className="metadata-form"
                   schema={schema}
                   idPrefix={"yoda"}
                   uiSchema={uiSchema}
