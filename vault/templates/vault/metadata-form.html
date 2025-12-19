@@ -2,18 +2,14 @@
 
 {% block title %}{{ super() }} - Vault{% endblock title %}
 
-{% block scripts %}
-<script src="{{ url_for('static', filename='lib/jquery-3.7.1/jquery-3.7.1.min.js') }}"></script>
-<script>
-    var formLoaded = false;
-</script>
-<script src="{{ url_for('vault_bp.static', filename='js/metadata-form.js') }}" async></script>
-{% endblock scripts %}
-
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/metadata/form.css') }}">
 <link rel="stylesheet" href="{{ url_for('vault_bp.static', filename='css/metadata/leaflet.css') }}">
 {% endblock style %}
+
+{% block scripts %}
+<script src="{{ url_for('vault_bp.static', filename='js/metadata-form.js') }}" async></script>
+{% endblock scripts %}
 
 {% block content %}
 <div id="form-errors" class="row hide">
@@ -41,7 +37,7 @@
     </div>
 </div>
 
-<div id="metadata-form" class="row hide">
+<div id="metadata-form" class="row">
     <div class="col-md-12">
         <div class="card">
             <div id="no-metadata" class="hide card-body">
@@ -49,7 +45,9 @@
             </div>
             <div id="form"
                     data-path="{{ path }}">
+              <div class="card-body">
                 <p>Loading metadata <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
+              </div>
             </div>
         </div>
     </div>
