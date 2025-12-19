@@ -1,4 +1,4 @@
-/* global $ */
+/* global $, DOMPurify */
 'use strict'
 
 const OpenSearchApi = {}
@@ -175,7 +175,7 @@ function search (term, page, itemsPerPage, sort, sortOrder, facets = [], filters
       }
 
       buildPagination(results)
-      $('#search-results').html(html)
+      $('#search-results').html(DOMPurify.sanitize(html))
       load(false, results)
     } else {
       let text
@@ -347,7 +347,7 @@ function buildFacets (data) {
       html += checkboxItem(facet, element.value, element.count, checked)
     })
 
-    $('.' + placeholder).html(html)
+    $('.' + placeholder).html(DOMPurify.sanitize(html))
   })
 
   $(rangeFields).each(function (i, facet) {
@@ -380,7 +380,7 @@ function buildFacets (data) {
       html += selectItem(facet, element.value, element.count, checked)
     })
 
-    $('.' + placeholder).html(html)
+    $('.' + placeholder).html(DOMPurify.sanitize(html))
   })
 
   // Set research period default range years
