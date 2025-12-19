@@ -12,7 +12,7 @@ import PersonIdentifier from 'YodaFields/PersonIdentifier'
 import Vocabulary from 'YodaFields/Vocabulary'
 import { withTheme } from "@rjsf/core";
 
-const path = $('#form').attr('data-path');
+const path = document.querySelector('#form').getAttribute('data-path');
 
 let schema       = {};
 let uiSchema     = {};
@@ -650,7 +650,7 @@ class Container extends React.Component {
 
     updateMetadata() {
         actual_edit_mode = true;
-        $(_ => loadForm());
+        loadForm();
     }
 
     render() {
@@ -680,7 +680,6 @@ function loadForm() {
         {rawResult: true})
     .then((data) => {
         formProperties = data;
-        formLoaded = true;
 
         if (formProperties.data !== null) {
             // These are only present when there is a form to show (i.e. no
@@ -692,116 +691,111 @@ function loadForm() {
 
         if (formProperties.status === 'error_transformation_needed') {
             // Transformation is necessary. Show transformation prompt.
-            $('#transformation-text').html(formProperties.data.transformation_html);
+            document.getElementById('transformation-text').innerHTML = formProperties.data.transformation_html;
+
             if (formProperties.data.can_edit) {
-                $('#transformation-buttons').removeClass('hide')
-                $('#transformation-text').html(formProperties.data.transformation_html);
+                document.getElementById('transformation-buttons').classList.remove('hide');
+                document.getElementById('transformation-text').innerHTML = formProperties.data.transformation_html;
             } else {
-                $('#transformation .close-button').removeClass('hide')
+                document.querySelector('#transformation .close-button').classList.remove('hide');
             }
-            $('.transformation-accept').on('click', async () => {
-                $('.transformation-accept').attr('disabled', true);
 
-                await Yoda.call('transform_metadata',
-                    {coll: Yoda.basePath + path},
-                    {errorPrefix: 'Metadata could not be transformed'});
+            document.querySelectorAll('.transformation-accept').forEach(button => {
+                button.addEventListener('click', async () => {
+                    button.setAttribute('disabled', true);
+                    await Yoda.call('transform_metadata', {
+                        coll: `${Yoda.basePath}${path}`,
+                        keep_metadata_backup: document.getElementById('cb-keep-metadata-backup').checked
+                    }, { errorPrefix: 'Metadata could not be transformed' });
 
-                window.location.reload();
+                    window.location.reload();
+                });
             });
-            $('#transformation').removeClass('hide');
+
+            document.getElementById('transformation').classList.remove('hide');
 
         } else if (formProperties.status !== 'ok') {
             // Errors exist - show those instead of loading a form.
             let text = '';
             if (formProperties.status === 'error_validation') {
-                // Validation errors? show a list.
-                $.each(formProperties.data.errors, (key, field) => {
-                    text += '<li>' + $('<div>').text(field.replace('->', '→')).html();
+                // Validation errors? Show a list.
+                Object.entries(formProperties.data.errors).forEach(([key, field]) => {
+                    text += `<li>${document.createElement('div').appendChild(document.createTextNode(field.replace('->', '→'))).innerHTML}</li>`;
                 });
             } else {
                 // Structural / misc error? Show status info.
-                text += '<li>' + $('<div>').text(formProperties.status_info).html();
+                text += `<li>${document.createElement('div').appendChild(document.createTextNode(formProperties.status_info)).innerHTML}</li>`;
             }
-            // HdR The delete button does not exist in vault
-            //$('.delete-all-metadata-btn').on('click', deleteMetadata);
-            $('#form-errors .error-fields').html(text);
-            $('#form-errors').removeClass('hide');
+
+            document.querySelector('.delete-all-metadata-btn').addEventListener('click', deleteMetadata);
+            document.querySelector('#form-errors .error-fields').innerHTML = text;
+            document.getElementById('form-errors').classList.remove('hide');
 
         } else if (formProperties.data.metadata === null && !formProperties.data.can_edit) {
             // No metadata present and no write access. Do not show a form.
-            $('#form').addClass('hide');
-            $('#no-metadata').removeClass('hide');
+            document.getElementById('form').classList.add('hide');
+            document.getElementById('no-metadata').classList.add('hide');
 
         } else {
             // Select validator based on schema.
+            validator = validatorAjv2019
             if (schema.$schema == "http://json-schema.org/draft-07/schema") {
                 validator = validatorAjvDraft7
-            } else {
-                validator = validatorAjv2019
             }
 
-            // Metadata present or user has write access, load the form and must be in actual_edit_mode as chosen by user
-            if (formProperties.data.can_edit && actual_edit_mode) {
-                uiSchema = formProperties.data.uischema; // take over original ui-shema again- not the readonly one
-
-                $(".form-completeness .progress-bar").css('width', '100%');
-            } else {
+            // Metadata present or user has write access, load the form.
+            if (!formProperties.data.can_edit) {
                 uiSchema['ui:readonly'] = true;
             }
 
             const root = createRoot(document.getElementById('form'));
-            root.render(<Container/>);
+            root.render(<Container />);
 
             // Form may already be visible (with "loading" text).
-            if ($('#metadata-form').hasClass('hide')) {
+            if (document.getElementById('metadata-form').classList.contains('hide')) {
                 // Avoid flashing things on screen.
-                $('#metadata-form').fadeIn(220);
-                $('#metadata-form').removeClass('hide');
+                document.getElementById('metadata-form').classList.remove('hide');
             }
 
             // If maintenance banner is visible, add padding to metadata form header
-            if ($('#maintenance-banner').length || $('.non-production').length) {
-                $('#metadata-form .card-header').addClass('pt-4 pb-3');
-                $('#metadata-form .card-header').css('top', '0.5rem');
-            }
-
-            // If progress bar is visible, change division of grid
-            if ($('.form-completeness').length > 0) {
-                $('#metadata-form .card-header .row h5').addClass('col-sm-4').removeClass('col-sm-8');
-                $('#metadata-form .card-header .yodaButtons').addClass('col-sm-8').removeClass('col-sm-4');
+            if (document.getElementById('maintenance-banner') || document.querySelector('.non-production')) {
+                const cardHeader = document.querySelector('#metadata-form .card-header');
+                cardHeader.classList.add('pt-4', 'pb-3');
+                cardHeader.style.top = '0.5rem';
             }
 
             // Specific required textarea handling
-            $('textarea').each(function() {
-                if ($(this).attr('required')) {
-                    // initial setting when form is opened
-                    if ($(this).val()=='') {
-                        $(this).addClass('is-invalid');
-                    }
-                    // following changes in the required textarea and adjust border status
-                    $(this).on("change keyup paste", function() {
-                        if ($(this).val()=='') {
-                            if (!$(this).hasClass('is-invalid')) {
-                                $(this).addClass('is-invalid');
-                            }
-                        }
-                        else {
-                            $(this).removeClass('is-invalid');
-                        }
-                    });
+            document.querySelectorAll('textarea[required]').forEach(textarea => {
+                // Initial setting when form is opened
+                if (textarea.value === '') {
+                    textarea.classList.add('is-invalid');
                 }
-            })
+
+                // Following changes in the required textarea and adjust border status
+                textarea.addEventListener("change", validateTextarea);
+                textarea.addEventListener("keyup", validateTextarea);
+                textarea.addEventListener("paste", validateTextarea);
+            });
 
             updateCompleteness();
+
+            function validateTextarea(e) {
+                if (e.target.value === '') {
+                    e.target.classList.add('is-invalid');
+                } else {
+                    e.target.classList.remove('is-invalid');
+                }
+            }
         }
     });
 }
 
-$(_ => loadForm());
+window.onload = () => loadForm();
 
 async function submitData(data) {
     // Disable buttons.
-    $('.yodaButtons button').attr('disabled', true);
+    const buttons = document.querySelectorAll('.yodaButtons button');
+    buttons.forEach(button => button.disabled = true);
 
     // Remove empty arrays and array items when saving.
     for (const property in data) {
@@ -827,33 +821,34 @@ async function submitData(data) {
         browse();
     } catch (e) {
         // Allow retry.
-        $('.yodaButtons button').attr('disabled', false);
+        buttons.forEach(button => button.disabled = false)
     }
 }
 
-function updateCompleteness()
-{
+function updateCompleteness() {
     let mandatoryTotal = 0;
     let mandatoryFilled = 0;
-    $(".form-control").each(function() {
-        if ($(this)[0].required && !$(this)[0].id.startsWith("yoda_links_")) {
+
+    document.querySelectorAll('.form-control[required]').forEach(control => {
+        if (!control.id.startsWith("yoda_links_")) {
             mandatoryTotal++;
-            if ($(this)[0].value != "") {
-                mandatoryFilled++;
-            }
+            mandatoryFilled += control.value !== "" ? 1 : 0;
         }
     });
 
-    $(".select-required").each(function() {
-        mandatoryTotal++;
-    });
-    $(".select-filled").each(function() {
-        mandatoryFilled++;
-    });
+    mandatoryTotal += document.querySelectorAll('.select-required').length;
+    mandatoryFilled += document.querySelectorAll('.select-filled').length;
 
-    let percent = (mandatoryFilled / mandatoryTotal) * 100;
-    $(".form-completeness .progress-bar").css('width', percent + '%');
-    $('.form-completeness').attr('title', `Required for the vault: ${mandatoryTotal}, currently filled required fields: ${mandatoryFilled}`);
+    const percent = (mandatoryFilled / mandatoryTotal) * 100;
+    const progressBar = document.querySelector('.form-completeness .progress-bar');
+    if (progressBar) {
+      progressBar.style.width = `${percent}%`;
+    }
 
-    return mandatoryTotal == mandatoryFilled;
+    const formCompleteness = document.querySelector('.form-completeness');
+    if (formCompleteness) {
+        formCompleteness.title = `Required for the vault: ${mandatoryTotal}, currently filled required fields: ${mandatoryFilled}`;
+    }
+
+    return mandatoryTotal === mandatoryFilled;
 }

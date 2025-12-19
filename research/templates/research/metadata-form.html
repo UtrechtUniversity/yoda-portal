@@ -9,11 +9,7 @@
 {% endblock style %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='lib/jquery-3.7.1/jquery-3.7.1.min.js') }}"></script>
 <script src="{{ url_for('research_bp.static', filename='lib/sweetalert/sweetalert.min.js') }}"></script>
-<script>
-    var formLoaded = false;
-</script>
 <script src="{{ url_for('research_bp.static', filename='js/metadata-form.js') }}" async></script>
 {% endblock scripts %}
 
@@ -73,7 +69,7 @@
     </div>
 </div>
 
-<div id="metadata-form" class="row hide">
+<div id="metadata-form" class="row">
     <div class="col-md-12">
         <div class="card">
             <div id="no-metadata" class="hide card-body">
@@ -86,7 +82,9 @@
                     data-path="{{ path }}"
                     data-csrf_token_name="{{ tokenName | urlencode }}"
                     data-csrf_token_hash="{{ tokenHash | urlencode }}">
-                <p>Loading metadata <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
+                <div class="card-body">
+                  <p>Loading metadata <i class="fa-solid fa-spinner fa-spin fa-fw"></i></p>
+                </div>
             </div>
         </div>
     </div>
