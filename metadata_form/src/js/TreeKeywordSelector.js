@@ -13,9 +13,10 @@ class TreeKeywordSelector extends React.Component {
 
     // Check what theme is set
     this.colorMode = props.formContext.colorMode
-    this.colorPrimary = getComputedStyle(document.documentElement).getPropertyValue('--bs-primary')
-    this.lightModeSelectColor = getComputedStyle(document.documentElement).getPropertyValue('--bs-black')
-    this.lightModeSelectBgColor = getComputedStyle(document.documentElement).getPropertyValue('--bs-secondary-bg')
+    this.colorPrimary = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-primary')
+    this.lightModeSelectColor = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-black')
+    this.lightModeSelectBgColor = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-secondary-bg')
+
     // From react-select theming
     this.darkModeSelectColor = '#dee2e6'
     this.darkModeSelectBgColor = props.formContext.darkThemeColors.primary25

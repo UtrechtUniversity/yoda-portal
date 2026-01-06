@@ -1,6 +1,7 @@
-import React, { Component } from 'react'
+/* eslint-disable react/no-string-refs */
+import React from 'react'
 import Modal from 'react-modal'
-import { MapContainer, TileLayer, Marker, FeatureGroup } from 'react-leaflet'
+import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet'
 import L from 'leaflet'
 import { EditControl } from 'react-leaflet-draw'
 
@@ -16,15 +17,16 @@ class Geolocation extends React.Component {
     }
 
     this.openModal = this.openModal.bind(this)
-    this.closeModal = this.closeModal.bind(this)
-    this.afterOpenModal = this.afterOpenModal.bind(this)
-    this.drawCreated = this.drawCreated.bind(this)
-    this.drawEdited = this.drawEdited.bind(this)
-    this.drawDeleted = this.drawDeleted.bind(this)
-    this.drawStop = this.drawStop.bind(this)
+    this.handleCloseModal = this.handleCloseModal.bind(this)
+    this.handleAfterOpenModal = this.handleAfterOpenModal.bind(this)
+    this.handleDrawCreated = this.handleDrawCreated.bind(this)
+    this.handleDrawEdited = this.handleDrawEdited.bind(this)
+    this.handleDrawDeleted = this.handleDrawDeleted.bind(this)
+    this.handleDrawStop = this.handleDrawStop.bind(this)
     this.setFormData = this.setFormData.bind(this)
     this.geoBoxID = globalGeoBoxCounter
     this.showModal = false
+    this.mapRef = React.createRef()
     globalGeoBoxCounter++
 
     this.modalStyle = {
@@ -42,13 +44,13 @@ class Geolocation extends React.Component {
         width: '70%',
         height: '625px',
         backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529' : '#ffffff',
-        border: this.props.formContext.colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+        border: this.props.formContext.colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da'
       }
     }
 
     this.coordsStyle = {
       backgroundColor: this.props.formContext.colorMode === 'dark' ? '#212529' : '#fff',
-      border: this.props.formContext.colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+      border: this.props.formContext.colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da'
     }
   }
 
@@ -60,14 +62,14 @@ class Geolocation extends React.Component {
     this.setState(this.state)
   }
 
-  closeModal (e) {
+  handleCloseModal (e) {
     e.preventDefault()
 
     this.showModal = false
     this.setState(this.state)
   }
 
-  afterOpenModal (e) {
+  handleAfterOpenModal (e) {
     const { northBoundLatitude, westBoundLongitude, southBoundLatitude, eastBoundLongitude } = this.state
     const map = this.refs.map
     if (typeof northBoundLatitude !== 'undefined' &&
@@ -92,68 +94,72 @@ class Geolocation extends React.Component {
 
     this.fillCoordinateInputs(northBoundLatitude, westBoundLongitude, southBoundLatitude, eastBoundLongitude)
 
-    $('.geoInputCoords').on('input propertychange paste', function () {
-      const boxid = $(this).attr('boxid')
+    document.querySelectorAll('.geoInputCoords').forEach(function (input) {
+      input.addEventListener('input', function () {
+        const boxid = input.getAttribute('boxid')
 
-      // Remove earlier markers and rectangle(s)
-      map.eachLayer(function (layer) {
-        if (layer instanceof L.Marker || layer instanceof L.Rectangle) {
-          map.removeLayer(layer)
+        // Remove earlier markers and rectangle(s)
+        map.eachLayer(function (layer) {
+          if (layer instanceof L.Marker || layer instanceof L.Rectangle) {
+            map.removeLayer(layer)
+          }
+        })
+
+        // only make persistent when correct coordinates are added by user
+        const lat0 = Number(document.querySelector(`.geoLat0[boxid='${boxid}']`).value)
+        const lng0 = Number(document.querySelector(`.geoLng0[boxid='${boxid}']`).value)
+        const lat1 = Number(document.querySelector(`.geoLat1[boxid='${boxid}']`).value)
+        const lng1 = Number(document.querySelector(`.geoLng1[boxid='${boxid}']`).value)
+        let alertText = ''
+
+        // Validation of coordinates - resetten als dialog wordt heropend
+        if (isNaN(lng0)) {
+          alertText += ', WEST'
+        }
+        if (isNaN(lat0)) {
+          alertText += ', NORTH'
+        }
+        if (isNaN(lng1)) {
+          alertText += ', EAST'
+        }
+        if (isNaN(lat1)) {
+          alertText += ', SOUTH'
+        }
+
+        const alertElement = document.querySelector(`.geoAlert[boxid='${boxid}']`)
+
+        if (alertText) {
+          alertElement.innerHTML = 'Invalid coordinates: ' + alertText.substring(2)
+        } else {
+          alertElement.innerHTML = '' // reset the alert box -> no alert required
+          const bounds = [[lat0, lng0], [lat1 + 0.1, lng1 + 0.1]]
+
+          // Coordinates are a point.
+          if (lat0 === lat1 && lng0 === lng1) {
+            const latlng = L.latLng(lat0, lng0)
+            L.marker(latlng).addTo(map)
+          } else {
+            L.rectangle(bounds).addTo(map)
+          }
+          map.fitBounds(bounds, { padding: [150, 150] })
+
+          globalThis.setFormData('northBoundLatitude', lat0)
+          globalThis.setFormData('westBoundLongitude', lng0)
+          globalThis.setFormData('southBoundLatitude', lat1)
+          globalThis.setFormData('eastBoundLongitude', lng1)
         }
       })
-
-      // only make persistent when correct coordinates are added by user
-      const lat0 = Number($(".geoLat0[boxid='" + boxid + "']").val())
-      const lng0 = Number($(".geoLng0[boxid='" + boxid + "']").val())
-      const lat1 = Number($(".geoLat1[boxid='" + boxid + "']").val())
-      const lng1 = Number($(".geoLng1[boxid='" + boxid + "']").val())
-      let alertText = ''
-
-      // Validation of coordinates - resetten als dialog wordt heropend
-      if (!$.isNumeric(lng0)) {
-        alertText += ', WEST'
-      }
-      if (!$.isNumeric(lat0)) {
-        alertText = ', NORTH'
-      }
-      if (!$.isNumeric(lng1)) {
-        alertText += ', EAST'
-      }
-      if (!$.isNumeric(lat1)) {
-        alertText += ', SOUTH'
-      }
-
-      if (alertText) {
-        $('.geoAlert[boxid="' + boxid + '"]').html('Invalid coordinates: ' + alertText.substring(2))
-      } else {
-        $('.geoAlert[boxid="' + boxid + '"]').html('') // reset the alert box -> no alert required
-        const bounds = [[lat0, lng0], [lat1 + 0.1, lng1 + 0.1]]
-
-        // Coordinates are a point.
-        if (lat0 === lat1 && lng0 === lng1) {
-          const latlng = L.latLng(lat0, lng0)
-          L.marker(latlng).addTo(map)
-        } else {
-          L.rectangle(bounds).addTo(map)
-        }
-        map.fitBounds(bounds, { padding: [150, 150] })
-
-        globalThis.setFormData('northBoundLatitude', lat0)
-        globalThis.setFormData('westBoundLongitude', lng0)
-        globalThis.setFormData('southBoundLatitude', lat1)
-        globalThis.setFormData('eastBoundLongitude', lng1)
-      }
     })
   }
 
   fillCoordinateInputs (northBoundLatitude, westBoundLongitude, southBoundLatitude, eastBoundLongitude) {
-    $('.geoLat0').val(northBoundLatitude)
-    $('.geoLng0').val(westBoundLongitude)
-    $('.geoLat1').val(southBoundLatitude)
-    $('.geoLng1').val(eastBoundLongitude)
+    document.querySelector('.geoLat0').value = northBoundLatitude
+    document.querySelector('.geoLng0').value = westBoundLongitude
+    document.querySelector('.geoLat1').value = southBoundLatitude
+    document.querySelector('.geoLng1').value = eastBoundLongitude
   }
 
-  drawCreated (e) {
+  handleDrawCreated (e) {
     const layer = e.layer
 
     if (layer instanceof L.Marker) {
@@ -179,7 +185,7 @@ class Geolocation extends React.Component {
     }
   }
 
-  drawEdited (e) {
+  handleDrawEdited (e) {
     e.layers.eachLayer((layer) => {
       if (layer instanceof L.Marker) {
         this.setFormData('northBoundLatitude', layer.getLatLng().lat)
@@ -205,7 +211,7 @@ class Geolocation extends React.Component {
     })
   }
 
-  drawDeleted (e) {
+  handleDrawDeleted (e) {
     this.setFormData('northBoundLatitude', undefined)
     this.setFormData('westBoundLongitude', undefined)
     this.setFormData('southBoundLatitude', undefined)
@@ -214,7 +220,7 @@ class Geolocation extends React.Component {
     this.fillCoordinateInputs('', '', '', '')
   }
 
-  drawStop (e) {
+  handleDrawStop (e) {
     const map = this.refs.map
     map.eachLayer(function (layer) {
       if (layer instanceof L.Marker || layer instanceof L.Rectangle) {
@@ -242,11 +248,12 @@ class Geolocation extends React.Component {
 
         <Modal
           isOpen={this.showModal}
-          onAfterOpen={this.afterOpenModal}
-          onRequestClose={this.closeModal}
+          onAfterOpen={this.handleAfterOpenModal}
+          onRequestClose={this.handleCloseModal}
           style={this.modalStyle}
           ariaHideApp={false}
         >
+
           <MapContainer ref='map' center={[48.760, 13.275]} zoom={4} animate={false}>
             <TileLayer
               attribution='&copy; <a href="https://tile.openstreetmap.org/{z}/{x}/{y}.png">OpenStreetMap contributors</a>'
@@ -255,10 +262,10 @@ class Geolocation extends React.Component {
             <FeatureGroup>
               <EditControl
                 position='topright'
-                onCreated={this.drawCreated}
-                onEdited={this.drawEdited}
-                onDeleted={this.drawDeleted}
-                onDrawStart={this.drawStop}
+                onCreated={this.handleDrawCreated}
+                onEdited={this.handleDrawEdited}
+                onDeleted={this.handleDrawDeleted}
+                onDrawStart={this.handleDrawStop}
                 draw={{
                   circle: false,
                   polygon: false,
@@ -280,7 +287,7 @@ class Geolocation extends React.Component {
               <label>West:</label> <input type='text' className='geoInputCoords geoLng0 me-1' style={this.coordsStyle} boxid={this.geoBoxID} disabled={this.props.readonly} />
               <label>South:</label> <input type='text' className='geoInputCoords geoLat1 me-1' style={this.coordsStyle} boxid={this.geoBoxID} disabled={this.props.readonly} />
               <label>East:</label> <input type='text' className='geoInputCoords geoLng1 me-1' style={this.coordsStyle} boxid={this.geoBoxID} disabled={this.props.readonly} />
-              <button className='btn btn-outline-secondary float-end' onClick={(e) => { this.closeModal(e) }}>Close</button>
+              <button className='btn btn-outline-secondary float-end' onClick={(e) => { this.handleCloseModal(e) }}>Close</button>
             </div>
           </div>
           <div className='geoAlert' boxid={this.geoBoxID} />

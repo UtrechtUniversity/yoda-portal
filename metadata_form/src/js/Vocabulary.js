@@ -1,6 +1,4 @@
-import React, { Component } from 'react'
-import { FieldProps } from '@rjsf/utils'
-import { render } from 'react-dom'
+import React from 'react'
 import Select from 'react-select'
 import axios from 'axios'
 
@@ -40,14 +38,14 @@ class Vocabulary extends React.Component {
     let label = <label className='form-label'>{title}</label>
     const help = this.props.uiSchema['ui:help']
     let customStyles = {
-        control: (styles) => ({
-            ...styles,
-            border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
-            boxShadow: 'none',
-            '&:hover': {
-                border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
-            }
-        })
+      control: (styles) => ({
+        ...styles,
+        border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+        boxShadow: 'none',
+        '&:hover': {
+          border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da'
+        }
+      })
     }
 
     // Check what theme is set
