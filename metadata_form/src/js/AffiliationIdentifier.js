@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+/* eslint-disable camelcase */
+import React from 'react'
 import CreatableSelect from 'react-select/creatable'
 import axios from 'axios'
 
@@ -69,7 +70,7 @@ class AffiliationIdentifier extends React.Component {
         border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
         boxShadow: 'none',
         '&:hover': {
-            border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+          border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da'
         }
       })
     }
@@ -158,8 +159,8 @@ class AffiliationIdentifier extends React.Component {
             onChange={this.handleChange}
             styles={customStyles}
             theme={(theme) => ({
-                ...theme,
-                colors: (colorMode === 'dark') ? { ...theme.colors, ...this.props.formContext.darkThemeColors } : { ...theme.colors },
+              ...theme,
+              colors: (colorMode === 'dark') ? { ...theme.colors, ...this.props.formContext.darkThemeColors } : { ...theme.colors }
             })}
           />
           {helpAffiliationName && (

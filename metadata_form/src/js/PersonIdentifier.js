@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+/* eslint-disable camelcase */
+import React from 'react'
 import Select from 'react-select'
 import InputMask from 'react-input-mask'
 
@@ -12,8 +13,6 @@ class PersonIdentifier extends React.Component {
     this.state = {
       ...props.formData
     }
-
-    const options = props.registry.rootSchema.definitions.optionsNameIdentifierScheme.enum
   }
 
   handleChange = (event) => {
@@ -72,16 +71,16 @@ class PersonIdentifier extends React.Component {
       placeholder = this.props.uiSchema.Name_Identifier['ui:field-placeholder']
     }
 
-    let customStyles = {
-        control: (styles) => ({
-            ...styles,
-            border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
-            boxShadow: 'none',
-            '&:hover': {
-                border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
-            }
-        })
-    };
+    const customStyles = {
+      control: (styles) => ({
+        ...styles,
+        border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+        boxShadow: 'none',
+        '&:hover': {
+          border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da'
+        }
+      })
+    }
 
     // Check what theme is set
     const colorMode = this.props.formContext.colorMode
@@ -187,8 +186,8 @@ class PersonIdentifier extends React.Component {
             onChange={this.handleChange}
             styles={customStylesScheme}
             theme={(theme) => ({
-                ...theme,
-                colors: (colorMode === 'dark') ? {...theme.colors, ...this.props.formContext.darkThemeColors} : {...theme.colors},
+              ...theme,
+              colors: (colorMode === 'dark') ? { ...theme.colors, ...this.props.formContext.darkThemeColors } : { ...theme.colors }
             })}
           />
           {helpScheme && (
