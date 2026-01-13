@@ -641,7 +641,7 @@ function deleteMetadata () {
   async isConfirm => {
     if (isConfirm) {
       await Yoda.call('meta_remove',
-        { coll: Yoda.basePath + path },
+        { coll: `${Yoda.basePath}${path}` },
         { errorPrefix: 'Metadata could not be deleted' })
 
       Yoda.store_message('success', `Deleted metadata of folder <${path}>`)
@@ -659,7 +659,7 @@ function loadForm () {
   })
 
   Yoda.call('meta_form_load',
-    { coll: Yoda.basePath + path },
+    { coll: `${Yoda.basePath}${path}` },
     { rawResult: true })
     .then((data) => {
       formProperties = data

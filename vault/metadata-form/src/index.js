@@ -672,7 +672,7 @@ function browse () {
 
 function loadForm () {
   Yoda.call('meta_form_load',
-    { coll: Yoda.basePath + path },
+    { coll: `${Yoda.basePath}${path}` },
     { rawResult: true })
     .then((data) => {
       formProperties = data
@@ -809,7 +809,7 @@ async function submitData (data) {
   // Save.
   try {
     await Yoda.call('meta_form_save',
-      { coll: Yoda.basePath + path, metadata: data },
+      { coll: `${Yoda.basePath}${path}`, metadata: data },
       { errorPrefix: 'Metadata could not be saved' })
 
     Yoda.store_message('success', `Updated metadata of folder <${path}>`)
