@@ -193,7 +193,7 @@ function submitData(data) {
 
     // Disable submit button
     $("button:submit").text("Submitting...")
-    $("button:submit").attr("disabled", "disabled");
+    $("button:submit").prop("disabled", true)
 
     // Submit form and redirect to view/
     Yoda.call("datarequest_datamanager_review_submit",
@@ -204,6 +204,6 @@ function submitData(data) {
     })
     .catch(error => {
         // Re-enable submit button if submission failed
-        $("button:submit").attr("disabled", false);
+        $("button:submit").prop("disabled", false).text("Submit")
     });
 }
