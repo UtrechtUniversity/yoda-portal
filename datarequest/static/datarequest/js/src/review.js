@@ -272,7 +272,7 @@ function submitData(data)
 {
     // Disable submit button
     $("button:submit").text("Submitting...")
-    $("button:submit").attr("disabled", "disabled");
+    $("button:submit").prop("disabled", true)
 
     console.log(config.username);
     // Append username to data
@@ -287,7 +287,7 @@ function submitData(data)
     })
     .catch(error => {
         // Re-enable submit button if submission failed
-        $("button:submit").attr("disabled", false);
+        $("button:submit").prop("disabled", false).text("Submit")
    });
 }
 
