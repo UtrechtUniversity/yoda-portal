@@ -294,6 +294,7 @@ function submitData(data)
         $("#submitButton").text("Submit");
         $("#saveButton").text("Save as draft");
         $('button:submit').attr("disabled", false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 }
 
