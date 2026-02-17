@@ -11,9 +11,9 @@
     "@babel/core": "^7.18.13",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-react": "^7.18.6",
-    "@rjsf/bootstrap-4": "^4.2.3",
-    "@rjsf/core": "^4.2.3",
-    "babel-loader": "^8.2.5",
+    "@rjsf/bootstrap-4": "^5.24.13",
+    "@rjsf/core": "^6.3.1",
+    "babel-loader": "^10.0.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "core-js": "^3.24.1",
@@ -23,7 +23,7 @@
     "react-bootstrap-table2-paginator": "^2.1.2",
     "react-dom": "^18.2.0",
     "regenerator-runtime": "^0.13.9",
-    "webpack": "^5.74.0",
+    "webpack": "^5.105.2",
     "webpack-cli": "^4.10.0"
   },
   "devDependencies": {
