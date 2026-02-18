@@ -512,6 +512,10 @@ def should_populate_api_cache() -> bool:
 
 @user_bp.before_app_request
 def prepare_user() -> None:
+    if request.endpoint == 'static':
+        # No need to get and lock iRODS session for static content.
+        return None
+
     user_id = session.get('user_id')
     irods = connman.get(session.sid)
     login_username = session.get('login_username')
@@ -584,7 +588,10 @@ def prepare_user() -> None:
 
 @user_bp.after_app_request
 def release_session(response: Response) -> Response:
-    connman.release(session.sid)
+    if request.endpoint != 'static':
+        # prepare_user will only get iRODS session for non-static content
+        connman.release(session.sid)
+
     return response
 
 
