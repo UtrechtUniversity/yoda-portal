@@ -147,9 +147,10 @@
                         </tfoot>
                     </table>
 
-                    <a href="{{ url_for('stats_bp.export') }}" class="btn btn-primary btn-sm">
-                        Export monthly storage details
-                    </a>
+                    <button id="export-statistics" class="btn btn-primary btn-sm" type="button">
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true" style="display: none;"></span>
+                        <span role="status">Export monthly storage details</span>
+                    </button>
                 </div>
             </div>
         </div>
