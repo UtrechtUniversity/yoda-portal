@@ -34,6 +34,45 @@ document.addEventListener('DOMContentLoaded', function () {
     endDateInput.value = getISODateString(chartDateLabels[chartDateLabels.length - 1])
     chartFilterDate()
   })
+
+  const exportBtn = document.getElementById('export-statistics')
+
+  if (exportBtn) {
+    exportBtn.addEventListener('click', async function (event) {
+      event.preventDefault()
+
+      const btn = this
+      const spinner = btn.querySelector('.spinner-border')
+      const statusText = btn.querySelector('[role="status"]')
+
+      // Disable button and show spinner
+      btn.disabled = true
+      spinner.style.display = 'inline-block'
+      statusText.textContent = 'Generating storage statistics'
+
+      try {
+        const response = await fetch('/stats/export')
+        const blob = await response.blob()
+
+        // Create and trigger download
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'export.csv' // Adjust filename as needed
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        a.remove()
+      } catch (error) {
+        console.error('Export failed:', error)
+      } finally {
+        // Re-enable button after export completes
+        btn.disabled = false
+        spinner.style.display = 'none'
+        statusText.textContent = 'Export monthly storage details'
+      }
+    })
+  }
 })
 
 // CHART DATA VARIABLES
