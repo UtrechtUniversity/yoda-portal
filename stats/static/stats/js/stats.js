@@ -9,10 +9,16 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   const searchGroupTable = document.getElementById('search-group-table')
+  let searchTimeout
+
   searchGroupTable.addEventListener('keyup', function () {
-    if (groupBrowser._dataTableInstance) {
-      groupBrowser._dataTableInstance.search(searchGroupTable.value).draw()
-    }
+    clearTimeout(searchTimeout)
+
+    searchTimeout = setTimeout(() => {
+      if (groupBrowser._dataTableInstance) {
+        groupBrowser._dataTableInstance.search(searchGroupTable.value).draw()
+      }
+    }, 400)
   })
 
   const startDateMin = document.getElementById('startdate_min')
