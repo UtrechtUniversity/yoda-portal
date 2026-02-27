@@ -3,6 +3,9 @@
 __copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import csv
+from io import StringIO
+
 from flask import Blueprint, make_response, render_template, Response
 
 import api
@@ -35,19 +38,20 @@ def export() -> Response:
         output.headers["Content-type"] = "text/csv"
         return output
 
-    csv = "category;subcategory;groupname;"
-
-    periods = ";".join(response['data']['dates'])
-
-    csv += periods + "\n"
+    csvdata = StringIO()
+    fieldnames = ["category", "subcategory", "groupname"] + response['data']['dates']
+    writer = csv.writer(csvdata, delimiter=';', lineterminator='\n')
+    writer.writerow(fieldnames)
 
     for stat in response['data']['storage']:
-        csv += f"{stat['category']};{stat['subcategory']};{stat['groupname']};"
-        for month in stat['storage']:
-            csv += f"{month};"
-        csv += "\n"
+        writer.writerow([
+            stat['category'],
+            stat['subcategory'],
+            stat['groupname'],
+            *stat['storage']
+        ])
 
-    output = make_response(csv)
+    output = make_response(csvdata.getvalue())
     output.headers["Content-Disposition"] = "attachment; filename=export.csv"
     output.headers["Content-type"] = "text/csv"
     return output
