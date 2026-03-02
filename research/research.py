@@ -9,7 +9,9 @@ import queue
 import threading
 from contextlib import suppress
 from typing import Optional
+from urllib.parse import parse_qs, urlparse
 
+import magic
 from flask import (
     Blueprint,
     g,
@@ -24,8 +26,9 @@ from irods.exception import CAT_NO_ROWS_FOUND
 from irods.manager.data_object_manager import DataObjectManager
 from irods.message import iRODSMessage
 
+import api
 from cache_config import cache_view
-from util import log_error, unicode_secure_filename
+from util import folder_template_path_check, get_parent_folders, log_error, unicode_secure_filename
 
 research_bp = Blueprint('research_bp', __name__,
                         template_folder='templates',
@@ -100,6 +103,102 @@ def build_object_path(path: str, relative_path: str, filename: str) -> str:
         base_dir = os.path.join("/" + g.irods.zone, 'home', path)
 
     return os.path.join(base_dir, filename)
+
+
+def _file_is_text(text_string: str) -> bool:
+    file_type = magic.from_buffer(text_string)
+    return 'text' in file_type
+
+
+@research_bp.route('/upload_folder_template', methods=['POST'])
+def upload_folder_template() -> Response:
+    file = request.files['file']
+
+    # Check that file is text file
+    try:
+        file_content_pre = file.read().decode('utf-8')
+    except Exception:
+        response = make_response({'errors': ["File is not text file."]}, 400)
+        response.headers["Content-Type"] = "application/json"
+        return response
+
+    # Limit file size to 1 MiB to prevent abuse or accidental DOS
+    if len(file_content_pre) > 1048576:
+        response = make_response({'errors': ["File exceeds the 1 MiB limit."]}, 400)
+        response.headers["Content-Type"] = "application/json"
+        return response
+
+    # Check that file has valid content
+    if not _file_is_text(file_content_pre[:2000]):
+        response = make_response({'errors': ["File is empty."]}, 400)
+        response.headers["Content-Type"] = "application/json"
+        return response
+
+    file_content = file_content_pre.split('\n')
+    if not file_content:
+        response = make_response({'errors': ["Could not read file content."]}, 500)
+        response.headers["Content-Type"] = "application/json"
+        return response
+
+    # Parse current folder
+    base_url = request.referrer
+    parsed_url = urlparse(base_url)
+    current_folder = parse_qs(parsed_url.query)['dir'][0]
+
+    # Process template file
+    folders = set()
+    errors = []
+
+    for i, line in enumerate(file_content):
+        line = line.rstrip()
+        if line != '' and not line.isspace():  # Skip lines that are empty or whitespaces
+            if '\\' in line:  # If path contains backslash, replace with slash
+                line = line.replace('\\', '/')
+            if line.endswith('/'):  # If path ends with slash, remove it
+                line = line.rstrip('/')
+
+            error = folder_template_path_check(i, line)
+            if error:
+                errors.append(error)
+            else:
+                # Add all parent folders (and this folder) found in path
+                folders.update(get_parent_folders(line))
+
+    if len(folders) == 0:  # If no paths are in the list, no valid paths were found in file
+        errors.append("No valid paths were found in file.")
+
+    if len(errors) > 0:  # Do not process if there are errors
+        log_error(
+            "Error(s) occurred while processing the template file."
+        )
+        response = make_response({'errors': errors}, 400)
+        response.headers["Content-Type"] = "application/json"
+        return response
+
+    # Sort folders before creating them
+    folders_list = sorted(folders)
+
+    # Create all folders
+    base_path = f"/{g.irods.zone}/home"
+    responses = []
+    for folder in folders_list:
+        parent = str(folder.parents[0])
+        if parent == '/':  # If path has parents, append parents to collection
+            coll = base_path + current_folder
+        else:
+            coll = base_path + current_folder + parent
+
+        response = api.call('research_folder_add', data={'coll': coll, 'new_folder_name': folder.name})
+        portal_response = {
+            "folder": str(folder),
+            "status": response['status'],
+            "status_info": response['status_info']
+        }
+        responses.append(portal_response)
+
+    response = make_response({"responses": responses}, 200)
+    response.headers["Content-Type"] = "application/json"
+    return response
 
 
 @research_bp.route('/upload', methods=['GET'])

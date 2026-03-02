@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2024, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2026, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import re
 import sys
 import traceback
 import urllib
 from os import listdir, name, path
+from pathlib import PurePath
 from re import compile, fullmatch
-from typing import List, Tuple
+from typing import List, Set, Tuple
 
 from werkzeug.security import safe_join
 from werkzeug.utils import secure_filename
@@ -87,6 +89,46 @@ def unicode_secure_filename(filename: str) -> str:
         return ''
 
     return filename
+
+
+def folder_template_path_check(i: int, line: str) -> str:
+    """
+    Basic checks of path before trying to create folder templates
+
+    :param i: Line number in the file
+    :param line: Path to check
+
+    :returns: Error if there is an error
+    """
+    if line.startswith('./') or line.startswith('../') or '/./' in line or '/../' in line:  # Traversal sequence check
+        return f"Error at line {i + 1}: path '{line}' contains a ./ or ../ which is not allowed."
+    if re.match('^[a-zA-Z]:', line):  # Windows absolute path check
+        return f"Error at line {i + 1}: path '{line}' is an absolute Windows path."
+
+    return ""
+
+
+def get_parent_folders(line: str) -> Set[PurePath]:
+    """
+    Return a set of the folder and its ancestors as PurePaths
+    Always starts with front slash
+
+    :param line: Path to enumerate
+
+    :returns: set of PurePaths
+    """
+    folders = set()
+    folder = PurePath(line)
+    parts = folder.parts
+
+    start = 0
+    if line.startswith('/'):
+        start = 1
+    for i in range(start, len(parts)):
+        parent_folder = PurePath("/" + "/".join(parts[start:i + 1]))
+        folders.add(parent_folder)
+
+    return folders
 
 
 def get_validated_static_path(

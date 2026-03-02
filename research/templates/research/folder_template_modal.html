@@ -1,0 +1,86 @@
+<!-- Folder Template Import Modal -->
+<div class="modal" tabindex="-1" role="dialog" id="upload-template-modal" aria-labelledby="upload-template-label" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="upload-template-label">Import folder template from text file</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div id="info-folder-template">
+                  <h5>Text file format</h5>
+
+                  <p>
+                    The file is expected to be a list of folder paths that will be created, with the assumption
+                    that the current directory is the root of the tree. Maximum file size is 1 MiB.
+                  </p>
+
+                  <h5>Example:</h5>
+<pre>Planning/Procedures
+Analysis
+Reports/Attachments
+Reports/Reviews/Final Review
+</pre>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <h5>Upload text file:</h5>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <input type="file" id="file-input" name="file-input" class="import-file" accept=".txt" title="Upload text file with list of folder paths" />
+                  <button for="file-input" class="btn btn-primary file-input-click" id="file-input-click" type="button">
+                    <span class="spinner-border spinner-border-sm" aria-hidden="true" style="display: none;"></span>
+                    <span role="status"><i class="fa-solid fa-upload" aria-hidden="true"></i> Upload file</span>
+                  </button>
+                </div>
+              </div>
+              <div class="row">
+                <span><br></span>
+                <div id="error-folder-template">
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="folder-template-progress" data-action="">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="card-body">
+                <div class="card">
+                    <div class="card-header clearfix">
+                        <h5 class="card-title float-start">
+                            <span class="action"></span> Folder structure creation progress
+                        </h5>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-bordered folder-template-table" style="table-layout: fixed;">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Folder name</th>
+                                    <th scope="col">Progress</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Close">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
