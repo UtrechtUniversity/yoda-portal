@@ -66,7 +66,7 @@ $(function () {
   /// /////////////////////////////////////////////
   // File and folder management from context menu
   /// /////////////////////////////////////////////
-  $('.btn-group button.folder-create').on('click', function () {
+  $('a.dropdown-item.folder-create').on('click', function () {
     // Destroy earlier alerts
     fileMgmtDialogAlert('folder-create', '')
 
@@ -80,7 +80,7 @@ $(function () {
     $('#path-folder-create').focus()
   })
 
-  // handle addition of new folder to
+  // handle addition of new folder
   $('.btn-confirm-folder-create').on('click', function () {
     // er kan een dubbele naam zijn? error handling afwikkelen!
     handleFolderAdd($('#path-folder-create').val(), $(this).attr('data-path'))
@@ -1307,8 +1307,9 @@ function topInformation (dir, showAlert) {
 
       $('.btn-group button.upload').attr('data-path', '')
       $('.btn-group button.upload').prop('disabled', true)
-      $('.btn-group button.folder-create').attr('data-path', '')
-      $('.btn-group button.folder-create').prop('disabled', true)
+
+      $('a.dropdown-item.folder-create').attr('data-path', '')
+      $('#createMenu').prop('disabled', true)
 
       $('.top-information').hide()
       $('.top-info-buttons').hide()
@@ -1382,8 +1383,8 @@ function topInformation (dir, showAlert) {
         $('.btn-group button.upload').prop('disabled', false)
 
         // Enable folder / file manipulations.
-        $('.btn-group button.folder-create').attr('data-path', dir)
-        $('.btn-group button.folder-create').prop('disabled', false)
+        $('a.dropdown-item.folder-create').attr('data-path', dir)
+        $('#createMenu').prop('disabled', false)
       }
 
       // Lock icon
@@ -1435,7 +1436,7 @@ function topInformation (dir, showAlert) {
     $('.btn-group button.upload').attr('data-path', '')
 
     // Folder/ file manipulation data
-    $('.btn-group button.folder-create').attr('data-path', '')
+    $('a.dropdown-item.folder-create').attr('data-path', '')
 
     $('.top-information').hide()
   }

@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 """Unit tests for portal utility functions."""
 
-__copyright__ = 'Copyright (c) 2023-2024, Utrecht University'
+__copyright__ = 'Copyright (c) 2023-2026, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import sys
+from pathlib import PurePath
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
 sys.path.append("..")
 
 from util import (
+    folder_template_path_check,
+    get_parent_folders,
     get_theme_directories,
     get_validated_static_path,
     is_email_in_domains,
@@ -37,7 +40,7 @@ class UtilTest(TestCase):
     def test_unicode_secure_filename(self) -> None:
         self.assertEqual(unicode_secure_filename('../../hi abc.txt'), '....hi abc.txt')
         self.assertEqual(unicode_secure_filename('....//hi abc.txt'), '....hi abc.txt')
-        self.assertEqual(unicode_secure_filename('....\/hi abc.txt'), '....hi abc.txt')
+        self.assertEqual(unicode_secure_filename('....\\/hi abc.txt'), '....hi abc.txt')
         self.assertEqual(unicode_secure_filename('..'), '')
         self.assertEqual(unicode_secure_filename('.\\.'), '')
         self.assertEqual(unicode_secure_filename('./.'), '')
@@ -239,6 +242,12 @@ class UtilTest(TestCase):
             result = get_theme_directories('/test/path')
             assert result == expected_result
 
+    def test_get_parent_folders(self) -> None:
+        self.assertEqual(get_parent_folders('Parent/Child/Grandkid'),
+                         {PurePath('/Parent'), PurePath('/Parent/Child'), PurePath('/Parent/Child/Grandkid')})
+        self.assertEqual(get_parent_folders('/Parent/Child/Grandkid'),
+                         {PurePath('/Parent'), PurePath('/Parent/Child'), PurePath('/Parent/Child/Grandkid')})
+
     def test_is_relative_url(self) -> None:
         self.assertEqual(is_relative_url("http://www.uu.nl"), False)
         self.assertEqual(is_relative_url("https://www.uu.nl"), False)
@@ -246,3 +255,35 @@ class UtilTest(TestCase):
         self.assertEqual(is_relative_url("https://username:password@www.uu.nl"), False)
         self.assertEqual(is_relative_url("/foo/bar/bat"), True)
         self.assertEqual(is_relative_url("foo/bar/bat"), True)
+
+    def test_folder_template_path_check(self) -> None:
+        result = folder_template_path_check(0, './sneaky-path')
+        self.assertIn("not allowed", result)
+
+        result = folder_template_path_check(0, '../sneaky-path')
+        self.assertIn("not allowed", result)
+
+        result = folder_template_path_check(0, '/sneaky/./sneaky-path')
+        self.assertIn("not allowed", result)
+
+        result = folder_template_path_check(0, '/sneaky/../sneaky-path')
+        self.assertIn("not allowed", result)
+
+        result = folder_template_path_check(0, 'C:\\Users\\Name')
+        self.assertIn("absolute Windows path", result)
+
+        result = folder_template_path_check(0, 'C:/Users/Name')
+        self.assertIn("absolute Windows path", result)
+
+        # Good paths
+        result = folder_template_path_check(0, '/Manuscripts/Preprint')
+        self.assertEqual(result, '')
+
+        result = folder_template_path_check(0, 'Manuscripts/Preprint')
+        self.assertEqual(result, '')
+
+        result = folder_template_path_check(0, '/Research/User\'s Feedback')
+        self.assertEqual(result, '')
+
+        result = folder_template_path_check(0, '/Studies/Schrödinger Equation')
+        self.assertEqual(result, '')
