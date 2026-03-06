@@ -48,10 +48,13 @@ document.addEventListener('DOMContentLoaded', function () {
       // Disable button and show spinner
       btn.disabled = true
       spinner.style.display = 'inline-block'
-      statusText.textContent = 'Generating storage statistics'
+      statusText.textContent = 'Generating monthly storage statistics'
 
       try {
         const response = await fetch('/stats/export')
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
         const blob = await response.blob()
 
         // Create and trigger download
@@ -63,13 +66,13 @@ document.addEventListener('DOMContentLoaded', function () {
         a.click()
         window.URL.revokeObjectURL(url)
         a.remove()
-      } catch (error) {
-        console.error('Export failed:', error)
-      } finally {
+
         // Re-enable button after export completes
         btn.disabled = false
         spinner.style.display = 'none'
-        statusText.textContent = 'Export monthly storage details'
+        statusText.textContent = 'Export monthly storage statistics'
+      } catch (error) {
+        Yoda.set_message('error', 'Something went wrong exporting monthly storage statistics. Please contact a Yoda administrator')
       }
     })
   }
