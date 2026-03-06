@@ -76,7 +76,7 @@ jobs:
         cd yoda/docker/compose
         docker exec provider.yoda sh -c 'set -x ; cd /etc/irods/yoda-ruleset && sudo chown irods:irods -R /etc/irods/yoda-ruleset && sudo -u irods git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*" && sudo -u irods git pull && sudo -u irods git status'
         docker exec provider.yoda sh -c "set -x ; cd /etc/irods/yoda-ruleset && ( sudo -u irods git checkout ${{ steps.extract_branch.outputs.branch }} || true ) && sudo -u irods python3 -m pip --no-cache-dir install --user --break-system-packages -r /etc/irods/yoda-ruleset/requirements.txt && sudo -u irods make && sudo -u irods make install"
-        docker exec provider.yoda sh -c 'set -x ; sudo -u irods /var/lib/irods/irodsctl restart'
+        docker exec provider.yoda sh -c 'kill -HUP $(cat /var/run/irods/irods-server.pid)'
 
     - name: Pull and install branch version of the portal
       shell: bash
@@ -111,7 +111,7 @@ jobs:
         docker logs portal.yoda
         docker logs provider.yoda
         docker exec portal.yoda sh -c 'set -x; cat /var/log/apache2/error.log || echo "Apache error log file not found."'
-        docker exec provider.yoda sh -c 'set -x ; cat /var/log/syslog' || echo "rodsLog not found."'
+        docker exec provider.yoda sh -c 'cat /var/lib/irods-log/rodsLog*' || echo "rodsLog not found."'
         cat ../../copytovault.log
         cat ../../publication.log
 
