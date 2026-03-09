@@ -38,7 +38,7 @@ API_CACHE_TIMEOUTS = {
     "notifications_load":                              {"prepopulate": True,  "timeout": 120},
     "resource_browse_group_data":                      {"prepopulate": True,  "timeout": 3600},
     "resource_category_stats":                         {"prepopulate": True,  "timeout": 3600},
-    "resource_monthly_category_stats":                 {"prepopulate": True,  "timeout": 3600},
+    "resource_monthly_category_stats":                 {"prepopulate": False, "timeout": 120},
     "resource_full_year_differentiated_group_storage": {"prepopulate": False, "timeout": 3600},
     "schema_get_schemas":                              {"prepopulate": True,  "timeout": 3600},
     "settings_load":                                   {"prepopulate": True,  "timeout": 3600},
