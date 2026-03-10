@@ -40,7 +40,7 @@ $(function () {
   /// /////////////////////////////////////////////
   // File and folder management from context menu
   /// /////////////////////////////////////////////
-  $('.btn-group button.folder-create').on('click', function () {
+  $('a.dropdown-item.folder-create').on('click', function () {
     // Destroy earlier alerts
     fileMgmtDialogAlert('folder-create', '')
 
@@ -668,7 +668,7 @@ function browse (dir = '', changeHistory = false) {
 
   buildFileBrowser(dir)
   $('button.upload').attr('data-path', dir)
-  $('button.folder-create').attr('data-path', dir)
+  $('a.dropdown-item.folder-create').attr('data-path', dir)
 }
 
 function resetMultiSelectCheckbox () {

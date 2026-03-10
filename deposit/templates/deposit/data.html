@@ -19,6 +19,7 @@
 <script src="{{ url_for('deposit_bp.static', filename='lib/flow-js/flow.min.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='lib/dragbetter-js/jquery.dragbetter.js') }}"></script>
 <script src="{{ url_for('deposit_bp.static', filename='js/data.js') }}"></script>
+<script src="{{ url_for('research_bp.static', filename='js/folder-template-modal.js') }}" type="module"></script>
 <script src="{{ url_for('deposit_bp.static', filename='js/dlgFileBrowseOperations.js') }}" type="module"></script>
 {% endblock scripts %}
 
@@ -92,8 +93,16 @@
 
     <div class="col-md-12">
         <div class="btn-toolbar float-end" role="toolbar">
-            <div class="btn-group me-2">
-                <button type="button" class="btn btn-outline-secondary folder-create" data-path="" title="Create a new folder"><i class="fa-solid fa-folder" aria-hidden="true"></i> Create Folder</button>
+            <div class="btn-group me-2" role="group" tabindex="0">
+                <div class="dropdown" title="Create folders" tabindex="0">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle create" data-path="" title="Create folders" id="createMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa-solid fa-folder" aria-hidden="true"></i> Create folders
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="createMenu">
+                        <li><a class="dropdown-item folder-create" title="Create a new folder" href="#">Create Folder</a></li>
+                        <li><a class="dropdown-item folder-template" title="Create folders from template" data-bs-toggle="modal" data-bs-target="#upload-template-modal" href="#">Create from Template</a></li>
+                    </ul>
+                </div>
             </div>
             <div class="btn-group me-2" role="group">
                 <div class="dropdown">
@@ -429,5 +438,7 @@
         </div>
     </div>
 </div>
+
+{% include 'research/folder_template_modal.html' %}
 
 {% endblock content %}

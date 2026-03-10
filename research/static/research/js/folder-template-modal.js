@@ -40,7 +40,7 @@ function handleFolderTemplateModal () {
 
     // Handle response
     try {
-      const response = await fetch('upload_folder_template', {
+      const response = await fetch('/research/upload_folder_template', {
         method: 'POST',
         credentials: 'same-origin',
         body: formData,
