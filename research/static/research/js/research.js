@@ -188,7 +188,7 @@ $(function () {
   // Show checksum report
   $('body').on('click', 'a.action-show-checksum-report', function () {
     const folder = $(this).attr('data-folder')
-    const downloadUrl = 'browse/download_checksum_report?path=' + encodeURIComponent(folder)
+    const downloadUrl = '/browse/download_checksum_report?path=' + encodeURIComponent(folder)
 
     $('#showChecksumReport .collection').text(folder)
     $('#showChecksumReport .modal-body #checksumReport').html('')
@@ -1108,7 +1108,7 @@ const tableRenderer = {
       actions.append(`<a href="#" class="dropdown-item folder-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this folder">Move</a>`)
       actions.append(`<a href="#" class="dropdown-item folder-delete" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Delete this file">Delete</a>`)
     } else {
-      actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
+      actions.append(`<a class="dropdown-item file-download" href="/browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
       actions.append(`<a href="#" class="dropdown-item file-rename" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Rename this file">Rename</a>`)
       actions.append(`<a href="#" class="dropdown-item file-copy" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Copy this file">Copy</a>`)
       actions.append(`<a href="#" class="dropdown-item file-move" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Move this file">Move</a>`)

@@ -1,20 +1,16 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-__copyright__ = 'Copyright (c) 2021-2025, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2026, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
-import csv
-import io
 import os
 import queue
 import threading
-import urllib.parse
 from contextlib import suppress
-from typing import Iterator, Optional
+from typing import Optional
 
 from flask import (
-    abort,
     Blueprint,
     g,
     jsonify,
@@ -22,17 +18,12 @@ from flask import (
     render_template,
     request,
     Response,
-    session,
-    stream_with_context,
 )
 from flask import current_app as app
-from irods.data_object import iRODSDataObject
-from irods.exception import CAT_NO_ACCESS_PERMISSION, CAT_NO_ROWS_FOUND
+from irods.exception import CAT_NO_ROWS_FOUND
 from irods.manager.data_object_manager import DataObjectManager
 from irods.message import iRODSMessage
 
-import api
-import connman
 from cache_config import cache_view
 from util import log_error, unicode_secure_filename
 
@@ -93,45 +84,6 @@ threading.Thread(target=irods_writer, name='irods-writer', daemon=True).start()
 @cache_view()
 def index() -> Response:
     return render_template('research/browse.html')
-
-
-@research_bp.route('/browse/download')
-def download() -> Response:
-    path = '/' + g.irods.zone + '/home' + request.args.get('filepath')
-    filename = path.rsplit('/', 1)[1]
-    quoted_filename = urllib.parse.quote(filename)
-
-    def read_file_chunks(data_object: iRODSDataObject) -> Iterator[bytes]:
-        READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
-
-        try:
-            with data_object.open('r') as fd:
-                while True:
-                    buf = fd.read(READ_BUFFER_SIZE)
-                    if buf:
-                        connman.extend(session.sid)
-                        yield buf
-                    else:
-                        break
-        except CAT_NO_ACCESS_PERMISSION:
-            abort(403)
-        except Exception:
-            abort(500)
-
-    if g.irods.data_objects.exists(path):
-        data_object = g.irods.data_objects.get(path)
-        size = data_object.replicas[0].size
-
-        return Response(
-            stream_with_context(read_file_chunks(data_object)),
-            headers={
-                'Content-Disposition': "attachment; filename*=UTF-8''" + quoted_filename,
-                'Content-Length': f'{size}',
-                'Content-Type': 'application/octet-stream'
-            }
-        )
-    else:
-        abort(404)
 
 
 def build_object_path(path: str, relative_path: str, filename: str) -> str:
@@ -300,36 +252,3 @@ def upload_post() -> Response:
 def form() -> Response:
     path = request.args.get('path')
     return render_template('research/metadata-form.html', path=path)
-
-
-@research_bp.route('/browse/download_checksum_report')
-def download_report() -> Response:
-    path = request.args.get("path")
-    format = request.args.get("format")
-    coll = "/" + g.irods.zone + "/home" + path
-    response = api.call('research_manifest', data={'coll': coll})
-
-    if format == 'csv':
-        mime = 'text/csv'
-        ext = '.csv'
-        output_io = io.StringIO()
-        writer = csv.writer(output_io, quoting=csv.QUOTE_MINIMAL)
-        writer.writerow(["filename", "size", "checksum"])
-        if response['status'] == 'ok':
-            for result in response["data"]["manifest"]:
-                writer.writerow([result['name'], result['human_readable_size'], result['checksum']])
-        output = output_io.getvalue()
-    else:
-        mime = 'text/plain'
-        ext = '.txt'
-        lines = []
-        if response['status'] == 'ok':
-            for result in response["data"]["manifest"]:
-                lines.append(f"{result['name']} {result['human_readable_size']} {result['checksum']}")
-        output = "\n".join(lines)
-
-    return Response(
-        output,
-        mimetype=mime,
-        headers={'Content-disposition': 'attachment; filename=checksums' + ext}
-    )

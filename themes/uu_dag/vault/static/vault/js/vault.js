@@ -239,7 +239,7 @@ const tableRenderer = {
 
     if (row.type === 'coll') { return '' }
 
-    actions.append(`<a href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file"><i class="fa-solid fa-download"></a>`)
+    actions.append(`<a href="/browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" title="Download this file"><i class="fa-solid fa-download"></a>`)
 
     return actions[0].innerHTML
   }

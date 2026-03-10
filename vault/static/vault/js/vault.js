@@ -58,7 +58,7 @@ $(function () {
 
   $('body').on('click', 'a.action-show-checksum-report', function () {
     const folder = $(this).attr('data-folder')
-    const downloadUrl = 'browse/download_checksum_report?path=' + encodeURIComponent(folder)
+    const downloadUrl = '/browse/download_checksum_report?path=' + encodeURIComponent(folder)
 
     $('#showChecksumReport .collection').text(folder)
     $('#showChecksumReport .modal-body #checksumReport').html('')
@@ -635,7 +635,7 @@ const tableRenderer = {
       }
       actions.append(`<a href="#" class="dropdown-item folder-download" data-path="${Yoda.htmlEncode(currentFolder + '/' + row.name)}" title="Download this folder">Download</a>`)
     } else {
-      actions.append(`<a class="dropdown-item file-download" href="browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
+      actions.append(`<a class="dropdown-item file-download" href="/browse/download?filepath=${encodeURIComponent(currentFolder + '/' + row.name)}" data-collection="${Yoda.htmlEncode(currentFolder)}" data-name="${Yoda.htmlEncode(row.name)}" title="Download this file">Download</a>`)
     }
 
     const dropdown = $(`<div class="dropdown">

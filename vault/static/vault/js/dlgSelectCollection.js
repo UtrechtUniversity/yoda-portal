@@ -275,7 +275,7 @@ const tableRenderer2 = {
     const ext = row.name.replace(/.*\./, '').toLowerCase()
 
     const actions = $('<ul class="dropdown-menu">')
-    actions.append(`<li><a href="browse/download?filepath=${encodeURIComponent(dlgCurrentFolder + '/' + row.name)}">Download</a>`)
+    actions.append(`<li><a href="/browse/download?filepath=${encodeURIComponent(dlgCurrentFolder + '/' + row.name)}">Download</a>`)
 
     // Generate dropdown "view" actions for different media types.
     for (const type of Object.keys(viewExts).filter(type => (viewExts[type].includes(ext)))) { actions.append(`<li><a class="view-${type}" data-path="${Yoda.htmlEncode(dlgCurrentFolder + '/' + row.name)}">View</a>`) }
@@ -394,7 +394,7 @@ async function collectFolderEntries (folderPath) {
     } else {
       // Single file
       const filepath = `${folderPath}/${item.name}`
-      const url = '/research/browse/download?filepath=' + encodeURIComponent(filepath)
+      const url = '/browse/download?filepath=' + encodeURIComponent(filepath)
       downloadEntries.push({ url, name: folderName + '/' + item.name })
     }
   }
@@ -415,7 +415,7 @@ async function collectMultiSelectEntries () {
     if (type === 'coll') {
       downloadEntries.push(...(await collectFolderEntries(path))) // reuse folder download func
     } else {
-      const url = '/research/browse/download?filepath=' + encodeURIComponent(path)
+      const url = '/browse/download?filepath=' + encodeURIComponent(path)
       downloadEntries.push({ url, name })
     }
   }
