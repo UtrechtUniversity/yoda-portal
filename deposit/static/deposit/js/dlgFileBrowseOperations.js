@@ -129,7 +129,7 @@ $(document).ready(function () {
       } else {
         // Single file
         const filepath = `${folderPath}/${item.name}`
-        const url = '/research/browse/download?filepath=' + encodeURIComponent(filepath)
+        const url = '/browse/download?filepath=' + encodeURIComponent(filepath)
         downloadEntries.push({ url, name: folderName + '/' + item.name })
       }
     }
@@ -150,7 +150,7 @@ $(document).ready(function () {
       if (type === 'coll') {
         downloadEntries.push(...(await collectFolderEntries(path))) // reuse folder download func
       } else {
-        const url = '/research/browse/download?filepath=' + encodeURIComponent(path)
+        const url = '/browse/download?filepath=' + encodeURIComponent(path)
         downloadEntries.push({ url, name })
       }
     }

@@ -64,19 +64,19 @@ window.addEventListener('load', function () {
 
   if (viewExts.video.includes(currentFileExtension)) {
     // video files
-    const viewerHtml = `<div class="ratio ratio-16x9"><video controls autoplay><source src="/research/browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(currentFile))}"></video></div>`
+    const viewerHtml = `<div class="ratio ratio-16x9"><video controls autoplay><source src="/browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(currentFile))}"></video></div>`
     document.getElementById('file-errors').style.display = 'none'
     document.getElementById('file-contents').innerHTML = viewerHtml
     document.getElementById('file-output').style.display = 'block'
   } else if (viewExts.image.includes(currentFileExtension)) {
     // image files
-    const viewerHtml = `<img class="img-fluid" src="/research/browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(currentFile))}" />`
+    const viewerHtml = `<img class="img-fluid" src="/browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(currentFile))}" />`
     document.getElementById('file-errors').style.display = 'none'
     document.getElementById('file-contents').innerHTML = viewerHtml
     document.getElementById('file-output').style.display = 'block'
   } else if (viewExts.audio.includes(currentFileExtension)) {
     // audio files
-    const viewerHtml = `<audio width="640" controls autoplay><source src="/research/browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(currentFile))}"></audio>`
+    const viewerHtml = `<audio width="640" controls autoplay><source src="/browse/download?filepath=${Yoda.htmlEncode(encodeURIComponent(currentFile))}"></audio>`
     document.getElementById('file-errors').style.display = 'none'
     document.getElementById('file-contents').innerHTML = viewerHtml
     document.getElementById('file-output').style.display = 'block'
