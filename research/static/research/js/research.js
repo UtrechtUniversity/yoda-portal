@@ -11,8 +11,6 @@ $(document).ajaxSend(function (e, request, settings) {
 })
 
 let preservableFormatsLists = null
-let folderCreateTooltip
-let uploadMenuTooltip
 let downloadChecksumReportTextTooltip
 let downloadChecksumReportCSVTooltip
 let currentFolder
@@ -42,7 +40,6 @@ $(function () {
 
   if ($('#file-browser').length) {
     startBrowsing()
-    createTooltips()
   }
 
   window.onbeforeunload = function (e) {
@@ -355,7 +352,6 @@ $(function () {
 
       $.each(sortedFiles, function (key, file) {
         const secureFile = secureFilename(file.name)
-        const folders = file.relativePath.substring(0, file.relativePath.lastIndexOf('/'))
         const fileName = file.relativePath.substring(0, file.relativePath.lastIndexOf('/') + 1) + secureFile
         logUpload(file.uniqueIdentifier, fileName)
         const folderName = file.relativePath.substring(0, file.relativePath.indexOf('/'))
@@ -403,15 +399,8 @@ $(function () {
             overwrite = true
           }
         }
-        // Check for apostrophe in folder name
-        if (folders.indexOf('\'') > -1) {
-          // It seems like you must first pause, then cancel
-          file.pause()
-          file.cancel()
-          $self.find('.msg').text('Upload cancelled: folder must not contain an apostrophe')
-          $self.find('.upload-pause').addClass('hidden')
-          $self.find('.upload-cancel').addClass('hidden')
-        } else if (overwrite) {
+
+        if (overwrite) {
           file.pause()
           $self.find('.msg').text('Upload paused')
           $self.find('.overwrite-div').removeClass('hidden')
@@ -627,25 +616,6 @@ $(function () {
 
   dragElement(document.getElementById('uploads'))
 })
-
-function createTooltips () {
-  // Let user know why cannot upload files.
-  const folderCreate = $('.btn-group button.folder-create').parent()
-  folderCreateTooltip = new bootstrap.Tooltip(folderCreate)
-  folderCreateTooltip.disable()
-
-  const uploadMenu = $('button#uploadMenu').parent()
-  uploadMenuTooltip = new bootstrap.Tooltip(uploadMenu)
-  uploadMenuTooltip.disable()
-
-  const downloadChecksumReportText = $('.download-report-text').parent()
-  downloadChecksumReportTextTooltip = new bootstrap.Tooltip(downloadChecksumReportText)
-  downloadChecksumReportTextTooltip.disable()
-
-  const downloadChecksumReportCSV = $('.download-report-csv').parent()
-  downloadChecksumReportCSVTooltip = new bootstrap.Tooltip(downloadChecksumReportCSV)
-  downloadChecksumReportCSVTooltip.disable()
-}
 
 function secureFilename (file) {
   // mirrors behaviour of unicode_secure_filename in util.py
@@ -1343,13 +1313,6 @@ function topInformation (dir, showAlert) {
       $('.top-information').hide()
       $('.top-info-buttons').hide()
 
-      if (folderCreateTooltip) {
-        folderCreateTooltip.disable()
-      }
-      if (uploadMenuTooltip) {
-        uploadMenuTooltip.disable()
-      }
-
       // Set folder status badge and actions.
       if (typeof status !== 'undefined') {
         if (status === '' || status === 'SECURED' || status === 'FOLDER') {
@@ -1409,15 +1372,6 @@ function topInformation (dir, showAlert) {
             actions.accept = 'Accept'
             actions.reject = 'Reject'
           }
-        }
-      }
-
-      if (dir.indexOf('\'') > -1) {
-        if (folderCreateTooltip) {
-          folderCreateTooltip.enable()
-        }
-        if (uploadMenuTooltip) {
-          uploadMenuTooltip.enable()
         }
       }
 

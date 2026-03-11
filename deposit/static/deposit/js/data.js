@@ -1,4 +1,4 @@
-/* global $, bootstrap, Flow, path */
+/* global $, Flow, path */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
@@ -14,8 +14,6 @@ let currentFolder
 let filenames = []
 const hasReadRights = true
 let uploadFolder = false
-let folderCreateTooltip
-let uploadMenuTooltip
 let downloadChecksumReportTextTooltip
 let downloadChecksumReportCSVTooltip
 
@@ -26,8 +24,6 @@ $(function () {
 
   // Canonicalize path somewhat, for convenience.
   currentFolder = path.replace(/\/+/g, '/').replace(/\/$/, '')
-
-  createTooltips()
 
   if ($('#file-browser').length) {
     startBrowsing()
@@ -263,7 +259,6 @@ $(function () {
 
       $.each(sortedFiles, function (key, file) {
         const secureFile = secureFilename(file.name)
-        const folders = file.relativePath.substring(0, file.relativePath.lastIndexOf('/'))
         const fileName = file.relativePath.substring(0, file.relativePath.lastIndexOf('/') + 1) + secureFile
         logUpload(file.uniqueIdentifier, fileName)
         const folderName = file.relativePath.substring(0, file.relativePath.indexOf('/'))
@@ -311,15 +306,8 @@ $(function () {
             overwrite = true
           }
         }
-        // Check for apostrophe in folder name
-        if (folders.indexOf('\'') > -1) {
-          // It seems like you must first pause, then cancel
-          file.pause()
-          file.cancel()
-          $self.find('.msg').text('Upload cancelled: folder must not contain an apostrophe')
-          $self.find('.upload-pause').addClass('hidden')
-          $self.find('.upload-cancel').addClass('hidden')
-        } else if (overwrite) {
+
+        if (overwrite) {
           file.pause()
           $self.find('.msg').text('Upload paused')
           $self.find('.overwrite-div').removeClass('hidden')
@@ -427,25 +415,6 @@ $(function () {
 
   dragElement(document.getElementById('uploads'))
 })
-
-function createTooltips () {
-  // Let user know why cannot upload files.
-  const folderCreate = $('.btn-group button.folder-create').parent()
-  folderCreateTooltip = new bootstrap.Tooltip(folderCreate)
-  folderCreateTooltip.disable()
-
-  const uploadMenu = $('button#uploadMenu').parent()
-  uploadMenuTooltip = new bootstrap.Tooltip(uploadMenu)
-  uploadMenuTooltip.disable()
-
-  const downloadChecksumReportText = $('.download-report-text').parent()
-  downloadChecksumReportTextTooltip = new bootstrap.Tooltip(downloadChecksumReportText)
-  downloadChecksumReportTextTooltip.disable()
-
-  const downloadChecksumReportCSV = $('.download-report-csv').parent()
-  downloadChecksumReportCSVTooltip = new bootstrap.Tooltip(downloadChecksumReportCSV)
-  downloadChecksumReportCSVTooltip.disable()
-}
 
 function secureFilename (file) {
   // mirrors behaviour of unicode_secure_filename in util.py
@@ -700,40 +669,12 @@ function browse (dir = '', changeHistory = false) {
   buildFileBrowser(dir)
   $('button.upload').attr('data-path', dir)
   $('button.folder-create').attr('data-path', dir)
-
-  apostropheFolderHints(dir)
 }
 
 function resetMultiSelectCheckbox () {
   $('#multi-select-all').prop({ checked: false })
   $('#multiSelect').addClass('hide')
   $("input[name='multiSelect[]']").prop('checked', false)
-}
-
-function apostropheFolderHints (dir) {
-  // Apostrophe in the name, so disable upload/creation
-  if (dir.indexOf('\'') > -1) {
-    if (folderCreateTooltip) {
-      folderCreateTooltip.enable()
-    }
-    if (uploadMenuTooltip) {
-      uploadMenuTooltip.enable()
-    }
-    $('.btn-group button.folder-create').addClass('disabled')
-    $('.btn-group button.upload').attr('data-path', '')
-    $('.btn-group button.upload').prop('disabled', true)
-  } else {
-    if (folderCreateTooltip) {
-      folderCreateTooltip.disable()
-    }
-    if (uploadMenuTooltip) {
-      uploadMenuTooltip.disable()
-    }
-    $('.btn-group button.folder-create').removeClass('disabled')
-    // Enable uploads.
-    $('.btn-group button.upload').attr('data-path', dir)
-    $('.btn-group button.upload').prop('disabled', false)
-  }
 }
 
 function makeBreadcrumb (dir) {
