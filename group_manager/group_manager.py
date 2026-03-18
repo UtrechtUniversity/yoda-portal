@@ -95,6 +95,7 @@ def group_create() -> Response:
     schema_id = request.form.get('group_schema_id', '')
     data_classification = request.form.get('group_data_classification', '')
     expiration_date = request.form.get('group_expiration_date', '')
+    sram_co = request.form.get('group_sram_co', '').strip().lower() == "true"
 
     response = api.call('group_create', data={'group_name': request.form['group_name'],
                                               'category': request.form['group_category'],
@@ -102,7 +103,8 @@ def group_create() -> Response:
                                               'schema_id': schema_id,
                                               'expiration_date': expiration_date,
                                               'description': request.form['group_description'],
-                                              'data_classification': data_classification})
+                                              'data_classification': data_classification,
+                                              'sram_co': sram_co})
 
     output = make_response(response)
     output.headers["Content-type"] = "application/json"

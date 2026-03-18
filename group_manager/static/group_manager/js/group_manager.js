@@ -678,6 +678,13 @@ $(function () {
 
   // When allowed to add groups the fields have to be initialized. Copy the values of category and subcategory
   $('.create-button-new').on('click', function () {
+    const groupType = this.getAttribute('data-group-type')
+    if (groupType === 'sram-co') {
+      $('#f-group-create-sram-co').prop('checked', true)
+    } else {
+      $('#f-group-create-sram-co').prop('checked', false)
+    }
+
     $('.properties-update').addClass('hidden')
     $('.users').addClass('hidden')
     $('.properties-create').removeClass('hidden')
@@ -1145,6 +1152,10 @@ $(function () {
           $('#f-group-update-data-classification')
             .val(group.data_classification).trigger('change')
         }
+
+        // Add SRAM CO value
+        $groupProperties.find('#f-group-update-sram-co')
+          .prop('checked', (group.sram_co.toLowerCase() === 'true'))
 
         $groupProperties.find('#f-group-update-submit')
           .attr('hidden', !userCanManage)
@@ -1802,7 +1813,8 @@ $(function () {
         data_classification,
         category: $('#f-group-' + action + '-category').select2('data')[0].id,
         subcategory: $('#f-group-' + action + '-subcategory').select2('data')[0].id,
-        expiration_date: $('#f-group-' + action + '-expiration-date').val()
+        expiration_date: $('#f-group-' + action + '-expiration-date').val(),
+        sram_co: $('#f-group-' + action + '-sram-co').is(':checked')
       }
 
       // specific datamanager-group testing dependent on mode
@@ -1900,7 +1912,8 @@ $(function () {
         group_expiration_date: newProperties.expiration_date,
         group_data_classification: newProperties.data_classification,
         group_category: newProperties.category,
-        group_subcategory: newProperties.subcategory
+        group_subcategory: newProperties.subcategory,
+        group_sram_co: newProperties.sram_co
       }
 
       // Avoid trying to set a schema id for groups that
@@ -2153,6 +2166,7 @@ $(function () {
                 schema_id: hier[categoryName][subcategoryName][groupName].schema_id,
                 expiration_date: hier[categoryName][subcategoryName][groupName].expiration_date,
                 data_classification: hier[categoryName][subcategoryName][groupName].data_classification,
+                sram_co: hier[categoryName][subcategoryName][groupName].sram_co,
                 members: hier[categoryName][subcategoryName][groupName].members
               }
             }
