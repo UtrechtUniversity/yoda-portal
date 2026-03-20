@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__copyright__ = 'Copyright (c) 2021-2025, Utrecht University'
+__copyright__ = 'Copyright (c) 2021-2026, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import contextlib
@@ -9,7 +9,7 @@ import secrets
 import ssl
 import time
 from datetime import datetime
-from typing import List
+from typing import Any, List
 from uuid import uuid4
 
 import jwt
@@ -69,9 +69,12 @@ def gate() -> Response:
         if redirect_target is not None and is_relative_url(redirect_target):
             session['redirect_target'] = redirect_target
 
-        # If the username matches the domain set for OIDC
+        # If the username matches the domains for OIDC
         if should_redirect_to_oidc(username):
             return redirect(oidc_authorize_url(username))
+        # If the username matches the domains for SRAM
+        elif should_redirect_to_sram(username):
+            return redirect(sram_authorize_url(username))
         # Else (i.e. it is an external user, local user, or OIDC is disabled)
         else:
             return redirect(url_for('user_bp.login'))
@@ -100,9 +103,11 @@ def login() -> Response:
         session['login_time'] = datetime.now()
         g.login_username = username
 
-        # Check if someone isn't trying to sneak past OIDC login.
+        # Check if someone isn't trying to sneak past OIDC / SRAM login.
         if should_redirect_to_oidc(username):
             return redirect(oidc_authorize_url(username))
+        elif should_redirect_to_sram(username):
+            return redirect(sram_authorize_url(username))
 
         if password == '':
             flash('Password missing', 'danger')
@@ -226,41 +231,82 @@ def data_transfer() -> Response:
     return render_template('user/data_transfer.html')
 
 
-@user_bp.route('/callback')
-def callback() -> Response:
-    """OpenID Connect callback."""
-    def token_request() -> requests.Response:
-        code = request.args.get('code')
-        data = {
-            'grant_type': 'authorization_code',
-            'code': code,
-            'redirect_uri': app.config.get('OIDC_CALLBACK_URI')
+def _get_oidc_config(endpoint: str) -> dict[str, Any]:
+    if endpoint == 'callback_sram':
+        return {
+            "redirect_uri": app.config.get('SRAM_OIDC_CALLBACK_URI'),
+            "token_uri": app.config.get('SRAM_OIDC_TOKEN_URI'),
+            "client_id": app.config.get('SRAM_OIDC_CLIENT_ID'),
+            "client_secret": app.config.get('SRAM_OIDC_CLIENT_SECRET'),
+            "userinfo_uri": app.config.get('SRAM_OIDC_USERINFO_URI'),
+            "jwks_uri": app.config.get('SRAM_OIDC_JWKS_URI'),
+            "jwt_options": app.config.get('SRAM_OIDC_JWT_OPTIONS'),
+            "jwt_issuer": app.config.get('SRAM_OIDC_JWT_ISSUER'),
+            "email_identifier": app.config.get('SRAM_OIDC_EMAIL_FIELD'),
+            "token_prefix": "++sram_token++",
+        }
+    else:
+        return {
+            "redirect_uri": app.config.get('OIDC_CALLBACK_URI'),
+            "token_uri": app.config.get('OIDC_TOKEN_URI'),
+            "client_id": app.config.get('OIDC_CLIENT_ID'),
+            "client_secret": app.config.get('OIDC_CLIENT_SECRET'),
+            "userinfo_uri": app.config.get('OIDC_USERINFO_URI'),
+            "jwks_uri": app.config.get('OIDC_JWKS_URI'),
+            "jwt_options": app.config.get('OIDC_JWT_OPTIONS'),
+            "jwt_issuer": app.config.get('OIDC_JWT_ISSUER'),
+            "email_identifier": app.config.get('OIDC_EMAIL_FIELD'),
+            "token_prefix": "++oidc_token++",
         }
 
-        token_uri = app.config.get('OIDC_TOKEN_URI')
 
-        # Content-type is application/x-www-form-urlencoded by default when data is a dict
-        response = requests.post(
-            token_uri,
-            data,
-            auth=(
-                app.config.get('OIDC_CLIENT_ID'),
-                app.config.get('OIDC_CLIENT_SECRET')
-            )
-        )
+def _token_request(oidc_config: dict[str, Any]) -> requests.Response:
+    code = request.args.get('code')
+    data = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': oidc_config['redirect_uri']
+    }
+    return requests.post(
+        oidc_config['token_uri'],
+        data,
+        auth=(oidc_config['client_id'], oidc_config['client_secret'])
+    )
 
-        return response
 
-    def userinfo_request(token: str) -> requests.Response:
-        userinfo_uri = app.config.get('OIDC_USERINFO_URI')
-        response = requests.get(
-            userinfo_uri,
-            headers={
-                'Authorization': f'Bearer {token}'
-            }
-        )
+def _userinfo_request(oidc_config: dict[str, Any], token: str) -> requests.Response:
+    return requests.get(
+        oidc_config['userinfo_uri'],
+        headers={'Authorization': f'Bearer {token}'}
+    )
 
-        return response
+
+def _verify_id_token(oidc_config: dict[str, Any], id_token: str) -> dict[str, Any]:
+    jwks_client = jwt.PyJWKClient(oidc_config['jwks_uri'])
+    signing_key = jwks_client.get_signing_key_from_jwt(id_token)
+    algorithms   = ['RS256']
+
+    return jwt.decode(
+        id_token,
+        signing_key.key,
+        algorithms,
+        options=oidc_config['jwt_options'],
+        audience=oidc_config['client_id'],
+        issuer=oidc_config['jwt_issuer']
+    )
+
+
+def _normalize_email_list(email_value: str | list[str]) -> list[str]:
+    if not isinstance(email_value, list):
+        email_value = [email_value]
+    return [x.lower() for x in email_value]
+
+
+@user_bp.route('/callback', endpoint='callback')
+@user_bp.route('/callback_sram', endpoint='callback_sram')
+def callback() -> Response:
+    """OpenID Connect callback."""
+    oidc_config = _get_oidc_config(request.endpoint)
 
     class StateMismatchError(Exception):
         pass
@@ -283,27 +329,14 @@ def callback() -> Response:
         if request.args['state'] != session.get('state'):
             raise StateMismatchError
 
-        token_response = token_request()
+        token_response = _token_request(oidc_config)
         js           = token_response.json()
         access_token = js['access_token']
         id_token     = js['id_token']
 
-        jwks_uri     = app.config.get('OIDC_JWKS_URI')
-        jwks_client  = jwt.PyJWKClient(jwks_uri)
-        signing_key  = jwks_client.get_signing_key_from_jwt(id_token)
-        algorithms   = ['RS256']
+        payload = _verify_id_token(oidc_config, id_token)
 
-        # Does verification of the token
-        payload = jwt.decode(
-            id_token,
-            signing_key.key,
-            algorithms,
-            options=app.config.get('OIDC_JWT_OPTIONS'),
-            audience=app.config.get('OIDC_CLIENT_ID'),
-            issuer=app.config.get('OIDC_JWT_ISSUER')
-        )
-
-        userinfo_response = userinfo_request(access_token)
+        userinfo_response = _userinfo_request(oidc_config, access_token)
         userinfo_payload = userinfo_response.json()
 
         # Check if payload subject matches with user info subject.
@@ -311,17 +344,13 @@ def callback() -> Response:
             raise UserinfoSubMismatchError
 
         # Check if login email matches with user info email.
-        email_identifier = app.config.get('OIDC_EMAIL_FIELD')
-        userinfo_email = userinfo_payload[email_identifier]
-        if not isinstance(userinfo_email, list):
-            userinfo_email = [userinfo_email]
-        userinfo_email = [x.lower() for x in userinfo_email]
-
+        email_identifier = oidc_config['email_identifier']
+        userinfo_email = _normalize_email_list(userinfo_payload[email_identifier])
         if email not in userinfo_email:
             raise UserinfoEmailMismatchError
 
         # Add a prefix to consume in the PAM stack
-        access_token = '++oidc_token++' + payload['sub'] + 'end_sub' + access_token
+        access_token = oidc_config['token_prefix'] + payload['sub'] + 'end_sub' + access_token
 
         try:
             irods_login(email, access_token)
@@ -439,6 +468,27 @@ def oidc_authorize_url(username: str) -> str:
 
     if app.config.get('OIDC_LOGIN_HINT') and username:
         authorize_url += '&login_hint=' + username
+
+    return authorize_url
+
+
+def should_redirect_to_sram(username: str) -> bool:
+    """Check if user should be redirected to SRAM based on domain."""
+    if app.config.get('SRAM_ENABLED'):
+        oidc_domain_list: List[str] = app.config.get('OIDC_DOMAINS', [])
+        if not is_email_in_domains(username, oidc_domain_list):
+            return '@' in username
+
+    return False
+
+
+def sram_authorize_url(username: str) -> str:
+    authorize_url: str = app.config.get('SRAM_OIDC_AUTH_URI')
+
+    # Generate a random string for the state parameter.
+    # https://www.rfc-editor.org/rfc/rfc6749#section-4.1.1
+    session['state'] = secrets.token_urlsafe(32)
+    authorize_url += '&state=' + session['state']
 
     return authorize_url
 
@@ -576,9 +626,12 @@ def prepare_user() -> None:
 
             session['login_username'] = login_username
 
-            # If the username matches the domain set for OIDC
+            # If the username matches the domains for OIDC
             if should_redirect_to_oidc(login_username):
                 return redirect(oidc_authorize_url(login_username))
+            # If the username matches the domains for SRAM
+            elif should_redirect_to_sram(login_username):
+                return redirect(sram_authorize_url(login_username))
             # Else (i.e. it is an external user, local user, or OIDC is disabled)
             else:
                 return redirect(url_for('user_bp.login'))
