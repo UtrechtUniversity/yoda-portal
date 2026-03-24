@@ -210,6 +210,22 @@ $(function () {
     $('#vaultUnarchive').modal('show')
   })
 
+  const deaccessionActions = {
+    'a.action-vault-request-deaccession': 'request',
+    'a.action-vault-approve-deaccession': 'approve',
+    'a.action-vault-cancel-deaccession': 'cancel'
+  }
+
+  document.addEventListener('click', function (event) {
+    for (const [selector, action] of Object.entries(deaccessionActions)) {
+      if (event.target.matches(selector)) {
+        event.preventDefault()
+        handleDeaccessionAction(action, event.target.dataset.folder)
+        break
+      }
+    }
+  })
+
   $('body').on('click', 'button.action-confirm-data-package-select', function () {
     dataPackage = $('#submitPublication .modal-body input[type="radio"]:checked').val()
     $('#submitPublication').modal('hide')
@@ -775,15 +791,17 @@ function topInformation (dir, rebuildFileBrowser = false) {
       let statusText = ''
       let archiveBadge = ''
       let todayDate = ''
+      let deaccessionBadge = ''
+      let actions = []
       const vaultStatus = data.status
       const vaultActionPending = data.vault_action_pending
       const hasWriteRights = 'yes'
       const userType = data.member_type
       const hasDatamanager = data.has_datamanager
       const isDatamanager = data.is_datamanager
-      const actions = []
       const downloadable = data.downloadable
       const archive = data.archive
+      const deaccession = data.deaccession
       researchGroupAccess = data.research_group_access
       const allVersions = data.all_versions
       const baseDOI = data.base_doi
@@ -902,6 +920,39 @@ function topInformation (dir, rebuildFileBrowser = false) {
           }
         }
 
+        // Vault deaccession data package
+        if (typeof deaccession !== 'undefined') {
+          if (isDatamanager && deaccession.status === '') {
+            if (vaultStatus === 'UNPUBLISHED' || vaultStatus === 'PUBLISHED' || vaultStatus === 'DEPUBLISHED') {
+              actions['vault-request-deaccession'] = 'Request deaccession'
+            }
+          }
+
+          const deaccessionAlert = document.querySelector('.alert.is-deaccession-complete')
+          deaccessionAlert?.classList.add('hide')
+
+          if (deaccession.status !== '') {
+            let deaccessionText = deaccession.status
+            actions = []
+
+            if (deaccession.status === 'DEACCESSION_REQUESTED') {
+              deaccessionText = 'Deaccession requested'
+              if (isDatamanager) {
+                actions['vault-cancel-deaccession'] = 'Cancel deaccession'
+              } else {
+                actions['vault-approve-deaccession'] = 'Approve deaccession'
+              }
+            } else if (deaccession.status === 'DEACCESSION_APPROVED') {
+              deaccessionText = 'Deaccession approved'
+            } else if (deaccession.status === 'DEACCESSION_COMPLETE') {
+              deaccessionText = 'Deaccession complete'
+              deaccessionAlert?.classList.remove('hide')
+            }
+
+            deaccessionBadge = `<span id="deaccessionBadge" class="ms-2 badge rounded-pill bg-secondary text-white">${deaccessionText}</span>`
+          }
+        }
+
         // Vault in progress of being created
         $('.alert.is-processing').hide()
         if (vaultStatus === '' || vaultStatus === 'INCOMPLETE') {
@@ -1000,7 +1051,7 @@ function topInformation (dir, rebuildFileBrowser = false) {
       // Show top information and buttons.
       if (typeof vaultStatus !== 'undefined') {
         // Arrange folder buttons of data package
-        $('.top-information h2').html(`${statusBadge}${archiveBadge}${systemMetadataIcon}${actionLogIcon}`)
+        $('.top-information h2').html(`${statusBadge}${archiveBadge}${deaccessionBadge}${systemMetadataIcon}${actionLogIcon}`)
 
         $('.top-information').show()
         $('.top-info-buttons').show()
@@ -1027,7 +1078,8 @@ function handleActionsList (actions, folder) {
     'submit-for-publication', 'cancel-publication',
     'approve-for-publication', 'depublish-publication',
     'republish-publication', 'vault-download',
-    'vault-archival', 'vault-unarchive'
+    'vault-archival', 'vault-unarchive',
+    'vault-request-deaccession', 'vault-approve-deaccession', 'vault-cancel-deaccession'
   ]
 
   const possibleVaultActions = [
@@ -1198,6 +1250,37 @@ async function vaultUnarchive (folder) {
     topInformation(folder, false)
   } else {
     Yoda.set_message('error', 'Failed to unarchive data package')
+    topInformation(folder, true)
+  }
+}
+
+async function handleDeaccessionAction (action, folder) {
+  const actionLabels = {
+    request: 'Request deaccession',
+    approve: 'Approve deaccession',
+    cancel: 'Cancel deaccession'
+  }
+
+  const $badge = $('#deaccessionBadge')
+  const label = actionLabels[action]
+  const spinner = '<i class="fa-solid fa-spinner fa-spin fa-fw"></i>'
+
+  $badge.html(`${label} ${spinner}`).removeClass('hide')
+
+  const result = await Yoda.call(`vault_${action}_deaccession`,
+    { coll: Yoda.basePath + folder },
+    { quiet: true, rawResult: true }
+  )
+
+  if (result.status === 'ok') {
+    topInformation(folder, false)
+  } else {
+    if (result.status_info) {
+      Yoda.set_message('error', result.status_info)
+    } else {
+      Yoda.set_message('error', `Failed to ${action} deaccession of data package`)
+    }
+    $badge.hide()
     topInformation(folder, true)
   }
 }
