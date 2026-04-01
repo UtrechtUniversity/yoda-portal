@@ -799,6 +799,7 @@ function topInformation (dir, rebuildFileBrowser = false) {
       const userType = data.member_type
       const hasDatamanager = data.has_datamanager
       const isDatamanager = data.is_datamanager
+      const isAdmin = data.is_admin
       const downloadable = data.downloadable
       const archive = data.archive
       const deaccession = data.deaccession
@@ -931,15 +932,16 @@ function topInformation (dir, rebuildFileBrowser = false) {
           const deaccessionAlert = document.querySelector('.alert.is-deaccession-complete')
           deaccessionAlert?.classList.add('hide')
 
+          let deaccessionText = deaccession.status
           if (deaccession.status !== '') {
-            let deaccessionText = deaccession.status
             actions = []
 
             if (deaccession.status === 'DEACCESSION_REQUESTED') {
               deaccessionText = 'Deaccession requested'
-              if (isDatamanager) {
+              if (isDatamanager || isAdmin) {
                 actions['vault-cancel-deaccession'] = 'Cancel deaccession'
-              } else {
+              }
+              if (isAdmin) {
                 actions['vault-approve-deaccession'] = 'Approve deaccession'
               }
             } else if (deaccession.status === 'DEACCESSION_APPROVED') {
@@ -948,9 +950,8 @@ function topInformation (dir, rebuildFileBrowser = false) {
               deaccessionText = 'Deaccession complete'
               deaccessionAlert?.classList.remove('hide')
             }
-
-            deaccessionBadge = `<span id="deaccessionBadge" class="ms-2 badge rounded-pill bg-secondary text-white">${deaccessionText}</span>`
           }
+          deaccessionBadge = `<span id="deaccessionBadge" class="ms-2 badge rounded-pill bg-secondary text-white">${deaccessionText}</span>`
         }
 
         // Vault in progress of being created
