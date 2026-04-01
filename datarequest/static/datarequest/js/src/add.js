@@ -1,8 +1,8 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 import { render } from "react-dom";
-import Form, { FieldTemplate } from "@rjsf/bootstrap-4"; 
+import Form from "@rjsf/bootstrap-4";
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { numberFilter, textFilter, selectFilter, multiSelectFilter, Comparator } from 'react-bootstrap-table2-filter';
 import paginationFactory from 'react-bootstrap-table2-paginator';
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Some validations that cannot be done in the schema itself
 function validate(formData, errors) {
- 
+
     // Validate whether CC email addresses are valid
     //
     // First check whether any CC email addresses have been entered
@@ -128,7 +128,6 @@ class YodaForm extends React.Component {
                   onSubmit={onSubmit}
                   showErrorList={false}
                   noHtml5Validate
-                  FieldTemplate={CustomFieldTemplate}
                   transformErrors={transformErrors}>
                   <button ref={(btn) => {this.submitButton=btn;}}
                           className="hidden" />
@@ -158,41 +157,6 @@ class YodaButtons extends React.Component {
 
 const onSubmit = ({formData}) => submitData(formData);
 
-function CustomFieldTemplate(props) {
-    const {id, classNames, label, help, required, description, errors, children, schema} = props;
-
-    const [inputLength, setInputLength] = useState(0);
-
-    const handleInputChange = (event) => {
-        setInputLength(event.target.value.length);
-    }
-
-    return (schema.maxLength ?
-      <div className={classNames}>
-        <small className="text-muted form-text" style={{position: 'absolute', right: '1.5em'}}>{inputLength + "/" + schema.maxLength + " characters"}</small>
-        
-        <div onChange={handleInputChange}>
-          {React.Children.map(children, (child) => {
-            return React.cloneElement(child, {
-              onChange: (event) => {
-                handleInputChange(event);
-                if (child.props.onChange) {
-                  child.props.onChange(event);
-                }
-              },
-            });
-          })}
-        </div>
-        
-        <small className="text-muted form-text">{description}</small>
-        
-        <div className="form-text list-group-item">{errors}</div>
-        
-        {help}
-      </div> : <FieldTemplate {...props}/>
-    );
-};
-
 const CustomDescriptionField = ({id, description}) => {
   return <div id={id} dangerouslySetInnerHTML={{ __html: description }}></div>;
 };
@@ -208,10 +172,10 @@ const fields = {
   DataSelection: DataSelectionTable
 };
 
-function transformErrors(errors) {     
-    // Filter errors when filling in form or saving as draft, except maxLength error
+function transformErrors(errors) {
+    // Filter errors when filling in form or saving as draft.
     if (!submit) {
-        errors = errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies' && e.name !== 'enum' && e.name !== 'type');
+        errors = errors.filter((e) => e.name !== 'required' && e.name !== 'dependencies' && e.name !== 'enum' && e.name !== 'type' && e.name !== 'maxLength');
     } else {
         // Filter out incorrect errors. These are erroneously added because of edge cases to do with
         // nesting, conditionals and the use of oneOf.
@@ -222,9 +186,9 @@ function transformErrors(errors) {
                 filtered_errors.push(error);
             }
         });
-        errors = filtered_errors; 
+        errors = filtered_errors;
     }
-    
+
     // Scroll to first error (ugly but works). A proper solution isn't available yet, see:
     // https://github.com/rjsf-team/react-jsonschema-form/issues/1791
     if (errors.length !== 0) {
