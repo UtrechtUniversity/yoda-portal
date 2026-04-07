@@ -211,8 +211,8 @@ $(function () {
   })
 
   const deaccessionActions = {
-    'a.action-vault-request-deaccession': 'request',
-    'a.action-vault-approve-deaccession': 'approve',
+    '.btn-confirm-folder-deaccession-approve': 'approve',
+    '.btn-confirm-folder-deaccession-deny': 'deny',
     'a.action-vault-cancel-deaccession': 'cancel'
   }
 
@@ -220,10 +220,38 @@ $(function () {
     for (const [selector, action] of Object.entries(deaccessionActions)) {
       if (event.target.matches(selector)) {
         event.preventDefault()
-        handleDeaccessionAction(action, event.target.dataset.folder)
+        handleDeaccessionAction(action, currentFolder)
         break
       }
     }
+  })
+
+  // Click request button in modal
+  const requestDeaccessForm = document.getElementById('deaccess-request-form')
+  requestDeaccessForm.addEventListener('submit', function (event) {
+    event.preventDefault()
+    handleDeaccessionAction('request', currentFolder)
+  })
+
+  // Reset request deaccess modal on opening of modal
+  document.querySelectorAll('.action-vault-request-deaccession').forEach(el => {
+    el.addEventListener('click', function (event) {
+      // TODO WHY doesn't this do anything?
+      document.getElementById('deaccess-request-form').reset()
+      // Hide certain boxes
+      document.getElementById('deaccess-owner-check-block').style.display = 'none'
+      document.getElementById('deaccess-owner-absence-check-block').style.display = 'none'
+    })
+  })
+
+  // Show or hide parts of the form depending on what user clicks
+  document.getElementById('found-owner-true').addEventListener('change', function (event) {
+    document.getElementById('deaccess-owner-check-block').style.display = ''
+    document.getElementById('deaccess-owner-absence-check-block').style.display = 'none'
+  })
+  document.getElementById('found-owner-false').addEventListener('change', function (event) {
+    document.getElementById('deaccess-owner-check-block').style.display = 'none'
+    document.getElementById('deaccess-owner-absence-check-block').style.display = ''
   })
 
   $('body').on('click', 'button.action-confirm-data-package-select', function () {
@@ -942,7 +970,7 @@ function topInformation (dir, rebuildFileBrowser = false) {
                 actions['vault-cancel-deaccession'] = 'Cancel deaccession'
               }
               if (isAdmin) {
-                actions['vault-approve-deaccession'] = 'Approve deaccession'
+                actions['vault-approve-deaccession'] = 'Approve/deny deaccession'
               }
             } else if (deaccession.status === 'DEACCESSION_APPROVED') {
               deaccessionText = 'Deaccession approved'
@@ -1083,6 +1111,10 @@ function handleActionsList (actions, folder) {
     'vault-request-deaccession', 'vault-approve-deaccession', 'vault-cancel-deaccession'
   ]
 
+  const possibleModalActions = [
+    'vault-request-deaccession', 'vault-approve-deaccession'
+  ]
+
   const possibleVaultActions = [
     'change-vault-access', 'copy-vault-package-to-research',
     'check-for-unpreservable-files', 'show-checksum-report'
@@ -1103,10 +1135,13 @@ function handleActionsList (actions, folder) {
         text = item
       }
 
-      html += '<a class="dropdown-item action-' + key +
-        (isDisabled ? ' disabled"' : '"') +
-        ' data-folder="' + Yoda.htmlEncode(folder) + '">' +
-        Yoda.htmlEncode(text) + '</a>'
+      if (possibleModalActions.includes(key)) {
+        html += `<a class="dropdown-item action-${key}${(isDisabled ? ' disabled' : '')}" data-folder="${Yoda.htmlEncode(folder)}" data-bs-toggle="modal" data-bs-target="#${key}">
+          ${Yoda.htmlEncode(text)}</a>`
+      } else {
+        html += `<a class="dropdown-item action-${key}${(isDisabled ? ' disabled' : '')}" data-folder="${Yoda.htmlEncode(folder)}">
+          ${Yoda.htmlEncode(text)}</a>`
+      }
     })
     return html
   }
@@ -1259,7 +1294,21 @@ async function handleDeaccessionAction (action, folder) {
   const actionLabels = {
     request: 'Request deaccession',
     approve: 'Approve deaccession',
-    cancel: 'Cancel deaccession'
+    cancel: 'Cancel deaccession',
+    deny: 'Cancel deaccession'
+  }
+
+  const modalActionsModals = {
+    approve: 'approve',
+    deny: 'approve',
+    request: 'request'
+  }
+
+  const actionCalls = {
+    request: 'request',
+    approve: 'approve',
+    cancel: 'cancel',
+    deny: 'cancel'
   }
 
   const $badge = $('#deaccessionBadge')
@@ -1268,8 +1317,20 @@ async function handleDeaccessionAction (action, folder) {
 
   $badge.html(`${label} ${spinner}`).removeClass('hide')
 
-  const result = await Yoda.call(`vault_${action}_deaccession`,
-    { coll: Yoda.basePath + folder },
+  // If button was in modal, hide modal
+  if (action in modalActionsModals) {
+    const modal = bootstrap.Modal.getInstance(document.getElementById(`vault-${modalActionsModals[action]}-deaccession`))
+    modal.hide()
+  }
+
+  const params = { coll: Yoda.basePath + folder }
+  if (action === 'request') {
+    const selected = document.querySelector('input[name="deaccess-reason"]:checked')
+    params.reason = selected?.id === 'reason-other' ? document.getElementById('deaccess-reason-input').value : 'End of retention period'
+  }
+
+  const result = await Yoda.call(`vault_${actionCalls[action]}_deaccession`,
+    params,
     { quiet: true, rawResult: true }
   )
 
