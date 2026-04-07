@@ -481,12 +481,22 @@ $(function () {
     $('#messages').html('')
   })
 
-  $('body').on('click', 'a.action-lock', function () {
-    lockFolder($(this).attr('data-folder'))
-  })
+  const folderActions = {
+    'a.action-lock': 'lock',
+    'a.action-unlock': 'unlock',
+    'a.action-unsubmit': 'unsubmit',
+    'a.action-accept': 'accept',
+    'a.action-reject': 'reject'
+  }
 
-  $('body').on('click', 'a.action-unlock', function () {
-    unlockFolder($(this).attr('data-folder'))
+  document.addEventListener('click', function (event) {
+    for (const [selector, action] of Object.entries(folderActions)) {
+      if (event.target.matches(selector)) {
+        event.preventDefault()
+        handleFolderAction(action, event.target.dataset.folder)
+        break
+      }
+    }
   })
 
   // Submit with the confirmation modal
@@ -514,7 +524,7 @@ $(function () {
       document.getElementById('submit-confirm')
     ).hide()
 
-    submitToVault(folder, deleteResearchCopy)
+    handleFolderAction('submit', folder, deleteResearchCopy)
   })
 
   $('body').on('click', 'a.action-check-for-unpreservable-files', function () {
@@ -575,18 +585,6 @@ $(function () {
       }
       $('#showUnpreservableFiles').modal('show')
     })
-  })
-
-  $('body').on('click', 'a.action-unsubmit', function () {
-    unsubmitToVault($(this).attr('data-folder'))
-  })
-
-  $('body').on('click', 'a.action-accept', function () {
-    acceptFolder($(this).attr('data-folder'))
-  })
-
-  $('body').on('click', 'a.action-reject', function () {
-    rejectFolder($(this).attr('data-folder'))
   })
 
   $('body').on('click', 'i.lock-icon', function () {
@@ -875,7 +873,7 @@ function browse (dir = '', changeHistory = false) {
   handleGoToGroupManager(dir)
   makeBreadcrumb(dir)
   if (changeHistory) { changeBrowserUrl(dir) }
-  topInformation(dir, true) // only here topInformation should show its alertMessage
+  topInformation(dir)
   buildFileBrowser()
 }
 
@@ -1292,7 +1290,7 @@ window.addEventListener('popstate', function (e) {
   browse('dir' in query ? query.dir : '')
 })
 
-function topInformation (dir, showAlert) {
+function topInformation (dir) {
   if (typeof dir !== 'undefined') {
     Yoda.call('research_collection_details',
       { path: Yoda.basePath + dir },
@@ -1488,107 +1486,49 @@ function handleActionsList (actions, folder) {
   $('.action-list').html(html)
 }
 
-async function lockFolder (folder) {
-  // Get current button text
-  const btnText = $('#statusBadge').html()
-  $('#statusBadge').html('Lock <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
-
-  // Change folder status call
-  try {
-    await Yoda.call('folder_lock', { coll: Yoda.basePath + folder })
-    $('#statusBadge').text('Locked')
-  } catch (e) {
-    $('#statusBadge').html(btnText)
-  }
-  topInformation(folder, false)
-}
-
-async function unlockFolder (folder) {
-  // Get current button text
-  const btnText = $('#statusBadge').html()
-  $('#statusBadge').html('Unlock <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
-
-  try {
-    await Yoda.call('folder_unlock', { coll: Yoda.basePath + folder })
-    $('#statusBadge').text('')
-  } catch (e) {
-    $('#statusBadge').html(btnText)
-  }
-  topInformation(folder, false)
-}
-
 function showMetadataForm (path) {
   window.location.href = 'metadata/form?path=' + encodeURIComponent(path)
 }
 
-async function submitToVault (folder, deleteResearchCopy = false) {
-  if (typeof folder !== 'undefined') {
-    // Set spinner & disable button
-    const btnText = $('#statusBadge').html()
-    $('#statusBadge').html('Submit <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-    $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
-
-    try {
-      const status = await Yoda.call('folder_submit', { coll: Yoda.basePath + folder, delete_research_copy: deleteResearchCopy })
-
-      if (status === 'SUBMITTED') {
-        $('#statusBadge').html('Submitted')
-      } else if (status === 'ACCEPTED') {
-        $('#statusBadge').html('Accepted')
-      } else {
-        $('#statusBadge').html(btnText)
-      }
-    } catch (e) {
-      $('#statusBadge').html(btnText)
-    }
-    topInformation(folder, false)
+async function handleFolderAction (action, folder, deleteResearchCopy = false) {
+  const actionLabels = {
+    lock: { action: 'Lock', status: 'Locked' },
+    unlock: { action: 'Unlock', status: 'Unlocked' },
+    submit: { action: 'Submit', status: 'Submitted' },
+    unsubmit: { action: 'Unsubmit', status: '' },
+    accept: { action: 'Accept', status: 'Accepted' },
+    reject: { action: 'Reject', status: 'Rejected' }
   }
-}
 
-async function unsubmitToVault (folder) {
-  if (typeof folder !== 'undefined') {
-    const btnText = $('#statusBadge').html()
-    $('#statusBadge').html('Unsubmit <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-    $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
+  const badge = document.getElementById('statusBadge')
+  const badgeText = badge.innerHTML
+  const label = actionLabels[action].action
+  const status = actionLabels[action].status
+  const spinner = '<i class="fa-solid fa-spinner fa-spin fa-fw"></i>'
 
-    try {
-      await Yoda.call('folder_unsubmit', { coll: Yoda.basePath + folder })
-      $('#statusBadge').html('')
-    } catch (e) {
-      $('#statusBadge').html(btnText)
+  badge.innerHTML = `${label} ${spinner}`
+
+  // Disable all buttons in .btn-group with class .folder-status and their next siblings
+  const folderStatusButtons = document.querySelectorAll('.btn-group button.folder-status')
+  folderStatusButtons.forEach(button => {
+    button.disabled = true
+    const nextButton = button.nextElementSibling
+    if (nextButton) {
+      nextButton.disabled = true
     }
-    topInformation(folder, false)
-  }
-}
-
-async function acceptFolder (folder) {
-  const btnText = $('#statusBadge').html()
-  $('#statusBadge').html('Accept <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
+  })
 
   try {
-    await Yoda.call('folder_accept', { coll: Yoda.basePath + folder })
-    $('#statusBadge').html('Accepted')
+    const params = { coll: Yoda.basePath + folder }
+    if (action === 'submit') {
+      params.delete_research_copy = deleteResearchCopy
+    }
+    await Yoda.call(`folder_${action}`, params)
+    badge.innerHTML = `${status}`
   } catch (e) {
-    $('#statusBadge').html(btnText)
+    badge.innerHTML = `${badgeText}`
   }
-  topInformation(folder, false)
-}
-
-async function rejectFolder (folder) {
-  const btnText = $('#statusBadge').html()
-  $('#statusBadge').html('Reject <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
-
-  try {
-    await Yoda.call('folder_reject', { coll: Yoda.basePath + folder })
-    $('#statusBadge').html('Rejected')
-  } catch (e) {
-    $('#statusBadge').html(btnText)
-  }
-  topInformation(folder, false)
+  topInformation(folder)
 }
 
 function logUpload (id, file) {

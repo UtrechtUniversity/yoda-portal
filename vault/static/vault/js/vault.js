@@ -13,7 +13,7 @@ $(document).ajaxSend(function (e, request, settings) {
 let preservableFormatsLists = null
 let currentFolder
 let currentFile
-let dataPackage = null
+let previousVersion = null
 let hasReadRights = true
 let researchGroupAccess = true
 let downloadChecksumReportTextTooltip
@@ -170,7 +170,7 @@ $(function () {
 
     const folder = $(this).attr('data-folder')
     const vault = String(folder.match(/.*\//)).replace(/\/+$/, '')
-    dataPackage = null
+    previousVersion = null
     $('.previousPublications').html('')
     Yoda.call('vault_get_published_packages', { path: Yoda.basePath + vault }).then((data) => {
       if (Object.keys(data).length > 0) {
@@ -180,8 +180,8 @@ $(function () {
           const vaultPath = publication.path.replace(Yoda.basePath, '')
           $('.previousPublications').append(`
 <div class="form-check">
-  <input class="form-check-input" type="radio" name="dataPackageSelect" id="dataPackage${i}" value="${Yoda.htmlEncode(publication.path)}">
-  <label class="form-check-label" for="dataPackage${i}">
+  <input class="form-check-input" type="radio" name="previousVersionSelect" id="previousVersion${i}" value="${Yoda.htmlEncode(publication.path)}">
+  <label class="form-check-label" for="previousVersion${i}">
     ${Yoda.htmlEncode(doi)} (<a target="_blank" href="?dir=${encodeURIComponent(vaultPath)}">${Yoda.htmlEncode(publication.title)}</a>)
   </label>
 </div>
@@ -276,7 +276,7 @@ $(function () {
   document.getElementById('deaccess-reason-input').addEventListener('input', updateRequestButton)
 
   $('body').on('click', 'button.action-confirm-data-package-select', function () {
-    dataPackage = $('#submitPublication .modal-body input[type="radio"]:checked').val()
+    previousVersion = $('#submitPublication .modal-body input[type="radio"]:checked').val()
     $('#submitPublication').modal('hide')
 
     $('#confirmAgreementConditions .modal-body').text('') // clear it first
@@ -310,17 +310,22 @@ $(function () {
     }
   })
 
-  $('#confirmAgreementConditions').on('click', '.action-confirm-submit-for-publication', function () {
-    $('#confirmAgreementConditions').modal('hide')
-    vaultSubmitForPublication($(this).attr('data-folder'))
-  })
+  const vaultActions = {
+    '.action-confirm-submit-for-publication': { action: 'submit', modal: '#confirmAgreementConditions' },
+    'a.action-approve-for-publication': { action: 'approve' },
+    'a.action-cancel-publication': { action: 'cancel' },
+    '.action-confirm-depublish-publication': { action: 'depublish', modal: '#confirmDepublish' },
+    '.action-confirm-republish-publication': { action: 'republish', modal: '#confirmRepublish' }
+  }
 
-  $('body').on('click', 'a.action-approve-for-publication', function () {
-    vaultApproveForPublication($(this).attr('data-folder'))
-  })
-
-  $('body').on('click', 'a.action-cancel-publication', function () {
-    vaultCancelPublication($(this).attr('data-folder'))
+  document.addEventListener('click', function (event) {
+    for (const [selector, config] of Object.entries(vaultActions)) {
+      if (event.target.matches(selector)) {
+        event.preventDefault()
+        handleVaultAction(config.action, event.target.dataset.folder)
+        break
+      }
+    }
   })
 
   $('body').on('click', 'i.actionlog-icon', function () {
@@ -366,21 +371,11 @@ $(function () {
     $('#confirmDepublish').modal('show')
   })
 
-  $('#confirmDepublish').on('click', '.action-confirm-depublish-publication', function () {
-    $('#confirmDepublish').modal('hide')
-    vaultDepublishPublication($(this).attr('data-folder'))
-  })
-
   $('body').on('click', 'a.action-republish-publication', function () {
     // Set the current folder.
     $('.action-confirm-republish-publication').attr('data-folder', $(this).attr('data-folder'))
     // Show depublish modal.
     $('#confirmRepublish').modal('show')
-  })
-
-  $('#confirmRepublish').on('click', '.action-confirm-republish-publication', function () {
-    $('#confirmRepublish').modal('hide')
-    vaultRepublishPublication($(this).attr('data-folder'))
   })
 
   $('#vaultDownload').on('click', '.action-confirm-vault-download', function () {
@@ -390,12 +385,12 @@ $(function () {
 
   $('#vaultArchival').on('click', '.action-confirm-vault-archival', function () {
     $('#vaultArchival').modal('hide')
-    vaultArchival($(this).attr('data-folder'))
+    handleVaultArchiveAction('archive', $(this).attr('data-folder'))
   })
 
   $('#vaultUnarchive').on('click', '.action-confirm-vault-unarchive', function () {
     $('#vaultUnarchive').modal('hide')
-    vaultUnarchive($(this).attr('data-folder'))
+    handleVaultArchiveAction('extract', $(this).attr('data-folder'))
   })
 
   $('body').on('click', "input:checkbox[name='multiSelect[]']", function () {
@@ -841,6 +836,7 @@ function topInformation (dir, rebuildFileBrowser = false) {
 
       let statusText = ''
       let archiveBadge = ''
+      let archiveText = ''
       let todayDate = ''
       let deaccessionBadge = ''
       let actions = []
@@ -944,9 +940,10 @@ function topInformation (dir, rebuildFileBrowser = false) {
 
             $('.alert.is-archived').hide()
             if (archive.status !== false) {
-              let archiveText = archive.status
+              archiveText = archive.status
               if (archive.status === 'archive' || archive.status === 'archiving') {
-                archiveText = 'Scheduled for archive'
+                archiveText = 'Scheduled for archiving'
+                $('.alert.is-archived').show()
               } else if (archive.status === 'archived') {
                 archiveText = 'Archived'
                 if (isDatamanager) {
@@ -957,18 +954,20 @@ function topInformation (dir, rebuildFileBrowser = false) {
                 archiveText = 'Updating archive'
                 $('.alert.is-archived').show()
               } else if (archive.status === 'extract' || archive.status === 'extracting') {
-                archiveText = 'Scheduled for unarchive'
+                archiveText = 'Scheduled for unarchiving'
+                $('.alert.is-archived').show()
               } else if (archive.status === 'bagit' || archive.status === 'baggingit') {
                 archiveText = 'Scheduled for download'
               }
-              archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white">' + archiveText + '</span>'
             } else if (downloadable) {
               actions['vault-download'] = 'Download as bagit'
             }
+            archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white">' + archiveText + '</span>'
           } else {
             if (downloadable) {
               actions['vault-download'] = 'Download as bagit'
             }
+            archiveBadge = '<span id="archiveBadge" class="ms-2 badge rounded-pill bg-secondary text-white">' + archiveText + '</span>'
           }
         }
 
@@ -1187,76 +1186,42 @@ function showMetadataForm (path) {
   window.location.href = 'metadata/form?path=' + encodeURIComponent(path)
 }
 
-async function vaultSubmitForPublication (folder) {
-  const btnText = $('#statusBadge').html()
-  $('#statusBadge').html('Submit for publication <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
+async function handleVaultAction (action, folder) {
+  const actionLabels = {
+    submit: { label: 'Submit for publication', status: 'Submitted for publication' },
+    approve: { label: 'Approve for publication', status: 'Approved for publication' },
+    cancel: { label: 'Cancel publication', status: 'Unpublished' },
+    depublish: { label: 'Depublish publication', status: 'Depublication pending' },
+    republish: { label: 'Republish publication', status: 'Republication pending' }
+  }
 
-  try {
-    if (dataPackage) {
-      await Yoda.call('vault_submit', { coll: Yoda.basePath + folder, previous_version: dataPackage })
-    } else {
-      await Yoda.call('vault_submit', { coll: Yoda.basePath + folder })
+  const badge = document.getElementById('statusBadge')
+  const badgeText = badge.innerHTML
+  const label = actionLabels[action].label
+  const status = actionLabels[action].status
+  const spinner = '<i class="fa-solid fa-spinner fa-spin fa-fw"></i>'
+
+  badge.innerHTML = `${label} ${spinner}`
+
+  // Disable all buttons in .btn-group with class .folder-status and their next siblings
+  const folderStatusButtons = document.querySelectorAll('.btn-group button.folder-status')
+  folderStatusButtons.forEach(button => {
+    button.disabled = true
+    const nextButton = button.nextElementSibling
+    if (nextButton) {
+      nextButton.disabled = true
     }
-    $('#statusBadge').html('')
-  } catch (e) {
-    $('#statusBadge').html(btnText)
-  }
-  topInformation(folder, false)
-}
-
-async function vaultApproveForPublication (folder) {
-  const btnText = $('#statusBadge').html()
-  $('#statusBadge').html('Approve for publication <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
+  })
 
   try {
-    await Yoda.call('vault_approve', { coll: Yoda.basePath + folder })
-    $('#statusBadge').html('')
+    const params = { coll: Yoda.basePath + folder }
+    if (action === 'submit' && previousVersion) {
+      params.previous_version = previousVersion
+    }
+    await Yoda.call(`vault_${action}`, params)
+    badge.innerHTML = `${status}`
   } catch (e) {
-    $('#statusBadge').html(btnText)
-  }
-  topInformation(folder, false)
-}
-
-async function vaultCancelPublication (folder) {
-  const btnText = $('#statusBadge').html()
-  $('#statusBadge').html('Cancel publication <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
-
-  try {
-    await Yoda.call('vault_cancel', { coll: Yoda.basePath + folder })
-    $('#statusBadge').html('')
-  } catch (e) {
-    $('#statusBadge').html(btnText)
-  }
-  topInformation(folder, false)
-}
-
-async function vaultDepublishPublication (folder) {
-  const btnText = $('#statusBadge').html()
-  $('#statusBadge').html('Depublish publication <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
-
-  try {
-    await Yoda.call('vault_depublish', { coll: Yoda.basePath + folder })
-    $('#statusBadge').html('')
-  } catch (e) {
-    $('#statusBadge').html(btnText)
-  }
-  topInformation(folder, false)
-}
-
-async function vaultRepublishPublication (folder) {
-  const btnText = $('#statusBadge').html()
-  $('#statusBadge').html('Republish publication <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  $('.btn-group button.folder-status').prop('disabled', true).next().prop('disabled', true)
-
-  try {
-    await Yoda.call('vault_republish', { coll: Yoda.basePath + folder })
-    $('#statusBadge').html('')
-  } catch (e) {
-    $('#statusBadge').html(btnText)
+    badge.innerHTML = `${badgeText}`
   }
   topInformation(folder, false)
 }
@@ -1279,39 +1244,29 @@ async function vaultDownload (folder) {
   }
 }
 
-async function vaultArchival (folder) {
-  $('#archiveBadge').html('Schedule for archive <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  $('#archiveBadge').removeClass('hide')
-
-  const result = await Yoda.call('vault_archive',
-    { coll: Yoda.basePath + folder },
-    { quiet: true, rawResult: true }
-  )
-
-  if (result.status === 'ok') {
-    topInformation(folder, false)
-  } else {
-    Yoda.set_message('error', 'Failed to archive data package')
-    $('#archiveBadge').hide()
-    topInformation(folder, true)
+async function handleVaultArchiveAction (action, folder) {
+  const actionLabels = {
+    archive: { label: 'Schedule for archiving', status: 'Scheduled for archiving' },
+    extract: { label: 'Schedule for unarchiving', status: 'Scheduled for unarchiving' }
   }
-}
 
-async function vaultUnarchive (folder) {
-  $('#archiveBadge').html('Schedule for unarchiving <i class="fa-solid fa-spinner fa-spin fa-fw"></i>')
-  $('#archiveBadge').removeClass('hide')
+  const badge = document.getElementById('archiveBadge')
+  const badgeText = badge.innerHTML
+  const actionConfig = actionLabels[action]
+  const label = actionConfig.label
+  const status = actionConfig.status
+  const spinner = '<i class="fa-solid fa-spinner fa-spin fa-fw"></i>'
 
-  const result = await Yoda.call('vault_extract',
-    { coll: Yoda.basePath + folder },
-    { quiet: true, rawResult: true }
-  )
+  badge.innerHTML = `${label} ${spinner}`
 
-  if (result.status === 'ok') {
-    topInformation(folder, false)
-  } else {
-    Yoda.set_message('error', 'Failed to unarchive data package')
-    topInformation(folder, true)
+  try {
+    const params = { coll: Yoda.basePath + folder }
+    await Yoda.call(`vault_${action}`, params)
+    badge.innerHTML = `${status}`
+  } catch (e) {
+    badge.innerHTML = `${badgeText}`
   }
+  topInformation(folder, false)
 }
 
 async function handleDeaccessionAction (action, folder) {
