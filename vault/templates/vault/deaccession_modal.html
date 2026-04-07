@@ -1,0 +1,109 @@
+<div class="modal" tabindex="-1" role="dialog" id="vault-request-deaccession">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Deaccession of data package</h5>
+            </div>
+            <div class="modal-body">
+                <p>
+                Please fill in this form completely to submit the deaccession request.
+                </p>
+                <form id="deaccess-request-form">
+                    <p>What is the reason for the deaccession request?</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="deaccess-reason" id="reason-end-retention-period">
+                        <label class="form-check-label" for="reason-end-retention-period">
+                            End of retention period
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="deaccess-reason" id="reason-other">
+                        <label class="form-check-label" for="reason-other">
+                            Other
+                        </label>
+                        <input type="text" class="form-control" id="deaccess-reason-input" aria-describedby="deaccess-reason-help">
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="deaccess-high-value-check">
+                        <label class="form-check-label" for="deaccess-high-value-check">
+                            I confirm that there is no heritage or high value data in this package.
+                        </label>
+                    </div>
+
+                    <p>As part of the deaccession process, permission from the original owner is required if owner is known.
+                    Were you able to locate the data owner? </p>
+                    <div class="form-check" id="found-owner-true-block">
+                        <input class="form-check-input" type="radio" name="found-owner-radio" id="found-owner-true">
+                        <label class="form-check-label" for="found-owner-true">
+                            Yes
+                        </label>
+                    </div>
+                    <div class="form-check" id="found-owner-false-block">
+                        <input class="form-check-input" type="radio" name="found-owner-radio" id="found-owner-false">
+                        <label class="form-check-label" for="found-owner-false">
+                            No
+                        </label>
+                    </div>
+
+                    <div class="mb-3 form-check" id="deaccess-owner-check-block">
+                        <input class="form-check-input" type="checkbox" value="" id="deaccess-owner-check">
+                        <label class="form-check-label" for="deaccess-owner-check">
+                            I have received permission from the owner to request deaccession of this data package.
+                        </label>
+                    </div>
+
+                    <div class="mb-3 form-check" id="deaccess-owner-absence-check-block">
+                        <input class="form-check-input" type="checkbox" value="" id="deacess-owner-absence-check">
+                        <label class="form-check-label" for="deaccess-owner-check">
+                            In the absence of the data owner, I request deaccession for this data package.
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary btn-confirm-deaccession-submit" form="deaccess-request-form" data-path="">Request deaccession</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="vault-approve-deaccession">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Deaccession of data package</h5>
+            </div>
+            <div class="modal-body">
+                <p>
+                The reason for deaccessing the data package is below. You can choose to approve or deny the request.
+                </p>
+                <p id="deaccess-reason-readonly"></p>
+                {# Somehow the following textarea breaks everything, even as a plain textarea. Maybe because of some js code on textareas? #}
+                {# <form>
+                    <div class="mb-3">
+                        <label for="deaccess-reason-readonly" class="form-label">Deaccession reason</label>
+                        <textarea class="form-control" id="deaccess-reason-readonly" type="text" value="" aria-label="Reason for deaccession request" readonly>
+                    </div>
+                </form> #}
+                <br>
+
+                <p>
+                The data manager has confirmed that they have tried to locate the data owner. If the owner  was still available,
+                the data manager has received permission to request deaccession of the data. If the owner was not available, the
+                data manager gives permission for the request.
+                </p>
+
+                <p>
+                The data manager confirms that there is no heritage or high value data in this package.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger btn-confirm-folder-deaccession-deny" data-path="">Deny deaccession</button>
+                <button type="button" class="btn btn-primary btn-confirm-folder-deaccession-approve" data-path="">Approve deaccession</button>
+            </div>
+        </div>
+    </div>
+</div>
