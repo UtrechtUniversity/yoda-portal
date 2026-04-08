@@ -342,11 +342,23 @@ $(function () {
   // Flow.js handle events
   r.on('filesAdded', function (files) {
     if (files.length) {
-      $('#files').html('')
-      // clear information present for new totals
-      $('.uploads-progress-information').html('')
-      $('.uploads-total-progress-bar').css('width', '0%')
-      $('.uploads-total-progress-bar-perc').html('0%')
+      const newFileIds = files.map(file => file.uniqueIdentifier)
+
+      // Check if there is at least one older file, and its upload is not complete.
+      const hasExistingIncompleteUploads = r.files.some(flowFile => {
+        return !newFileIds.includes(flowFile.uniqueIdentifier) &&
+          $('#' + flowFile.uniqueIdentifier).length &&
+          flowFile.progress() < 1
+      })
+
+      // Reset UI only not incomplete uploads
+      if (!hasExistingIncompleteUploads) {
+        $('#files').html('')
+        // clear information present for new totals
+        $('.uploads-progress-information').html('')
+        $('.uploads-total-progress-bar').css('width', '0%')
+        $('.uploads-total-progress-bar-perc').html('0%')
+      }
 
       const sortedFiles = files.sort((a, b) => a.name.localeCompare(b.name))
 
@@ -425,6 +437,8 @@ $(function () {
       })
     }
     $('#uploads').removeClass('hidden')
+    // Refresh progress display
+    updateProgress(r.files)
   })
   r.on('filesSubmitted', function () {
     const path = $('.upload').attr('data-path')
