@@ -390,6 +390,7 @@ function browse (dir = '', changeHistory = false) {
     $('.metadata-info').hide()
     $('.alert.is-archived').hide()
     $('.alert.is-processing').hide()
+    $('.alert.is-embargoed').hide()
   }
   // only here topInformation should show its alertMessage and rebuild the file browser
   topInformation(dir, true, true)
@@ -773,6 +774,7 @@ function topInformation (dir, rebuildFileBrowser = false) {
 
       let statusText = ''
       let archiveBadge = ''
+      let todayDate = ''
       const vaultStatus = data.status
       const vaultActionPending = data.vault_action_pending
       const hasWriteRights = 'yes'
@@ -786,6 +788,8 @@ function topInformation (dir, rebuildFileBrowser = false) {
       const allVersions = data.all_versions
       const baseDOI = data.base_doi
       const packageDOI = data.package_doi
+      const embargoEndDate = data.embargo_end_date
+      const dataAccessRestriction = data.data_access_restriction
 
       const pathParts = dir.split('/')
 
@@ -952,6 +956,14 @@ function topInformation (dir, rebuildFileBrowser = false) {
             $('.meta-content-size').removeClass('col-lg-9').addClass('col-lg-10')
             $('.version').hide()
           }
+        }
+
+        // Embargo end date
+        todayDate = (new Date()).toISOString().slice(0, 10)
+
+        if (embargoEndDate !== '' && (todayDate < embargoEndDate) && dataAccessRestriction === 'Open - freely retrievable') {
+          $('.alert.is-embargoed').html('This data package is embargoed until ' + embargoEndDate + '.')
+          $('.alert.is-embargoed').show()
         }
 
         // Datamanager sees access buttons in vault.
