@@ -233,25 +233,24 @@ $(function () {
     handleDeaccessionAction('request', currentFolder)
   })
 
-  // Reset request deaccess modal on opening of modal
-  document.querySelectorAll('.action-vault-request-deaccession').forEach(el => {
-    el.addEventListener('click', function (event) {
-      // TODO WHY doesn't this do anything?
-      document.getElementById('deaccess-request-form').reset()
-      // Hide certain boxes
-      document.getElementById('deaccess-owner-check-block').style.display = 'none'
-      document.getElementById('deaccess-owner-absence-check-block').style.display = 'none'
+  // Reset request deaccess modal on opening of modal.
+  const deaccessModal = document.getElementById('vault-request-deaccession')
+  deaccessModal.addEventListener('shown.bs.modal', function () {
+    document.getElementById('deaccess-request-form').reset()
+    document.getElementById('deaccess-owner-check-block').style.display = 'none'
+    document.getElementById('deaccess-owner-absence-check-block').style.display = 'none'
+    document.querySelectorAll('input[name="found-owner-radio"]').forEach(input => {
+      input.checked = false
     })
   })
 
-  // Show or hide parts of the form depending on what user clicks
-  document.getElementById('found-owner-true').addEventListener('change', function (event) {
-    document.getElementById('deaccess-owner-check-block').style.display = ''
-    document.getElementById('deaccess-owner-absence-check-block').style.display = 'none'
-  })
-  document.getElementById('found-owner-false').addEventListener('change', function (event) {
-    document.getElementById('deaccess-owner-check-block').style.display = 'none'
-    document.getElementById('deaccess-owner-absence-check-block').style.display = ''
+  // Show or hide parts of the form depending on what user clicks.
+  document.getElementById('deaccess-request-form').addEventListener('change', function (event) {
+    if (event.target.name === 'found-owner-radio') {
+      const showOwnerCheck = event.target.id === 'found-owner-true'
+      document.getElementById('deaccess-owner-check-block').style.display = showOwnerCheck ? '' : 'none'
+      document.getElementById('deaccess-owner-absence-check-block').style.display = showOwnerCheck ? 'none' : ''
+    }
   })
 
   $('body').on('click', 'button.action-confirm-data-package-select', function () {
