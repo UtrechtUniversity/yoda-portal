@@ -435,6 +435,8 @@ function browse (dir = '', changeHistory = false) {
     $('.alert.is-archived').hide()
     $('.alert.is-processing').hide()
     $('.alert.is-embargoed').hide()
+    const deaccessionAlert = document.querySelector('.alert.is-deaccession-complete')
+    deaccessionAlert?.classList.add('hide')
   }
   // only here topInformation should show its alertMessage and rebuild the file browser
   topInformation(dir, true, true)
@@ -1336,6 +1338,9 @@ async function handleDeaccessionAction (action, folder) {
 
   if (result.status === 'ok') {
     topInformation(folder, false)
+    if (action === 'approve') {
+      browse(currentFolder)
+    }
   } else {
     if (result.status_info) {
       Yoda.set_message('error', result.status_info)
