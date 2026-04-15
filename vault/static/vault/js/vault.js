@@ -242,6 +242,7 @@ $(function () {
     document.querySelectorAll('input[name="found-owner-radio"]').forEach(input => {
       input.checked = false
     })
+    updateRequestButton()
   })
 
   // Show or hide parts of the form depending on what user clicks.
@@ -251,7 +252,28 @@ $(function () {
       document.getElementById('deaccess-owner-check-block').style.display = showOwnerCheck ? '' : 'none'
       document.getElementById('deaccess-owner-absence-check-block').style.display = showOwnerCheck ? 'none' : ''
     }
+    updateRequestButton()
   })
+
+  // Validate request and update button.
+  function updateRequestButton () {
+    const reasonSelected = document.querySelector('input[name="deaccess-reason"]:checked')
+    const reasonValid = reasonSelected && (reasonSelected.id !== 'reason-other' || document.getElementById('deaccess-reason-input').value.trim())
+
+    const highValueChecked = document.getElementById('deaccess-high-value-check').checked
+
+    const ownerFound = document.querySelector('input[name="found-owner-radio"]:checked')
+    const ownerPermissionValid = ownerFound && (
+      (ownerFound.id === 'found-owner-true' && document.getElementById('deaccess-owner-check').checked) ||
+      (ownerFound.id === 'found-owner-false' && document.getElementById('deaccess-owner-absence-check').checked)
+    )
+
+    const isFormValid = reasonValid && highValueChecked && ownerPermissionValid
+    document.querySelector('.btn-confirm-deaccession-submit').disabled = !isFormValid
+  }
+
+  // Validate deaccession reason changes.
+  document.getElementById('deaccess-reason-input').addEventListener('input', updateRequestButton)
 
   $('body').on('click', 'button.action-confirm-data-package-select', function () {
     dataPackage = $('#submitPublication .modal-body input[type="radio"]:checked').val()
