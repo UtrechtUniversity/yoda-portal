@@ -973,6 +973,7 @@ function topInformation (dir, rebuildFileBrowser = false) {
               if (isAdmin) {
                 actions['vault-approve-deaccession'] = 'Approve/deny deaccession'
               }
+              document.getElementById('deaccess-reason-readonly').textContent = deaccession.reason
             } else if (deaccession.status === 'DEACCESSION_APPROVED') {
               deaccessionText = 'Deaccession approved'
             } else if (deaccession.status === 'DEACCESSION_COMPLETE') {
