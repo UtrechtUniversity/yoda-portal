@@ -77,17 +77,10 @@
             </div>
             <div class="modal-body">
                 <p>
-                The reason for deaccessing the data package is below. You can choose to approve or deny the request.
+                You can approve or deny this request, the reason for deaccessioning the data package is:
                 </p>
-                <p id="deaccess-reason-readonly"></p>
-                {# Somehow the following textarea breaks everything, even as a plain textarea. Maybe because of some js code on textareas? #}
-                {# <form>
-                    <div class="mb-3">
-                        <label for="deaccess-reason-readonly" class="form-label">Deaccession reason</label>
-                        <textarea class="form-control" id="deaccess-reason-readonly" type="text" value="" aria-label="Reason for deaccession request" readonly>
-                    </div>
-                </form> #}
-                <br>
+
+                <p><mark id="deaccess-reason-readonly"></mark></p>
 
                 <p>
                 The data manager has confirmed that they have tried to locate the data owner. If the owner  was still available,
