@@ -207,9 +207,9 @@ $(function () {
       if (data.manifest.length > 0) {
         $.each(data.manifest, function (index, obj) {
           table += `<tr>
-                      <td>${obj.name}</td>
-                      <td>${obj.human_readable_size}</td>
-                      <td><pre>${obj.checksum}</pre></td>
+                      <td>${Yoda.htmlEncode(obj.name)}</td>
+                      <td>${Yoda.htmlEncode(obj.human_readable_size)}</td>
+                      <td><pre>${Yoda.htmlEncode(obj.checksum)}</pre></td>
                   </tr>`
         })
         if (downloadChecksumReportTextTooltip) {
