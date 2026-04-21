@@ -237,9 +237,9 @@ $(function () {
   const deaccessModal = document.getElementById('vault-request-deaccession')
   deaccessModal.addEventListener('shown.bs.modal', function () {
     document.getElementById('deaccess-request-form').reset()
-    document.getElementById('deaccess-owner-check-block').style.display = 'none'
-    document.getElementById('deaccess-owner-absence-check-block').style.display = 'none'
-    document.querySelectorAll('input[name="found-owner-radio"]').forEach(input => {
+    document.getElementById('deaccess-data-collector-check-block').style.display = 'none'
+    document.getElementById('deaccess-data-collector-absence-check-block').style.display = 'none'
+    document.querySelectorAll('input[name="found-data-collector-radio"]').forEach(input => {
       input.checked = false
     })
     updateRequestButton()
@@ -247,10 +247,10 @@ $(function () {
 
   // Show or hide parts of the form depending on what user clicks.
   document.getElementById('deaccess-request-form').addEventListener('change', function (event) {
-    if (event.target.name === 'found-owner-radio') {
-      const showOwnerCheck = event.target.id === 'found-owner-true'
-      document.getElementById('deaccess-owner-check-block').style.display = showOwnerCheck ? '' : 'none'
-      document.getElementById('deaccess-owner-absence-check-block').style.display = showOwnerCheck ? 'none' : ''
+    if (event.target.name === 'found-data-collector-radio') {
+      const showOwnerCheck = event.target.id === 'found-data-collector-true'
+      document.getElementById('deaccess-data-collector-check-block').style.display = showOwnerCheck ? '' : 'none'
+      document.getElementById('deaccess-data-collector-absence-check-block').style.display = showOwnerCheck ? 'none' : ''
     }
     updateRequestButton()
   })
@@ -262,10 +262,10 @@ $(function () {
 
     const highValueChecked = document.getElementById('deaccess-high-value-check').checked
 
-    const ownerFound = document.querySelector('input[name="found-owner-radio"]:checked')
+    const ownerFound = document.querySelector('input[name="found-data-collector-radio"]:checked')
     const ownerPermissionValid = ownerFound && (
-      (ownerFound.id === 'found-owner-true' && document.getElementById('deaccess-owner-check').checked) ||
-      (ownerFound.id === 'found-owner-false' && document.getElementById('deaccess-owner-absence-check').checked)
+      (ownerFound.id === 'found-data-collector-true' && document.getElementById('deaccess-data-collector-check').checked) ||
+      (ownerFound.id === 'found-data-collector-false' && document.getElementById('deaccess-data-collector-absence-check').checked)
     )
 
     const isFormValid = reasonValid && highValueChecked && ownerPermissionValid
