@@ -85,12 +85,12 @@ class Vocabulary extends React.Component {
     const required = this.props.required
 
     if (isError) {
-      return <label className='text-danger form-label select-required'>{title}*</label>
+      return <label htmlFor={this.props.id} className='text-danger form-label select-required'>{title}*</label>
     } else if (required) {
-      return <label className='form-label select-required select-filled'>{title}*</label>
+      return <label htmlFor={this.props.id} className='form-label select-required select-filled'>{title}*</label>
     }
 
-    return <label className='form-label'>{title}</label>
+    return <label htmlFor={this.props.id} className='form-label'>{title}</label>
   }
 
   handleChange = (event) => {
@@ -101,11 +101,14 @@ class Vocabulary extends React.Component {
     const help = this.props.uiSchema['ui:help']
     const required = this.props.required
 
+    // Check if this field is part of an array.
+    const isArrayItem = this.props.title && /-\d+$/.test(this.props.title)
+
     return (
       <div>
-        {this.getLabel()}
+        {!isArrayItem && this.getLabel()}
         <CreatableSelect
-          className='select-box'
+          className='select-box mb-1'
           options={this.state.options}
           required={required}
           isDisabled={this.props.readonly || this.state.isLoading}
