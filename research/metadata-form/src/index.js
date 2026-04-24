@@ -207,161 +207,122 @@ const fields = {
 }
 
 const CustomArrayFieldTemplate = (props) => {
-  const { readonly, disabled } = props
+  const { readonly, disabled, required, title, items, canAdd, uiSchema, schema, onAddClick } = props
 
+  // Disabled view - just display items
   if (disabled) {
-    const output = props.items.map((element, i) => {
-      // Disabled view
-      if (disabled) {
-        return element.children
-      }
-      return null
-    })
-    return (<div className='hide'>{output}</div>)
-  } else {
-    let buttonClass = 'col-sm-2 offset-sm-10 array-item-add text-right'
-    if (props.uiSchema['ui:description'] || props.schema.description) {
-      buttonClass = 'col-sm-2 array-item-add text-right'
-    }
-
     return (
-      <fieldset className='yoda-array-field border rounded mb-4'>
-        {(props.title) && (
-          <legend>{props.title}</legend>
-        )}
-
-        <div className='d-flex'>
-          {(props.uiSchema['ui:description'] || props.schema.description) && (
-            <small className='col-sm-10 text-muted form-text mb-2'>
-              {props.uiSchema['ui:description'] || props.schema.description}
-            </small>
-          )}
-
-          {(!readonly && props.canAdd) && (
-            <p className={buttonClass}>
-              <button className='btn btn-outline-secondary btn-sm' onClick={props.onAddClick} type='button'>
-                <i className='fa-solid fa-plus' aria-hidden='true' />
-              </button>
-            </p>
-          )}
-        </div>
-
-        {props.items &&
-                props.items.map(el => (
-                  <div key={el.key} className='d-flex'>
-                    <div className='col-lg-10 col-10'>
-                      {el.children}
-                    </div>
-                    {!readonly && (
-                      <div className='py-4 col-lg-2 col-2 mt-2'>
-                        <div className='d-flex flex-row'>
-                          {el.hasMoveUp && (
-                            <div className='m-0 p-0'>
-                              <button
-                                className='btn btn-outline-secondary btn-sm' type='button' tabindex='-1'
-                                onClick={el.onReorderClick(
-                                  el.index,
-                                  el.index - 1
-                                )}
-                              >
-                                <i className='fa-solid fa-arrow-up' aria-hidden='true' />
-                              </button>
-                            </div>
-                          )}
-
-                          {el.hasMoveDown && (
-                            <div className='m-0 p-0'>
-                              <button
-                                className='btn btn-outline-secondary btn-sm' type='button' tabindex='-1'
-                                onClick={el.onReorderClick(
-                                  el.index,
-                                  el.index + 1
-                                )}
-                              >
-                                <i className='fa-solid fa-arrow-down' aria-hidden='true' />
-                              </button>
-                            </div>
-                          )}
-
-                          {el.hasRemove && props.items.length > 1 && (
-                            <div className='m-0 p-0'>
-                              <button
-                                className='btn btn-outline-secondary btn-sm' type='button' tabindex='-1'
-                                onClick={el.onDropIndexClick(el.index)}
-                              >
-                                <i className='fa-solid fa-trash' aria-hidden='true' />
-                              </button>
-                            </div>
-                          )}
-
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-      </fieldset>
+      <div className='hide'>
+        {items.map((el) => el.children)}
+      </div>
     )
   }
+
+  const description = uiSchema['ui:description'] || schema.description
+
+  return (
+    <fieldset className='yoda-array-field border rounded mb-4'>
+      {title && (
+        <legend className={required ? 'text-danger' : ''}>
+          {title}
+          {required && '*'}
+        </legend>
+      )}
+
+      <div className='d-flex'>
+        {description && (
+          <small className='col-sm-10 text-muted form-text mb-2'>
+            {description}
+          </small>
+        )}
+
+        {!readonly && canAdd && (
+          <div className='col-sm-2 text-right'>
+            <button className='btn btn-outline-secondary btn-sm' onClick={onAddClick} type='button'>
+              <i className='fa-solid fa-plus' aria-hidden='true' />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {items && items.map((el) => (
+        <div key={el.key} className='d-flex'>
+          <div className='col-lg-10 col-10'>
+            {el.children}
+          </div>
+          {!readonly && (
+            <div className={`col-lg-2 col-2 ${el.schema.type === 'string' ? 'mt-1' : 'mt-2 py-4'}`}>
+              <div className='d-flex flex-row'>
+                {el.hasMoveUp && (
+                  <button
+                    className='btn btn-outline-secondary btn-sm'
+                    type='button'
+                    onClick={el.onReorderClick(el.index, el.index - 1)}
+                  >
+                    <i className='fa-solid fa-arrow-up' aria-hidden='true' />
+                  </button>
+                )}
+
+                {el.hasMoveDown && (
+                  <button
+                    className='btn btn-outline-secondary btn-sm'
+                    type='button'
+                    onClick={el.onReorderClick(el.index, el.index + 1)}
+                  >
+                    <i className='fa-solid fa-arrow-down' aria-hidden='true' />
+                  </button>
+                )}
+
+                {el.hasRemove && items.length > 1 && (
+                  <button
+                    className='btn btn-outline-secondary btn-sm'
+                    type='button'
+                    onClick={el.onDropIndexClick(el.index)}
+                  >
+                    <i className='fa-solid fa-trash' aria-hidden='true' />
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </fieldset>
+  )
 }
 
 const CustomFieldTemplate = (props) => {
-  const {
-    id, classNames, label, help, hidden, required, description, errors,
-    rawErrors, children, displayLabel, formContext
-  } = props
+  const { id, classNames, label, help, hidden, required, description, errors, rawErrors, children, displayLabel, formContext } = props
 
-  let labelClass = ''
-  if (Array.isArray(rawErrors)) {
-    labelClass = 'text-danger'
-  }
-
+  // Hide field entirely if needed
   if (hidden || !displayLabel) {
     return children
   }
 
-  // Only show error messages after submit.
-  if (formContext.saving) {
-    return (
-      <div className={classNames + ' row'}>
-        <div className='col-12 field-wrapper'>
-          <div className='form-group mb-0'>
-            <div className='mb-0 form-group'>
-              <label htmlFor={id} className={labelClass}>
-                {label}
-                {required ? '*' : null}
-              </label>
-              {children}
-              {help && (
-                <small className='text-muted form-text'>{help}</small>
-              )}
-              {description}
-            </div>
-          </div>
-          {errors}
+  // Check if this field is part of an array.
+  const isArrayItem = id && /_\d+$/.test(id)
+
+  const hasErrors = Array.isArray(rawErrors) && rawErrors.length > 0
+  const shouldShowErrors = formContext?.saving && hasErrors
+
+  return (
+    <div className={`${classNames} row`}>
+      <div className='col-12 field-wrapper'>
+        <div className='form-group mb-0'>
+          {!isArrayItem && (
+            <label htmlFor={id} className={hasErrors ? 'text-danger' : ''}>
+              {label}
+              {required && '*'}
+            </label>
+          )}
+          {children}
+          {help && <small className='text-muted form-text'>{help}</small>}
+          {description && <div className='form-text'>{description}</div>}
+          {shouldShowErrors && errors}
         </div>
       </div>
-    )
-  } else {
-    return (
-      <div className={classNames + ' row'}>
-        <div className='col-12 field-wrapper'>
-          <div className='form-group mb-0'>
-            <div className='mb-0 form-group'>
-              <label htmlFor={id} className={labelClass}>
-                {label}
-                {required ? '*' : null}
-              </label>
-              {children}
-              {help && (
-                <small className='text-muted form-text'>{help}</small>
-              )}
-              {description}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+    </div>
+  )
 }
 
 const CustomObjectFieldTemplate = (props) => {
@@ -380,10 +341,12 @@ const CustomObjectFieldTemplate = (props) => {
     })
 
     if (props.title) {
+      const description = props.uiSchema['ui:description'] || props.schema.description
       return (
         <fieldset className='yoda-array-field border rounded mb-4'>
           <legend>{props.title}</legend>
-          <div className='d-flex'>{output} </div>
+          {description && <div className='d-flex'><small className='col-sm-10 text-muted form-text mb-2'>{description}</small></div>}
+          <div className='d-flex'>{output}</div>
         </fieldset>
       )
     } else {
