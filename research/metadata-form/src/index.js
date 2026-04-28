@@ -251,7 +251,7 @@ const CustomArrayFieldTemplate = (props) => {
             {el.children}
           </div>
           {!readonly && (
-            <div className={`col-lg-2 col-2 ${el.schema.type === 'string' ? 'mt-1' : 'mt-2 py-4'}`}>
+            <div className={`col-lg-2 col-2 ${(el.schema.type === 'string' || el.uiSchema['ui:field'] === 'vocabulary') ? 'mt-1' : 'mt-2 py-4'}`}>
               <div className='d-flex flex-row'>
                 {el.hasMoveUp && (
                   <button
