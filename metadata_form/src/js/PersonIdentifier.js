@@ -162,7 +162,7 @@ class PersonIdentifier extends React.Component {
 
     // Only present link if there is a label/href combination for a non readonly field
     if (searchUrl.length) {
-      searchLink = <a class='btn btn-sm btn-primary float-end' href={searchUrl} target='_blank' rel='noreferrer'><i class='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup {Name_Identifier_Scheme}</a>
+      searchLink = <a className='btn btn-sm btn-primary float-end' href={searchUrl} target='_blank' rel='noreferrer'><i className='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup {Name_Identifier_Scheme}</a>
     }
 
     let labelClasses = 'form-label'
