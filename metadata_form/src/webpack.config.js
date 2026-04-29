@@ -15,7 +15,8 @@ const configIndividual = function (argv) {
     resolve: {
       modules: ['...', SHARED_DIR + '/node_modules', 'node_modules'],
       alias: {
-        YodaFields: SHARED_DIR + '/js'
+        YodaFields: SHARED_DIR + '/js',
+        YodaTemplates: SHARED_DIR + '/js'
       }
     },
     module: {

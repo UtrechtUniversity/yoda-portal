@@ -65,6 +65,9 @@ class Vocabulary extends React.Component {
       return { options: [], dataMap: {} }
     }
 
+    // Sort options alphabetically by label.
+    options.sort((a, b) => a.label.localeCompare(b.label))
+
     return { options, dataMap }
   }
 
