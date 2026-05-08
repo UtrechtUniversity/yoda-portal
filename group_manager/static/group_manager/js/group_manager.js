@@ -600,6 +600,8 @@ $(function () {
   // Store the initial state of the CSV import instructions
   let initialImportCsvHtml = $('#result-import-groups-csv').html()
 
+  let sramCo = 'false'
+
   // Multiple user role change
   $('.users.card .update-button').on('click', function (e) {
     const newRole = $(this).attr('data-target-role')
@@ -680,9 +682,11 @@ $(function () {
   $('.create-button-new').on('click', function () {
     const groupType = this.getAttribute('data-group-type')
     if (groupType === 'sram-co') {
-      $('#f-group-create-sram-co').prop('checked', true)
+      sramCo = 'true'
+      $('#sram-alert-create').removeClass('hidden')
     } else {
-      $('#f-group-create-sram-co').prop('checked', false)
+      sramCo = 'false'
+      $('#sram-alert-create').addClass('hidden')
     }
 
     $('.properties-update').addClass('hidden')
@@ -1153,9 +1157,12 @@ $(function () {
             .val(group.data_classification).trigger('change')
         }
 
-        // Add SRAM CO value
-        $groupProperties.find('#f-group-update-sram-co')
-          .prop('checked', (group.sram_co.toLowerCase() === 'true'))
+        // Check if group is connected to SRAM CO.
+        if (group.sram_co.toLowerCase() === 'true') {
+          $('#sram-alert-update').removeClass('hidden')
+        } else {
+          $('#sram-alert-update').addClass('hidden')
+        }
 
         $groupProperties.find('#f-group-update-submit')
           .attr('hidden', !userCanManage)
@@ -1814,7 +1821,7 @@ $(function () {
         category: $('#f-group-' + action + '-category').select2('data')[0].id,
         subcategory: $('#f-group-' + action + '-subcategory').select2('data')[0].id,
         expiration_date: $('#f-group-' + action + '-expiration-date').val(),
-        sram_co: $('#f-group-' + action + '-sram-co').is(':checked')
+        sram_co: sramCo
       }
 
       // specific datamanager-group testing dependent on mode
