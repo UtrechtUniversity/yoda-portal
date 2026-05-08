@@ -102,6 +102,11 @@
             <div class="card properties-create hidden">
                 <div class="card-header">Create new group</div>
                 <div class="card-body" id="group-properties-create">
+                    {% if config.get('SRAM_ENABLED', False) %}
+                    <div id="sram-alert-create" class="alert alert-primary hidden" role="alert">
+                      You are creating a <a href="https://sram.surf.nl/" title="SURF Research Access Management (SRAM)">SURF Research Access Management</a> collaboration
+                    </div>
+                    {% endif %}
                     <form class="form-horizontal" id="f-group-create" action="{{ url_for('group_manager_bp.group_create') }}" method="post">
                         <div class="mb-3 row">
                             <label class="col-sm-4 form-label" for="f-group-create-name">Group name
@@ -190,17 +195,6 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 row sram-co hidden">
-                            <label class="col-sm-4 form-label" for="f-group-create-sram-co">Research collaboration in SRAM
-                                <i class="fa-solid fa-question-circle" aria-hidden="true" title="Create SRAM CO for the group to enable connection with multiple services"></i>
-                            </label>
-                            <div class="col-sm-8">
-                                <div class="form-check">
-                                    <input name="group_sram_co" id="f-group-create-sram-co" type="checkbox" class="form-check-input"/>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="row">
                             <div class="offset-sm-4 col-sm-8">
                                 <input action="{{ url_for('group_manager_bp.group_create') }}" id="f-group-create-submit" class="btn btn-primary" type="button" value="Add group">
@@ -222,6 +216,11 @@
                     <p class="placeholder-text">
                         Please select a group.
                     </p>
+                    {% if config.get('SRAM_ENABLED', False) %}
+                    <div id="sram-alert-update" class="alert alert-primary hidden" role="alert">
+                      This is a <a href="https://sram.surf.nl/" title="SURF Research Access Management (SRAM)">SURF Research Access Management</a> collaboration
+                    </div>
+                    {% endif %}
                     <form action="{{ url_for('group_manager_bp.group_update') }}" method="post" id="f-group-update" class="hidden">
 
                         <div class="mb-3 row">
@@ -309,16 +308,6 @@
                                 <input name="group_creation_date" id="f-group-update-creation-date" class="form-control" type="text" disabled />
                             </div>
                         </div>
-                        {% if config.get('SRAM_ENABLED', False) %}
-                        <div class="mb-3 row sram_co">
-                            <label class="col-sm-4 form-label" for="f-group-update-sram-co">Research collaboration in SRAM
-                                <i class="fa-solid fa-question-circle" aria-hidden="true" title="Create SRAM CO for the group enable connection with multiple services"></i>
-                            </label>
-                            <div class="col-sm-8">
-                                <input name="group_sram_co" id="f-group-update-sram-co" class="form-check-input" type="checkbox" disabled/>
-                            </div>
-                        </div>
-                        {% endif %}
 
                         <div class="row">
                             <div class="offset-sm-4 col-sm-8">
