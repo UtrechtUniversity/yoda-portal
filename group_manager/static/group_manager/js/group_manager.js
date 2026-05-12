@@ -788,8 +788,7 @@ $(function () {
     accessIcons: {
       reader: 'fa-eye',
       normal: 'fa-user',
-      manager: 'fa-crown',
-      invited: 'fa-user-clock'
+      manager: 'fa-crown'
     },
 
     /// Human-readable descriptions of access levels.
@@ -1231,12 +1230,14 @@ $(function () {
           const userAccessClass = `user-access-${user.access}`
           const userStatusClass = (actionsDisabled) ? 'disabled' : ''
           const selfClass = isCurrentUser ? 'self' : ''
+          const invitedIcon = invited ? '<i class="fa-solid fa-clock float-end mt-1" aria-hidden="true" title="User is invited to SRAM CO"></i>' : ''
 
           $user.html(`
               <a id="user-${i}" class="list-group-item list-group-item-action user ${userAccessClass} ${userStatusClass} ${selfClass}" data-name="${userName}">
                   <input class="form-check-input" type="checkbox" value="">
-                  <i class="fa-solid ${invited ? that.accessIcons.invited : that.accessIcons[user.access]}" aria-hidden="true" title="${that.accessNames[user.access]}"></i>
+                  <i class="fa-solid ${that.accessIcons[user.access]}" aria-hidden="true" title="${that.accessNames[user.access]}"></i>
                   ${Yoda.htmlEncode(displayName)}
+                  ${invitedIcon}
               </a>
           `)
 
@@ -1295,6 +1296,8 @@ $(function () {
       $userPanel.find('#user-list-search').val('')
       $userPanel.find('.card-body:has(.placeholder-text)').removeClass('hidden')
       $userPanel.find('#user-list').addClass('hidden')
+
+      $('#sram-alert-update').addClass('hidden')
 
       // Fix bad bootstrap borders caused by hidden elements.
       $userPanel.find('.card-header').css({ borderBottom: '' })
@@ -2089,7 +2092,8 @@ $(function () {
       if (result.status === 'ok') {
         that.groups[groupName].members[userName] = {
           // XXX
-          access: 'normal'
+          access: 'normal',
+          sram: that.groups[groupName].sram_co === 'true' ? 'invited' : ''
         }
 
         $(el).find('#f-user-create-name').val(null).trigger('change')
