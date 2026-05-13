@@ -182,7 +182,7 @@ def settings() -> Response:
     if request.method == 'POST':
         # Build user settings dict.
         settings = {}
-        settings['mail_notifications'] = request.form.get('mail_notifications', "OFF")
+        settings['mail_notifications'] = request.form.get('mail_notifications', "IMMEDIATE")
         settings['group_manager_view'] = request.form.get('group_manager_view', "TREE")
         settings['number_of_items'] = request.form.get('number_of_items', "10")
         settings['color_mode'] = request.form.get('color_mode', "AUTO")
