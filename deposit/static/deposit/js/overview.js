@@ -164,17 +164,12 @@ const getFolderContents = (() => {
           offset: args.start,
           limit: batchSize,
           sort_order: args.order[0].dir,
-          sort_on: ['name', 'size', 'modified'][args.order[0].column],
+          sort_on: ['name', 'modified'][args.order[0].column],
           space: 'Space.DEPOSIT'
         })
 
       // If another requests has come while we were waiting, simply drop this one.
       if (i !== j) return null
-
-      // Populate the 'size' of collections so datatables doesn't get confused.
-      for (const x of result.items) {
-        if (x.type === 'coll') { x.size = 0 }
-      }
 
       // Update cache info.
       total = result.total
@@ -219,15 +214,6 @@ const tableRenderer = {
   access: (name, _, row) => {
     return `${Yoda.htmlEncode(row.deposit_access)}`
   },
-  size: (depositSize, _, row) => {
-    const szs = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB']
-    let szi = 0
-    while (row.deposit_size >= 1024 && szi < szs.length - 1) {
-      row.deposit_size /= 1024
-      szi++
-    }
-    return (Math.floor(row.deposit_size * 10) / 10 + '') + '&nbsp;' + szs[szi]
-  },
   date: ts => {
     const date = new Date(ts * 1000)
     const pad = n => n < 10 ? '0' + n : '' + n
@@ -261,11 +247,10 @@ function startBrowsing () {
     columns: [{ render: tableRenderer.name, orderable: true, data: 'name' },
       { render: tableRenderer.title, orderable: false, data: 'name' },
       { render: tableRenderer.access, orderable: false, data: 'name' },
-      // Size and date should be orderable, but limitations
+      // Date should be orderable, but limitations
       // on how queries work prevent us from doing this
       // correctly without significant overhead.
       // (enabling this as is may result in duplicated results for data objects)
-      { render: tableRenderer.size, orderable: false, data: 'size' },
       { render: tableRenderer.date, orderable: true, data: 'modify_time' },
       { render: tableRenderer.context, orderable: false }],
     ajax: getFolderContents,
