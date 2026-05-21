@@ -226,7 +226,7 @@ $(document).ready(function () {
       $('.multi-select-table tbody').html('')
       $("input:checkbox[name='multiSelect[]']:checked").each(function (index) {
         const type = $(this).attr('data-type')
-        const name = $(this).attr('data-name')
+        const name = DOMPurify.sanitize($(this).attr('data-name'))
         let icon
         if (type === 'coll') {
           icon = '<i class="fa-regular fa-folder"></i>'
@@ -239,11 +239,12 @@ $(document).ready(function () {
                     <td class="item-progress">-</td>
                 </tr>
                 `
-        $('.multi-select-table tbody').append(DOMPurify.sanitize(row))
+        $('.multi-select-table tbody').append(row)
       })
 
       if (action === 'multiple-delete') {
         $('#multi-select-delete').modal('hide')
+        $('.dlg-multi-action-button').hide()
       } else {
         $('#dlg-file-browse-operations').modal('hide')
       }
