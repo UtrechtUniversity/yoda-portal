@@ -13,7 +13,10 @@ const CustomArrayFieldTemplate = (props) => {
   }
 
   const description = uiSchema['ui:description'] || schema.description
-  const isStringField = (el) => el.schema.type === 'string' || el.uiSchema?.['ui:field'] === 'vocabulary'
+  const isStringField = (el) => {
+    const type = el.schema.type
+    return (type === 'string' || (Array.isArray(type) && type.includes('string'))) || el.uiSchema?.['ui:field'] === 'vocabulary'
+  }
   const actionSpacingClass = (el) => (isStringField(el) ? 'mt-1' : 'mt-2 py-4')
   const hasErrors = Array.isArray(rawErrors) && rawErrors.length > 0
 
