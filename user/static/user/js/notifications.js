@@ -1,3 +1,4 @@
+/* global DOMPurify */
 'use strict'
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -6,10 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
   Yoda.call('notifications_load', { sort_order: sortOrder }).then((data) => {
     const notificationContainer = document.getElementById('notifications')
     const notificationTools = document.getElementById('notification-tools')
+    let notificationHtml = ''
 
     if (data && data.length > 0) {
       notificationTools.classList.remove('hidden')
-      notificationContainer.innerHTML = data.map(notification => `
+      notificationHtml = data.map(notification => `
         <a href="${notification.link || '#'}" class="list-group-item list-group-item-action">
           <div class="d-flex w-100 justify-content-between">
             <p class="mb-1">${notification.message}</p>
@@ -21,8 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
         </a>
       `).join('')
     } else {
-      notificationContainer.innerHTML = '<p>All caught up! You have no new notifications.</p>'
+      notificationHtml = '<p>All caught up! You have no new notifications.</p>'
     }
+    notificationContainer.innerHTML = DOMPurify.sanitize(notificationHtml)
   })
 
   document.body.addEventListener('click', (e) => {
