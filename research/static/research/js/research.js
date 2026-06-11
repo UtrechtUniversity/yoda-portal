@@ -230,7 +230,7 @@ $(function () {
       }
       table += '</tbody></table>'
 
-      $('#showChecksumReport .modal-body #checksumReport').html(table)
+      $('#showChecksumReport .modal-body #checksumReport').html(DOMPurify.sanitize(table))
       $('#showChecksumReport').modal('show')
     })
   })
