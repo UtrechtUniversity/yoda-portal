@@ -1,4 +1,4 @@
-/* global $, bootstrap, Flow, Option */
+/* global $, bootstrap, DOMPurify, Flow, Option */
 'use strict'
 
 $(document).ajaxSend(function (e, request, settings) {
@@ -925,16 +925,18 @@ function determineFileIcon (name, rowType, fileType) {
   }
 }
 
-function determineNameHTML (name, row, tgt, fileType, icon) {
+function determineNameHtml (name, row, tgt, fileType, icon) {
+  let nameHtml = ''
   if (row.type === 'coll') {
-    return `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+    nameHtml = `<a class="coll browse" href="?dir=${encodeURIComponent(tgt)}" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
   } else if (hasReadRights && Yoda.isTextExtension(name) && row.size < 4 * 1024 * 1024) {
-    return `<a href="/fileviewer?file=${encodeURIComponent(tgt)}" target="_blank" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+    nameHtml = `<a href="/fileviewer?file=${encodeURIComponent(tgt)}" target="_blank" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
   } else if (hasReadRights && fileType) {
-    return `<a href="/fileviewer?file=${encodeURIComponent(tgt)}" target="_blank" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
+    nameHtml = `<a href="/fileviewer?file=${encodeURIComponent(tgt)}" target="_blank" data-path="${Yoda.htmlEncode(tgt)}"><i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}</a>`
   } else {
-    return `<i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}`
+    nameHtml = `<i class="fa-regular ${icon}"></i> ${Yoda.htmlEncode(name)}`
   }
+  return DOMPurify.sanitize(nameHtml)
 }
 
 function makeBreadcrumb (dir) {
@@ -1082,7 +1084,7 @@ const tableRenderer = {
     const fileType = Yoda.viewableExtensionType(name)
     const icon = determineFileIcon(name, row.type, fileType)
 
-    return determineNameHTML(name, row, tgt, fileType, icon)
+    return determineNameHtml(name, row, tgt, fileType, icon)
   },
   size: (size, _, row) => {
     if (row.type === 'coll') {
