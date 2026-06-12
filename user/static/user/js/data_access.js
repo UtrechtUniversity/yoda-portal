@@ -1,3 +1,4 @@
+/* global DOMPurify */
 'use strict'
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -7,11 +8,11 @@ document.addEventListener('DOMContentLoaded', function () {
     data.forEach(token => {
       const div = document.createElement('div')
       div.className = 'list-group-item d-inline-flex'
-      div.innerHTML = `
+      div.innerHTML = DOMPurify.sanitize(`
             <label class="col-sm-7">${token.label}</label>
             <span class="col-sm-3">${token.exp_time}</span>
             <button type="button" class="btn btn-danger col-sm-2 delete-token">Delete</button>
-        `
+        `)
       container.appendChild(div)
     })
   })
