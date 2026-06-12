@@ -1,3 +1,4 @@
+/* global DOMPurify, Yoda */
 'use strict'
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -6,10 +7,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     data.forEach(token => {
       const div = document.createElement('div')
+      const label = DOMPurify.sanitize(token.label)
+      const expTime = DOMPurify.sanitize(token.exp_time)
       div.className = 'list-group-item d-inline-flex'
       div.innerHTML = `
-            <label class="col-sm-7">${token.label}</label>
-            <span class="col-sm-3">${token.exp_time}</span>
+            <label class="col-sm-7">${Yoda.htmlEncode(label)}</label>
+            <span class="col-sm-3">${Yoda.htmlEncode(expTime)}</span>
             <button type="button" class="btn btn-danger col-sm-2 delete-token">Delete</button>
         `
       container.appendChild(div)
