@@ -16,8 +16,10 @@ document.addEventListener('DOMContentLoaded', function () {
       let codeBlockId
       if (this.id === 'button1') {
         codeBlockId = 'code-block1'
-      } else {
+      } else if (this.id === 'button2') {
         codeBlockId = 'code-block2'
+      } else if (this.id === 'button3') {
+        codeBlockId = 'code-block3'
       }
 
       const codeContent = document.getElementById(codeBlockId).textContent
@@ -40,9 +42,12 @@ document.addEventListener('DOMContentLoaded', function () {
       if (this.id === 'download-button1') {
         codeBlockId = 'code-block1'
         filename = 'irods_environment.json'
-      } else {
+      } else if (this.id === 'download-button2') {
         codeBlockId = 'code-block2'
         filename = 'config.yml'
+      } else if (this.id === 'download-button3') {
+        codeBlockId = 'code-block3'
+        filename = 'irods_environment.json'
       }
 
       const codeContent = document.getElementById(codeBlockId).textContent
