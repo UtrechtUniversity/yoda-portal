@@ -298,6 +298,16 @@ class YodaForm extends React.Component {
   componentDidMount () {
     const formInstance = this.formRef.current
     const data = formInstance?.state?.formData ?? this.state.formData
+
+    // If maintenance banner is visible, add padding to metadata form header
+    if (document.getElementById('maintenance-banner') || document.querySelector('.non-production')) {
+      const cardHeader = document.querySelector('#metadata-form .card-header')
+      if (cardHeader) {
+        cardHeader.classList.add('pt-4', 'pb-3')
+        cardHeader.style.top = '1rem'
+      }
+    }
+
     this.afterFormLoad(data)
   }
 
@@ -564,15 +574,6 @@ function loadForm () {
         if (document.getElementById('metadata-form').classList.contains('hide')) {
           // Avoid flashing things on screen.
           document.getElementById('metadata-form').classList.remove('hide')
-        }
-
-        // If maintenance banner is visible, add padding to metadata form header
-        if (document.getElementById('maintenance-banner') || document.querySelector('.non-production')) {
-          const cardHeader = document.querySelector('#metadata-form .card-header')
-          if (cardHeader) {
-            cardHeader.classList.add('pt-4', 'pb-3')
-            cardHeader.style.top = '0.5rem'
-          }
         }
 
         // Specific required textarea handling
