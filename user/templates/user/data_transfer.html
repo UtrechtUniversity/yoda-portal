@@ -42,6 +42,9 @@
         <li class="nav-item">
           <a class="nav-link" data-bs-toggle="tab" href="#Gocommands">GoCommands</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#iBridges">iBridges</a>
+        </li>
       </ul>
     </div>
     <div class="card-body">
@@ -75,7 +78,7 @@
 }
           </code></pre>
           <div class="float-md-end">
-            <button id="download-button1" type="button" class="btn btn-outline-secondary btn-download-file"> Download as JSON </button>
+            <button id="download-button1" type="button" class="btn btn-outline-secondary btn-download-file">Download as JSON</button>
           </div>
         </div>
         <div id="Gocommands" class="container tab-pane fade">
@@ -102,7 +105,36 @@ irods_client_server_negotiation: "request_server_negotiation"
 irods_client_server_policy: "CS_NEG_REQUIRE"
           </code></pre>
           <div class="float-md-end">
-            <button id="download-button2" type="button" class="btn btn-outline-secondary btn-download-file"> Download as YAML </button>
+            <button id="download-button2" type="button" class="btn btn-outline-secondary btn-download-file">Download as YAML</button>
+          </div>
+        </div>
+        <div id="iBridges" class="container tab-pane fade">
+          <p>
+            <a href="https://ibridges-for-irods.github.io/iBridges-GUI/" target="_blank">iBridges-GUI</a> is a graphical user interface
+            to the python package iBridges, it provides users of Windows, Linux and Mac with a graphical user interface to interact with
+            iRODS servers. The out-of-the-box iBridges supports three main functions: browsing through iRODS collections, upload/download
+            and synchronisation of data, manipulate iRODS metadata and search through data collections.
+          </p>
+          <p>Download or copy the following configuration into iBridges.</p>
+          <pre><code id="code-block3">
+{
+    "irods_host": "{{ config.get('IRODS_ICAT_HOSTNAME') }}",
+    "irods_port": 1247,
+    "irods_home": "/{{ config.get('IRODS_DEFAULT_ZONE') }}/home",
+    "irods_user_name": "{{ g.user }}",
+    "irods_zone_name": "{{ config.get('IRODS_DEFAULT_ZONE') }}",
+    "irods_default_resource": "{{ config.get('IRODS_DEFAULT_RESC') }}",
+    "irods_authentication_scheme": "pam_password",
+    "irods_encryption_algorithm": "AES-256-CBC",
+    "irods_encryption_key_size": 32,
+    "irods_encryption_num_hash_rounds": 16,
+    "irods_encryption_salt_size": 8,
+    "irods_client_server_negotiation": "request_server_negotiation",
+    "irods_client_server_policy": "CS_NEG_REQUIRE"
+}
+          </code></pre>
+          <div class="float-md-end">
+            <button id="download-button3" type="button" class="btn btn-outline-secondary btn-download-file">Download as JSON</button>
           </div>
         </div>
       </div>
