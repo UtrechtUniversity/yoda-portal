@@ -37,8 +37,13 @@ const CustomArrayFieldTemplate = (props) => {
         )}
 
         {!readonly && canAdd && (
-          <div className='col-sm-2 text-right'>
-            <button className='btn btn-outline-secondary btn-sm' onClick={onAddClick} type='button'>
+          <div className='col-sm-2 ms-auto px-3'>
+            <button
+              className='btn btn-outline-secondary btn-sm'
+              type='button'
+              onClick={onAddClick}
+              aria-label='Add item'
+            >
               <i className='fa-solid fa-plus' aria-hidden='true' />
             </button>
           </div>
