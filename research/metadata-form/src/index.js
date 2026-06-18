@@ -635,6 +635,9 @@ async function submitData (data) {
     // Allow retry.
     buttons.forEach(button => { button.disabled = false })
   }
+
+  // Scroll to top to show alert
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 function updateCompleteness () {
