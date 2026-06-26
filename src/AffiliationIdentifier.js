@@ -1,8 +1,7 @@
-import React, { Component } from 'react'
-import { render } from 'react-dom'
+/* eslint-disable camelcase */
+import React from 'react'
 import CreatableSelect from 'react-select/creatable'
 import axios from 'axios'
-import { FieldProps } from '@rjsf/utils'
 
 class AffiliationIdentifier extends React.Component {
   constructor (props) {
@@ -71,81 +70,13 @@ class AffiliationIdentifier extends React.Component {
         border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
         boxShadow: 'none',
         '&:hover': {
-            border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+          border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da'
         }
       })
     }
 
-    const darkThemeColors = {
-        /* For theme color guidance: https://github.com/JedWatson/react-select/issues/3692#issuecomment-523425096 */
-        /*
-         * control/backgroundColor
-         * menu/backgroundColor
-         * option/color(selected)
-         */
-        neutral0: '#212529',
-
-        /*
-         * control/backgroundColor(disabled)
-         */
-        neutral5: '#212529',
-
-        /*
-         * control/borderColor(disabled)
-         * multiValue/backgroundColor
-         * indicators(separator)/backgroundColor(disabled)
-         */
-        neutral10: '#343a40',
-
-        /*
-         * control/borderColor
-         * option/color(disabled)
-         * indicators/color
-         * indicators(separator)/backgroundColor
-         * indicators(loading)/color
-         */
-        neutral20: '#343a40',
-
-        /*
-         * control/borderColor(focused)
-         * control/borderColor:hover
-         */
-        neutral30: '#343a40',
-
-        /*
-         * input/color
-         * multiValue(label)/color
-         * singleValue/color
-         * indicators/color(focused)
-         * indicators/color:hover(focused)
-         */
-        neutral80: 'var(--neutral-10)',
-        neutral90: 'var(--neutral-10)',
-
-         /*
-          * One of the few bootstrap variables we can use with themeing react-select!
-          * control/boxShadow(focused)
-          * control/borderColor(focused)
-          * control/borderColor:hover(focused)
-          * option/backgroundColor(selected)
-          * option/backgroundColor:active(selected)
-          */
-        primary: 'var(--bs-primary)',
-
-        /*
-         * option/backgroundColor(focused)
-         */
-        primary25: '#2b3035',
-
-        /*
-         * option/backgroundColor:active
-         */
-        primary50: '#2b3035',
-        primary75: '#2b3035',
-    };
-
     // Check what theme is set
-    const colorMode = document.documentElement.getAttribute('data-bs-theme');
+    const colorMode = this.props.formContext.colorMode
 
     let parentContext = this.props.idSchema.$id
     parentContext = parentContext.replace(this.props.idPrefix + '_', '')
@@ -176,7 +107,7 @@ class AffiliationIdentifier extends React.Component {
       classesName += ' is-invalid'
     }
 
-    // If Affiliation is required, Name is laways required.
+    // If Affiliation is required, Name is always required.
     if (affiliationRequired) {
       reqName = '*'
 
@@ -228,8 +159,8 @@ class AffiliationIdentifier extends React.Component {
             onChange={this.handleChange}
             styles={customStyles}
             theme={(theme) => ({
-                ...theme,
-                colors: (colorMode === 'dark') ? {...theme.colors, ...darkThemeColors} : {...theme.colors},
+              ...theme,
+              colors: (colorMode === 'dark') ? { ...theme.colors, ...this.props.formContext.darkThemeColors } : { ...theme.colors }
             })}
           />
           {helpAffiliationName && (

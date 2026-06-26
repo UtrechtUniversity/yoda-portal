@@ -1,0 +1,38 @@
+{
+  "$id": "rights-metadata-0.json",
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "definitions": {
+    "optionsDataAccessRestriction": {
+      "type": "string",
+      "enum": [
+        "Open - freely retrievable",
+        "Restricted - available upon request",
+        "Closed"
+      ]
+    }
+  },
+  "title": "Rights metadata",
+  "type": "object",
+  "unevaluatedProperties": false,
+  "required": [
+    "License",
+    "Data_Access_Restriction"
+  ],
+  "properties": {
+    "License": {
+      "type": "string",
+      "enum": [
+        "Creative Commons Attribution 4.0 International Public License",
+        "Creative Commons Zero v1.0 Universal",
+        "Open Data Commons Attribution License (ODC-By) v1.0",
+        "Custom"
+      ],
+      "title": "License"
+    },
+    "Data_Access_Restriction": {
+      "$ref": "#/definitions/optionsDataAccessRestriction",
+      "title": "Data package access",
+      "default": "Restricted - available upon request"
+    }
+  }
+}

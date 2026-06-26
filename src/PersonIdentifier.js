@@ -1,7 +1,6 @@
-import React, { Component } from 'react'
-import { render } from 'react-dom'
+/* eslint-disable camelcase */
+import React from 'react'
 import Select from 'react-select'
-import { FieldProps } from '@rjsf/utils'
 import InputMask from 'react-input-mask'
 
 // The Person Identifier field will always be a combination of Name_Identifier_Scheme and Name_Identifier.
@@ -14,8 +13,6 @@ class PersonIdentifier extends React.Component {
     this.state = {
       ...props.formData
     }
-
-    const options = props.registry.rootSchema.definitions.optionsNameIdentifierScheme.enum
   }
 
   handleChange = (event) => {
@@ -46,7 +43,7 @@ class PersonIdentifier extends React.Component {
 
     // Dependant on selected name scheme the corresponding identifier field shows/does different things
     //  Selected scheme dependent help text handling
-    // default value from schema (independent of name_scheme
+    // default value from schema (independent of name_scheme)
     let helpIdentifier = this.props.uiSchema.Name_Identifier['ui:help']
     if (typeof this.props.uiSchema.Name_Identifier['ui:help-' + Name_Identifier_Scheme] !== 'undefined') {
       helpIdentifier = this.props.uiSchema.Name_Identifier['ui:help-' + Name_Identifier_Scheme]
@@ -74,87 +71,19 @@ class PersonIdentifier extends React.Component {
       placeholder = this.props.uiSchema.Name_Identifier['ui:field-placeholder']
     }
 
-    let customStyles = {
-        control: (styles) => ({
-            ...styles,
-            border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
-            boxShadow: 'none',
-            '&:hover': {
-                border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
-            }
-        })
-    };
-
-    const darkThemeColors = {
-        /* For theme color guidance: https://github.com/JedWatson/react-select/issues/3692#issuecomment-523425096 */
-        /*
-         * control/backgroundColor
-         * menu/backgroundColor
-         * option/color(selected)
-         */
-        neutral0: '#212529',
-
-        /*
-         * control/backgroundColor(disabled)
-         */
-        neutral5: '#212529',
-
-        /*
-         * control/borderColor(disabled)
-         * multiValue/backgroundColor
-         * indicators(separator)/backgroundColor(disabled)
-         */
-        neutral10: '#343a40',
-
-        /*
-         * control/borderColor
-         * option/color(disabled)
-         * indicators/color
-         * indicators(separator)/backgroundColor
-         * indicators(loading)/color
-         */
-        neutral20: '#343a40',
-
-        /*
-         * control/borderColor(focused)
-         * control/borderColor:hover
-         */
-        neutral30: '#343a40',
-
-        /*
-         * input/color
-         * multiValue(label)/color
-         * singleValue/color
-         * indicators/color(focused)
-         * indicators/color:hover(focused)
-         */
-        neutral80: 'var(--neutral-10)',
-        neutral90: 'var(--neutral-10)',
-
-         /*
-          * One of the few bootstrap variables we can use with themeing react-select!
-          * control/boxShadow(focused)
-          * control/borderColor(focused)
-          * control/borderColor:hover(focused)
-          * option/backgroundColor(selected)
-          * option/backgroundColor:active(selected)
-          */
-        primary: 'var(--bs-primary)',
-
-        /*
-         * option/backgroundColor(focused)
-         */
-        primary25: '#2b3035',
-
-        /*
-         * option/backgroundColor:active
-         */
-        primary50: '#2b3035',
-        primary75: '#2b3035',
-    };
+    const customStyles = {
+      control: (styles) => ({
+        ...styles,
+        border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da',
+        boxShadow: 'none',
+        '&:hover': {
+          border: colorMode === 'dark' ? '1px solid #495057' : '1px solid #ced4da'
+        }
+      })
+    }
 
     // Check what theme is set
-    const colorMode = document.documentElement.getAttribute('data-bs-theme');
+    const colorMode = this.props.formContext.colorMode
 
     // total: yoda_Creator_0_Person_Identifier_1
     // postfix: Person_Identifier-1   !!!! let op hier staat -1 ipv _1
@@ -233,7 +162,7 @@ class PersonIdentifier extends React.Component {
 
     // Only present link if there is a label/href combination for a non readonly field
     if (searchUrl.length) {
-      searchLink = <a class='btn btn-sm btn-primary float-end' href={searchUrl} target='_blank' rel='noreferrer'><i class='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup {Name_Identifier_Scheme}</a>
+      searchLink = <a className='btn btn-sm btn-primary float-end' href={searchUrl} target='_blank' rel='noreferrer'><i className='fa-solid fa-magnifying-glass' aria-hidden='true' /> Lookup {Name_Identifier_Scheme}</a>
     }
 
     let labelClasses = 'form-label'
@@ -257,8 +186,8 @@ class PersonIdentifier extends React.Component {
             onChange={this.handleChange}
             styles={customStylesScheme}
             theme={(theme) => ({
-                ...theme,
-                colors: (colorMode === 'dark') ? {...theme.colors, ...darkThemeColors} : {...theme.colors},
+              ...theme,
+              colors: (colorMode === 'dark') ? { ...theme.colors, ...this.props.formContext.darkThemeColors } : { ...theme.colors }
             })}
           />
           {helpScheme && (
