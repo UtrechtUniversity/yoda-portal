@@ -77,7 +77,7 @@ def add(sid: str, irods: iRODSSession) -> None:
     s.time = time.time()
     s.irods_time = time.time()
     s.lock.acquire()
-    print(f"[login]: Successfully connected to iRODS for session {sid}'")
+    print(f"[login]: Successfully connected to iRODS for session {sid}")
 
 
 def release(sid: str) -> None:
