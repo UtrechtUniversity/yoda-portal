@@ -6,11 +6,11 @@ __license__   = 'GPLv3, see LICENSE'
 import re
 import sys
 import traceback
-import urllib
 from os import listdir, name, path
 from pathlib import PurePath
 from re import compile, fullmatch
 from typing import List, Set, Tuple
+from urllib.parse import urlparse
 
 from werkzeug.security import safe_join
 from werkzeug.utils import secure_filename
@@ -236,5 +236,5 @@ def is_relative_url(url: str) -> bool:
 
     :returns: boolean value that indicated whether the URL is relative or not.
     """
-    parsed_url = urllib.parse.urlparse(url)
+    parsed_url = urlparse(url)
     return parsed_url.scheme == "" and parsed_url.netloc == ""

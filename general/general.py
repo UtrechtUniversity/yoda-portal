@@ -5,8 +5,8 @@ __license__   = 'GPLv3, see LICENSE'
 
 import csv
 import io
-import urllib
 from typing import Iterator
+from urllib.parse import quote as urllib_quote
 
 from flask import (
     abort,
@@ -71,7 +71,7 @@ def download() -> Response:
 
     path = f"/{g.irods.zone}/home{filepath}"
     filename = path.rsplit('/', 1)[1]
-    quoted_filename = urllib.parse.quote(filename, safe='')
+    quoted_filename = urllib_quote(filename, safe='')
 
     def read_file_chunks(data_object: iRODSDataObject) -> Iterator[bytes]:
         READ_BUFFER_SIZE = 1024 * io.DEFAULT_BUFFER_SIZE
