@@ -201,7 +201,7 @@ function transformErrors(errors) {
     return errors;
 }
 
-function submitData(data)
+async function submitData(data)
 {
     // Disable button
     //
@@ -222,44 +222,68 @@ function submitData(data)
         data['datarequest']['data']['selectedRows'] = [];
     }
 
-    // Submit form
-    Yoda.call("datarequest_submit",
-        {data: data,
-         draft: save,
-         draft_request_id: typeof(config.draft_request_id) !== 'undefined' ? config.draft_request_id : null},
-        {errorPrefix: "Could not submit data"})
-    // Redirect if applicable
-    .then(response => {
-        if (save) {
-            // If this is the first time the draft is saved, redirect to
-            // add_from_draft/{draft_request_id}
-            //
-            // We know this is the case when the call returns a requestId, i.e. the requestId of the
-            // newly created draft data request
-            if (response !== null && response.hasOwnProperty('requestId')) {
-                window.location.href = "/datarequest/add_from_draft/" + response.requestId;
-            // If no draft requestId is returned, we are already working on a draft proposal and can
-            // therefore stay on the same page (i.e. add_from_draft/{draft_request_id})
-            } else {
-                $("#saveButton").text("Save as draft");
-                $('#saveButton').attr("disabled", false);
-                $("#submitButton").attr("disabled", false);
+    const draft_request_id = typeof(config.draft_request_id) !== 'undefined' ? config.draft_request_id : null;
+
+    try {
+        const formData = new FormData()
+        formData.append('data', JSON.stringify(data))
+        formData.append(Yoda.csrf.tokenName, Yoda.csrf.tokenValue)
+        // Generate request id
+        const result = await Yoda.call("generate_request_id", 
+            {draft_request_id: draft_request_id}, 
+            {errorPrefix: "Could not generate request id"})
+
+        if (result !== "") {
+            const responseFetch = await fetch('/datarequest/add_data_request/' + result, {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: formData,
+                redirect: 'manual'
+            })
+            
+            if (responseFetch.status == '200'){
+                const submit_data =await Yoda.call("datarequest_submit",
+                    {filename: "datarequest-data.json",
+                        request_id: result,
+                        draft: save,
+                        draft_request_id: draft_request_id},
+                    {errorPrefix: "Could not submit data"})
+                .then(response => {
+                    if (save) {
+                        // If this is the first time the draft is saved, redirect to
+                        // add_from_draft/{draft_request_id}
+                        //
+                        // We know this is the case when the call returns a requestId, i.e. the requestId of the
+                        // newly created draft data request
+                        if (response !== null && response.hasOwnProperty('requestId')) {
+                            window.location.href = "/datarequest/add_from_draft/" + response.requestId;
+                        // If no draft requestId is returned, we are already working on a draft proposal and can
+                        // therefore stay on the same page (i.e. add_from_draft/{draft_request_id})
+                        } else {
+                            $("#saveButton").text("Save as draft");
+                            $('#saveButton').attr("disabled", false);
+                            $("#submitButton").attr("disabled", false);
+                        }
+                    // If attachments should be added, redirect to attachment upload page
+                    } else if  (response !== null && response.hasOwnProperty('pendingAttachments')) {
+                        window.location.href = "/datarequest/add_attachments/" + response.requestId;
+                    // If we are submitting the data request instead of saving it as a draft, redirect to index
+                    } else {
+                        window.location.href = "/datarequest/";
+                    }
+                })
+                .catch(error => {
+                    // Re-enable submit button if submission failed
+                    $("#submitButton").text("Submit");
+                    $("#saveButton").text("Save as draft");
+                    $('button:submit').attr("disabled", false);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
             }
-        // If attachments should be added, redirect to attachment upload page
-        } else if  (response !== null && response.hasOwnProperty('pendingAttachments')) {
-            window.location.href = "/datarequest/add_attachments/" + response.requestId;
-        // If we are submitting the data request instead of saving it as a draft, redirect to index
-        } else {
-            window.location.href = "/datarequest/";
         }
-    })
-    .catch(error => {
-        // Re-enable submit button if submission failed
-        $("#submitButton").text("Submit");
-        $("#saveButton").text("Save as draft");
-        $('button:submit').attr("disabled", false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    } catch(error) {
+        console.error('Could not submit data: ', error)
+    }
 }
 
 // https://stackoverflow.com/a/2631198
