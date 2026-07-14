@@ -458,3 +458,41 @@ def data_ready(request_id: str) -> Response:
 
     if result['status'] == 'ok':
         return redirect(url_for('datarequest_bp.view', request_id=request_id))
+
+
+@datarequest_bp.route('/add_data_request/<request_id>', methods=['POST'])
+def add_data_request(request_id: str) -> Response:
+
+    filename = secure_filename('datarequest-data.json')
+    app.logger.error("File name created")
+
+    file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, filename)
+    app.logger.error("File Path created")
+
+    result = api.call('datarequest_data_write_permission', {'request_id': request_id, 'action': 'own'})
+    app.logger.error("Result: {}".format(result))
+    if result['status'] != 'ok':
+        abort(500)
+
+    session = g.irods
+    app.logger.error('iRODS session started')
+
+    # Get the chunk data.
+    data = request.form['data']
+    app.logger.error('data: {}'.format(data))
+    encode_unicode_content = iRODSMessage.encode_unicode(data)
+    app.logger.error('encode_unicode_content: {}'.format(str(encode_unicode_content)))
+
+    try:
+        with session.data_objects.open(file_path, 'w') as obj_desc:
+            obj_desc.write(encode_unicode_content)
+
+        obj_desc.close()
+    except Exception:
+        response = make_response(jsonify({"message": "Data write failed"}), 500)
+        response.headers["Content-Type"] = "application/json"
+        return response
+
+    response = make_response(jsonify({"message": "Data write successful"}), 200)
+    response.headers["Content-Type"] = "application/json"
+    return response
