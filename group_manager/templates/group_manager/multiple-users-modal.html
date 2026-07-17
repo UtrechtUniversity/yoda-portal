@@ -1,0 +1,86 @@
+
+<!-- Add multiple users modal -->
+<div class="modal" tabindex="-1" role="dialog" id="multiple-users-modal">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Add multiple users to group</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div id="multiple-users-info">
+                    <h5>Paste the list of new group members</h5>
+                    <p>Paste inside of the text area below the list of members to be added to this group.</p>
+                    <h5>Member list format</h5>
+                    <p>Each member needs to be defined by their email address. There should be one member per line.<br> 
+                        A role can be included after a semicolon to be assigned automatically to the new member.<br>
+                        If no role is specified, the new member will be assigned to "member" role by default.</p>
+                    <h6>Example:</h6>
+                    <pre>
+member1@yoda.uu.nl
+member2@yoda.uu.nl;reader
+member3@yoda.uu.nl
+                    </pre>
+                </div>
+              </div>
+              <div class="row">
+                <div id="multiple-users-input">
+                    <form action="#" method="post" class="form-inline" id="multiple-users-form">
+                        <input id="multiple-users-group" type="hidden" />
+                        <div class="input-group">
+                            <textarea name="user-list" id="multiple-users-list" class="form-control form-control-sm" required data-group="#multiple-users-group"></textarea>
+                            <div class="input-group-btn">
+                                <input id="multiple-users-submit" class="btn btn-primary btn-block btn-sm ms-2" type="submit" value="Add all" />
+                            </div>                           
+                        </div>
+                    </form>
+                </div>
+              </div>
+              <div class="row">
+                <div id="error-multiple-users">
+
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="multiple-users-progress" data-action="">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="card-body">
+                <div class="card">
+                    <div class="card-header clearfix">
+                        <h5 class="card-title float-start">
+                            <span class="action"></span> User creation progress
+                        </h5>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-bordered multiple-users-table" style="table-layout: fixed;">
+                                <thead>
+                                <tr>
+                                    <th scope="col">User</th>
+                                    <th scope="col">Progress</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Close">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- -->

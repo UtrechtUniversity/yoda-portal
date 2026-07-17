@@ -340,7 +340,8 @@
                                 <option></option>
                             </select>
                             <div class="input-group-btn">
-                                <input id="f-user-create-submit" class="btn btn-primary btn-block btn-sm ms-2" type="submit" value="Add" />
+                                <input id="f-user-create-submit" class="btn btn-primary btn-block btn-sm ms-2 mt-1" type="submit" value="Add" />
+                                <button type="button" class="btn btn-primary btn-sm me-2 mt-1 add-multiple-users" title="Add multiple">Add multiple</button>
                             </div>
                         </div>
                     </form>
@@ -361,6 +362,7 @@
     </div>
 </div>
 
+<!-- Import groups modal -->
 <div class="modal" tabindex="-1" role="dialog" id="dlg-import-groups-csv">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -437,7 +439,9 @@ departmentx,teamb,groupteamb,m.manager@example.com,p.member@example.com,,,</pre>
         </div>
     </div>
 </div>
+<!-- -->
 
+<!-- Delete group modal -->
 <div class="modal fade" id="modal-group-delete" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -456,7 +460,9 @@ departmentx,teamb,groupteamb,m.manager@example.com,p.member@example.com,,,</pre>
     </div>
   </div>
 </div>
+<!-- -->
 
+<!-- Delete user modal -->
 <div class="modal fade" id="modal-user-delete" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -474,4 +480,8 @@ departmentx,teamb,groupteamb,m.manager@example.com,p.member@example.com,,,</pre>
         </div>
     </div>
 </div>
+<!-- -->
+
+{% include 'group_manager/multiple-users-modal.html' %}
+
 {% endblock content %}
