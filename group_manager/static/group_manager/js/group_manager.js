@@ -1248,6 +1248,7 @@ $(function () {
         const $userList2 = $('#user-list-add-user')
         $userList2.find('#f-user-create-group').val(groupName)
         $userList2.attr('hidden', !that.canManageGroup(groupName))
+        document.getElementById('multiple-users-group').value = groupName
 
         // Show or hide user actions depending on group permissions.
         const $userActions = $('#user-actions')
@@ -2129,6 +2130,115 @@ $(function () {
       $(el).find('input[type="submit"]').removeClass('disabled').val('Add')
     },
 
+    onSubmitMultipleUsers: async function (el, e) {
+      e.preventDefault()
+
+      if ($(el).find('input[type="submit"]').hasClass('disabled')) { return }
+      $(el).find('input[type="submit"]').addClass('disabled').val('Adding...')
+
+      const groupName = $(el).find('#multiple-users-group').val()
+      const usersList = $(el).find('#multiple-users-list').val().split(/\r?\n/)
+
+      const usersToAdd = []
+      for (let i = 0; i < usersList.length; i++) {
+        if (usersList[i].trim() === '') { // Ignore empty lines or lines only containing whitespaces
+          continue
+        }
+
+        const username = usersList[i].split(';')[0].trim()
+        let role = usersList[i].split(';')[1]
+        if (role !== undefined) { // If role is not provided, assign member by default
+          role = role.trim()
+        } else {
+          role = 'member'
+        }
+
+        // Check username is valid
+        if (!username.match(/^([a-z.]+|[a-z0-9_.-]+@[a-z0-9_.-]+)(#[a-zA-Z0-9_-]+)?$/)) {
+          window.alert(`Error at line ${i + 1}: username should be either an e-mail address or a name consisting only of lowercase chars and dots.`)
+          $(el).find('input[type="submit"]').removeClass('disabled').val('Add all')
+          return
+        }
+
+        const usernameOnly = username.indexOf('#') > -1 ? username.split('#')[0] : username
+        if (usernameOnly.length > 63) {
+          window.alert(`Error at line ${i + 1}: username should not be longer than 64 characters.`)
+          $(el).find('input[type="submit"]').removeClass('disabled').val('Add all')
+          return
+        }
+
+        // Check role is valid
+        const validRoles = ['manager', 'member', 'normal', 'viewer', 'reader']
+        if (!(validRoles.indexOf(role) > -1)) {
+          window.alert(`Error at line ${i + 1}: provided role is invalid.`)
+          $(el).find('input[type="submit"]').removeClass('disabled').val('Add all')
+          return
+        }
+
+        const user = {}
+        user.username = DOMPurify.sanitize(username)
+        user.role = DOMPurify.sanitize(role)
+        usersToAdd.push(user)
+      }
+
+      // Add each new user
+      const addAllUsers = async () => {
+        const responses = []
+        for (const user of usersToAdd) {
+          const result = await Yoda.call('group_user_add', {
+            username: user.username,
+            group_name: groupName,
+            role: user.role
+          }, { quiet: true, rawResult: true })
+
+          const response = {}
+          response.username = user.username
+          response.role = user.role
+          if (result) {
+            response.status = result.status
+            response.status_info = result.status_info
+          } else {
+            response.status = 'error'
+            response.status_info = 'Something went wrong'
+          }
+          responses.push(response)
+        }
+        return responses
+      }
+
+      // Await responses from API calls then process and render modal
+      const jsonResponses = await addAllUsers()
+      if (jsonResponses.length > 0) {
+        $('#multiple-users-modal').modal('hide')
+        $('#multiple-users-progress').modal('show')
+        $('.multiple-users-table tbody').html('')
+
+        jsonResponses.forEach(function (response, index) {
+          const icon = '<i class="fa-regular fa-user"></i>'
+          const username = DOMPurify.sanitize(response.username)
+          const role = DOMPurify.sanitize(response.role)
+          let progress
+
+          if (response.status === 'ok') {
+            progress = `User created and assigned ${role} role`
+          } else {
+            progress = DOMPurify.sanitize(response.status_info)
+          }
+
+          const row = document.createElement('tr')
+          row.className = `row-${index}`
+          row.innerHTML = `<td><p>${icon} ${username}</p></td>
+                      <td class="item-progress"><p>${progress}</p></td>`
+
+          document.querySelector('.multiple-users-table tbody').appendChild(row)
+        })
+      } else {
+        const errorDiv = document.querySelector('#error-multiple-users')
+        errorDiv.innerHTML = '<p>Something went wrong while creating users.</p>'
+      }
+      $(el).find('input[type="submit"]').removeClass('disabled').val('Add all')
+    },
+
     /**
          * \brief Initialize the group manager module.
          *
@@ -2383,6 +2493,30 @@ $(function () {
         if (e.which === 13) {
           that.onSubmitUserCreate(this, e)
         }
+      })
+
+      // Add multiple users to group
+      $('.add-multiple-users').on('click', function () {
+        $('#multiple-users-modal').modal('show')
+
+        const groupName = $('#group-list .group.active').attr('data-name')
+        $('#multiple-users-modal .modal-title').text(`Add multiple users to group ${groupName}`) // Append group name to modal title
+      })
+
+      $('#multiple-users-modal').on('hidden.bs.modal', function () {
+        const textArea = document.getElementById('multiple-users-list') // Clear text area on modal closure
+        textArea.value = ''
+
+        $('#multiple-users-modal .modal-title').text('Add multiple users to group') // Reset modal title
+      })
+
+      $('#multiple-users-progress').on('hidden.bs.modal', function () { // Clear table and reload on modal closure
+        $('.multiple-users-table tbody').html('')
+        window.location.reload(true)
+      })
+
+      $('#multiple-users-form').on('submit', function (e) {
+        that.onSubmitMultipleUsers(this, e)
       })
 
       // User list search.
