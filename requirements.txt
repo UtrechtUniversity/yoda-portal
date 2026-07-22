@@ -14,3 +14,5 @@ python-magic==0.4.27
 Werkzeug==3.1.4
 psutil==6.1.1
 humanize==4.11.0
+orjson==3.11.9
+typing_extensions==4.16.0
