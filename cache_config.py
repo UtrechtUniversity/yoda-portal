@@ -4,11 +4,11 @@ __copyright__ = 'Copyright (c) 2024-2025, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
 import hashlib
-import json
 from concurrent.futures import ThreadPoolExecutor
 from functools import wraps
 from typing import Any, Callable, List, Optional
 
+import orjson
 from flask import current_app as app, g, request, session
 from flask_caching import Cache
 
@@ -201,8 +201,8 @@ def populate_api_cache(fn: str, user: str, irods: str, session_id: str) -> None:
         if fn in API_CACHE_PARAMS:
             data = API_CACHE_PARAMS[fn]["default_params"]
 
-        params = json.dumps(data)
-        encoded_params = hashlib.shake_256(params.encode("utf-8")).hexdigest(20)
+        params = orjson.dumps(data)
+        encoded_params = hashlib.shake_256(params).hexdigest(20)
         cache_key = make_key(f"{fn}:{encoded_params}")
         if cache.get(cache_key) is None:
             try:
