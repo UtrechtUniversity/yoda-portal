@@ -1214,7 +1214,7 @@ $(function () {
           }
 
           // Open SRAM invitation.
-          const invited = typeof user.sram !== 'undefined'
+          const invited = typeof user.sram !== 'undefined' && user.sram
           if (invited) {
             $user.attr({
               'data-bs-toggle': 'tooltip',
@@ -2091,9 +2091,8 @@ $(function () {
 
       if (result.status === 'ok') {
         that.groups[groupName].members[userName] = {
-          // XXX
           access: 'normal',
-          sram: that.groups[groupName].sram_co === 'true' ? 'invited' : ''
+          sram: result.status_info === 'SRAM invitation'
         }
 
         $(el).find('#f-user-create-name').val(null).trigger('change')
