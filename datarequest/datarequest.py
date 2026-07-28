@@ -467,10 +467,8 @@ def add_data_request(request_id: str) -> Response:
     app.logger.error("File name created")
 
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, filename)
-    app.logger.error("File Path created")
 
     result = api.call('datarequest_data_write_permission', {'request_id': request_id, 'action': 'own'})
-    app.logger.error("Result: {}".format(result))
     if result['status'] != 'ok':
         abort(500)
 
@@ -481,7 +479,6 @@ def add_data_request(request_id: str) -> Response:
     data = request.form['data']
     app.logger.error('data: {}'.format(data))
     encode_unicode_content = iRODSMessage.encode_unicode(data)
-    app.logger.error('encode_unicode_content: {}'.format(str(encode_unicode_content)))
 
     try:
         with session.data_objects.open(file_path, 'w') as obj_desc:
