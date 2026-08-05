@@ -464,7 +464,6 @@ def data_ready(request_id: str) -> Response:
 def add_data_request(request_id: str) -> Response:
 
     filename = secure_filename('datarequest-data.json')
-    app.logger.error("File name created")
 
     file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, filename)
 
@@ -473,11 +472,9 @@ def add_data_request(request_id: str) -> Response:
         abort(500)
 
     session = g.irods
-    app.logger.error('iRODS session started')
 
     # Get the chunk data.
     data = request.form['data']
-    app.logger.error('data: {}'.format(data))
     encode_unicode_content = iRODSMessage.encode_unicode(data)
 
     try:
