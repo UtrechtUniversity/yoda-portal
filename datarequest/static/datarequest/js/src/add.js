@@ -229,7 +229,7 @@ async function submitData(data)
         formData.append('data', JSON.stringify(data))
         formData.append(Yoda.csrf.tokenName, Yoda.csrf.tokenValue)
         // Generate request id
-        const result = await Yoda.call("generate_request_id", 
+        const result = await Yoda.call("datarequest_generate_id", 
             {draft_request_id: draft_request_id}, 
             {errorPrefix: "Could not generate request id"})
 
@@ -243,8 +243,7 @@ async function submitData(data)
             
             if (responseFetch.status == '200'){
                 const submit_data =await Yoda.call("datarequest_submit",
-                    {filename: "datarequest-data.json",
-                        request_id: result,
+                    {   request_id: result,
                         draft: save,
                         draft_request_id: draft_request_id},
                     {errorPrefix: "Could not submit data"})
