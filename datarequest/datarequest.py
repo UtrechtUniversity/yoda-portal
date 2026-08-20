@@ -47,6 +47,7 @@ def permission_check(request_id: str, roles: List[str], statuses: Optional[List[
 
 
 class human_readable_status(Enum):
+    IN_SUBMISSION = 'In submission'
     DRAFT = 'In draft'
     PENDING_ATTACHMENTS = 'Pending attachments'
     DAO_SUBMITTED = 'Submitted (data assessment)'
