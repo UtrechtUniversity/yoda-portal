@@ -82,7 +82,7 @@ const getSearchResults = (() => {
       search_string: currentSearchString,
       search_type: currentSearchType,
       offset: args.start,
-      limit: $("select[name='search_length']").val(),
+      limit: parseInt($("select[name='search_length']").val()),
       sort_order: args.order[0].dir,
       sort_on: ['name', 'modified'][args.order[0].column]
     })
