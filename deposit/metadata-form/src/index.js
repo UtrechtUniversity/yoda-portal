@@ -12,6 +12,7 @@ import CustomErrorListTemplate from 'YodaTemplates/CustomErrorListTemplate'
 import CustomFieldTemplate from 'YodaTemplates/CustomFieldTemplate'
 import CustomObjectFieldTemplate from 'YodaTemplates/CustomObjectFieldTemplate'
 import Geolocation from 'YodaFields/Geolocation'
+import KeywordInput from 'YodaFields/KeywordInput'
 import TreeKeywordSelector from 'YodaFields/TreeKeywordSelector'
 import PersonIdentifier from 'YodaFields/PersonIdentifier'
 import Vocabulary from 'YodaFields/Vocabulary'
@@ -209,6 +210,7 @@ const fields = {
   vocabulary: Vocabulary,
   affiliation_identifier: AffiliationIdentifier,
   person_identifier: PersonIdentifier,
+  keyword_input: KeywordInput,
   tree_keyword_selector: TreeKeywordSelector
 }
 
