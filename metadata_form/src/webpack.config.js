@@ -51,6 +51,7 @@ const config = function (env, argv) {
     confArray.push(configIndividual({ name: 'research', mode: 'production' }))
     confArray.push(configIndividual({ name: 'deposit', mode: 'production' }))
     confArray.push(configIndividual({ name: 'vault', mode: 'production' }))
+    confArray.push(configIndividual({ name: 'schema_composer', mode: 'production' }))
     return confArray
   }
 
