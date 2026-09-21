@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} - {% if is_edit %}Edit{% else %}Compose{% endif %} Metadata Schema{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('schema_composer_bp.static', filename='css/schema_composer.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='lib/jquery-3.7.1/jquery-3.7.1.min.js') }}"></script>
+<script src="{{ url_for('schema_composer_bp.static', filename='js/schema_composer.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <h2>{% if is_edit %}Edit{% else %}Compose{% endif %} Metadata Schema</h2>
+    </div>
+    <div class="col-md-6">
+        <button type="submit" form="schema-composer-form" class="btn btn-primary float-end">
+            Save</button>
+        <a class="btn btn-secondary float-end me-1" href="{{ url_for('schema_composer_bp.index') }}">Cancel</a>
+    </div>
+
+    <div class="mt-3">
+        <form id="schema-composer-form" method="post" action="{% if is_edit %}{{
+            url_for('schema_composer_bp.compose_edit_post', identifier=identifier) }}{% else %}{{
+                url_for('schema_composer_bp.compose_create_post') }}{% endif %}" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-4">
+                <label for="schema-name" class="form-label">
+                    Schema Name<span class="text-danger">*</span>
+                </label>
+                <input type="text" class="form-control" id="schema-name" name="schema_name" 
+                    value="{{ identifier or '' }}" placeholder="Enter schema name" {% if is_edit %}readonly{% endif %} required>
+            </div>
+
+            <div class="mb-4">
+                <label for="schema-description" class="form-label">
+                    Description<span class="text-danger">*</span>
+                </label>
+                <textarea class="form-control" id="schema-description" name="description" 
+                    rows="3" placeholder="Enter schema description" required>{{ description or '' }}</textarea>
+            </div>
+
+            <h4>Building Blocks</h4>
+
+            <p class="text-muted">
+                Add, remove, or reorder building blocks. For existing schemas, preselected building blocks can only be reordered.
+            </p>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Available building blocks</div>
+                        <div class="card-body">
+                            <div id="available-building-blocks" class="list-group">
+                                {% for block in building_blocks %}
+                                    {% for block_name, block_data in block.items() %}
+                                        {% if block_name not in selected_blocks %}
+                                            {% set info = block_info.get(block_name, {}) %}
+                                            <div class="list-group-item d-flex justify-content-between align-items-center" data-block="{{ block_name }}" data-block-title="{{ info.get('title', block_name) }}" data-block-description="{{ info.get('description', '') }}">
+                                                <span{% if info.get('description') %} title="{{ info.get('description') }}"{% endif %}>  {{ info.get('title', block_name) }} </span>
+                                                <button type="button" class="btn btn-primary add-building-block">
+                                                    Add
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                            {% if not building_blocks %}
+                                <p class="text-muted mb-0">No building blocks are available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Selected building blocks</div>
+                        <div class="card-body">
+                            <div id="selected-building-blocks" class="list-group" data-is-edit="{{ is_edit|tojson }}">
+                                {% for block in selected_blocks %}
+                                    {% set info = block_info.get(block, {}) %}
+                                    <div class="list-group-item d-flex align-items-center sortable-item" data-block="{{ block }}" data-block-title="{{ info.get('title', block) }}" data-block-description="{{ info.get('description', '') }}" data-existing="true" draggable="true">
+                                        <span class="drag-handle me-3">
+                                            <i class="fa-solid fa-grip-vertical"></i></span>
+                                        <span class="flex-grow-1"{% if info.get('description') %} title="{{ info.get('description') }}"{% endif %}>
+                                            {{ info.get('title', block) }}
+                                        </span>
+                                        <button type="button" class="btn btn-danger remove-building-block" {% if is_edit %}disabled{% endif %}>
+                                            Remove
+                                        </button>
+                                        <input type="hidden" name="building_blocks" value="{{ block }}">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

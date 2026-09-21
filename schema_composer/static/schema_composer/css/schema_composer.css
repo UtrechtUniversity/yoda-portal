@@ -1,0 +1,66 @@
+/* Schema Composer Table Styling */
+
+#composed-schemas {
+    width: 100% !important;
+    table-layout: fixed;
+}
+
+#available-building-blocks,
+#selected-building-blocks {
+    height: 450px;
+    overflow-y: auto;
+}
+
+#composed-schemas tr > :nth-child(1) {
+    width: 20%;
+}
+
+#composed-schemas tr > :nth-child(2) {
+    width: 40%;
+}
+
+#composed-schemas tr > :nth-child(3) {
+    width: 25%;
+}
+
+#composed-schemas tr > :nth-child(4) {
+    width: 15%;
+}
+
+#composed-schemas > tbody > tr > td {
+    padding: 5px;
+    vertical-align: baseline;
+}
+
+#composed-schemas > tbody > tr > td i {
+    vertical-align: bottom;
+}
+
+.yoda-table th {
+    background-color: #dcdcdc;
+    border-color: #ddd;
+    border-bottom: 1px solid transparent !important;
+    color: #333;
+    font-family: inherit;
+    font-weight: 500;
+}
+
+.yoda-table tr.odd {
+    background-color: transparent !important;
+}
+
+#selected-building-blocks .list-group-item {
+    cursor: default;
+}
+
+#selected-building-blocks .drag-handle {
+    cursor: grab;
+}
+
+#selected-building-blocks .drag-handle:active {
+    cursor: grabbing;
+}
+
+#selected-building-blocks .dragging {
+    opacity: 0.5;
+}

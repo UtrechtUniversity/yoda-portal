@@ -23,12 +23,12 @@ from group_manager.group_manager import group_manager_bp
 from monitor import Monitor
 from open_search.open_search import open_search_bp
 from research.research import research_bp
+from schema_composer.schema_composer import schema_composer_bp
 from search.search import search_bp
 from stats.stats import stats_bp
 from user.user import user_bp
 from util import get_validated_static_path, log_error
 from vault.vault import vault_bp
-
 
 app = Flask(__name__, static_folder='assets')
 app.json.sort_keys = False
@@ -135,6 +135,7 @@ with app.app_context():
     app.register_blueprint(search_bp, url_prefix='/search')
     app.register_blueprint(api_bp, url_prefix='/api/')
     app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(schema_composer_bp, url_prefix='/schema_composer')
     if app.config.get('DEPOSIT_ENABLED'):
         app.register_blueprint(deposit_bp, url_prefix='/deposit')
     if app.config.get('OPEN_SEARCH_ENABLED'):

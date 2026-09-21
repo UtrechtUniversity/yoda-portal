@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} - Schema Composer Overview{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('schema_composer_bp.static', filename='css/schema_composer.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='lib/jquery-3.7.1/jquery-3.7.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/datatables-1.13.5/datatables.min.js') }}"></script>
+<script src="{{ url_for('schema_composer_bp.static', filename='js/schema_composer.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Schema Composer</h2>
+    </div>
+    <div class="col-md-6">
+        <a class="btn btn-primary float-end" href="{{ url_for('schema_composer_bp.compose_create_get') }}">
+            <i class="fa-solid fa-plus me-1" aria-hidden="true"></i>
+            Create new schema
+        </a>
+    </div>
+
+    <div class="mt-3">
+        <table id="composed-schemas" class="table yoda-table table-striped">
+            <thead>
+                <tr>
+                    <th>Schema</th>
+                    <th>Description</th>
+                    <th>Building Blocks</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for schema in composed_schemas %}
+                <tr>
+                    <td>{{ schema.name }}</td>
+                    <td>{{ schema.description }}</td>
+                    <td>
+                        {% for block in schema.blocks %}
+                        {% set info = block_info.get(block, {}) %}
+                        <span class="badge bg-body text-body border me-1"{% if info.get('description') %} title="{{ info.get('description') }}"{% endif %}>{{ info.get('title', block) }}</span>
+                        {% endfor %}
+                    </td>
+                    <td class="text-nowrap">
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a href="{{ url_for('schema_composer_bp.compose_edit_get', identifier=schema.name) }}"
+                            class="btn btn-sm btn-primary text-decoration-none">
+                                Update
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger schema-delete" data-schema-id="{{ schema.name }}" data-bs-toggle="modal" data-bs-target="#schema-delete">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="schema-delete">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h5 class="modal-title">Delete schema</h5>
+                <div class="alert alert-warning d-none" id="alert-panel-schema-delete"></div>
+                <p>Do you want to delete schema <span id="schema-delete-id" class="fw-bold"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary btn-confirm-schema-delete" data-schema-id="">Delete schema</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
