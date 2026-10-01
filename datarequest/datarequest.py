@@ -464,12 +464,9 @@ def data_ready(request_id: str) -> Response:
 @datarequest_bp.route('/add_data_request/<request_id>', methods=['POST'])
 def add_data_request(request_id: str) -> Response:
 
-    if not permission_check(request_id, ['OWN'], ['SUBMITTED']):
-        abort(403)
-
     filename = secure_filename('datarequest-data.json')
 
-    file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, filename)
+    file_path = os.path.join("/" + g.irods.zone, 'home', 'datarequests-research', request_id, 'stage', filename)
 
     result = api.call('datarequest_data_write_permission', {'request_id': request_id, 'action': 'own'})
     if result['status'] != 'ok':
