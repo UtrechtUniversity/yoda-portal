@@ -145,12 +145,25 @@ def execute_rule(fn: str, params: bytes) -> str:
 
     :returns: The output of the rule execution as a string.
     """
-    def bytesbuf_to_str(s: message.BinBytesBuf) -> str:
-        """Convert a BinBytesBuf to a string, handling null termination."""
-        s = s.buf[:s.buflen]
-        i = s.find(b'\x00')
-        return s if i < 0 else s[:i]
+    def chunk_parameters(input: str) -> list[str]:
+        MAX_SIZE = 15000
+        return [input[n:n + MAX_SIZE] for n in range(0, len(input), MAX_SIZE)]
 
+    # Compress params and encode as base64 to reduce size (max rule length in iRODS is 20KB)
+    parameter_chunks = chunk_parameters(_compress_parameters(params))
+
+    if len(parameter_chunks == 1):
+        return _execute_rule(fn, parameter_chunks[0])
+    else:
+        _execute_rule("api_stage_multipart_request_clear", _compress_parameters("{}"))
+        for parameter_chunk in parameter_chunks:
+            _execute_rule("api_stage_multipart_request_submit", _compress_parameters(
+                orjson.dumps({"chunk": parameter_chunk})))
+        return _execute_rule("api_stage_multipart_request_run", _compress_parameters(
+            orjson.dumps({"function": fn})))
+
+
+def _compress_parameters(params: str):
     def escape_quotes(s: str) -> str:
         """Escape quotes in a string for safe inclusion in rules."""
         return s.replace('\\', '\\\\').replace('"', '\\"')
@@ -173,7 +186,15 @@ def execute_rule(fn: str, params: bytes) -> str:
     # Compress params and encode as base64 to reduce size (max rule length in iRODS is 20KB)
     compressed_params = zlib.compress(params)
     base64_encoded_params = base64.b64encode(compressed_params)
-    arg_str_expr = nrep_string_expr(base64_encoded_params.decode('utf-8'))
+    return nrep_string_expr(base64_encoded_params.decode('utf-8'))
+
+
+def _execute_rule(fn: str, arg_str_expr: str):
+    def bytesbuf_to_str(s: message.BinBytesBuf) -> str:
+        """Convert a BinBytesBuf to a string, handling null termination."""
+        s = s.buf[:s.buflen]
+        i = s.find(b'\x00')
+        return s if i < 0 else s[:i]
 
     # Set parameters as variable instead of parameter input to circumvent iRODS string limits.
     rule_body = f''' *x={arg_str_expr}
