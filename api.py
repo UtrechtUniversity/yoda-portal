@@ -14,14 +14,32 @@ from typing import Any, Dict, Optional, Tuple
 import orjson
 from flask import Blueprint, g, jsonify, request, Response
 from flask import current_app as app
-from irods import message, rule
+from irods import exception as irods_ex
+from irods import rule
+from irods.api_number import api_number
+from irods.connection import Connection
+from irods.message import (
+    iRODSMessage,
+    MsParamArray,
+    RodsHostAddress,
+    RuleExecutionRequest,
+    StringStringMap,
+)
 from typing_extensions import TypeGuard
 
 from cache_config import cache, clear_api_cache_keys, get_api_cache_timeout, make_key
 from errors import InvalidAPIError, UnauthorizedAPIAccessError
-from util import log_error
+from util import bytesbuf_to_bytes, log_error, nrep_string_expr
+
+RULE_ENGINE_INSTANCE = 'irods_rule_engine_plugin-irods_rule_language-instance'
+MULTIPART_MAX_CHUNK_SIZE = 15000   # Characters of base64 payload per part.
+MULTIPART_MAX_TOTAL_SIZE = 300000  # Maximum total compressed size of multi-part request
 
 api_bp = Blueprint('api_bp', __name__)
+
+
+class MultiPartRequestException(Exception):
+    pass
 
 
 @api_bp.route('/<fn>', methods=['POST'])
@@ -137,46 +155,149 @@ def _verify_api_response_type(response: Any) -> TypeGuard[Tuple[Dict[str, Any], 
             and all(isinstance(k, str) for k in response[0]))
 
 
-def execute_rule(fn: str, params: bytes) -> str:
+def execute_rule(fn: str, params: bytes) -> bytes:
     """Execute the specified iRODS rule with the given parameters.
 
     :param fn:     The name of the API function to execute
     :param params: The parameters to pass to the rule
 
-    :returns: The output of the rule execution as a string.
+    :returns: The output of the rule execution (JSON)
+
+    :raises MultiPartRequestException: If an error occurs during processing
+                   a multi-part API request
     """
-    def bytesbuf_to_str(s: message.BinBytesBuf) -> str:
-        """Convert a BinBytesBuf to a string, handling null termination."""
-        s = s.buf[:s.buflen]
-        i = s.find(b'\x00')
-        return s if i < 0 else s[:i]
-
-    def escape_quotes(s: str) -> str:
-        """Escape quotes in a string for safe inclusion in rules."""
-        return s.replace('\\', '\\\\').replace('"', '\\"')
-
-    def break_strings(N: int, m: int) -> int:
-        """Calculate the number of segments needed to break a string."""
-        return (N - 1) // m + 1
-
-    def nrep_string_expr(s: str, m: int = 64) -> str:
-        """Break up the string literal to work around limits for both parameter strings
-           and literal string constants in the iRODS core code.
-
-        :param s: The string to be broken
-        :param m: The maximum length of each segment
-
-        :returns: A string formatted for iRODS rule input
-        """
-        return '++\n'.join(f'"{escape_quotes(s[i * m:i * m + m])}"' for i in range(break_strings(len(s), m) + 1))
+    def chunk_parameters(inp: str) -> list[str]:
+        if len(inp) > MULTIPART_MAX_TOTAL_SIZE:
+            raise MultiPartRequestException("Total compressed size of parameters exceeds multi-part size limit.")
+        return [inp[n:n + MULTIPART_MAX_CHUNK_SIZE] for n in range(0, len(inp), MULTIPART_MAX_CHUNK_SIZE)]
 
     # Compress params and encode as base64 to reduce size (max rule length in iRODS is 20KB)
+    checksum = hashlib.shake_256(params).hexdigest(20)
+    parameter_chunks = chunk_parameters(_compress_parameters(params))
+
+    if len(parameter_chunks) == 1:
+        return _execute_rule(fn, parameter_chunks[0])
+    else:
+        try:
+            return _execute_rule_multipart(fn, parameter_chunks, checksum)
+        except MultiPartRequestException as e:
+            log_error('API Multi-part Error: ' + str(e), True)
+            raise e from e
+
+
+def _execute_rule_multipart(fn: str, parameter_chunks: list[str], checksum: str) -> bytes:
+    with g.irods.pool.get_connection() as connection:
+        _ensure_ok_multipart(_execute_rule_single_agent(
+            "stage_multipart_request_clear",
+            _compress_parameters(b"{}"),
+            connection))
+        for parameter_chunk in parameter_chunks:
+            _ensure_ok_multipart(_execute_rule_single_agent(
+                "stage_multipart_request_submit",
+                _compress_parameters(orjson.dumps({"chunk": parameter_chunk})),
+                connection))
+        return _execute_rule_single_agent("stage_multipart_request_run",
+                                          _compress_parameters(orjson.dumps({"function": fn, "checksum": checksum})),
+                                          connection=connection)
+
+
+def _ensure_ok_multipart(response: bytes) -> None:
+    """Ensure that a response has an OK status. If not, raise
+       a MultiPartRequestException.
+
+       :param response: the response to the API call
+
+       :raises MultiPartRequestException: if status is not OK or cannot be determined
+    """
+    try:
+        parsed_response = orjson.loads(response)
+        if parsed_response.get("status", "") != "ok":
+            raise MultiPartRequestException("Response for multi-part request has error status")
+    except orjson.JSONDecodeError as e:
+        raise MultiPartRequestException("Cannot decode response for multi-part request.") from e
+
+
+def _execute_rule_single_agent(fn: str, encoded: str, connection: Connection) -> bytes:
+    """Execute API rule api_<fn> on a specific connection.
+
+    Similar _execute_rule, but this one is meant to be used when we need
+    to be sure all requests are transmitted on the same connection (e.g. with
+    multi-part requests).
+
+    :param fn: function name (without api_ prefix)
+    :param encoded: base64 encoded parameters
+    :param connection: iRODSConnection to transmit to
+
+    :returns: output of API function
+
+    :raises Exception: If transmitting API call fails
+    """
+    request = iRODSMessage('RODS_API_REQ',
+                           msg=RuleExecutionRequest(
+                               myRule=_rule_text(fn, encoded),
+                               addr=RodsHostAddress(hostAddr='', rodsZone='', port=0, dummyInt=0),
+                               condInput=StringStringMap({'instance_name': RULE_ENGINE_INSTANCE}),
+                               outParamDesc='ruleExecOut',
+                               inpParamArray=MsParamArray(paramLen=0, oprType=0, MsParam_PI=[])),
+                           int_info=api_number['EXEC_MY_RULE_AN'])
+
+    connection.send(request)
+    response = connection.recv(acceptable_errors=(irods_ex.FAIL_ACTION_ENCOUNTERED_ERR,))
+    try:
+        out = response.get_main_message(MsParamArray)
+    except iRODSMessage.ResponseNotParseable as e:
+        raise Exception(f'api_{fn}: rule returned no output') from e
+
+    return bytesbuf_to_bytes(out._values['MsParam_PI'][0]._values['inOutStruct']._values['stdoutBuf'])
+
+
+def _rule_text(fn: str, encoded: str) -> str:
+    """Construct the text of a rule that calls API rule api_<fn>.
+
+    The rule body is wrapped in the same way as irods.rule.Rule does,
+    because the rule language cannot parse a bare rule body.
+
+    :param fn:      function name (without api_ prefix)
+    :param encoded: base64 encoded parameters
+
+    :returns: rule text
+    """
+    # Set parameters as variable instead of parameter input to circumvent iRODS string limits.
+    arg_str_expr = _string_to_rule_string(encoded)
+    rule_body = f''' *x={arg_str_expr}
+                    api_{fn}(*x)
+                '''
+    return '@external rule { ' + rule_body + ' }'
+
+
+def _compress_parameters(params: bytes) -> str:
+    """Compress params and encode as base64 to reduce size
+       (max rule length in iRODS is 20KB)
+
+       :param params: Parameters as JSON
+
+       :returns:      Base64 compressed data
+    """
     compressed_params = zlib.compress(params)
-    base64_encoded_params = base64.b64encode(compressed_params)
-    arg_str_expr = nrep_string_expr(base64_encoded_params.decode('utf-8'))
+    return base64.b64encode(compressed_params).decode("ascii")
+
+
+def _string_to_rule_string(params: str) -> str:
+    """Convert base64-compressed parameters to a format that can
+       be put into a rule.
+
+       :param params: base64 encoded parameters
+
+       :returns: the encoded parameters in a format that can be put
+                 into a rule"""
+    return nrep_string_expr(params)
+
+
+def _execute_rule(fn: str, parameters: str) -> bytes:
+    arg_str_expr = _string_to_rule_string(parameters)
 
     # Set parameters as variable instead of parameter input to circumvent iRODS string limits.
-    rule_body = f''' *x={arg_str_expr}
+    rule_body = f'''*x={arg_str_expr}
                     api_{fn}(*x)
                 '''
 
@@ -192,7 +313,7 @@ def execute_rule(fn: str, params: bytes) -> str:
         g.irods.cleanup()
 
     x = x.execute(session_cleanup=False)
-    return bytesbuf_to_str(x._values['MsParam_PI'][0]._values['inOutStruct']._values['stdoutBuf'])
+    return bytesbuf_to_bytes(x._values['MsParam_PI'][0]._values['inOutStruct']._values['stdoutBuf'])
 
 
 def authenticated() -> bool:

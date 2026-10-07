@@ -12,6 +12,7 @@ from re import compile, fullmatch
 from typing import List, Set, Tuple
 from urllib.parse import urlparse
 
+from irods import message
 from werkzeug.security import safe_join
 from werkzeug.utils import secure_filename
 
@@ -238,3 +239,34 @@ def is_relative_url(url: str) -> bool:
     """
     parsed_url = urlparse(url)
     return parsed_url.scheme == "" and parsed_url.netloc == ""
+
+
+def bytesbuf_to_bytes(s: message.BinBytesBuf) -> bytes:
+    """Convert a PRC BinBytesBuf to bytes, handling null termination.
+
+    :param s: the BinBytesBuf object
+
+    :returns: the contents of BinBytesBuf, in bytes format"""
+    s = s.buf[:s.buflen]
+    i = s.find(b'\x00')
+    return s if i < 0 else s[:i]
+
+
+def nrep_string_expr(s: str, m: int = 64) -> str:
+    """Break up the string literal to work around limits for both parameter strings
+       and literal string constants in the iRODS core code.
+
+    :param s: The string to be broken
+    :param m: The maximum length of each segment (default:64)
+
+    :returns: A string formatted for iRODS rule input
+    """
+    def escape_quotes(s: str) -> str:
+        """Escape quotes in a string for safe inclusion in rules."""
+        return s.replace('\\', '\\\\').replace('"', '\\"')
+
+    def break_strings(N: int, m: int) -> int:
+        """Calculate the number of segments needed to break a string."""
+        return (N - 1) // m + 1
+
+    return '++\n'.join(f'"{escape_quotes(s[i * m:i * m + m])}"' for i in range(break_strings(len(s), m) + 1))
