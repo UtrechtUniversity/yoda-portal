@@ -824,7 +824,7 @@ const tableRenderer = {
     if (currentFolder) {
       checkbox = `<input class="form-check-input ms-1" type="checkbox" name="multiSelect[]" value="${Yoda.htmlEncode(tgt)}" data-name="${Yoda.htmlEncode(name)}" data-type="${row.type}">`
     }
-    return checkbox
+    return DOMPurify.sanitize(checkbox)
   },
   name: (name, _, row) => {
     const tgt = `${currentFolder}/${name}`
@@ -884,7 +884,7 @@ const tableRenderer = {
                             </button>`)
     dropdown.append(actions)
 
-    return dropdown[0].outerHTML
+    return DOMPurify.sanitize(dropdown[0].outerHTML)
   }
 }
 
