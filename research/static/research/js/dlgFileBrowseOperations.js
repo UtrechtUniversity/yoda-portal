@@ -757,7 +757,7 @@ const tableRenderer2 = {
                                 </span>`)
     dropdown.append(actions)
 
-    return dropdown[0].outerHTML
+    return DOMPurify.sanitize(dropdown[0].outerHTML)
   }
 }
 
