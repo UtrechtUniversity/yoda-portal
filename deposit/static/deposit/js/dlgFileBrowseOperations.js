@@ -19,22 +19,22 @@ $(document).ready(function () {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'file-move')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move')
       $('#dlg-file-browse-operations .card-title span.action').text('move')
-      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', '')
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', 'false')
     } else if ($(this).hasClass('folder-move')) {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-move')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Move')
       $('#dlg-file-browse-operations .card-title span.action').text('move')
-      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', '')
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', 'false')
     } else if ($(this).hasClass('file-copy')) {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'file-copy')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy')
       $('#dlg-file-browse-operations .card-title span.action').text('copy')
-      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', '')
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', 'false')
     } else {
       $('#dlg-file-browse-operations .dlg-action-button').attr('data-action', 'folder-copy')
       $('#dlg-file-browse-operations .dlg-action-button span.action').text('Copy')
       $('#dlg-file-browse-operations .card-title span.action').text('copy')
-      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', '')
+      $('#dlg-file-browse-operations .dlg-action-button').attr('data-overwrite', 'false')
     }
 
     // Set filename in modal & button attribute
@@ -204,7 +204,8 @@ $(document).ready(function () {
 
   $('.dlg-action-button').on('click', function () {
     const action = $(this).attr('data-action')
-    const overwrite = $(this).attr('data-overwrite')
+    // Enforce data-overwrite to a boolean value.
+    const overwrite = $(this).attr('data-overwrite') === 'true'
     // Single file
     if (action === 'file-move' || action === 'file-copy' || action === 'folder-move' || action === 'folder-copy') {
       const path = $(this).attr('data-collection') + '/' + $(this).attr('data-name')

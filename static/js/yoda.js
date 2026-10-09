@@ -4,6 +4,8 @@
  * \copyright Copyright (c) 2015-2023, Utrecht university. All rights reserved
  * \license   GPLv3, see LICENSE
  */
+
+/* global DOMPurify */
 'use strict'
 
 // Namespace for JS functions shared across Yoda modules.
@@ -43,7 +45,34 @@ Yoda.set_message = function (type, msg) {
   }
 }
 
+Yoda.preserve_data_path_whitespace = function () {
+  // Whitespace at the end of collection name would cause issues.
+  // This function aims to untrim the whitespace while
+  // keep DOMpurify's validation.
+  //
+  // Only data-path attribute is touched in this function.
+
+  if (typeof DOMPurify === 'undefined') {
+    return
+  }
+
+  DOMPurify.addHook('uponSanitizeAttribute', function (node, data) {
+    if (data.attrName !== 'data-path') {
+      return
+    }
+
+    const original = node.getAttribute('data-path')
+    // If a collection name is trimmed, use the original collection name
+    if (original !== null && original.trim() === data.attrValue) {
+      data.attrValue = original
+    }
+  })
+}
+
 Yoda.load = function () {
+  // Register the hook before sanitizing data-path.
+  Yoda.preserve_data_path_whitespace()
+
   // Insert sessionStorage messages if a #messages container is present.
   const $messages = document.querySelector('#messages')
   if ($messages) {
