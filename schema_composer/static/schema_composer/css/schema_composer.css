@@ -1,5 +1,15 @@
 /* Schema Composer Table Styling */
 
+.clickable-preview {
+  cursor: pointer;
+}
+
+.schema-preview {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
 #composed-schemas {
     width: 100% !important;
     table-layout: fixed;
