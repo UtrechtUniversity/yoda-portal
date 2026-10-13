@@ -52,12 +52,12 @@ def get_building_blocks() -> list[Any]:
 
 def get_block_info(building_blocks: list[Any]) -> dict[str, dict[str, str]]:
     """Build a lookup of building block titles and descriptions."""
-    block_info: dict[str, dict[str, str]] = {}
+    block_info = {}
     for block in building_blocks:
         for block_name, block_data in block.items():
             schema = block_data.get('schema', {})
             block_info[block_name] = {
-                'title': schema.get('title', block_name),
+                'title': schema.get('title', ''),
                 'description': schema.get('description', ''),
             }
     return block_info
@@ -79,7 +79,7 @@ def index() -> Response:
         )
     except Exception:
         log_error('Error fetching schemas', True)
-        flash('An unexpected error occurred while loading schemas.', 'danger')
+        flash('Error while loading schemas.', 'danger')
         return render_template(
             'overview.html',
             composed_schemas=[],
@@ -92,7 +92,6 @@ def index() -> Response:
 @schema_composer_required
 def compose_create_get() -> Response:
     """Get building-blocks to create a new composed schema."""
-    building_blocks = []
     try:
         building_blocks = get_building_blocks()
     except Exception:
@@ -113,10 +112,10 @@ def compose_create_get() -> Response:
 @schema_composer_required
 def compose_create_post() -> Response:
     """Create new composed schema."""
-    schema_name = request.form.get('schema_name', '').strip()
-    description = request.form.get('description', '').strip()
+    schema_name = request.form.get('schema_name', '')
+    description = request.form.get('description', '')
     chosen_blocks = request.form.getlist('building_blocks')
-    building_blocks = []
+
     try:
         building_blocks = get_building_blocks()
     except Exception:
@@ -159,14 +158,7 @@ def compose_create_post() -> Response:
             if result['status'] == 'ok':
                 flash(f"Schema '{schema_name}' saved successfully.", 'success')
                 return redirect(url_for('schema_composer_bp.index'))
-            flash(
-                result.get(
-                    'message',
-                    'Failed to save schema. Please verify the schema '
-                    'name and building block selections.'
-                ),
-                'danger'
-            )
+            flash(result.get('message', 'Failed to save schema'), 'danger')
         except Exception:
             log_error(f"Error creating composed schema '{schema_name}'", True)
             flash('An error occurred while saving the schema.', 'danger')
@@ -185,14 +177,12 @@ def compose_create_post() -> Response:
 @schema_composer_required
 def compose_edit_get(identifier: str) -> Response:
     """Get pre-selected building blocks for an existing schema for editing."""
-    building_blocks = []
-    selected_blocks = []
-    description = ''
     try:
         building_blocks = get_building_blocks()
     except Exception:
         log_error('Error fetching building blocks', True)
         flash('Error loading building blocks.', 'danger')
+
     try:
         result = api.call('schema_get_composed_schema', data={'identifier': identifier})
         if isinstance(result, dict):
@@ -203,6 +193,7 @@ def compose_edit_get(identifier: str) -> Response:
     except Exception:
         log_error(f"Error fetching schema '{identifier}'", True)
         flash(f'Error loading schema {identifier}.', 'danger')
+
     return render_template(
         'schema_composer.html',
         building_blocks=building_blocks,
@@ -218,14 +209,15 @@ def compose_edit_get(identifier: str) -> Response:
 @schema_composer_required
 def compose_edit_post(identifier: str) -> Response:
     """Updating an existing composed schema."""
-    description = request.form.get('description', '').strip()
+    description = request.form.get('description', '')
     chosen_blocks = request.form.getlist('building_blocks')
-    building_blocks = []
+
     try:
         building_blocks = get_building_blocks()
     except Exception:
         log_error('Error fetching building blocks', True)
         flash('Error loading building blocks.', 'danger')
+
     block_info = get_block_info(building_blocks)
     # The same checks as in API
     if len(identifier) > 50:
@@ -247,14 +239,7 @@ def compose_edit_post(identifier: str) -> Response:
             if result['status'] == 'ok':
                 flash(f"Schema '{identifier}' updated successfully.", 'success')
                 return redirect(url_for('schema_composer_bp.index'))
-            flash(
-                result.get(
-                    'message',
-                    'Failed to update schema. Please verify the '
-                    'building block selections.'
-                ),
-                'danger'
-            )
+            flash(result.get('message', 'Failed to update schema'), 'danger')
         except Exception:
             log_error(f"Error updating composed schema '{identifier}'", True)
             flash('An error occurred while updating the schema.', 'danger')

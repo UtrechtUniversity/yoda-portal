@@ -18,9 +18,10 @@
         <h2>{% if is_edit %}Edit{% else %}Compose{% endif %} Metadata Schema</h2>
     </div>
     <div class="col-md-6">
-        <button type="submit" form="schema-composer-form" class="btn btn-primary float-end">
-            Save</button>
-        <a class="btn btn-secondary float-end me-1" href="{{ url_for('schema_composer_bp.index') }}">Cancel</a>
+        <a class="btn btn-secondary float-end" href="{{ url_for('schema_composer_bp.index') }}">Cancel</a>
+        <button type="submit" form="schema-composer-form" class="btn btn-primary float-end me-1">
+            Save
+        </button>
     </div>
 
     <div class="mt-3">
@@ -109,7 +110,7 @@
                                                         <i class="fa-regular fa-eye me-1"></i>
                                                         {{ info.get('title', block_name) }}
                                                     </span>
-                                                <button type="button" class="btn btn-danger remove-building-block">
+                                                <button type="button" class="btn btn-danger remove-building-block" {% if is_edit %}disabled{% endif %}>
                                                     Remove
                                                 </button>
                                                 <input type="hidden" name="building_blocks" value="{{ block_name }}">
@@ -139,6 +140,36 @@
             <div class="modal-body">
                 <p id="building-block-preview-description" class="text-muted mb-3"></p>
                 <div id="building-block-preview"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="schema-save-confirm-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {% if is_edit %}Update Metadata Schema{% else %}Create Metadata Schema{% endif %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>Are you sure you want to save the metadata schema?</p>
+                <p>
+                    Once the schema is {% if is_edit %}updated{% else %}created{% endif %},
+                    its selected building blocks can only be reordered.
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="confirm-schema-save">
+                    {% if is_edit %}Update{% else %}Create{% endif %}
+                </button>
             </div>
         </div>
     </div>

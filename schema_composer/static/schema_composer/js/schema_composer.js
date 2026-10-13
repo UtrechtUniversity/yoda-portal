@@ -104,11 +104,18 @@ $(document).ready(function () {
 
   $('#schema-composer-form').on('submit', function (event) {
     const form = this
+    event.preventDefault()
 
     if (!form.checkValidity()) {
-      event.preventDefault()
       form.classList.add('was-validated')
+      return
     }
+
+    $('#schema-save-confirm-modal').modal('show')
+  })
+
+  $('#confirm-schema-save').on('click', function () {
+    document.getElementById('schema-composer-form').submit()
   })
 
   let $draggedItem = null
