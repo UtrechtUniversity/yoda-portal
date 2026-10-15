@@ -58,7 +58,8 @@
                                     data-schema-id="{{ schema.identifier }}"
                                     data-bs-toggle="modal"
                                     data-bs-target="#schema-delete"
-                                    title="Delete">
+                                    title="{% if schema.in_use %}Schema is in use{% else %}Delete{% endif %}"
+                                    {% if schema.in_use %}disabled{% endif %}>
                                 <i class="fa-solid fa-trash" aria-hidden="true"></i>
                             </button>
                         </div>
