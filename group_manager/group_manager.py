@@ -22,7 +22,7 @@ def index() -> Response:
     user_zone = response['data']['user_zone']
 
     response = api.call('schema_get_schemas', data={})
-    schema_ids = response['data']['schemas']
+    schema_ids = response['data']['schemas'] + response['data']['composed_schemas']
     schema_id_default = response['data']['schema_default']
 
     return render_template('group_manager/index.html',
@@ -74,6 +74,9 @@ def get_schemas() -> Response:
 
     schemas = []
     for schema in response['data']['schemas']:
+        schemas.append(schema)
+
+    for schema in response['data']['composed_schemas']:
         schemas.append(schema)
 
     output = make_response({'schemas': schemas})
