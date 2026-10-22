@@ -17,8 +17,8 @@ import TreeKeywordSelector from 'YodaFields/TreeKeywordSelector'
 import PersonIdentifier from 'YodaFields/PersonIdentifier'
 import Vocabulary from 'YodaFields/Vocabulary'
 
-let schema = window.previewSchema
-let uiSchema = window.previewUiSchema
+const schema = window.previewSchema
+const uiSchema = window.previewUiSchema
 
 console.log('PREVIEW SCHEMA:', schema)
 console.log('PREVIEW UI SCHEMA:', uiSchema)

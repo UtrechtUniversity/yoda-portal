@@ -30,12 +30,21 @@
                 url_for('schema_composer_bp.compose_create_post') }}{% endif %}" novalidate>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
+
+            <div class="mb-4">
+                <label for="schema-identifier" class="form-label text-danger">
+                    Identifier<span class="text-danger">*</span>
+                </label>
+                <input type="text" class="form-control" id="schema-identifier" name="identifier"
+                    value="{{ identifier or '' }}" placeholder="Enter schema identifier" {% if is_edit %}readonly{% endif %} required>
+            </div>
+
             <div class="mb-4">
                 <label for="schema-name" class="form-label text-danger">
                     Schema Name<span class="text-danger">*</span>
                 </label>
-                <input type="text" class="form-control" id="schema-name" name="schema_name" 
-                    value="{{ identifier or '' }}" placeholder="Enter schema name" {% if is_edit %}readonly{% endif %} required>
+                <input type="text" class="form-control" id="schema-name" name="schema_name"
+                    value="{{ schema_name or '' }}" placeholder="Enter schema name" required>
             </div>
 
             <div class="mb-4">

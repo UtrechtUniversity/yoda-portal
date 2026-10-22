@@ -30,23 +30,18 @@
         <table id="composed-schemas" class="table yoda-table table-striped">
             <thead>
                 <tr>
-                    <th>Schema</th>
+                    <th>Identifier</th>
+                    <th>Name</th>
                     <th>Description</th>
-                    <th>Building Blocks</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for schema in composed_schemas %}
                 <tr>
+                    <td>{{ schema.identifier }}</td>
                     <td>{{ schema.name }}</td>
                     <td>{{ schema.description }}</td>
-                    <td class="align-middle">
-                        {% for block in schema.blocks %}
-                        {% set info = block_info.get(block, {}) %}
-                        <span class="badge bg-body text-body border"{% if info.get('description') %} title="{{ info.get('description') }}"{% endif %}>{{ info.get('title', block) }}</span>
-                        {% endfor %}
-                    </td>
                     <td class="text-nowrap">
                         <div class="d-flex gap-2 justify-content-end">
                             <a href="{{ url_for('schema_composer_bp.compose_edit_get', identifier=schema.name) }}"

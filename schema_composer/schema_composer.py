@@ -103,6 +103,7 @@ def compose_create_get() -> Response:
         block_info=get_block_info(building_blocks),
         selected_blocks=[],
         identifier=None,
+        schema_name='',
         description='',
         is_edit=False
     )
@@ -112,6 +113,7 @@ def compose_create_get() -> Response:
 @schema_composer_required
 def compose_create_post() -> Response:
     """Create new composed schema."""
+    identifier = request.form.get('identifier', '')
     schema_name = request.form.get('schema_name', '')
     description = request.form.get('description', '')
     chosen_blocks = request.form.getlist('building_blocks')
@@ -123,12 +125,14 @@ def compose_create_post() -> Response:
         flash('Error loading building blocks.', 'danger')
     block_info = get_block_info(building_blocks)
 
-    if not schema_name:
+    if not identifier:
+        flash('Schema identifier is required.', 'warning')
+    elif len(identifier) > 50:
+        flash('Schema identifier must be at most 50 characters.', 'warning')
+    elif not identifier.isalnum():
+        flash('Schema identifier may contain only letters and numbers.', 'warning')
+    elif not schema_name:
         flash('Schema name is required.', 'warning')
-    elif len(schema_name) > 50:
-        flash('Schema name must be at most 50 characters.', 'warning')
-    elif not schema_name.isalnum():
-        flash('Schema name may contain only letters and numbers.', 'warning')
     elif not chosen_blocks:
         flash('At least one building block must be selected.', 'warning')
     else:
@@ -136,21 +140,23 @@ def compose_create_post() -> Response:
             result = api.call('schema_get_composed_schemas')
             if isinstance(result, dict):
                 composed_schemas = result.get('data', result)
-                if any(schema.get('name') == schema_name for schema in composed_schemas):
-                    flash(f"Schema '{schema_name}' already exists.", 'warning')
+                if any(schema.get('identifier') == identifier for schema in composed_schemas):
+                    flash(f"Schema identifier '{identifier}' already exists.", 'warning')
                     return render_template(
                         'schema_composer.html',
                         building_blocks=building_blocks,
                         block_info=block_info,
                         selected_blocks=chosen_blocks,
-                        identifier=schema_name,
+                        identifier=identifier,
+                        schema_name=schema_name,
                         description=description,
                         is_edit=False
                     )
             result = api.call(
                 'schema_post_composed_schema',
                 data={
-                    'identifier': schema_name,
+                    'identifier': identifier,
+                    'name': schema_name,
                     'description': description,
                     'blocks': chosen_blocks
                 }
@@ -167,7 +173,8 @@ def compose_create_post() -> Response:
         building_blocks=building_blocks,
         block_info=block_info,
         selected_blocks=chosen_blocks,
-        identifier=schema_name,
+        identifier=identifier,
+        schema_name=schema_name,
         description=description,
         is_edit=False
     )
@@ -177,6 +184,10 @@ def compose_create_post() -> Response:
 @schema_composer_required
 def compose_edit_get(identifier: str) -> Response:
     """Get pre-selected building blocks for an existing schema for editing."""
+    selected_blocks = []
+    schema_name = ''
+    description = ''
+
     try:
         building_blocks = get_building_blocks()
     except Exception:
@@ -189,6 +200,7 @@ def compose_edit_get(identifier: str) -> Response:
             data = result.get('data', result)
             if isinstance(data, dict):
                 selected_blocks = data.get('blocks', [])
+                schema_name = data.get('name', '')
                 description = data.get('description', '')
     except Exception:
         log_error(f"Error fetching schema '{identifier}'", True)
@@ -200,6 +212,7 @@ def compose_edit_get(identifier: str) -> Response:
         block_info=get_block_info(building_blocks),
         selected_blocks=selected_blocks,
         identifier=identifier,
+        schema_name=schema_name,
         description=description,
         is_edit=True
     )
@@ -209,6 +222,7 @@ def compose_edit_get(identifier: str) -> Response:
 @schema_composer_required
 def compose_edit_post(identifier: str) -> Response:
     """Updating an existing composed schema."""
+    schema_name = request.form.get('schema_name', '')
     description = request.form.get('description', '')
     chosen_blocks = request.form.getlist('building_blocks')
 
@@ -221,9 +235,11 @@ def compose_edit_post(identifier: str) -> Response:
     block_info = get_block_info(building_blocks)
     # The same checks as in API
     if len(identifier) > 50:
-        flash('Schema name must be at most 50 characters.', 'warning')
+        flash('Schema identifier must be at most 50 characters.', 'warning')
     elif not identifier.isalnum():
-        flash('Schema name may contain only letters and numbers.', 'warning')
+        flash('Schema identifier may contain only letters and numbers.', 'warning')
+    elif not schema_name:
+        flash('Schema name is required.', 'warning')
     elif not chosen_blocks:
         flash('At least one building block must be selected.', 'warning')
     else:
@@ -232,6 +248,7 @@ def compose_edit_post(identifier: str) -> Response:
                 'schema_put_composed_schema',
                 data={
                     'identifier': identifier,
+                    'name': schema_name,
                     'description': description,
                     'blocks': chosen_blocks
                 }
@@ -249,6 +266,7 @@ def compose_edit_post(identifier: str) -> Response:
         block_info=block_info,
         selected_blocks=chosen_blocks,
         identifier=identifier,
+        schema_name=schema_name,
         description=description,
         is_edit=True
     )
@@ -277,10 +295,12 @@ def delete(identifier: str) -> Response:
         response.headers['Content-Type'] = 'application/json'
         return response
 
+
 @schema_composer_bp.route('/preview/<block_name>')
 @schema_composer_required
 def preview(block_name: str) -> Response:
     """Preview a building block schema."""
+    building_blocks = []
     try:
         building_blocks = get_building_blocks()
     except Exception:
@@ -292,15 +312,14 @@ def preview(block_name: str) -> Response:
             block_data = block[block_name]
             return render_template(
                 'preview.html',
-                file=block_name,
+                schema_name=block_name,
                 schema=block_data.get('schema', {}),
                 uischema=block_data.get('ui_schema', {})
             )
 
     return render_template(
         'preview.html',
-        file=block_name,
+        schema_name=block_name,
         schema={},
         uischema={}
     )
-    
