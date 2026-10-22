@@ -44,13 +44,13 @@
                     <td>{{ schema.description }}</td>
                     <td class="text-nowrap">
                         <div class="d-flex gap-2 justify-content-end">
-                            <a href="{{ url_for('schema_composer_bp.compose_edit_get', identifier=schema.name) }}"
+                            <a href="{{ url_for('schema_composer_bp.compose_edit_get', identifier=schema.identifier) }}"
                             class="btn btn-sm btn-primary text-decoration-none">
                                 Edit
                             </a>
                             <button type="button"
                                     class="btn btn-sm btn-danger schema-delete d-flex align-items-center justify-content-center"
-                                    data-schema-id="{{ schema.name }}"
+                                    data-schema-id="{{ schema.identifier }}"
                                     data-bs-toggle="modal"
                                     data-bs-target="#schema-delete"
                                     title="Delete">
