@@ -7,11 +7,7 @@ $(document).ready(function () {
 
   $('body').on('click', '.clickable-preview', function () {
     const $item = $(this).closest('.list-group-item')
-
-    window.previewBuildingBlock(
-      $item.data('schema'),
-      $item.data('block-description')
-    )
+    window.location.href = '/schema_composer/preview/' + encodeURIComponent($item.data('block'))
   })
 
   $('#schema-composer-form').on('submit', function (event) {

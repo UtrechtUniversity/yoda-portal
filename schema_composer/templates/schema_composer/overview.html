@@ -41,19 +41,26 @@
                 <tr>
                     <td>{{ schema.name }}</td>
                     <td>{{ schema.description }}</td>
-                    <td>
+                    <td class="align-middle">
                         {% for block in schema.blocks %}
                         {% set info = block_info.get(block, {}) %}
-                        <span class="badge bg-body text-body border me-1"{% if info.get('description') %} title="{{ info.get('description') }}"{% endif %}>{{ info.get('title', block) }}</span>
+                        <span class="badge bg-body text-body border"{% if info.get('description') %} title="{{ info.get('description') }}"{% endif %}>{{ info.get('title', block) }}</span>
                         {% endfor %}
                     </td>
                     <td class="text-nowrap">
                         <div class="d-flex gap-2 justify-content-end">
                             <a href="{{ url_for('schema_composer_bp.compose_edit_get', identifier=schema.name) }}"
                             class="btn btn-sm btn-primary text-decoration-none">
-                                Update
+                                Edit
                             </a>
-                            <button type="button" class="btn btn-sm btn-danger schema-delete" data-schema-id="{{ schema.name }}" data-bs-toggle="modal" data-bs-target="#schema-delete">Delete</button>
+                            <button type="button"
+                                    class="btn btn-sm btn-danger schema-delete d-flex align-items-center justify-content-center"
+                                    data-schema-id="{{ schema.name }}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#schema-delete"
+                                    title="Delete">
+                                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>

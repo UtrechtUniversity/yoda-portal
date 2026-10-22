@@ -276,3 +276,31 @@ def delete(identifier: str) -> Response:
         }), 500)
         response.headers['Content-Type'] = 'application/json'
         return response
+
+@schema_composer_bp.route('/preview/<block_name>')
+@schema_composer_required
+def preview(block_name: str) -> Response:
+    """Preview a building block schema."""
+    try:
+        building_blocks = get_building_blocks()
+    except Exception:
+        log_error('Error fetching building blocks', True)
+        flash('Error loading building blocks.', 'danger')
+
+    for block in building_blocks:
+        if block_name in block:
+            block_data = block[block_name]
+            return render_template(
+                'preview.html',
+                file=block_name,
+                schema=block_data.get('schema', {}),
+                uischema=block_data.get('ui_schema', {})
+            )
+
+    return render_template(
+        'preview.html',
+        file=block_name,
+        schema={},
+        uischema={}
+    )
+    

@@ -1,0 +1,37 @@
+{% extends 'base-bare.html' %}
+
+{% block title %}{{ super() }} - {{ file }}{% endblock title %}
+
+{% block style %}
+<link id="pagestyle" rel="stylesheet" {% if g.settings and g.settings.color_mode and g.settings.color_mode == 'DARK' %}href="{{ url_for('static', filename='lib/highlight-js-11.9.0/styles/dark.min.css')}}" {% else %}href="{{ url_for('static', filename='lib/highlight-js-11.9.0/styles/default.min.css')}}" {% endif %}>
+<link rel="stylesheet" href="{{ url_for('research_bp.static', filename='css/metadata/form.css') }}">
+{% endblock style %}
+
+{% block scripts %}
+<script>
+  window.previewSchema = {{ schema | tojson }};
+  window.previewUiSchema = {{ uischema | tojson }};
+  {% if g.settings %}
+    Yoda.settings = {{ g.settings | tojson}}
+  {% endif %}
+</script>
+
+<script src="{{ url_for('schema_composer_bp.static', filename='js/metadata-form.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+<div id="form-output" class="row">
+  <div class="col-md-12 p-2">
+    <div class="card">
+      <div class="card-header clearfix">
+        <h5 class="card-title float-start">
+          {{ file | trim }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <div id="form"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

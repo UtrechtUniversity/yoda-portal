@@ -10,7 +10,6 @@
     <script src="{{ url_for('static', filename='lib/jquery-3.7.1/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ url_for('schema_composer_bp.static', filename='js/compose.js') }}"></script>
     <script src="{{ url_for('schema_composer_bp.static', filename='js/sort.js') }}"></script>
-    <script src="{{ url_for('schema_composer_bp.static', filename='js/preview.js') }}"></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -32,7 +31,7 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <div class="mb-4">
-                <label for="schema-name" class="form-label">
+                <label for="schema-name" class="form-label text-danger">
                     Schema Name<span class="text-danger">*</span>
                 </label>
                 <input type="text" class="form-control" id="schema-name" name="schema_name" 
@@ -40,7 +39,7 @@
             </div>
 
             <div class="mb-4">
-                <label for="schema-description" class="form-label">
+                <label for="schema-description" class="form-label text-danger">
                     Description<span class="text-danger">*</span>
                 </label>
                 <textarea class="form-control" id="schema-description" name="description" 
@@ -125,24 +124,6 @@
                 </div>
             </div>
         </form>
-    </div>
-</div>
-
-<div class="modal fade" id="building-block-preview-modal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Building block Preview</h5>
-                <button type="button" class="btn btn-secondary ms-auto" data-bs-dismiss="modal">
-                    Close
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <p id="building-block-preview-description" class="text-muted mb-3"></p>
-                <div id="building-block-preview"></div>
-            </div>
-        </div>
     </div>
 </div>
 

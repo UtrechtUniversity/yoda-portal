@@ -222,6 +222,7 @@ def add_security_headers(response: Response) -> Response:
     # Endpoints which allow unsafe eval and OSM data.
     unsafe_eval_endpoints = ['research_bp.form',
                              'vault_bp.form',
+                             'schema_composer_bp.preview',
                              'deposit_bp.metadata',
                              'vault_bp.metadata',
                              'datarequest_bp.add',
