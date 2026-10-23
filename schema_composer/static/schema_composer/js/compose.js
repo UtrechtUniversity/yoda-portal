@@ -28,6 +28,14 @@ $(document).ready(function () {
 
   const isEdit = $selected.data('is-edit')
 
+  function updatePreviewButton() {
+    const hasIdentifier = $('#schema-identifier').val().trim() !== ''
+    const hasBlocks = $selected.find('input[name="building_blocks"]').length > 0
+
+    $('#preview-schema').prop('disabled', !hasIdentifier || !hasBlocks)
+  }
+
+$('#schema-identifier').on('input', updatePreviewButton)
   function selectBlock ($item) {
     const block = $item.data('block')
     const title = $item.data('block-title')
@@ -103,6 +111,7 @@ $(document).ready(function () {
 
     selectBlock($item)
     $item.remove()
+    updatePreviewButton()
   })
 
   $selected.on('click', '.remove-building-block', function () {
@@ -114,5 +123,16 @@ $(document).ready(function () {
 
     restoreBlock($item)
     $item.remove()
+    updatePreviewButton()
   })
+
+  $('#preview-schema').on('click', function () {
+    const form = document.getElementById('schema-composer-form')
+    const action = form.action
+
+    form.action = $(this).data('url')
+    form.submit()
+    form.action = action
+  })
+  updatePreviewButton()
 })

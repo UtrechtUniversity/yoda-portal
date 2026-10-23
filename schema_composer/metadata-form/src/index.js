@@ -20,9 +20,6 @@ import Vocabulary from 'YodaFields/Vocabulary'
 const schema = window.previewSchema
 const uiSchema = window.previewUiSchema
 
-console.log('PREVIEW SCHEMA:', schema)
-console.log('PREVIEW UI SCHEMA:', uiSchema)
-console.log('PREVIEW UI SCHEMA TYPE:', typeof uiSchema)
 
 let validator
 

@@ -39,7 +39,12 @@
             <tbody>
                 {% for schema in composed_schemas %}
                 <tr>
-                    <td>{{ schema.identifier }}</td>
+                <td>
+                    <a href="{{ url_for('schema_composer_bp.preview_composed', identifier=schema.identifier) }}"
+                    title="Preview schema">
+                        <i class="fa-regular fa-file-lines me-1"></i>{{ schema.identifier }}
+                    </a>
+                </td>
                     <td>{{ schema.name }}</td>
                     <td>{{ schema.description }}</td>
                     <td class="text-nowrap">

@@ -223,6 +223,8 @@ def add_security_headers(response: Response) -> Response:
     unsafe_eval_endpoints = ['research_bp.form',
                              'vault_bp.form',
                              'schema_composer_bp.preview',
+                             'schema_composer_bp.preview_composed',
+                             'schema_composer_bp.preview_composed_draft',
                              'deposit_bp.metadata',
                              'vault_bp.metadata',
                              'datarequest_bp.add',

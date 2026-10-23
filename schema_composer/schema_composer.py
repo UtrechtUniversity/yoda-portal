@@ -323,3 +323,62 @@ def preview(block_name: str) -> Response:
         schema={},
         uischema={}
     )
+
+@schema_composer_bp.route('/preview/composed/<identifier>')
+@schema_composer_required
+def preview_composed(identifier: str) -> Response:
+    """Preview a composed schema."""
+    try:
+        result = api.call(
+            'schema_get_composed_schema',
+            data={'identifier': identifier}
+        )
+        data = result.get('data', result)
+
+        return render_template(
+            'preview.html',
+            schema_name=identifier,
+            schema=data.get('schema', {}),
+            uischema=data.get('uischema', {})
+        )
+    except Exception:
+        log_error(f"Error previewing composed schema '{identifier}'", True)
+
+        return render_template(
+            'preview.html',
+            schema_name=identifier,
+            schema={},
+            uischema={}
+        )
+
+
+@schema_composer_bp.route('/preview/composed', methods=['POST'])
+@schema_composer_required
+def preview_composed_draft() -> Response:
+    """Preview a composed schema before saving."""
+    identifier = request.form.get('identifier')
+    blocks = request.form.getlist('building_blocks')
+
+    try:
+        result = api.call(
+            'schema_preview_composed_schema',
+            data={'blocks': blocks}
+        )
+        data = result.get('data', result)
+        schema, uischema = data
+
+        return render_template(
+            'preview.html',
+            schema_name=identifier,
+            schema=schema,
+            uischema=uischema
+        )
+    except Exception:
+        log_error('Error previewing composed schema', True)
+
+        return render_template(
+            'preview.html',
+            schema_name=identifier,
+            schema={},
+            uischema={}
+        )
