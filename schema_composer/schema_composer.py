@@ -67,7 +67,6 @@ def get_block_info(building_blocks: list[Any]) -> dict[str, dict[str, str]]:
 @schema_composer_required
 def index() -> Response:
     """Schema Composer overview page."""
-    building_blocks = []
     try:
         result = api.call('schema_get_composed_schemas')
         composed_schemas = result.get('data', result) if isinstance(result, dict) else []
@@ -327,12 +326,13 @@ def preview(block_name: str) -> Response:
         uischema={}
     )
 
+
 @schema_composer_bp.route('/preview/composed/<identifier>')
 @schema_composer_required
 def preview_composed(identifier: str) -> Response:
     """Preview a composed schema."""
     try:
-        result = api.call('schema_get_composed_schema',data={'identifier': identifier})
+        result = api.call('schema_get_composed_schema', data={'identifier': identifier})
         if result.get('status') != 'ok':
             flash(result.get('message', f"Cannot preview schema '{identifier}'."), 'danger')
             return redirect(url_for('schema_composer_bp.index'))
@@ -358,7 +358,7 @@ def preview_composed_draft() -> Response:
     blocks = request.form.getlist('building_blocks')
 
     try:
-        result = api.call('schema_preview_composed_schema',data={'blocks': blocks})
+        result = api.call('schema_preview_composed_schema', data={'blocks': blocks})
         if result.get('status') != 'ok':
             flash(result.get('message', 'Cannot preview schema.'), 'danger')
             return redirect(url_for('schema_composer_bp.compose_create_get'))

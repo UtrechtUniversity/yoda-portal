@@ -20,7 +20,6 @@ import Vocabulary from 'YodaFields/Vocabulary'
 const schema = window.previewSchema
 const uiSchema = window.previewUiSchema
 
-
 let validator
 
 const validatorAjvDraft7 = customizeValidator({ ajvOptionsOverrides: { verbose: true, addUsedSchema: false } })
