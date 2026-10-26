@@ -10,6 +10,15 @@
     overflow-x: auto;
 }
 
+[data-bs-theme="dark"] .schema-preview-link {
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .schema-preview-link:hover {
+    color: #fff;
+    text-decoration: underline !important;
+}
+
 #composed-schemas {
     width: 100% !important;
     table-layout: fixed;
