@@ -33,7 +33,9 @@ class PersonIdentifier extends React.Component {
     const { Name_Identifier_Scheme, Name_Identifier } = this.state
 
     const options = []
-    this.props.registry.rootSchema.definitions.optionsNameIdentifierScheme.enum.forEach((option) => {
+    const definitions = this.props.registry.rootSchema.$defs || this.props.registry.rootSchema.definitions
+
+    definitions.optionsNameIdentifierScheme.enum.forEach((option) => {
       options.push({ value: option, label: option })
     })
 
