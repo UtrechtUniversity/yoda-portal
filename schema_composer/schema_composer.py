@@ -67,41 +67,41 @@ def get_block_info(building_blocks: list[Any]) -> dict[str, dict[str, str]]:
 @schema_composer_required
 def index() -> Response:
     """Schema Composer overview page."""
+    building_blocks = []
     try:
         result = api.call('schema_get_composed_schemas')
         composed_schemas = result.get('data', result) if isinstance(result, dict) else []
-        building_blocks = get_building_blocks()
-        return render_template(
-            'overview.html',
-            composed_schemas=composed_schemas,
-            building_blocks=building_blocks,
-            block_info=get_block_info(building_blocks)
-        )
+        return render_template('overview.html', composed_schemas=composed_schemas)
     except Exception:
         log_error('Error fetching schemas', True)
         flash('Error while loading schemas.', 'danger')
-        return render_template(
-            'overview.html',
-            composed_schemas=[],
-            building_blocks=[],
-            block_info={}
-        )
+        return render_template('overview.html', composed_schemas=[])
 
 
 @schema_composer_bp.route('/compose', methods=['GET'])
 @schema_composer_required
 def compose_create_get() -> Response:
     """Get building-blocks to create a new composed schema."""
+    building_blocks = []
     try:
         building_blocks = get_building_blocks()
     except Exception:
         log_error('Error fetching building blocks', True)
         flash('Error loading building blocks.', 'danger')
+        building_blocks = []
+
+    selected_blocks = [
+        block_name
+        for block in building_blocks
+        for block_name, block_data in block.items()
+        if block_data.get('required', False)
+    ]
+
     return render_template(
         'schema_composer.html',
         building_blocks=building_blocks,
         block_info=get_block_info(building_blocks),
-        selected_blocks=[],
+        selected_blocks=selected_blocks,
         identifier=None,
         schema_name='',
         description='',
@@ -118,6 +118,7 @@ def compose_create_post() -> Response:
     description = request.form.get('description', '')
     chosen_blocks = request.form.getlist('building_blocks')
 
+    building_blocks = []
     try:
         building_blocks = get_building_blocks()
     except Exception:
@@ -139,7 +140,7 @@ def compose_create_post() -> Response:
         try:
             result = api.call('schema_get_composed_schemas')
             if isinstance(result, dict):
-                composed_schemas = result.get('data', result)
+                composed_schemas = result.get('data', [])
                 if any(schema.get('identifier') == identifier for schema in composed_schemas):
                     flash(f"Schema identifier '{identifier}' already exists.", 'warning')
                     return render_template(
@@ -161,7 +162,7 @@ def compose_create_post() -> Response:
                     'blocks': chosen_blocks
                 }
             )
-            if result['status'] == 'ok':
+            if result.get('status') == 'ok':
                 flash(f"Schema '{schema_name}' saved successfully.", 'success')
                 return redirect(url_for('schema_composer_bp.index'))
             flash(result.get('message', 'Failed to save schema'), 'danger')
@@ -188,6 +189,7 @@ def compose_edit_get(identifier: str) -> Response:
     schema_name = ''
     description = ''
 
+    building_blocks = []
     try:
         building_blocks = get_building_blocks()
     except Exception:
@@ -226,6 +228,7 @@ def compose_edit_post(identifier: str) -> Response:
     description = request.form.get('description', '')
     chosen_blocks = request.form.getlist('building_blocks')
 
+    building_blocks = []
     try:
         building_blocks = get_building_blocks()
     except Exception:
@@ -329,11 +332,11 @@ def preview(block_name: str) -> Response:
 def preview_composed(identifier: str) -> Response:
     """Preview a composed schema."""
     try:
-        result = api.call(
-            'schema_get_composed_schema',
-            data={'identifier': identifier}
-        )
-        data = result.get('data', result)
+        result = api.call('schema_get_composed_schema',data={'identifier': identifier})
+        if result.get('status') != 'ok':
+            flash(result.get('message', f"Cannot preview schema '{identifier}'."), 'danger')
+            return redirect(url_for('schema_composer_bp.index'))
+        data = result.get('data', {})
 
         return render_template(
             'preview.html',
@@ -342,14 +345,9 @@ def preview_composed(identifier: str) -> Response:
             uischema=data.get('uischema', {})
         )
     except Exception:
-        log_error(f"Error previewing composed schema '{identifier}'", True)
-
-        return render_template(
-            'preview.html',
-            schema_name=identifier,
-            schema={},
-            uischema={}
-        )
+        log_error(f"Cannot preview schema '{identifier}'", True)
+        flash('Error while loading schema preview.', 'danger')
+        return redirect(url_for('schema_composer_bp.index'))
 
 
 @schema_composer_bp.route('/preview/composed', methods=['POST'])
@@ -360,11 +358,11 @@ def preview_composed_draft() -> Response:
     blocks = request.form.getlist('building_blocks')
 
     try:
-        result = api.call(
-            'schema_preview_composed_schema',
-            data={'blocks': blocks}
-        )
-        data = result.get('data', result)
+        result = api.call('schema_preview_composed_schema',data={'blocks': blocks})
+        if result.get('status') != 'ok':
+            flash(result.get('message', 'Cannot preview schema.'), 'danger')
+            return redirect(url_for('schema_composer_bp.compose_create_get'))
+        data = result.get('data', [])
         schema, uischema = data
 
         return render_template(
@@ -375,10 +373,5 @@ def preview_composed_draft() -> Response:
         )
     except Exception:
         log_error('Error previewing composed schema', True)
-
-        return render_template(
-            'preview.html',
-            schema_name=identifier,
-            schema={},
-            uischema={}
-        )
+        flash('Error while loading schema preview.', 'danger')
+        return redirect(url_for('schema_composer_bp.compose_create_get'))

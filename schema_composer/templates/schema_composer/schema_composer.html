@@ -124,6 +124,7 @@
                                                 data-block-description="{{ info.get('description', '') }}"
                                                 data-schema='{{ block_data.schema | tojson }}'
                                                 data-existing="true"
+                                                data-required="{{ block_data.required|tojson }}"
                                                 draggable="true">
                                                 <span class="drag-handle me-3"> <i class="fa-solid fa-grip-vertical"></i></span>
                                                     <span class="block-title clickable-preview flex-grow-1 me-2"
@@ -131,7 +132,7 @@
                                                         <i class="fa-regular fa-eye me-1"></i>
                                                         {{ info.get('title', block_name) }}
                                                     </span>
-                                                <button type="button" class="btn btn-danger remove-building-block" {% if is_edit %}disabled{% endif %}>
+                                                <button type="button" class="btn btn-danger remove-building-block" {% if is_edit or block_data.required %}disabled{% endif %}>
                                                     Remove
                                                 </button>
                                                 <input type="hidden" name="building_blocks" value="{{ block_name }}">
