@@ -28,7 +28,7 @@ $(document).ready(function () {
 
   const isEdit = $selected.data('is-edit')
 
-  function selectBlock($item) {
+  function selectBlock ($item) {
     const block = $item.data('block')
     const title = $item.data('block-title')
     const description = $item.data('block-description')
@@ -67,7 +67,7 @@ $(document).ready(function () {
     $selected.append($newItem)
   }
 
-  function restoreBlock($item) {
+  function restoreBlock ($item) {
     const block = $item.data('block')
     const title = $item.data('block-title')
     const description = $item.data('block-description')
