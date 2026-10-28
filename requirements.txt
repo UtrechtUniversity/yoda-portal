@@ -11,8 +11,9 @@ opensearch-py==1.0.0
 irods-avu-json==2.2.0
 MarkupSafe==2.1.5
 python-magic==0.4.27
-Werkzeug==3.1.4
+Werkzeug==3.1.9
 psutil==6.1.1
 humanize==4.11.0
 orjson==3.11.9
 typing_extensions==4.16.0
+certifi==2026.10.23
