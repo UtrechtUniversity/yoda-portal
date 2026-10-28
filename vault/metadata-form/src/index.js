@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import Form from '@rjsf/bootstrap-4'
 import { customizeValidator } from '@rjsf/validator-ajv8'
 import Ajv2019 from 'ajv/dist/2019'
+import Ajv2020 from 'ajv/dist/2020'
 import Select from 'react-select'
 
 import AffiliationIdentifier from 'YodaFields/AffiliationIdentifier'
@@ -31,6 +32,7 @@ let saving = false
 
 const validatorAjvDraft7 = customizeValidator({ ajvOptionsOverrides: { verbose: true, addUsedSchema: false } })
 const validatorAjv2019 = customizeValidator({ AjvClass: Ajv2019, ajvOptionsOverrides: { verbose: true, addUsedSchema: false } })
+const validatorAjv2020 = customizeValidator({ AjvClass: Ajv2020, ajvOptionsOverrides: { verbose: true, addUsedSchema: false } })
 
 const darkThemeColors = {
   /* For theme color guidance: https://github.com/JedWatson/react-select/issues/3692#issuecomment-523425096 */
@@ -511,9 +513,11 @@ function loadForm () {
         document.getElementById('no-metadata').classList.add('hide')
       } else {
         // Select validator based on schema.
-        validator = validatorAjv2019
+        validator = validatorAjv2020
         if (schema.$schema === 'http://json-schema.org/draft-07/schema') {
           validator = validatorAjvDraft7
+        } else if (schema.$schema === 'https://json-schema.org/draft/2019-09/schema') {
+          validator = validatorAjv2019
         }
 
         // Metadata present or user has write access, load the form and must be in actualEditMode as chosen by user.
