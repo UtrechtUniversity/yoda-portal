@@ -15,7 +15,9 @@
             <div class="dropdown-divider"></div>
             {% if g.admin %}
             <a class="dropdown-item" href="{{ url_for('admin_bp.index') }}">Administration</a>
-            <a class="dropdown-item" href="{{ url_for('schema_composer_bp.index') }}">Schema composer</a>
+                {% if config.get('METADATA_SCHEMA_COMPOSER_ENABLED', False) %}
+                <a class="dropdown-item" href="{{ url_for('schema_composer_bp.index') }}">Schema composer</a>
+                {% endif %}
             {% endif %}
             <a class="dropdown-item" href="{{ url_for('group_manager_bp.index') }}">Group Manager</a>
             <a class="dropdown-item" href="{{ url_for('stats_bp.index') }}">Statistics</a>

@@ -135,7 +135,8 @@ with app.app_context():
     app.register_blueprint(search_bp, url_prefix='/search')
     app.register_blueprint(api_bp, url_prefix='/api/')
     app.register_blueprint(admin_bp, url_prefix='/admin')
-    app.register_blueprint(schema_composer_bp, url_prefix='/schema_composer')
+    if app.config.get('METADATA_SCHEMA_COMPOSER_ENABLED', False):
+        app.register_blueprint(schema_composer_bp, url_prefix='/schema_composer')
     if app.config.get('DEPOSIT_ENABLED'):
         app.register_blueprint(deposit_bp, url_prefix='/deposit')
     if app.config.get('OPEN_SEARCH_ENABLED'):
