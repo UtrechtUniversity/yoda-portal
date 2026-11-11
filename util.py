@@ -62,7 +62,7 @@ def unicode_secure_filename(filename: str) -> str:
     """
     # Blacklist of characters to strip
     # No control characters, no delete, no slashes. Otherwise all other characters ok
-    remove_chars_re = compile('[\u0000-\u001F\u007F\\\/]')
+    remove_chars_re = compile(r'[\u0000-\u001F\u007F\\/]')
     # From werkzeug
     windows_device_files = {
         "CON",
