@@ -16,7 +16,7 @@
     <script src="{{ url_for('group_manager_bp.static', filename='js/group_manager.js') }}"></script>
     <script>
     $(function() {
-        Yoda.groupManager.load({{ group_hierarchy | safe }}, {{ schema_ids | safe }}, '{{ schema_id_default }}', '{{ user_type }}', '{{ user_zone }}');
+        Yoda.groupManager.load({{ group_hierarchy | tojson }}, {{ schema_ids | tojson }}, '{{ schema_id_default }}', '{{ user_type }}', '{{ user_zone }}');
     });
     </script>
 {% endblock scripts %}
