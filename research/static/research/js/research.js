@@ -282,6 +282,13 @@ $(function () {
     handleFileRename($('#file-rename-name').val(), $(this).attr('data-collection'), $('#org-file-rename-name').val())
   })
 
+  // Catch pressing the enter key and rename the file
+  $('#file-rename-name').on('keyup', function (e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      handleFileRename($(this).val(), $('.btn-confirm-file-rename').attr('data-collection'), $('#org-file-rename-name').val())
+    }
+  })
+
   // FILE delete
   $('body').on('click', 'a.file-delete', function () {
     // Destroy earlier alerts
