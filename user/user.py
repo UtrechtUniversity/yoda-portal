@@ -3,6 +3,7 @@
 __copyright__ = 'Copyright (c) 2021-2026, Utrecht University'
 __license__   = 'GPLv3, see LICENSE'
 
+import base64
 import contextlib
 import json
 import secrets
@@ -302,6 +303,20 @@ def _normalize_email_list(email_value: str | list[str]) -> list[str]:
     return [x.lower() for x in email_value]
 
 
+def _pack_token_data(prefix: str, sub: str, access_token: str, id_token: str) -> str:
+    fields = (sub, access_token, id_token)
+    if any(not isinstance(value, str) or not value or value != value.strip()
+           for value in fields):
+        raise ValueError("Token fields must be non-empty strings")
+
+    data = json.dumps(
+        {"sub": sub, "access_token": access_token, "id_token": id_token},
+        separators=(",", ":"),
+    ).encode("utf-8")
+    encoded = base64.urlsafe_b64encode(data).decode("ascii").rstrip("=")
+    return prefix + encoded
+
+
 @user_bp.route('/callback', endpoint='callback')
 @user_bp.route('/callback_sram', endpoint='callback_sram')
 def callback() -> Response:
@@ -349,11 +364,16 @@ def callback() -> Response:
         if email not in userinfo_email:
             raise UserinfoEmailMismatchError
 
-        # Add a prefix to consume in the PAM stack
-        access_token = oidc_config['token_prefix'] + payload['sub'] + 'end_sub' + access_token + 'end_idt' + id_token
+        # Package the tokens for the PAM stack.
+        pam_token = _pack_token_data(
+            oidc_config["token_prefix"],
+            payload["sub"],
+            access_token,
+            id_token,
+        )
 
         try:
-            irods_login(email, access_token)
+            irods_login(email, pam_token)
         except CAT_INVALID_USER:
             log_error(f"iRODS invalid user {email}", True)
             exception_occurred = "CAT_INVALID_USER_ERROR"
