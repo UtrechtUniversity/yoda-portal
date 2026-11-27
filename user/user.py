@@ -387,7 +387,7 @@ def callback() -> Response:
     except jwt.PyJWTError:
         # Error occurred during steps for verification,
         # configurations used can be found in flask.cfg
-        log_error("PyJWTError during callback for token " + str(id_token), True)
+        log_error("PyJWTError during callback for token ", True)
 
     except json.decoder.JSONDecodeError:
         # Either token response or userinfo response decoding failed
