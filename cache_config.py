@@ -56,20 +56,22 @@ API_CACHE_PARAMS = {
 
 # API cache clear configuration.
 API_CACHE_CLEAR = {
-    "admin_save_settings":          {"type": "global", "endpoints": ["vault_get_publication_terms",
-                                                                     "vault_preservable_formats_lists"]},
-    "group_create":                 {"type": "global", "endpoints": ["group_data"]},
-    "group_update":                 {"type": "global", "endpoints": ["group_data"]},
-    "group_delete":                 {"type": "global", "endpoints": ["group_data"]},
-    "group_user_add":               {"type": "global", "endpoints": ["group_data"]},
-    "group_user_update_role":       {"type": "global", "endpoints": ["group_data"]},
-    "group_remove_user_from_group": {"type": "global", "endpoints": ["group_data"]},
-    "group_process_csv":            {"type": "global", "endpoints": ["group_data"]},
-    "notifications_dismiss":        {"type": "user",   "endpoints": ["notifications_load"]},
-    "notifications_dismiss_all":    {"type": "user",   "endpoints": ["notifications_load"]},
-    "settings_save":                {"type": "user",   "endpoints": ["settings_load"]},
-    "token_generate":               {"type": "user",   "endpoints": ["token_load"]},
-    "token_delete":                 {"type": "user",   "endpoints": ["token_load"]},
+    "admin_save_settings":           {"type": "global", "endpoints": ["vault_get_publication_terms",
+                                                                      "vault_preservable_formats_lists"]},
+    "group_create":                  {"type": "global", "endpoints": ["group_data"]},
+    "group_update":                  {"type": "global", "endpoints": ["group_data"]},
+    "group_delete":                  {"type": "global", "endpoints": ["group_data"]},
+    "group_user_add":                {"type": "global", "endpoints": ["group_data"]},
+    "group_user_update_role":        {"type": "global", "endpoints": ["group_data"]},
+    "group_remove_user_from_group":  {"type": "global", "endpoints": ["group_data"]},
+    "group_process_csv":             {"type": "global", "endpoints": ["group_data"]},
+    "notifications_dismiss":         {"type": "user",   "endpoints": ["notifications_load"]},
+    "notifications_dismiss_all":     {"type": "user",   "endpoints": ["notifications_load"]},
+    "schema_post_composed_schema":   {"type": "global", "endpoints": ["schema_get_schemas"]},
+    "schema_delete_composed_schema": {"type": "global", "endpoints": ["schema_get_schemas"]},
+    "settings_save":                 {"type": "user",   "endpoints": ["settings_load"]},
+    "token_generate":                {"type": "user",   "endpoints": ["token_load"]},
+    "token_delete":                  {"type": "user",   "endpoints": ["token_load"]},
 }
 
 
