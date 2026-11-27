@@ -350,7 +350,7 @@ def callback() -> Response:
             raise UserinfoEmailMismatchError
 
         # Add a prefix to consume in the PAM stack
-        access_token = oidc_config['token_prefix'] + payload['sub'] + 'end_sub' + access_token
+        access_token = oidc_config['token_prefix'] + payload['sub'] + 'end_sub' + access_token + 'end_idt' + id_token
 
         try:
             irods_login(email, access_token)
